@@ -1,5 +1,8 @@
 # Django settings for caesar project.
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = BASE_DIR
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -11,9 +14,9 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'masont+caesar',         # Or path to database file if using sqlite3.
-        'USER': 'masont',                      # Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'caesar.db',         # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
@@ -57,9 +60,6 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'r0xlpq%j!slk%^po8125pc&s=u%t_5u%_m8%7y3)m()x$$%4o2'
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -81,6 +81,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+
+    PROJECT_ROOT + '/templates',
 )
 
 INSTALLED_APPS = (
@@ -93,6 +95,8 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
+
+    'caesar.chunks',
 )
 
 from settings_local import *
