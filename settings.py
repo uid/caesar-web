@@ -1,5 +1,7 @@
 # Django settings for caesar project.
 
+import os
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = BASE_DIR
 
