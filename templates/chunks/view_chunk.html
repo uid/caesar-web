@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<pre>
-{{ data }}
-</pre>
+
+{% for line in data.splitlines %}
+<pre>{{ line }}</pre>
+{% endfor %}
+
+
 {% endblock %}
 
