@@ -21,8 +21,16 @@ $(document).ready(function() {
 
 $('#chunk-display').selectable({
     stop: function(event, ui) {
+        var startLine = Number.MAX_VALUE;
+        var endLine = Number.MIN_VALUE;
+        $('.chunk-line.ui-selected').each(function(i) {
+            var n = parseInt($(this).attr('id').split('-')[1]);
+            endLine = Math.max(endLine, n);
+            startLine = Math.min(startLine, n);
+        });
+
         $.get('{% url caesar.comments.views.new_comment %}', 
-            { start: 1, end: 10 },
+            { start: startLine, end: endLine, chunk: {{ chunk.id }} },
             function(data) {
                 $('#comment-display').html(data);
             }
@@ -38,7 +46,7 @@ $('#chunk-display').selectable({
 
 {% block content %}
 
-<div id="chunk-info" class="span-3 colborder">
+<div id="chunk-info" class="span-24">
     <dl>
     <dt>Assignment Name: </dt>
     <dd>
@@ -48,18 +56,34 @@ $('#chunk-display').selectable({
     <dd>
     {{ chunk.file.submission.name }}
     </dd>
+    <dt>File Name: </dt>
+    <dd>
+    {{ chunk.file.path }}
+    </dd>
     </dl>
 </div>
 
-<div id="chunk-display" class="span-14">
-    {% for line in data.splitlines %}
-    <pre class="chunk-line">{{ line }}</pre>
+<hr/>
+
+
+<div id="chunk-display" class="span-17 colborder">
+    {% for n, line in lines %}
+    <span id="line-{{ n }}" class="chunk-line">
+      <span class="line-number">{{ n }}</span><pre class="line-code">{{ line }}</pre>
+    </span>
     {% endfor %}
 </div>
 
-<div id="comment-display" class="span-5 last">
+<div id="comment-display" class="span-6 last">
+
+    {% for comment in chunk.comments.all %}
+    
+    {% include "comments/comment.html" %} 
+
+    {% endfor %}
 
 </div>
+
 
 
 {% endblock %}

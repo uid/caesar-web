@@ -43,4 +43,8 @@ class Chunk(models.Model):
     class Meta:
         db_table = u'chunks'
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('caesar.chunks.views.view_chunk', [str(self.id)])
+
 
