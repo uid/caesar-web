@@ -15,5 +15,5 @@ urlpatterns = patterns('',
     # (r'^admin/', include(admin.site.urls)),
 
     (r'^chunks/', include('caesar.chunks.urls')),
-
+    (r'^comments/', include('caesar.comments.urls')),
 )

@@ -1,10 +1,65 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+
+<style type="text/css">
+    .ui-selected {
+        background-color: #FFFF5A;
+    }
+    .ui-selecting {
+        background-color: #FFFFCA;
+    }
+
+    textarea {
+        width: 100%;
+    }
+</style>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+$('#chunk-display').selectable({
+    stop: function(event, ui) {
+        $.get('{% url caesar.comments.views.new_comment %}', 
+            { start: 1, end: 10 },
+            function(data) {
+                $('#comment-display').html(data);
+            }
+        );
+    }
+});
+
+});
+</script>
+
+{% endblock %}
+
+
 {% block content %}
 
-{% for line in data.splitlines %}
-<pre>{{ line }}</pre>
-{% endfor %}
+<div id="chunk-info" class="span-3 colborder">
+    <dl>
+    <dt>Assignment Name: </dt>
+    <dd>
+    {{ chunk.file.submission.assignment.name }}
+    </dd>
+    <dt>Submission Name: </dt>
+    <dd>
+    {{ chunk.file.submission.name }}
+    </dd>
+    </dl>
+</div>
+
+<div id="chunk-display" class="span-14">
+    {% for line in data.splitlines %}
+    <pre class="chunk-line">{{ line }}</pre>
+    {% endfor %}
+</div>
+
+<div id="comment-display" class="span-5 last">
+
+</div>
 
 
 {% endblock %}

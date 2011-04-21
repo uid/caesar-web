@@ -3,11 +3,39 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>{% block title %}Caesar{% endblock %}</title>
-  </head>
-  <body>
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/blueprint/print.css" type="text/css" media="print" />
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/blueprint/ie.css" type="text/css" media="screen, projection" />
+    <![endif]-->
+    <link rel="stylesheet" href="{{ MEDIA_URL}}css/smoothness/jquery-ui.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ MEDIA_URL }}css/style.css" type="text/css" />
 
-    {% block content %}
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.5.2.min.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui-1.8.11.custom.min.js"></script>
+
+    {% block extrahead %}
+
     {% endblock %}
 
+</head>
+  <body>
+    <div class="container ">
+
+      {% block header %}
+      <div id="toolbar" class="span-24">
+        <h1>caesar</h1>
+      </div>
+      {% endblock %}
+
+      {% block content %}
+      {% endblock %}
+
+      {% block footer %}
+      <div id="footer" class="span-24">
+
+      </div>
+      {% endblock %}
+    </div>
   </body>
 </html>

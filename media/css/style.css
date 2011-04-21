@@ -1,0 +1,10 @@
+.chunk-line {
+    font-family: monospace;
+    margin: 0;
+}
+
+.chunk-line:hover {
+    cursor: pointer;
+    background-color: #eee
+}
+
