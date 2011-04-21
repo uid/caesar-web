@@ -47,20 +47,11 @@ $('#chunk-display').selectable({
 {% block content %}
 
 <div id="chunk-info" class="span-24">
-    <dl>
-    <dt>Assignment Name: </dt>
-    <dd>
-    {{ chunk.file.submission.assignment.name }}
-    </dd>
-    <dt>Submission Name: </dt>
-    <dd>
-    {{ chunk.file.submission.name }}
-    </dd>
-    <dt>File Name: </dt>
-    <dd>
+    <h3>
+    {{ chunk.file.submission.assignment.name }} :: 
+    {{ chunk.file.submission.name }} :: 
     {{ chunk.file.path }}
-    </dd>
-    </dl>
+    </h3>
 </div>
 
 <hr/>
