@@ -23,3 +23,13 @@
     padding: 0 .25em;
 }
 
+#toolbar {
+    margin-bottom: 25px;
+    background: #eee;
+    padding: 5px;
+    text-size: .75em; 
+}
+
+#toolbar-user {
+    float: right;
+}

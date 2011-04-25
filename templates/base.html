@@ -14,6 +14,21 @@
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.5.2.min.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui-1.8.11.custom.min.js"></script>
 
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+            $('#toolbar-anonymous .login-button').click(function() {
+                $.get('{% url caesar.accounts.views.login %}', 
+                    { next: '{{ request.path }}' }, function(data) {
+                        $('#toolbar-anonymous').html(data);        
+                    }
+                );
+            });
+
+        });
+
+    </script>
+
     {% block extrahead %}
 
     {% endblock %}
@@ -24,7 +39,18 @@
 
       {% block header %}
       <div id="toolbar" class="span-24">
-        <h1>caesar</h1>
+        <div id="toolbar-user">
+            {% if user.is_authenticated %}
+            <div id="toolbar-logged-in">
+              Welcome back, {{ user.username }}
+              <a href="{% url django.contrib.auth.views.logout %}">Logout</a>
+            </div>
+            {% else %}
+            <div id="toolbar-anonymous">
+              <button class="login-button" type="button">Login</button>
+            </div>
+            {% endif %}
+        </div>
       </div>
       {% endblock %}
 

@@ -19,6 +19,14 @@
 
 $(document).ready(function() {
 
+var commentBoundaries = $('.comment').map(function() {
+    var idSplit = this.id.split('-');
+    return { id: parseInt(idSplit[1]), 
+             start: parseInt(idSplit[2]), 
+             end: parseInt(idSplit[3]),
+             elt: this };
+});
+
 $('#chunk-display').selectable({
     stop: function(event, ui) {
         var startLine = Number.MAX_VALUE;
@@ -33,7 +41,19 @@ $('#chunk-display').selectable({
             { start: startLine, end: endLine, chunk: {{ chunk.id }} },
             function(data) {
                 $('.comment-form').remove();
-                $('#comment-display').append(data);
+                // find the appropriate place to insert the form
+                var added = false;
+                $.each(commentBoundaries, function(index, comment) {
+                    if ((startLine == comment.start && endLine <= comment.end)
+                        || startLine < comment.start) {
+                        $(comment.elt).before(data);                        
+                        added = true;
+                        return false;
+                    }
+                });
+                if (!added) {
+                    $('#comment-display').append(data);
+                }
             }
         );
     }
