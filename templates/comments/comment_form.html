@@ -1,3 +1,12 @@
+<script type="text/javascript">
+
+  $('#cancel-button').click(function() {
+      $('.comment').show();
+      $('.comment-form').hide();
+  });
+
+</script>
+
 <div class="comment-form">
   <form action="{% url caesar.comments.views.new_comment %}" method="post">
     {% csrf_token %}
@@ -6,6 +15,6 @@
     {{ form.end }}
     {{ form.chunk }}
     <button type="submit">Save</button>
-    <button type="button">Cancel</button>
+    <button id="cancel-button" type="button">Cancel</button>
   </form>
 </div>

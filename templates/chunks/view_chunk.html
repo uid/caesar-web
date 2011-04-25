@@ -32,7 +32,8 @@ $('#chunk-display').selectable({
         $.get('{% url caesar.comments.views.new_comment %}', 
             { start: startLine, end: endLine, chunk: {{ chunk.id }} },
             function(data) {
-                $('#comment-display').html(data);
+                $('.comment-form').remove();
+                $('#comment-display').append(data);
             }
         );
     }
