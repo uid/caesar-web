@@ -48,6 +48,7 @@
             {% else %}
             <div id="toolbar-anonymous">
               <button class="login-button" type="button">Login</button>
+              <a href="{% url caesar.accounts.views.register %}">Register</a>
             </div>
             {% endif %}
         </div>
