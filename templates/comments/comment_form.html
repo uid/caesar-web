@@ -8,7 +8,7 @@
 </script>
 
 <div class="comment-form">
-  <form action="{% url caesar.comments.views.new_comment %}" method="post">
+  <form action="{% url caesar.comments.views.new %}" method="post">
     {% csrf_token %}
     {{ form.text }}
     {{ form.start }}

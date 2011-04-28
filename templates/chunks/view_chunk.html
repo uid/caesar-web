@@ -60,15 +60,12 @@ $('#chunk-display').selectable({
 });
 
 $('.comment').mouseover(function() {
-    $('.comment-actions', this).show();
 });
 
-$('.comment').mouseout(function() {
-    $('.comment-actions', this).hide();
-});
 
-// hook up delete buttons for each comment
+// hook up some more behavior for each comment
 $.each(commentBoundaries, function(index, comment) {
+    // delete button
     $('.delete-button', comment.elt).click(function() {
         $.get('{% url caesar.comments.views.delete %}', {
             comment_id: comment.id
@@ -76,6 +73,24 @@ $.each(commentBoundaries, function(index, comment) {
             $(comment.elt).remove();        
         });
     });
+
+    // mouseover behavior
+    $(comment.elt).mouseover(function() {
+        // show little comment action buttons
+        $('.comment-actions', this).show();
+        // highlight corresponding code lines
+        $('#chunk-display *').removeClass('ui-selected');
+        for (var i = comment.start; i <= comment.end; i++) {
+            $('#line-' + i).addClass('ui-selected');            
+        }
+    });
+    $(comment.elt).mouseout(function() {
+        $('.comment-actions', this).hide();
+        for (var i = comment.start; i <= comment.end; i++) {
+            $('#line-' + i).removeClass('ui-selected');            
+        }
+    });
+
 });
 
 
