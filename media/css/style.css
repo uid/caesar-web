@@ -33,3 +33,20 @@
 #toolbar-user {
     float: right;
 }
+
+
+/* -- COMMENTS -------------------------------------------------------------- */
+.comment {
+    padding: 5px;
+}
+.comment:hover {
+    cursor: pointer;
+    background-color: #eee;
+}
+
+.comment-actions {
+    float: right;
+    display: none;
+}
+
+

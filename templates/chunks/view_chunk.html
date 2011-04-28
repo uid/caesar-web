@@ -37,7 +37,7 @@ $('#chunk-display').selectable({
             startLine = Math.min(startLine, n);
         });
 
-        $.get('{% url caesar.comments.views.new_comment %}', 
+        $.get('{% url caesar.comments.views.new %}', 
             { start: startLine, end: endLine, chunk: {{ chunk.id }} },
             function(data) {
                 $('.comment-form').remove();
@@ -58,6 +58,26 @@ $('#chunk-display').selectable({
         );
     }
 });
+
+$('.comment').mouseover(function() {
+    $('.comment-actions', this).show();
+});
+
+$('.comment').mouseout(function() {
+    $('.comment-actions', this).hide();
+});
+
+// hook up delete buttons for each comment
+$.each(commentBoundaries, function(index, comment) {
+    $('.delete-button', comment.elt).click(function() {
+        $.get('{% url caesar.comments.views.delete %}', {
+            comment_id: comment.id
+        }, function(data) {
+            $(comment.elt).remove();        
+        });
+    });
+});
+
 
 });
 </script>

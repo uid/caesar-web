@@ -1,8 +1,10 @@
 <!-- comment node ids are named like comment-$ID-$START-$END -->
 <div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}" 
   class="comment">
-  {{ comment.start }} - {{ comment.end }}
-  <p>
+  <div class="comment-actions">
+    <button id="delete-{{ comment.id }}-button" class="delete-button" 
+      type="button">x</button>
+  </div>
+  {{ comment.start }} - {{ comment.end }} <br/>
   {{ comment.text }}
-  </p>
 </div>

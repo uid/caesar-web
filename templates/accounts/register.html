@@ -2,7 +2,6 @@
 
 {% block content %}
 <form id="register-form" action="{% url caesar.accounts.views.register %}" method="post">
-  <fieldset>
     {% csrf_token %}
     <legend>Account Information</legend>
     {% for field in form %}
@@ -20,7 +19,6 @@
 
     {% endfor %}
     <button type="submit">Register</button>
-  </fieldset>
 
 </form>
 
