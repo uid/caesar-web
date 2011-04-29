@@ -14,4 +14,6 @@ urlpatterns = patterns('',
     (r'^accounts/', include('caesar.accounts.urls')),
     (r'^chunks/', include('caesar.chunks.urls')),
     (r'^comments/', include('caesar.comments.urls')),
+
+    (r'^api/', include('caesar.api.urls')),
 )
