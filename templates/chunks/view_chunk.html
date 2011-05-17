@@ -74,6 +74,16 @@ $.each(commentBoundaries, function(index, comment) {
         });
     });
 
+    $('.upvote-button', comment.elt).click(function() {
+        var button = this;
+        $.post('{% url caesar.comments.views.vote %}', {
+            comment_id: comment.id,
+            value: 1
+        }, function(data) {
+            $(button).attr('disabled', 'true');
+        });
+    });
+
     // mouseover behavior
     $(comment.elt).mouseover(function() {
         // show little comment action buttons

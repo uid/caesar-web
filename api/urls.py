@@ -7,7 +7,12 @@ from piston.authentication import HttpBasicAuthentication
 auth = HttpBasicAuthentication(realm="Caesar")
 ad = { 'authentication': auth }
 
-comment_handler = Resource(CommentHandler, **ad)
+class CsrfExemptResource(Resource):
+    def __init__(self, handler, authentication=None):
+        super(CsrfExemptResource, self).__init__(handler, authentication)
+        self.csrf_exempt = getattr(self.handler, 'csrf_exempt', True)
+
+comment_handler = CsrfExemptResource(CommentHandler, **ad)
 
 urlpatterns = patterns('',
    (r'^comments/', comment_handler),

@@ -47,4 +47,7 @@ class Chunk(models.Model):
     def get_absolute_url(self):
         return ('caesar.chunks.views.view_chunk', [str(self.id)])
 
+    def __unicode__(self):
+        return u'%s' % (self.id,)
+
 

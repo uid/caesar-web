@@ -17,14 +17,13 @@ class CommentHandler(BaseHandler):
             return base.all()
 
     def create(self, request):
-        if request.content_type:
-            data = request.data
-            chunk = Chunk.objects.get(pk=data['chunk'])
-            comment = self.model(
-                    text=data['text'], chunk=chunk,
-                    start=data['start'], end=data['end'], type=data['type'],
-                    author=request.user)
-            comment.save()
-            response = rc.CREATED
-            response.write(str(comment.id))
-            return response
+        data = request.data
+        chunk = Chunk.objects.get(pk=data['chunk'])
+        comment = self.model(
+                text=data['text'], chunk=chunk,
+                start=data['start'], end=data['end'], type=data['type'],
+                author=request.user)
+        comment.save()
+        response = rc.CREATED
+        response.write(str(comment.id))
+        return response

@@ -19,5 +19,21 @@ class Comment(models.Model):
     modified = models.DateTimeField(auto_now=True)
     parent = models.ForeignKey('self', related_name='child_comments', 
         blank=True, null=True)
+
+    def __unicode__(self):
+        return self.text
+
     class Meta:
         ordering = [ 'start', 'end' ]
+
+class Vote(models.Model):
+    VALUE_CHOICES = (
+        (1, '+1'),
+        (-1, '-1'),
+    )
+    value = models.SmallIntegerField(choices=VALUE_CHOICES)
+    comment = models.ForeignKey(Comment)
+    author = models.ForeignKey(User)
+
+    class Meta:
+        unique_together = ('comment', 'author',)
