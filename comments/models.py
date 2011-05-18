@@ -32,7 +32,7 @@ class Vote(models.Model):
         (-1, '-1'),
     )
     value = models.SmallIntegerField(choices=VALUE_CHOICES)
-    comment = models.ForeignKey(Comment)
+    comment = models.ForeignKey(Comment, related_name='votes')
     author = models.ForeignKey(User)
 
     class Meta:
