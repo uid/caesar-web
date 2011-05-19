@@ -1,7 +1,7 @@
 import os
 import sys
 
-path = '/home/masont/django-projects'
+path = '/home/caesar'
 projpath = path + '/caesar'
 if path not in sys.path:
     sys.path.append(path)
