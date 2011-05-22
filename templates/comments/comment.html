@@ -1,12 +1,23 @@
 <!-- comment node ids are named like comment-$ID-$START-$END -->
 <div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}" 
   class="comment">
+  {% if user.is_authenticated %}
   <div class="comment-actions">
-    <button id="upvote-{{ comment.id }}-button" class="upvote-button"
-      type="button">+1</button>
+    <div class="vote-buttons">
+      <input type="checkbox" id="upvote-{{ comment.id }}-button" 
+        class="upvote-button" value="up"/>
+      <label for="upvote-{{ comment.id }}-button">+1</label>
+      <input type="checkbox" id="downvote-{{ comment.id }}-button" 
+        class="downvote-button" value="down"/>
+      <label for="downvote-{{ comment.id }}-button">-1</label>
+    </div>
     <button id="delete-{{ comment.id }}-button" class="delete-button" 
       type="button">x</button>
   </div>
+  {% endif %}
   {{ comment.start }} - {{ comment.end }} <br/>
   {{ comment.text }}
+  <div class="comment-votes">
+    {% include "comments/comment_votes.html" %}
+  </div>
 </div>

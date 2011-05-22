@@ -59,9 +59,7 @@ $('#chunk-display').selectable({
     }
 });
 
-$('.comment').mouseover(function() {
-});
-
+$('.vote-buttons').buttonset();
 
 // hook up some more behavior for each comment
 $.each(commentBoundaries, function(index, comment) {
@@ -74,14 +72,37 @@ $.each(commentBoundaries, function(index, comment) {
         });
     });
 
-    $('.upvote-button', comment.elt).click(function() {
+    $('.upvote-button,.downvote-button', comment.elt).click(function() {
         var button = this;
-        $.post('{% url caesar.comments.views.vote %}', {
-            comment_id: comment.id,
-            value: 1
-        }, function(data) {
-            $(button).attr('disabled', 'true');
-        });
+        var isUp = ($(this).val() == 'up');
+        if ($(this).is(':checked')) {
+            $.post('{% url caesar.comments.views.vote %}', {
+                comment_id: comment.id,
+                value: (isUp ? 1 : -1)
+            }, function(data) {
+                // deselect the other vote button if it is selected
+                if (isUp && $(button).nextAll('input').is(':checked')) {
+                    // trigger it this way to prevent hitting the handler on the
+                    // other checkbox
+                    $(button).nextAll('input').attr('checked', false).change();
+                    console.log("A");
+                } else if (!isUp && $(button).prevAll('input').is(':checked')) {
+                    // trigger it this way to prevent hitting the handler on the
+                    // other checkbox
+                    $(button).prevAll('input').attr('checked', false).change();
+                    console.log("B");
+                }
+                $('.comment-votes', comment.elt).html(data)
+                    .effect('highlight', {}, 1000);
+            });
+        } else {
+            $.post('{% url caesar.comments.views.unvote %}', {
+                comment_id: comment.id
+            }, function(data) {
+                $('.comment-votes', comment.elt).html(data)
+                    .effect('highlight', {}, 1000);
+            });
+        }
     });
 
     // mouseover behavior

@@ -23,6 +23,11 @@ class Comment(models.Model):
     def __unicode__(self):
         return self.text
 
+    def vote_counts(self):
+        upvote_count = self.votes.filter(value=1).count()
+        downvote_count = self.votes.filter(value=-1).count()
+        return (upvote_count, downvote_count)
+
     class Meta:
         ordering = [ 'start', 'end' ]
 

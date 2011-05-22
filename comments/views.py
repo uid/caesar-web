@@ -1,7 +1,7 @@
 from caesar.comments.models import Comment, Vote
 from caesar.comments.forms import CommentForm
 
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -15,9 +15,7 @@ def new(request):
             'end': request.GET['end'],
             'chunk': request.GET['chunk']
         })
-        return render_to_response('comments/comment_form.html', {
-            'form': form,
-        }, context_instance=RequestContext(request))   
+        return render(request, 'comments/comment_form.html', {'form': form,})   
     else:
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -38,6 +36,19 @@ def vote(request):
     comment_id = request.POST['comment_id']
     value = request.POST['value']
     comment = Comment.objects.get(pk=comment_id)
-    vote = Vote(comment=comment, value=value, author=request.user)
+    try:
+        vote = Vote.objects.get(comment=comment, author=request.user)
+        vote.value = value
+    except Vote.DoesNotExist:
+        vote = Vote(comment=comment, value=value, author=request.user)
+
     vote.save()
-    return HttpResponse('success')
+    return render(request, 'comments/comment_votes.html', {'comment': comment})
+
+@login_required
+def unvote(request):
+    comment_id = request.POST['comment_id']
+    comment = Comment.objects.get(pk=comment_id)
+    Vote.objects.filter(comment=comment, author=request.user).delete()
+    return render(request, 'comments/comment_votes.html', {'comment': comment})
+
