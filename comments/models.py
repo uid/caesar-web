@@ -24,6 +24,7 @@ class Comment(models.Model):
         return self.text
 
     def vote_counts(self):
+        """Returns the total upvote and downvote counts as a tuple."""
         upvote_count = self.votes.filter(value=1).count()
         downvote_count = self.votes.filter(value=-1).count()
         return (upvote_count, downvote_count)
@@ -38,7 +39,7 @@ class Vote(models.Model):
     )
     value = models.SmallIntegerField(choices=VALUE_CHOICES)
     comment = models.ForeignKey(Comment, related_name='votes')
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, related_name='votes')
 
     class Meta:
         unique_together = ('comment', 'author',)

@@ -5,10 +5,18 @@
   <div class="comment-actions">
     <div class="vote-buttons">
       <input type="checkbox" id="upvote-{{ comment.id }}-button" 
-        class="upvote-button" value="up"/>
+        class="upvote-button" value="up"
+        {% if vote == 1 %}
+        checked="true"
+        {% endif %}
+      />
       <label for="upvote-{{ comment.id }}-button">+1</label>
       <input type="checkbox" id="downvote-{{ comment.id }}-button" 
-        class="downvote-button" value="down"/>
+        class="downvote-button" value="down"
+        {% if vote == -1 %}
+        checked="true"
+        {% endif %}
+      />
       <label for="downvote-{{ comment.id }}-button">-1</label>
     </div>
     <button id="delete-{{ comment.id }}-button" class="delete-button" 

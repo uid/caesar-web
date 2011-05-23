@@ -154,7 +154,7 @@ $.each(commentBoundaries, function(index, comment) {
 
 <div id="comment-display" class="span-6 last">
 
-    {% for comment in chunk.comments.all %}
+    {% for comment, vote in comment_data %}
     
     {% include "comments/comment.html" %} 
 

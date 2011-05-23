@@ -1,5 +1,5 @@
 from caesar.chunks.models import Chunk, File
-from caesar.comments.models import Comment
+from caesar.comments.models import Comment, Vote
 
 from django.http import Http404
 from django.shortcuts import render_to_response
@@ -24,9 +24,19 @@ def view_chunk(request, chunk_id):
         # TODO: more robust (custom) dedenting code
         data = file_data[first_line_offset:chunk.end].expandtabs(4)
         lines = enumerate(textwrap.dedent(data).splitlines(), start=first_line)
+
+        def get_comment_vote(comment):
+            try:
+                vote = comment.votes.get(author=request.user).value
+            except Vote.DoesNotExist:
+                vote = None
+            return (comment, vote)
+
+        comment_data = map(get_comment_vote, chunk.comments.all())
     except Chunk.DoesNotExist:
         raise Http404
     return render_to_response('chunks/view_chunk.html', { 
         'chunk': chunk,
-        'lines': lines
+        'lines': lines,
+        'comment_data': comment_data,
     }, context_instance=RequestContext(request)) 
