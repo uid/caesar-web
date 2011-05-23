@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 
 def login(request):
     if request.method == 'GET':
-        redirect_to = request.GET['next']
+        redirect_to = request.GET.get('next', '')
         if request.is_ajax():
             return direct_to_template(request, 'accounts/login_fragment.html', {
                 'form': AuthenticationForm(),

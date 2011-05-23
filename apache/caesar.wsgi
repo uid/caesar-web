@@ -1,7 +1,7 @@
 import os
 import sys
 
-path = '/home/caesar'
+path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 projpath = path + '/caesar'
 if path not in sys.path:
     sys.path.append(path)

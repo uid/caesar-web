@@ -3,16 +3,16 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>{% block title %}Caesar{% endblock %}</title>
-    <link rel="stylesheet" href="{{ MEDIA_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection" />
-    <link rel="stylesheet" href="{{ MEDIA_URL }}css/blueprint/print.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/print.css" type="text/css" media="print" />
     <!--[if lt IE 8]>
-    <link rel="stylesheet" href="{{ MEDIA_URL }}css/blueprint/ie.css" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/ie.css" type="text/css" media="screen, projection" />
     <![endif]-->
-    <link rel="stylesheet" href="{{ MEDIA_URL}}css/smoothness/jquery-ui.css" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="{{ MEDIA_URL }}css/style.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL}}css/smoothness/jquery-ui.css" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" type="text/css" />
 
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.5.2.min.js"></script>
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui-1.8.11.custom.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.5.2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.11.custom.min.js"></script>
 
     <script type="text/javascript">
         // CSRF protection for AJAX post requests made with jQuery
@@ -86,7 +86,7 @@
               Welcome back, {{ user.username }}
               {% if user.is_staff %}
               {# TODO un-hardcode URL to admin site #}
-              <a href="/caesar/admin">Admin</a>
+              <a href="/admin">Admin</a>
               {% endif %}
               <a href="{% url django.contrib.auth.views.logout %}">Logout</a>
             </div>

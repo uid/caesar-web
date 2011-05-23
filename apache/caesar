@@ -1,0 +1,20 @@
+Alias /media /var/django/caesar/media
+Alias /static /var/django/caesar/sitestatic
+
+<Directory /var/django/caesar/media>
+Order deny,allow
+Allow from all
+</Directory>
+
+<Directory /var/django/caesar/sitestatic>
+Order deny,allow
+Allow from all
+</Directory>
+
+WSGIScriptAlias / /var/django/caesar/apache/caesar.wsgi
+
+<Directory /var/django/caesar/apache>
+Order deny,allow
+Allow from all
+WSGIPassAuthorization On
+</Directory>
