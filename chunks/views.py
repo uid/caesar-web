@@ -27,7 +27,7 @@ def view_chunk(request, chunk_id):
 
         def get_comment_vote(comment):
             try:
-                vote = comment.votes.get(author=request.user).value
+                vote = comment.votes.get(author=request.user.id).value
             except Vote.DoesNotExist:
                 vote = None
             return (comment, vote)
