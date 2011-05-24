@@ -28,7 +28,8 @@ def new(request):
 def delete(request):
     comment_id = request.GET['comment_id']
     comment = Comment.objects.get(pk=comment_id)
-    comment.delete()
+    if comment.author == request.user:
+        comment.delete()
     return HttpResponse('deleted')
 
 @login_required

@@ -16,7 +16,7 @@ def login(request):
                 'next': redirect_to
             })
     else:
-        redirect_to = request.POST['next']
+        redirect_to = request.POST.get('next', '')
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username, password=password)
