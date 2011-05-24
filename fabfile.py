@@ -5,7 +5,6 @@ env.project_name = 'caesar'
 def prod():
     env.hosts = ['caesar.xvm.mit.edu']
     env.path = '/var/django/caesar'
-    env.user = 'masont'
 
 def deploy():
     """
@@ -23,7 +22,7 @@ def install_project():
     # symlink the caesar apache configuration file to apache
     sudo('cd /etc/apache2/sites-enabled; ln -sf %(path)s/apache/%(project_name)s %(project_name)s' % env)
     with cd(env.path):
-        run('python manage.py collectstatic')
+        run('python manage.py collectstatic --noinput')
         run('python manage.py syncdb --noinput')
         run('python manage.py migrate')
 
