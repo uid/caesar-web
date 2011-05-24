@@ -19,8 +19,10 @@
       />
       <label for="downvote-{{ comment.id }}-button">-1</label>
     </div>
+    {% if comment.author == user %}
     <button id="delete-{{ comment.id }}-button" class="delete-button" 
       type="button">x</button>
+    {% endif %}
   </div>
   {% endif %}
   {{ comment.start }} - {{ comment.end }} <br/>
