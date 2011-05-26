@@ -12,3 +12,10 @@ class CommentForm(ModelForm):
             'end': HiddenInput(),
             'chunk': HiddenInput(),
         }
+class ReplyForm(ModelForm):
+	class Meta:
+		model = Comment
+		fields = ('text', 'parent')
+		widgets = {
+			'parent': HiddenInput(),
+		}

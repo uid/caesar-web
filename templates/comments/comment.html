@@ -1,6 +1,6 @@
 <!-- comment node ids are named like comment-$ID-$START-$END -->
 <div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}" 
-  class="comment">
+  class="comment" {% if comment.is_reply %} style="margin-left:30px" {% endif %} >
   {% if user.is_authenticated %}
   <div class="comment-actions">
     <div class="vote-buttons">
@@ -23,9 +23,13 @@
     <button id="delete-{{ comment.id }}-button" class="delete-button" 
       type="button">x</button>
     {% endif %}
+	<button id="reply-{{ comment.id }}-button" class="reply-button"
+	  type="button">reply</button>
   </div>
   {% endif %}
-  {{ comment.start }} - {{ comment.end }} <br/>
+  {% if not comment.is_reply %}
+  	{{ comment.start }} - {{ comment.end }} <br/>
+  {% endif %}
   {{ comment.text }}
   <div class="comment-votes">
     {% include "comments/comment_votes.html" %}

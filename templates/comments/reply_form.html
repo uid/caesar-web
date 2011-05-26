@@ -1,0 +1,18 @@
+<script type="text/javascript">
+
+  $('#cancel-reply-button').click(function() {
+      // $('.comment').show();
+      // $('.reply-form').hide();
+  });
+
+</script>
+
+<div class="reply-form">
+  <form action="{% url caesar.comments.views.reply %}" method="post">
+    {% csrf_token %}
+    {{ form.text }}
+	{{ form.parent }}
+    <button type="submit">Save</button>
+    <button id="cancel-reply-button" type="button">Cancel</button>
+  </form>
+</div>
