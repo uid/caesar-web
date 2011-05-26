@@ -1,4 +1,4 @@
-from caesar.accounts.forms import *
+from accounts.forms import *
 
 from django.views.generic.simple import direct_to_template
 from django.contrib.auth.forms import AuthenticationForm

@@ -1,4 +1,4 @@
-from caesar.comments.models import *
+from comments.models import *
 
 from django.forms import ModelForm
 from django.forms import Textarea, HiddenInput

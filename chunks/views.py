@@ -1,5 +1,5 @@
-from caesar.chunks.models import Chunk, File
-from caesar.comments.models import Comment, Vote
+from chunks.models import Chunk, File
+from comments.models import Comment, Vote
 
 from django.http import Http404
 from django.shortcuts import render_to_response

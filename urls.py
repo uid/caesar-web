@@ -8,9 +8,9 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
 
-    (r'^accounts/', include('caesar.accounts.urls')),
-    (r'^chunks/', include('caesar.chunks.urls')),
-    (r'^comments/', include('caesar.comments.urls')),
+    (r'^accounts/', include('accounts.urls')),
+    (r'^chunks/', include('chunks.urls')),
+    (r'^comments/', include('comments.urls')),
 
-    (r'^api/', include('caesar.api.urls')),
+    (r'^api/', include('api.urls')),
 )
