@@ -1,5 +1,5 @@
-from caesar.comments.models import Comment, Vote
-from caesar.comments.forms import CommentForm, ReplyForm
+from comments.models import Comment, Vote
+from comments.forms import CommentForm, ReplyForm
 
 from django.shortcuts import render, redirect
 from django.template import RequestContext

@@ -68,7 +68,7 @@ STATIC_ROOT = PROJECT_ROOT + '/sitestatic'
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/admin/'
+ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -95,7 +95,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
 )
 
-ROOT_URLCONF = 'caesar.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -116,8 +116,8 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'south',
 
-    'caesar.chunks',
-    'caesar.comments',
+    'chunks',
+    'comments',
 )
 
 from settings_local import *
