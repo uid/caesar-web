@@ -1,0 +1,44 @@
+.comment {
+    padding: 5px;
+}
+.comment:hover {
+    cursor: pointer;
+    background-color: #eee;
+}
+
+.comment-actions {
+    float: right;
+    display: none;
+}
+
+.ui-button-text {
+    font-size: 75%;
+}
+
+.ui-button .ui-icon-thumb-up {
+    background-image: url('../img/thumb-up.png');
+    width: 16px;
+    height: 16px;
+}
+
+.ui-button .ui-icon-thumb-down {
+    background-image: url('../img/thumb-down.png');
+    width: 16px;
+    height: 16px;
+}
+
+.ui-button .ui-icon-reply {
+    background-image: url('../img/arrow-curve-180-left.png');
+    width: 16px;
+    height: 16px;
+}
+
+.ui-button .ui-icon-delete {
+    background-image: url('../img/cross-script.png');
+    width: 16px;
+    height: 16px;
+}
+
+textarea {
+    width: 100%;
+}

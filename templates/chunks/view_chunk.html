@@ -2,22 +2,8 @@
 
 {% block extrahead %}
 
-<style type="text/css">
-    .ui-selected {
-        background-color: #FFFF5A;
-    }
-    .ui-selecting {
-        background-color: #FFFFCA;
-    }
-
-    .ui-button-text {
-        font-size: 75%;
-    }
-
-    textarea {
-        width: 100%;
-    }
-</style>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
 
 <script type="text/javascript">
 
@@ -64,6 +50,22 @@ $('#chunk-display').selectable({
 });
 
 $('.vote-buttons').buttonset();
+$('.upvote-button').button('option', {
+    icons: { primary: 'ui-icon-thumb-up', secondary: null },
+    text: false
+});
+$('.downvote-button').button('option', {
+    icons: { primary: 'ui-icon-thumb-down', secondary: null },
+    text: false
+});
+$('.reply-button').button({
+    icons: { primary: 'ui-icon-reply', secondary: null },
+    text: false
+});
+$('.delete-button').button({
+    icons: { primary: 'ui-icon-delete', secondary: null },
+    text: false
+});
 
 // hook up some more behavior for each comment
 $.each(commentBoundaries, function(index, comment) {

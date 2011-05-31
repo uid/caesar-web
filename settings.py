@@ -1,15 +1,15 @@
-# Django settings for caesar project.
-
 import os
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = BASE_DIR
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+def project_path(s):
+    return os.path.join(PROJECT_ROOT, s)
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
+    ('Mason Tang', 'masont@mit.edu'),
+    ('Elena Tatarchenko', 'elena_11@mit.edu'),
 )
 
 MANAGERS = ADMINS
@@ -17,11 +17,11 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'caesar.db',         # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'NAME': 'caesar.db',
+        'USER': '',        
+        'PASSWORD': '',   
+        'HOST': '',      
+        'PORT': '',     
     }
 }
 
@@ -59,16 +59,17 @@ MEDIA_URL = '/media/'
 
 STATIC_URL = '/static/'
 
-STATICFILES_DIRS = (
-    PROJECT_ROOT + '/static/',
-)
-
-STATIC_ROOT = PROJECT_ROOT + '/sitestatic'
-
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
+
+STATICFILES_DIRS = (
+    project_path('static'),
+)
+
+STATIC_ROOT = project_path('sitestatic')
+
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -102,7 +103,7 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 
-    PROJECT_ROOT + '/templates',
+    project_path('templates'),
 )
 
 INSTALLED_APPS = (

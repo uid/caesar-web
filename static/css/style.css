@@ -1,28 +1,3 @@
-.chunk-line {
-    font-family: monospace;
-    font-size: 10px;
-    margin: 0;
-    display: block;
-}
-
-.chunk-line:hover {
-    cursor: pointer;
-    background-color: #eee
-}
-
-.line-code {
-    display: inline;
-}
-
-.line-number {
-    display: inline-block;
-    text-align: right;
-    width: 3em;
-    background-color: #ccf;
-    margin-right: 1em;
-    padding: 0 .25em;
-}
-
 #toolbar {
     margin-bottom: 25px;
     background: #eee;
@@ -34,19 +9,5 @@
     float: right;
 }
 
-
-/* -- COMMENTS -------------------------------------------------------------- */
-.comment {
-    padding: 5px;
-}
-.comment:hover {
-    cursor: pointer;
-    background-color: #eee;
-}
-
-.comment-actions {
-    float: right;
-    display: none;
-}
 
 
