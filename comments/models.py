@@ -72,3 +72,10 @@ class Vote(models.Model):
 
 	class Meta:
 		unique_together = ('comment', 'author',)
+
+class Star(models.Model):
+	value = models.BooleanField(default = False)
+	chunk = models.ForeignKey(Chunk, related_name = "stars")
+	author = models.ForeignKey(User, related_name = "stars")
+	created = models.DateTimeField(auto_now_add=True)
+	modified = models.DateTimeField(auto_now=True)

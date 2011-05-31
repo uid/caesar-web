@@ -1,5 +1,6 @@
-from comments.models import Comment, Vote
+from comments.models import Comment, Vote, Star
 from comments.forms import CommentForm, ReplyForm
+from chunks.models import Chunk
 
 from django.shortcuts import render, redirect
 from django.template import RequestContext
@@ -71,3 +72,21 @@ def unvote(request):
 	comment = Comment.objects.get(pk=comment_id)
 	Vote.objects.filter(comment=comment, author=request.user).delete()
 	return render(request, 'comments/comment_votes.html', {'comment': comment})
+
+@login_required
+def change_star(request):
+	if request.POST['value'] == "check":
+		value = True
+	else:
+		value = False
+	chunk_id = request.POST['chunk_id']
+	chunk = Chunk.objects.get(pk=chunk_id)
+	try:
+		star = Star.objects.get(chunk=chunk, author=request.user)
+		star.value = value
+		star.save()
+	except Star.DoesNotExist:
+		star = Star(chunk=chunk, value=value, author=request.user)
+		star.save()
+		
+	return render(request,'comments/change_star.html',{'star':star})
