@@ -3,12 +3,12 @@
   $('#cancel-button').click(function() {
       $('.comment').show();
       $('.comment-form').hide();
-      $('#chunk-display *').removeClass('ui-selected');
+      clearSelection();
   });
 
 </script>
 
-<div class="comment-form">
+<div class="comment-form" title="Add a comment">
   <form action="{% url caesar.comments.views.new %}" method="post">
     {% csrf_token %}
     {{ form.text }}

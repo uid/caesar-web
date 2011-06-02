@@ -29,3 +29,7 @@
 .ui-selecting {
     background-color: #FFFFCA;
 }
+
+.chunk-line.highlighted {
+    background-color: #FFFFCA;
+}

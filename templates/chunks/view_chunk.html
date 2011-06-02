@@ -6,8 +6,10 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
 
 <script type="text/javascript">
+var chunkId = {{ chunk.id }};
 
 $(document).ready(function() {
+
 
 var commentBoundaries = $('.comment').map(function() {
     var idSplit = this.id.split('-');
@@ -17,7 +19,48 @@ var commentBoundaries = $('.comment').map(function() {
              elt: this };
 });
 
+function showCommentForm(startLine, endLine) {
+    $.get('{% url caesar.comments.views.new %}', 
+        { start: startLine, end: endLine, chunk: chunkId },
+        function(data) {
+            $('.comment-form').remove();
+            // find the appropriate place to insert the form
+            var added = false;
+            $.each(commentBoundaries, function(index, comment) {
+                if ((startLine == comment.start && endLine <= comment.end)
+                    || startLine < comment.start) {
+                    $(comment.elt).before(data);                        
+                    added = true;
+                    return false;
+                }
+            });
+            if (!added) {
+                $('#comment-display').append(data);
+            }
+        }
+    );
+};
+
+window.isSelecting = false;
+window.clearSelection = function() {
+    isSelecting = false;
+    $('.chunk-line').removeClass('ui-selected');
+};
+
+// Clear the selected lines if the user clicks anywhere except the comment form
+$(document).mousedown(function(e) {
+    if ($(e.target).is('.comment-form *')) {
+        return true;
+    }
+    clearSelection();
+    return true;
+});
+
 $('#chunk-display').selectable({
+    filter: '.chunk-line',
+    start: function(event, ui) {
+        isSelecting = true;
+    },
     stop: function(event, ui) {
         var startLine = Number.MAX_VALUE;
         var endLine = Number.MIN_VALUE;
@@ -26,26 +69,7 @@ $('#chunk-display').selectable({
             endLine = Math.max(endLine, n);
             startLine = Math.min(startLine, n);
         });
-
-        $.get('{% url caesar.comments.views.new %}', 
-            { start: startLine, end: endLine, chunk: {{ chunk.id }} },
-            function(data) {
-                $('.comment-form').remove();
-                // find the appropriate place to insert the form
-                var added = false;
-                $.each(commentBoundaries, function(index, comment) {
-                    if ((startLine == comment.start && endLine <= comment.end)
-                        || startLine < comment.start) {
-                        $(comment.elt).before(data);                        
-                        added = true;
-                        return false;
-                    }
-                });
-                if (!added) {
-                    $('#comment-display').append(data);
-                }
-            }
-        );
+        showCommentForm(startLine, endLine);
     }
 });
 
@@ -128,15 +152,14 @@ $.each(commentBoundaries, function(index, comment) {
         // show little comment action buttons
         $('.comment-actions', this).show();
         // highlight corresponding code lines
-        $('#chunk-display *').removeClass('ui-selected');
         for (var i = comment.start; i <= comment.end; i++) {
-            $('#line-' + i).addClass('ui-selected');            
+            $('#line-' + i).addClass('highlighted');            
         }
     });
     $(comment.elt).mouseout(function() {
         $('.comment-actions', this).hide();
         for (var i = comment.start; i <= comment.end; i++) {
-            $('#line-' + i).removeClass('ui-selected');            
+            $('#line-' + i).removeClass('highlighted');            
         }
     });
 
@@ -202,15 +225,16 @@ $.each(commentBoundaries, function(index, comment) {
     {% include "comments/comment.html" %} 
 
     {% endfor %}
-
-	{% if user.is_authenticated %}
-	<div id="star_div">
-	  <hr>
-	  <input type="checkbox" id="star_box" class="star_box_class"/> This code looks good to me. 
-	</div>
-	{% endif %}
-
 </div>
+
+{% if user.is_authenticated %}
+<div id="star_div" class="prepend-18 span-6 last">  
+  <hr class="space"/>
+  <hr/>
+  <input type="checkbox" id="star_box" class="star_box_class"/> This code looks good to me. 
+</div>
+{% endif %}
+
 
 
 
