@@ -1,37 +1,54 @@
 <!-- comment node ids are named like comment-$ID-$START-$END -->
 <div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}" 
-  class="comment" {% if comment.is_reply %} style="margin-left:30px" {% endif %} >
-  {% if user.is_authenticated %}
-  <div class="comment-actions">
-    <div class="vote-buttons">
-      <input type="checkbox" id="upvote-{{ comment.id }}-button" 
-        class="upvote-button" value="up"
-        {% if vote == 1 %}
-        checked="true"
-        {% endif %}
-      />
-      <label for="upvote-{{ comment.id }}-button">+1</label>
-      <input type="checkbox" id="downvote-{{ comment.id }}-button" 
-        class="downvote-button" value="down"
-        {% if vote == -1 %}
-        checked="true"
-        {% endif %}
-      />
-      <label for="downvote-{{ comment.id }}-button">-1</label>
-    </div>
-    {% if comment.author == user %}
-    <button id="delete-{{ comment.id }}-button" class="delete-button" 
-      type="button">x</button>
+  class="comment" 
+  {% if comment.is_reply %} style="margin-left:30px" {% endif %} >
+
+  <div class="comment-header">
+    <span class="comment-line-numbers">
+    {% if not comment.is_reply %}
+    {{ comment.start }}
+    {% if comment.end != comment.start %} - {{ comment.end }}
     {% endif %}
-	<button id="reply-{{ comment.id }}-button" class="reply-button"
-	  type="button">reply</button>
+    {% endif %}
+    </span>
+    <span class="comment-snippet">
+    {{ snippet }}
+    </span>
+  </div>
+  
+  <p class="comment-text">
+    {{ comment.text }}
+  </p>
+
+  <div class="comment-footer">
+    <span class="comment-votes">
+      {% include "comments/comment_votes.html" %}
+    </span>
+    {% if user.is_authenticated %}
+    <span class="comment-actions">
+      <span class="vote-buttons">
+        <input type="checkbox" id="upvote-{{ comment.id }}-button" 
+          class="upvote-button" value="up"
+          {% if vote == 1 %}
+          checked="true"
+          {% endif %}
+        />
+        <label for="upvote-{{ comment.id }}-button">+1</label>
+        <input type="checkbox" id="downvote-{{ comment.id }}-button" 
+          class="downvote-button" value="down"
+          {% if vote == -1 %}
+          checked="true"
+          {% endif %}
+        />
+        <label for="downvote-{{ comment.id }}-button">-1</label>
+      </span>
+      <button id="reply-{{ comment.id }}-button" class="reply-button"
+        type="button">Reply</button>
+      {% if comment.author == user %}
+      <button id="delete-{{ comment.id }}-button" class="delete-button" 
+        type="button">Delete</button>
+      {% endif %}
+    </span>
   </div>
   {% endif %}
-  {% if not comment.is_reply %}
-  	{{ comment.start }} - {{ comment.end }} <br/>
-  {% endif %}
-  {{ comment.text }}
-  <div class="comment-votes">
-    {% include "comments/comment_votes.html" %}
-  </div>
 </div>

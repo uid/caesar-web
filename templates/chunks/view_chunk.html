@@ -10,7 +10,6 @@ var chunkId = {{ chunk.id }};
 
 $(document).ready(function() {
 
-
 var commentBoundaries = $('.comment').map(function() {
     var idSplit = this.id.split('-');
     return { id: parseInt(idSplit[1]), 
@@ -111,6 +110,7 @@ $.each(commentBoundaries, function(index, comment) {
             comment_id: comment.id
         }, function(data) {
             $(comment.elt).remove();        
+            $('.chunk-line').removeClass('highlighted');            
         });
     });
 
@@ -127,12 +127,10 @@ $.each(commentBoundaries, function(index, comment) {
                     // trigger it this way to prevent hitting the handler on the
                     // other checkbox
                     $(button).nextAll('input').attr('checked', false).change();
-                    console.log("A");
                 } else if (!isUp && $(button).prevAll('input').is(':checked')) {
                     // trigger it this way to prevent hitting the handler on the
                     // other checkbox
                     $(button).prevAll('input').attr('checked', false).change();
-                    console.log("B");
                 }
                 $('.comment-votes', comment.elt).html(data)
                     .effect('highlight', {}, 1000);
@@ -158,9 +156,7 @@ $.each(commentBoundaries, function(index, comment) {
     });
     $(comment.elt).mouseout(function() {
         $('.comment-actions', this).hide();
-        for (var i = comment.start; i <= comment.end; i++) {
-            $('#line-' + i).removeClass('highlighted');            
-        }
+        $('.chunk-line').removeClass('highlighted');            
     });
 
 });
@@ -219,8 +215,7 @@ $.each(commentBoundaries, function(index, comment) {
 </script>
 
 <div id="comment-display" class="span-6 last">
-
-    {% for comment, vote in comment_data %}
+    {% for comment, vote, snippet in comment_data %}
     
     {% include "comments/comment.html" %} 
 
@@ -234,9 +229,6 @@ $.each(commentBoundaries, function(index, comment) {
   <input type="checkbox" id="star_box" class="star_box_class"/> This code looks good to me. 
 </div>
 {% endif %}
-
-
-
 
 {% endblock %}
 

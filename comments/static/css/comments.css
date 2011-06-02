@@ -1,11 +1,48 @@
 .comment {
-    padding: 5px;
+    border: 1px solid #000;
+    margin: 0px 0px 10px 0px;
 }
 .comment:hover {
     cursor: pointer;
     background-color: #eee;
 }
 
+.comment-header {
+    font-size: 10px;
+    border-bottom: 1px dashed #555;
+    padding: 0px 2px;
+}
+.comment-line-numbers {
+    float: left;
+    padding-right: 1em;
+}
+.comment-snippet {
+    display: block;
+    color: #777;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-family: monospace;
+}
+
+.comment-text {
+    padding: 5px;
+    margin: 0px;
+    clear: both;
+}
+
+.comment-footer {
+    display: table;
+    width: 100%;
+    overflow: auto;
+    height: 28px;
+    padding: 0px 5px;
+}
+
+.comment-votes {
+    display: table-cell;
+    vertical-align: bottom;
+}
 .comment-actions {
     float: right;
     display: none;
