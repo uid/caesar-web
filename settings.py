@@ -127,4 +127,8 @@ INSTALLED_APPS = (
     'comments',
 )
 
+# PROJECT SPECIFIC SETTINGS
+MINIMUM_SNIPPET_LENGTH = 80
+
+
 from settings_local import *

@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 import textwrap
 
@@ -58,14 +59,23 @@ class Chunk(models.Model):
         self.__split_lines()
 
     def generate_snippet(self, start, end):
-        first_line = self.lines[0][0]
+        line_offset = self.lines[0][0]
         snippet_length = 0
-        end_line = start - first_line
-        # FIXME refactor this constant out
-        while snippet_length < 80:
+        start_line = start - line_offset
+        end_line = start - line_offset
+        last_line = len(self.lines) - 1
+        
+        # first, search forward and gather text
+        while snippet_length < settings.MINIMUM_SNIPPET_LENGTH and \
+                end_line < last_line:
             snippet_length += len(self.lines[end_line][1].strip()) + 1
             end_line += 1
-        snippet_lines = self.lines[start - first_line:end_line + 1]
+        # if necessary, scan backwards
+        # while snippet_length < settings.MINIMUM_SNIPPET_LENGTH and \
+        #         start_line >= 0:
+        #     snippet_length += len(self.lines[start_line][1].strip()) + 1
+        #     start_line -= 1
+        snippet_lines = self.lines[start_line:end_line + 1]
         return ' '.join(zip(*snippet_lines)[1])
 
     class Meta:
