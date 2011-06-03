@@ -7,6 +7,7 @@
 
 <script type="text/javascript">
 var chunkId = {{ chunk.id }};
+window.isSelecting = false;
 
 $(document).ready(function() {
 
@@ -22,7 +23,7 @@ function showCommentForm(startLine, endLine) {
     $.get('{% url caesar.comments.views.new %}', 
         { start: startLine, end: endLine, chunk: chunkId },
         function(data) {
-            $('.comment-form').remove();
+            $('.new-comment').remove();
             // find the appropriate place to insert the form
             var added = false;
             $.each(commentBoundaries, function(index, comment) {
@@ -40,10 +41,10 @@ function showCommentForm(startLine, endLine) {
     );
 };
 
-window.isSelecting = false;
 window.clearSelection = function() {
     isSelecting = false;
     $('.chunk-line').removeClass('ui-selected');
+    $('.new-comment').remove();
 };
 
 // Clear the selected lines if the user clicks anywhere except the comment form
