@@ -92,6 +92,14 @@
     height: 16px;
 }
 
-textarea {
+.new-comment textarea, .reply-form textarea {
     width: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+}
+
+.comment-form, .reply-form {
+    padding: 5px;
 }
