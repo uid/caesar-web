@@ -1,20 +1,19 @@
 <!-- comment node ids are named like comment-$ID-$START-$END -->
 <div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}" 
-  class="comment" 
-  {% if comment.is_reply %} style="margin-left:30px" {% endif %} >
+  class="comment {% if comment.is_reply %}comment-reply{% endif %}">
 
+  {% if not comment.is_reply %}
   <div class="comment-header">
     <span class="comment-line-numbers">
-    {% if not comment.is_reply %}
     {{ comment.start }}
     {% if comment.end != comment.start %} - {{ comment.end }}
-    {% endif %}
     {% endif %}
     </span>
     <span class="comment-snippet">
     {{ snippet }}
     </span>
   </div>
+  {% endif %}
   
   <p class="comment-text">
     {{ comment.text }}

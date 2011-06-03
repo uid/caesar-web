@@ -170,18 +170,17 @@ $.each(commentBoundaries, function(index, comment) {
 
 {% block content %}
 
+{% comment %}
 <div id="chunk-info" class="span-24">
     <h3>
     {{ chunk.file.submission.assignment.name }} :: 
     {{ chunk.file.submission.name }} :: 
     {{ chunk.file.path }}
     </h3>
-</div>
+<}/div>
+{% endcomment %}
 
-<hr/>
-
-
-<div id="chunk-display" class="span-17 colborder">
+<div id="chunk-display" class="span-18">
     {% for n, line in lines %}
     <span id="line-{{ n }}" class="chunk-line">
       <span class="line-number">{{ n }}</span><pre class="line-code">{{ line }}</pre>
