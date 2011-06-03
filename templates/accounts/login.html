@@ -2,6 +2,7 @@
 
 {% block content %}
 
+<div id="login-container" class="span-24">
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
@@ -22,6 +23,8 @@
   <input type="submit" value="Login" />
   <input type="hidden" name="next" value="{{ next }}" />
 </form>
+
+</div>
 
 {% endblock %}
 

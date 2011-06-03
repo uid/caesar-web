@@ -32,16 +32,17 @@
 }
 
 .comment-footer {
-    display: table;
-    width: 100%;
+    display: block;
     overflow: auto;
     height: 28px;
     padding: 0px 5px;
+    position: relative;
 }
 
 .comment-votes {
-    display: table-cell;
-    vertical-align: bottom;
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
 }
 .comment-actions {
     float: right;
