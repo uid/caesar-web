@@ -28,7 +28,7 @@ def login(request):
             if user.is_active:
                 auth.login(request, user)
                 return HttpResponseRedirect(redirect_to)
-        return direct_to_template(request, 'accounts/login.html', {
+        return render(request, 'accounts/login.html', {
             'form': form,
             'next': redirect_to
         })
@@ -44,7 +44,7 @@ def register(request):
     else:
         # render a registration form
         form = UserForm()
-    return direct_to_template(request, 'accounts/register.html', {
+    return render(request, 'accounts/register.html', {
         'form': form,
         'next': redirect_to
     })

@@ -1,25 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-<form id="register-form" action="{% url caesar.accounts.views.register %}" method="post">
-    {% csrf_token %}
-    <legend>Account Information</legend>
-    {% for field in form %}
-    <div>
-      <label for="{{ field.id }}">
-        {{ field.label }}{% if field.field.required %}*{% endif %}
-      </label><br/>
-      {{ field }} <br/>
-      {{ field.help_text }}
-    </div>
+<div id="register-container" class="span-24">
+    <form id="register-form" action="{% url caesar.accounts.views.register %}" method="post">
+        {% csrf_token %}
+        <legend>Account Information</legend>
+        {% for field in form %}
+        <div>
+          <label for="{{ field.id }}">
+            {{ field.label }}{% if field.field.required %}*{% endif %}
+          </label><br/>
+          {{ field }} <br/>
+          {{ field.help_text }}
+        </div>
 
-    {% for error in field.errors %}
-    <p class="error">{{ error }}</p>
-    {% endfor %}
+        {% for error in field.errors %}
+        <p class="error">{{ error }}</p>
+        {% endfor %}
 
-    {% endfor %}
-    <button type="submit">Register</button>
+        {% endfor %}
+        <button type="submit">Register</button>
 
-</form>
-
+    </form>
+</div>
 {% endblock %}

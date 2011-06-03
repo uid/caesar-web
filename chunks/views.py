@@ -28,12 +28,22 @@ def view_chunk(request, chunk_id):
         lines = list(enumerate(textwrap.dedent(data).splitlines(), 
             start=first_line))
 
+        def get_snippet(comment):
+            snippet_length = 0
+            end_line = comment.start - first_line
+            # FIXME refactor this constant out
+            while snippet_length < 80:
+                snippet_length += len(lines[end_line][1].strip()) + 1
+                end_line += 1
+            snippet_lines = lines[comment.start - first_line:end_line + 1]
+            return ' '.join(zip(*snippet_lines)[1])
+
         def get_comment_data(comment):
             try:
                 vote = comment.votes.get(author=request.user.id).value
             except Vote.DoesNotExist:
                 vote = None
-            snippet = lines[comment.start - first_line][1]
+            snippet = get_snippet(comment)
             return (comment, vote, snippet)
 
         comment_data = map(get_comment_data, Comment.get_comments_for_chunk(chunk))
