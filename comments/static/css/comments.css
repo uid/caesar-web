@@ -34,6 +34,13 @@
     font-family: monospace;
 }
 
+.comment-author {
+    text-align: right;
+    padding: 0px 5px;
+    color: #777;
+    font-size: 10px;
+}
+
 .comment-text {
     padding: 5px;
     margin: 0px;
