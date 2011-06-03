@@ -181,7 +181,7 @@ $.each(commentBoundaries, function(index, comment) {
 {% endcomment %}
 
 <div id="chunk-display" class="span-18">
-    {% for n, line in lines %}
+    {% for n, line in chunk.lines %}
     <span id="line-{{ n }}" class="chunk-line">
       <span class="line-number">{{ n }}</span><pre class="line-code">{{ line }}</pre>
     </span>
