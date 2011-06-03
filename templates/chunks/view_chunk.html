@@ -97,9 +97,9 @@ $.each(commentBoundaries, function(index, comment) {
 		$.get('{% url caesar.comments.views.reply %}', 
 	        { parent: comment.id }	,
 	        function(data) {
-	            $('.reply-form').remove();
+	            $('.comment-reply').remove();
 	            // find the appropriate place to insert the form
-	            $(comment.elt).append(data);
+	            $(comment.elt).after(data);
 	        }
 	    );
 	});
