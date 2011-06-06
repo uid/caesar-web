@@ -1,5 +1,5 @@
 from django.contrib import admin
-from comments.models import Comment, Vote
+from review.models import Comment, Vote
 
 class VoteInline(admin.TabularInline):
     model = Vote

@@ -1,4 +1,4 @@
-from comments.models import *
+from review.models import *
 
 from django.forms import ModelForm
 from django.forms import Textarea, HiddenInput

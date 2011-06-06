@@ -1,5 +1,5 @@
 from chunks.models import Chunk, File
-from comments.models import Comment, Vote, Star
+from review.models import Comment, Vote, Star
 
 from django.http import Http404
 from django.shortcuts import render

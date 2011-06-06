@@ -10,7 +10,7 @@ urlpatterns = patterns('',
 
     (r'^accounts/', include('accounts.urls')),
     (r'^chunks/', include('chunks.urls')),
-    (r'^comments/', include('comments.urls')),
+    (r'^review/', include('review.urls')),
 
     (r'^api/', include('api.urls')),
 )

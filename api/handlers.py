@@ -1,4 +1,4 @@
-from comments.models import Comment
+from review.models import Comment
 from chunks.models import Chunk
 from piston.handler import BaseHandler, AnonymousBaseHandler
 from piston.utils import rc

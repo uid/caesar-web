@@ -34,6 +34,8 @@ class Chunk(models.Model):
     start = models.IntegerField()
     end = models.IntegerField()
     created = models.DateTimeField()
+    class Meta:
+        db_table = u'chunks'
     
     def __split_lines(self):
         file_data = self.file.data
@@ -78,8 +80,6 @@ class Chunk(models.Model):
         snippet_lines = self.lines[start_line:end_line + 1]
         return ' '.join(zip(*snippet_lines)[1])
 
-    class Meta:
-        db_table = u'chunks'
 
     @models.permalink
     def get_absolute_url(self):
@@ -87,5 +87,4 @@ class Chunk(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.id,)
-
 

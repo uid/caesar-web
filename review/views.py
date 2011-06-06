@@ -1,5 +1,5 @@
-from comments.models import Comment, Vote, Star
-from comments.forms import CommentForm, ReplyForm
+from review.models import Comment, Vote, Star
+from review.forms import CommentForm, ReplyForm
 from chunks.models import Chunk
 
 from django.shortcuts import render, redirect
@@ -20,7 +20,7 @@ def new(request):
             'chunk': chunk_id
         })
         chunk = Chunk.objects.get(pk=chunk_id)
-        return render(request, 'comments/comment_form.html', {
+        return render(request, 'review/comment_form.html', {
             'form': form,
             'start': start,
             'end': end,
@@ -41,7 +41,7 @@ def reply(request):
         form = ReplyForm(initial={
             'parent': request.GET['parent']
         })
-        return render(request, 'comments/reply_form.html', {'form': form,})
+        return render(request, 'review/reply_form.html', {'form': form,})
     else:
         form = ReplyForm(request.POST)
         if form.is_valid():
@@ -74,14 +74,14 @@ def vote(request):
         vote = Vote(comment=comment, value=value, author=request.user)
 
     vote.save()
-    return render(request, 'comments/comment_votes.html', {'comment': comment})
+    return render(request, 'review/comment_votes.html', {'comment': comment})
 
 @login_required
 def unvote(request):
     comment_id = request.POST['comment_id']
     comment = Comment.objects.get(pk=comment_id)
     Vote.objects.filter(comment=comment, author=request.user).delete()
-    return render(request, 'comments/comment_votes.html', {'comment': comment})
+    return render(request, 'review/comment_votes.html', {'comment': comment})
 
 @login_required
 def change_star(request):
@@ -99,4 +99,4 @@ def change_star(request):
         star = Star(chunk=chunk, value=value, author=request.user)
         star.save()
         
-    return render(request,'comments/change_star.html',{'star':star})
+    return render(request,'review/change_star.html',{'star':star})

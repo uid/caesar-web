@@ -20,7 +20,7 @@ var commentBoundaries = $('.comment').map(function() {
 });
 
 function showCommentForm(startLine, endLine) {
-    $.get('{% url caesar.comments.views.new %}', 
+    $.get('{% url review.views.new %}', 
         { start: startLine, end: endLine, chunk: chunkId },
         function(data) {
             $('.new-comment').remove();
@@ -95,7 +95,7 @@ $('.delete-button').button({
 $.each(commentBoundaries, function(index, comment) {
     //reply button
     $('.reply-button', comment.elt).click(function() {
-		$.get('{% url caesar.comments.views.reply %}', 
+		$.get('{% url review.views.reply %}', 
 	        { parent: comment.id }	,
 	        function(data) {
 	            $('.comment-reply').remove();
@@ -107,7 +107,7 @@ $.each(commentBoundaries, function(index, comment) {
 
 	// delete button
     $('.delete-button', comment.elt).click(function() {
-        $.get('{% url caesar.comments.views.delete %}', {
+        $.get('{% url review.views.delete %}', {
             comment_id: comment.id
         }, function(data) {
             $(comment.elt).remove();        
@@ -119,7 +119,7 @@ $.each(commentBoundaries, function(index, comment) {
         var button = this;
         var isUp = ($(this).val() == 'up');
         if ($(this).is(':checked')) {
-            $.post('{% url caesar.comments.views.vote %}', {
+            $.post('{% url review.views.vote %}', {
                 comment_id: comment.id,
                 value: (isUp ? 1 : -1)
             }, function(data) {
@@ -137,7 +137,7 @@ $.each(commentBoundaries, function(index, comment) {
                     .effect('highlight', {}, 1000);
             });
         } else {
-            $.post('{% url caesar.comments.views.unvote %}', {
+            $.post('{% url review.views.unvote %}', {
                 comment_id: comment.id
             }, function(data) {
                 $('.comment-votes', comment.elt).html(data)
@@ -200,12 +200,12 @@ $.each(commentBoundaries, function(index, comment) {
 		//set the listener
 		$("#star_box").click(function(){
 			if(this.checked){ //star box was just checked
-				$.post('{% url caesar.comments.views.change_star %}', 
+				$.post('{% url review.views.change_star %}', 
 					{chunk_id: {{ chunk.id }}, value: "check"} ,
 					function(data){}
 				);
 			} else { // star box was just unchecked
-				$.post('{% url caesar.comments.views.change_star %}', 
+				$.post('{% url review.views.change_star %}', 
 					{chunk_id: {{ chunk.id }}, value: "uncheck"}, 
 					function(data){}
 				);
@@ -217,7 +217,7 @@ $.each(commentBoundaries, function(index, comment) {
 <div id="comment-display" class="span-6 last">
     {% for comment, vote, snippet in comment_data %}
     
-    {% include "comments/comment.html" %} 
+    {% include "review/comment.html" %} 
 
     {% endfor %}
 </div>

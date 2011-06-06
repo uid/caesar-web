@@ -8,7 +8,7 @@
 
 <div class="comment comment-reply">
   <div class="reply-form">
-    <form action="{% url caesar.comments.views.reply %}" method="post">
+    <form action="{% url review.views.reply %}" method="post">
       {% csrf_token %}
       {{ form.text }}
       {{ form.parent }}

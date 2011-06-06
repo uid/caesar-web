@@ -124,7 +124,7 @@ INSTALLED_APPS = (
 
     'utils',
     'chunks',
-    'comments',
+    'review',
 )
 
 # PROJECT SPECIFIC SETTINGS

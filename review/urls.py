@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('caesar.comments.views',
+urlpatterns = patterns('review.views',
     (r'^new/', 'new'),
     (r'^change_star/','change_star'),
     (r'^reply/', 'reply'),
