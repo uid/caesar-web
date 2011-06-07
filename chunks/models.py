@@ -60,7 +60,12 @@ class Chunk(models.Model):
         super(Chunk, self).save(*args, **kwargs)
         self.__split_lines()
 
-    def generate_snippet(self, start, end):
+    def generate_snippet(self, start=None, end=None):
+        if start is None:
+            start = self.lines[0][0]
+        if end is None:
+            end = self.lines[-1][0]
+
         line_offset = self.lines[0][0]
         snippet_length = 0
         start_line = start - line_offset

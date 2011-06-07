@@ -89,6 +89,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -122,10 +123,22 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'south',
 
+    'debug_toolbar',
+
     'utils',
+    'accounts',
     'chunks',
     'review',
 )
+
+AUTH_PROFILE_MODULE = 'accounts.UserProfile'
+
+def show_debug_toolbar(request):
+    return request.user.id in (1,2)
+
+DEBUG_TOOLBAR_CONFIG = {
+    'SHOW_TOOLBAR_CALLBACK': show_debug_toolbar,
+}
 
 # PROJECT SPECIFIC SETTINGS
 MINIMUM_SNIPPET_LENGTH = 80

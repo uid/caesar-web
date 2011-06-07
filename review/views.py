@@ -1,6 +1,6 @@
-from review.models import Comment, Vote, Star
+from review.models import Comment, Vote, Star, Task
 from review.forms import CommentForm, ReplyForm
-from chunks.models import Chunk
+from chunks.models import Chunk, Assignment
 
 from django.shortcuts import render, redirect
 from django.template import RequestContext
@@ -9,7 +9,20 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 
 @login_required
-def new(request):
+def dashboard(request):
+    user = request.user
+    if not user.get_profile().tasks.exclude(status='C').count() >= 3:
+        assignment = Assignment.objects.get(pk=1)
+        task = Task.objects.assign_task(assignment, user)
+    active_tasks = user.get_profile().tasks.exclude(status='C')
+    completed_tasks = user.get_profile().tasks.filter(status='C')
+    return render(request, 'review/dashboard.html', {
+        'active_tasks': active_tasks,
+        'completed_tasks': completed_tasks,
+    })
+
+@login_required
+def new_comment(request):
     if request.method == 'GET':
         start = int(request.GET['start'])
         end = int(request.GET['end'])
@@ -55,7 +68,7 @@ def reply(request):
             return redirect(comment.chunk)
 
 @login_required
-def delete(request):
+def delete_comment(request):
     comment_id = request.GET['comment_id']
     comment = Comment.objects.get(pk=comment_id)
     if comment.author == request.user:

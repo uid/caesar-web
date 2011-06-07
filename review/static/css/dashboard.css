@@ -1,0 +1,54 @@
+.task-header {
+    margin: 0px;
+}
+
+.task-list {
+    margin-bottom: 10px;
+}
+
+.task-line {
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    height: 18px;
+    clear: both;
+    padding: 2px 0px;
+}
+
+.task-line:hover {
+    background-color: #eee;
+    cursor: pointer;
+}
+
+
+.task-snippet {
+    display: block; 
+    color: #777;
+    font-family: monospace;
+    font-size: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    clear: none;
+}
+
+.task-stats {
+    display: block;
+    float: right;
+    padding-left: 5px;
+}
+
+.comment-count {
+    display: inline;
+    background-image: url('../img/balloon.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+    margin-right: 4px;
+}
+.reviewer-count {
+    display: inline;
+    background-image: url('../img/user-silhouette.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+}

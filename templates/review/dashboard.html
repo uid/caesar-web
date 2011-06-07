@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+
+<script>
+$(document).ready(function() {
+
+
+});
+</script>
+
+{% endblock %}
+
+{% block content %}
+
+<h2 class="task-header">to review</h2>
+<div class="task-list">
+  {% for task in active_tasks.all %}
+  <div class="task-line">
+    <span class="task-stats">
+      <span class="comment-count">
+        {{ task.chunk.comments.count }}
+      </span>
+      <span class="reviewer-count">
+        {{ task.chunk.tasks.count }}
+      </span>
+    </span>
+    <span class="task-snippet">
+    {{ task.chunk.generate_snippet }}
+    </span>
+  </div>
+  {% empty %}
+  No tasks found
+  {% endfor %}
+</div>
+
+<h2 class="task-header">recently reviewed</h2>
+<div class="task-list">
+  {% for task in completed_tasks.all %}
+  {{ task }}
+  {% empty %}
+  No tasks found
+  {% endfor %}
+</div>
+
+
+{% endblock %}

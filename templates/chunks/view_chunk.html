@@ -20,7 +20,7 @@ var commentBoundaries = $('.comment').map(function() {
 });
 
 function showCommentForm(startLine, endLine) {
-    $.get('{% url review.views.new %}', 
+    $.get('{% url review.views.new_comment %}', 
         { start: startLine, end: endLine, chunk: chunkId },
         function(data) {
             $('.new-comment').remove();
@@ -107,7 +107,7 @@ $.each(commentBoundaries, function(index, comment) {
 
 	// delete button
     $('.delete-button', comment.elt).click(function() {
-        $.get('{% url review.views.delete %}', {
+        $.get('{% url review.views.delete_comment %}', {
             comment_id: comment.id
         }, function(data) {
             $(comment.elt).remove();        
