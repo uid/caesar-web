@@ -7,6 +7,11 @@
 <script>
 $(document).ready(function() {
 
+    $('.task-line').click(function(e) {
+      var chunkId = this.id.split('-')[2];
+      window.location = "/chunks/view/" + chunkId;
+      return false;
+    });
 
 });
 </script>
@@ -18,7 +23,7 @@ $(document).ready(function() {
 <h2 class="task-header">to review</h2>
 <div class="task-list">
   {% for task in active_tasks.all %}
-  <div class="task-line">
+  <div id="task-{{task.id}}-{{task.chunk.id}}" class="task-line">
     <span class="task-stats">
       <span class="comment-count">
         {{ task.chunk.comments.count }}
@@ -28,7 +33,7 @@ $(document).ready(function() {
       </span>
     </span>
     <span class="task-snippet">
-    {{ task.chunk.generate_snippet }}
+      {{ task.chunk.generate_snippet }}
     </span>
   </div>
   {% empty %}

@@ -59,7 +59,7 @@
         $(document).ready(function() {
 
             $('#toolbar-anonymous .login-button').click(function() {
-                $.get('{% url caesar.accounts.views.login %}', 
+                $.get('{% url accounts.views.login %}', 
                     { next: '{{ request.path }}' }, function(data) {
                         $('#toolbar-anonymous').html(data);        
                     }
@@ -93,7 +93,7 @@
             {% else %}
             <div id="toolbar-anonymous">
               <button class="login-button" type="button">Login</button>
-              <a href="{% url caesar.accounts.views.register %}">Register</a>
+              <a href="{% url accounts.views.register %}">Register</a>
             </div>
             {% endif %}
         </div>
