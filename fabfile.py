@@ -14,12 +14,17 @@ def deploy():
     Pulls the latest code from git and deploys it.
     """
     update_code()
+    update_dependencies()
     install_project()
     restart_webserver()
 
 def update_code():
     with cd(env.project_path):
         run('git pull')
+
+def update_dependencies():
+    with cd(env.project_path):
+        sudo('pip install -r requirements.txt')
 
 def install_project():
     # symlink the caesar apache configuration file to apache
