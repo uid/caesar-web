@@ -1,3 +1,5 @@
+{% load thumbnail %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -89,7 +91,13 @@
         <div id="toolbar-user">
             {% if user.is_authenticated %}
             <div id="toolbar-logged-in">
+
+              {% thumbnail user.get_profile.photo "20x20" crop="center" as photo %}
+              <img class="user-photo" src="{{ photo.url }}"/>
+              {% empty %}
               <img class="user-photo" src="{{ STATIC_URL }}img/user-silhouette.png"/>
+              {% endthumbnail %}
+
               {{ user.username }}
               {% if user.is_staff %}
               <a href="{% url admin:index %}">Admin</a>
