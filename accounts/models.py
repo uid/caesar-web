@@ -2,6 +2,8 @@ import os
 
 from chunks.models import Chunk
 
+from sorl.thumbnail import ImageField
+
 from django.db import models
 from django.db.models.signals import post_save
 from django.contrib.auth.models import User
@@ -15,7 +17,7 @@ class UserProfile(models.Model):
                 filename)
 
     user = models.OneToOneField(User)
-    photo = models.ImageField(upload_to=get_photo_path)
+    photo = ImageField(upload_to=get_photo_path)
     assigned_chunks = models.ManyToManyField(Chunk, through='review.Task',
         related_name='reviewers')
 

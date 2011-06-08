@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 
-{% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
-{% endblock %}
-
 {% block extrahead %}
 
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
@@ -20,6 +16,10 @@ $(document).ready(function() {
 });
 </script>
 
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
 {% endblock %}
 
 {% block content %}

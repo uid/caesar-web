@@ -1,3 +1,4 @@
 Django
 South
 django-south
+sorl-thumbnail

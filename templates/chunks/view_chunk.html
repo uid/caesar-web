@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 
-{% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
-  <a class="breadcrumb" href="{{ chunk.get_permanent_url }}">Review</a>
-{% endblock %}
 
 {% block extrahead %}
 
@@ -15,6 +11,13 @@ var chunkId = {{ chunk.id }};
 window.isSelecting = false;
 
 $(document).ready(function() {
+
+$('#done-button').click(function(e) {
+    $.post('{% url review.views.change_task %}', {
+        chunk_id: chunkId,
+        status: 'C'
+    });
+});
 
 var commentBoundaries = $('.comment').map(function() {
     var idSplit = this.id.split('-');
@@ -171,6 +174,15 @@ $.each(commentBoundaries, function(index, comment) {
 });
 </script>
 
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb" href="{{ chunk.get_permanent_url }}">Review</a>
+{% endblock %}
+
+{% block actions %}
+  <button id="done-button">Done</button>
 {% endblock %}
 
 

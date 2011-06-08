@@ -2,3 +2,4 @@ settings_local.*
 *.pyc
 .DS_Store
 /sitestatic
+/media

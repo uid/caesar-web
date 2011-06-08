@@ -121,9 +121,10 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'django.contrib.staticfiles',
-    'south',
 
+    'south',
     'debug_toolbar',
+    'sorl.thumbnail',
 
     'utils',
     'accounts',

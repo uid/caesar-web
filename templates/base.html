@@ -10,6 +10,7 @@
     <![endif]-->
     <link rel="stylesheet" href="{{ STATIC_URL}}css/smoothness/jquery-ui.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/toolbar.css" type="text/css" />
 
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.5.2.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.11.custom.min.js"></script>
@@ -88,7 +89,8 @@
         <div id="toolbar-user">
             {% if user.is_authenticated %}
             <div id="toolbar-logged-in">
-              Welcome back, {{ user.username }}
+              <img class="user-photo" src="{{ STATIC_URL }}img/user-silhouette.png"/>
+              {{ user.username }}
               {% if user.is_staff %}
               <a href="{% url admin:index %}">Admin</a>
               {% endif %}
@@ -100,6 +102,11 @@
               <a href="{% url accounts.views.register %}">Register</a>
             </div>
             {% endif %}
+        </div>
+        <div id="toolbar-actions">
+            {% block actions %}
+
+            {% endblock %}
         </div>
       </div>
       {% endblock %}

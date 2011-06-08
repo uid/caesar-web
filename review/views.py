@@ -2,7 +2,7 @@ from review.models import Comment, Vote, Star, Task
 from review.forms import CommentForm, ReplyForm
 from chunks.models import Chunk, Assignment
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -113,3 +113,15 @@ def change_star(request):
         star.save()
         
     return render(request,'review/change_star.html',{'star':star})
+
+@login_required
+def change_task(request):
+    task_id = request.POST['id']
+    status = request.POST['status']
+    task = get_object_or_404(Task, pk=task_id)
+    task.status = status
+    task.save()
+    next_task = request.user.get_profile().tasks.exclude(status='C') \
+                                          .order_by('created')[0]
+    return redirect(next_task.chunk)
+
