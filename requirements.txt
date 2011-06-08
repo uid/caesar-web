@@ -1,4 +1,4 @@
 Django
 South
-django-south
+django-piston
 sorl-thumbnail
