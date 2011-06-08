@@ -3,7 +3,7 @@
 }
 
 .task-list {
-    margin-bottom: 10px;
+    margin-bottom: 18px;
 }
 
 .task-line {
@@ -34,7 +34,7 @@
 .task-stats {
     display: block;
     float: right;
-    padding-left: 5px;
+    padding: 0px 5px;
 }
 
 .comment-count {

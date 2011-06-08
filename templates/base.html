@@ -80,13 +80,17 @@
 
       {% block header %}
       <div id="toolbar" class="span-24">
+        <div id="toolbar-breadcrumbs">
+            {% block breadcrumbs %}
+
+            {% endblock %}
+        </div>
         <div id="toolbar-user">
             {% if user.is_authenticated %}
             <div id="toolbar-logged-in">
               Welcome back, {{ user.username }}
               {% if user.is_staff %}
-              {# TODO un-hardcode URL to admin site #}
-              <a href="/admin">Admin</a>
+              <a href="{% url admin:index %}">Admin</a>
               {% endif %}
               <a href="{% url django.contrib.auth.views.logout %}">Logout</a>
             </div>

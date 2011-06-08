@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb" href="{{ chunk.get_permanent_url }}">Review</a>
+{% endblock %}
+
 {% block extrahead %}
 
 <link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
