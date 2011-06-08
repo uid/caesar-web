@@ -27,19 +27,7 @@ $(document).ready(function() {
 <h2 class="task-header">to review</h2>
 <div class="task-list">
   {% for task in active_tasks.all %}
-  <div id="task-{{task.id}}-{{task.chunk.id}}" class="task-line">
-    <span class="task-stats">
-      <span class="comment-count">
-        {{ task.chunk.comments.count }}
-      </span>
-      <span class="reviewer-count">
-        {{ task.chunk.tasks.count }}
-      </span>
-    </span>
-    <span class="task-snippet">
-      {{ task.chunk.generate_snippet }}
-    </span>
-  </div>
+    {% include "review/task.html" %}
   {% empty %}
   No tasks found
   {% endfor %}
@@ -48,7 +36,7 @@ $(document).ready(function() {
 <h2 class="task-header">recently reviewed</h2>
 <div class="task-list">
   {% for task in completed_tasks.all %}
-  {{ task }}
+    {% include "review/task.html" %}
   {% empty %}
   No tasks found
   {% endfor %}

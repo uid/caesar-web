@@ -38,10 +38,11 @@
 
 #toolbar-user {
     float: right;
-    margin: 4px; 
+    margin: 3px; 
 }
 
 #toolbar-logged-in .user-photo {
     vertical-align: middle;    
+    border: 1px solid #fff;
 }
 

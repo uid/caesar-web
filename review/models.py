@@ -107,6 +107,8 @@ class Task(models.Model):
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
     created = models.DateTimeField(auto_now_add=True)
     objects = TaskManager()
+    class Meta:
+        unique_together = ('chunk', 'reviewer',)
     
     def __unicode__(self):
         return "Task: %s - %s" % (self.reviewer.user, self.chunk)

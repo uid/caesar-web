@@ -116,12 +116,15 @@ def change_star(request):
 
 @login_required
 def change_task(request):
-    task_id = request.POST['id']
-    status = request.POST['status']
+    task_id = request.REQUEST['task_id']
+    status = request.REQUEST['status']
     task = get_object_or_404(Task, pk=task_id)
     task.status = status
     task.save()
-    next_task = request.user.get_profile().tasks.exclude(status='C') \
-                                          .order_by('created')[0]
-    return redirect(next_task.chunk)
+    try:
+        user_task = request.user.get_profile().tasks.exclude(status='C') \
+                                              .order_by('created')[0:1].get()
+        return redirect(next_task.chunk)
+    except Task.DoesNotExist:
+        return redirect('review.views.dashboard')
 

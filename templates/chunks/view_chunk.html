@@ -12,13 +12,6 @@ window.isSelecting = false;
 
 $(document).ready(function() {
 
-$('#done-button').click(function(e) {
-    $.post('{% url review.views.change_task %}', {
-        chunk_id: chunkId,
-        status: 'C'
-    });
-});
-
 var commentBoundaries = $('.comment').map(function() {
     var idSplit = this.id.split('-');
     return { id: parseInt(idSplit[1]), 
@@ -182,7 +175,13 @@ $.each(commentBoundaries, function(index, comment) {
 {% endblock %}
 
 {% block actions %}
-  <button id="done-button">Done</button>
+  {% if task %}
+  <form method="post" 
+    action="{% url review.views.change_task %}?task_id={{ task.id }}&status=C">
+    {% csrf_token %}
+    <button id="done-button" type="submit">Done</button>
+  </form>
+  {% endif %}
 {% endblock %}
 
 

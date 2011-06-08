@@ -4,6 +4,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 def project_path(s):
     return os.path.join(PROJECT_ROOT, s)
 
+# These should be overridden in production in settings_local.py
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
