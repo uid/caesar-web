@@ -21,15 +21,12 @@ class Comment(models.Model):
     modified = models.DateTimeField(auto_now=True)
     parent = models.ForeignKey('self', related_name='child_comments', 
         blank=True, null=True)
+    # fields added for denormalization purposes
+    upvote_count = models.IntegerField(default=0)
+    downvote_count = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.text
-
-    def vote_counts(self):
-        """Returns the total upvote and downvote counts as a tuple."""
-        upvote_count = self.votes.filter(value=1).count()
-        downvote_count = self.votes.filter(value=-1).count()
-        return (upvote_count, downvote_count)
 
     #returns child and vote counts for child as a tuple
     def get_child_comment_vote(self):
@@ -51,7 +48,9 @@ class Comment(models.Model):
     @staticmethod
     def get_comments_for_chunk(chunk):
         all_comments = []
-        parent_comments=Comment.objects.filter(chunk=chunk).filter(parent=None)
+        parent_comments= \
+            Comment.objects.select_related('author') \
+                   .filter(chunk=chunk).filter(parent=None)
         for parent_comment in parent_comments:
             temp_stack = [parent_comment]
             while len(temp_stack) != 0:
@@ -74,6 +73,15 @@ class Vote(models.Model):
 
     class Meta:
         unique_together = ('comment', 'author',)
+
+def denormalize_votes(sender, instance, created=False, **kwargs):
+    """This recalculates the vote totals for the comment being voted on"""
+    comment = instance.comment
+    comment.upvote_count = comment.votes.filter(value=1).count()
+    comment.downvote_count = comment.votes.filter(value=-1).count()
+    comment.save()
+models.signals.post_save.connect(denormalize_votes, sender=Vote)
+models.signals.post_delete.connect(denormalize_votes, sender=Vote)
 
 class Star(models.Model):
     value = models.BooleanField(default = False)
