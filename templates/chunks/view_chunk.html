@@ -103,7 +103,7 @@ $.each(commentBoundaries, function(index, comment) {
 		$.get('{% url review.views.reply %}', 
 	        { parent: comment.id }	,
 	        function(data) {
-	            $('.comment-reply').remove();
+	            $('.reply-form').parent().remove();
 	            // find the appropriate place to insert the form
 	            $(comment.elt).after(data);
 	        }

@@ -138,6 +138,7 @@ def show_debug_toolbar(request):
 
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': show_debug_toolbar,
+    'INTERCEPT_REDIRECTS': False,
 }
 
 # PROJECT SPECIFIC SETTINGS

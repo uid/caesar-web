@@ -2,7 +2,7 @@
 
 {% block content %}
 <div id="register-container" class="span-24">
-    <form id="register-form" action="{% url caesar.accounts.views.register %}" method="post">
+    <form id="register-form" action="{% url accounts.views.register %}" method="post">
         {% csrf_token %}
         <legend>Account Information</legend>
         {% for field in form %}

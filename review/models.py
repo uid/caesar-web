@@ -85,13 +85,13 @@ class Star(models.Model):
 class TaskManager(models.Manager):
     def assign_task(self, assignment, user):
         # FIXME this query will probably need to be optimized
-        chunks = Chunk.objects.exclude(file__submission__name=user.username) \
-                              .filter(file__submission__assignment=assignment) \
-                              .exclude(tasks__reviewer=user.get_profile()) \
-                              .annotate(Count('tasks')) \
-                              .order_by('tasks__count')
-        if chunks.exists():
-            task = Task(reviewer=user.get_profile(), chunk=chunks[0])
+        chunk = Chunk.objects.exclude(file__submission__name=user.username) \
+                             .filter(file__submission__assignment=assignment) \
+                             .exclude(tasks__reviewer=user.get_profile()) \
+                             .annotate(Count('tasks')) \
+                             .order_by('-tasks__count')[0]
+        if chunk:
+            task = Task(reviewer=user.get_profile(), chunk=chunk)
             task.save()
             return task
 

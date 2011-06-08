@@ -10,20 +10,20 @@
 
 #toolbar-breadcrumbs a.breadcrumb {
     display: inline-block;
-    padding: 3px 15px;
+    padding: 4px 15px;
     border-radius: 0px 10px 10px 0px / 0px 15px 15px 0px;
     text-decoration: none;
     color: #000;
     margin: 0px;
     margin-left: -11px;
 
-    border: 2px solid #ccc;
+    border: 1px solid #ccc;
     border-left: 0px;
 }
 
 #toolbar-breadcrumbs a.breadcrumb.first-breadcrumb {
     margin-left: 0px;
-    border-left: 2px solid #ccc;
+    border-left: 1px solid #ccc;
     padding-left: 10px;
 }
 
