@@ -125,7 +125,7 @@ def change_task(request):
     task.status = status
     task.save()
     try:
-        user_task = request.user.get_profile().tasks.exclude(status='C') \
+        next_task = request.user.get_profile().tasks.exclude(status='C') \
                                               .order_by('created')[0:1].get()
         return redirect(next_task.chunk)
     except Task.DoesNotExist:
