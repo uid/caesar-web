@@ -87,15 +87,16 @@ def vote(request):
         vote.value = value
     except Vote.DoesNotExist:
         vote = Vote(comment=comment, value=value, author=request.user)
-
     vote.save()
     return render(request, 'review/comment_votes.html', {'comment': comment})
 
 @login_required
 def unvote(request):
     comment_id = request.POST['comment_id']
+    Vote.objects.filter(comment=comment_id, author=request.user).delete()
+    # need to make sure to load the comment after deleting the vote to make sure
+    # the vote counts are correct
     comment = Comment.objects.get(pk=comment_id)
-    Vote.objects.filter(comment=comment, author=request.user).delete()
     return render(request, 'review/comment_votes.html', {'comment': comment})
 
 @login_required

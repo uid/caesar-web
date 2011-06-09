@@ -11,11 +11,11 @@ from django.contrib.auth.decorators import login_required
 def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
+    user_votes = dict((vote.comment_id, vote.value) \
+            for vote in user.votes.filter(comment__chunk=chunk_id))
+
     def get_comment_data(comment):
-        try:
-            vote = comment.votes.get(author=user.id).value
-        except Vote.DoesNotExist:
-            vote = None
+        vote = user_votes.get(comment.id, None)
         snippet = chunk.generate_snippet(comment.start, comment.end)
         return (comment, vote, snippet)
 
