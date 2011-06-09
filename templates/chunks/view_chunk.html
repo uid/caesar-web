@@ -94,6 +94,13 @@ $('.delete-button').button({
 
 // hook up some more behavior for each comment
 $.each(commentBoundaries, function(index, comment) {
+
+    if (!$('#line-' + comment.start).has('.comment-marker').size()) {
+        $('<img src="{{ STATIC_URL }}img/balloon.png">')
+          .prependTo('#line-' + comment.start)
+          .addClass('comment-marker');
+    }
+
     //reply button
     $('.reply-button', comment.elt).click(function() {
 		$.get('{% url review.views.reply %}', 

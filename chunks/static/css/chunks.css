@@ -3,11 +3,18 @@
     font-size: 10px;
     margin: 0;
     display: block;
+    position: relative;
 }
 
 .chunk-line:hover {
     cursor: pointer;
     background-color: #eee
+}
+
+.chunk-line .comment-marker {
+    vertical-align: middle;
+    position: absolute;
+    left: -18px;
 }
 
 .line-code {

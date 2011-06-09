@@ -14,8 +14,10 @@ def dashboard(request):
     if not user.get_profile().tasks.exclude(status='C').count() >= 3:
         assignment = Assignment.objects.get(pk=1)
         task = Task.objects.assign_task(assignment, user)
-    active_tasks = user.get_profile().tasks.exclude(status='C')
-    completed_tasks = user.get_profile().tasks.filter(status='C')
+    active_tasks = user.get_profile().tasks \
+        .select_related('chunk').exclude(status='C')
+    completed_tasks = user.get_profile().tasks \
+        .select_related('chunk').filter(status='C')
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
