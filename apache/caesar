@@ -1,3 +1,7 @@
+SSLVerifyClient require
+SSLVerifyDepth 1
+SSLCACertificateFile /etc/ssl/certs/mitCAclient.pem
+
 Alias /media /var/django/caesar/media
 Alias /static /var/django/caesar/sitestatic
 
@@ -17,4 +21,5 @@ WSGIScriptAlias / /var/django/caesar/apache/caesar.wsgi
 Order deny,allow
 Allow from all
 WSGIPassAuthorization On
+SSLOptions +StdEnvVars
 </Directory>
