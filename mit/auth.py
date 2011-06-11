@@ -1,3 +1,4 @@
+# Code courtesy of Alex Dehnert <adehnert@mit.edu>
 import ldap
 import ldap.filter
 
