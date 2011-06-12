@@ -32,7 +32,7 @@ class SSLRemoteUserBackend(RemoteUserBackend):
             user.last_name = result[0][1]['sn'][0]
             user.email = result[0][1]['mail'][0]
             try:
-                user.groups.add(auth.models.Group.objects.get(name='mit'))
+                user.groups.add(auth.models.Group.objects.get(name='MIT'))
             except ObjectDoesNotExist:
                 print "Failed to retrieve mit group"
         else:
