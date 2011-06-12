@@ -1,28 +1,41 @@
 {% extends "base.html" %}
 
+{% block extrahead %}
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/login.css" type="text/css" />
+
+{% endblock %}
+
 {% block content %}
 
-<div id="login-container" class="span-24">
-{% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+<div id="login-container">
+<h2>log in</h2>
 
-<form method="post" action="{% url accounts.views.login %}">
-  {% csrf_token %}
-  <table>
-    <tr>
-      <td>{{ form.username.label_tag }}</td>
-      <td>{{ form.username }}</td>
-    </tr>
-    <tr>
-      <td>{{ form.password.label_tag }}</td>
-      <td>{{ form.password }}</td>
-    </tr>
-  </table>
+<div id="standard-login-box" >
+  {% if form.errors %}
+  <p>Your username and password didn't match. Please try again.</p>
+  {% endif %}
 
-  <input type="submit" value="Login" />
-  <input type="hidden" name="next" value="{{ next }}" />
-</form>
+  <form method="post" action="{% url django.contrib.auth.views.login %}">
+    {% csrf_token %}
+
+    {{ form.username.label_tag }}
+    {{ form.username }} 
+    {{ form.password.label_tag }}
+    {{ form.password }}
+
+    <input type="hidden" name="next" value="{{ next }}" />
+    <input type="submit" value="Login"/>
+  </form>
+</div>
+
+<div id="cert-login-box">
+    <h3>MIT Certificates</h3>
+    <form action="https://{{ request.get_host }}{{ next }}">
+      <input type="submit"  value="Login with certificates"/>
+    </form>
+
+</div>
 
 </div>
 

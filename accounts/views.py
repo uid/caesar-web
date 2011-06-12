@@ -9,17 +9,16 @@ from django.http import HttpResponseRedirect
 def login(request):
     if request.method == 'GET':
         redirect_to = request.GET.get('next', '')
-        if request.is_ajax():
-            return render(request, 'accounts/login_fragment.html', {
-                'form': AuthenticationForm(),
-                'next': redirect_to
-            })
-        else:
-            return render(request, 'accounts/login.html', {
-                'form': AuthenticationForm(),
-                'next': redirect_to
-            })
+        return render(request, 'accounts/login.html', {
+            'form': AuthenticationForm(),
+            'next': redirect_to
+        })
     else:
+        form = AuthenticationForm(request, request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return HttpResponseRedirect(redirect_to)
+            
         redirect_to = request.POST.get('next', '')
         username = request.POST['username']
         password = request.POST['password']

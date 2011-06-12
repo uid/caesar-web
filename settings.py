@@ -142,7 +142,7 @@ INSTALLED_APPS = (
 AUTH_PROFILE_MODULE = 'accounts.UserProfile'
 
 def show_debug_toolbar(request):
-    return request.user.id in (1,2)
+    return DEBUG
 
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': show_debug_toolbar,
