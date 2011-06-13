@@ -130,8 +130,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'south',
-    'debug_toolbar',
     'sorl.thumbnail',
+    'debug_toolbar',
+    'django_extensions',
 
     'utils',
     'accounts',
