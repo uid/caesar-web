@@ -44,7 +44,7 @@ function showCommentForm(startLine, endLine) {
 
 window.clearSelection = function() {
     isSelecting = false;
-    $('.chunk-line').removeClass('ui-selected');
+    $('.line').removeClass('ui-selected');
     $('.new-comment').remove();
 };
 
@@ -58,14 +58,14 @@ $('body').mousedown(function(e) {
 });
 
 $('#chunk-display').selectable({
-    filter: '.chunk-line',
+    filter: '.line',
     start: function(event, ui) {
         isSelecting = true;
     },
     stop: function(event, ui) {
         var startLine = Number.MAX_VALUE;
         var endLine = Number.MIN_VALUE;
-        $('.chunk-line.ui-selected').each(function(i) {
+        $('.line.ui-selected').each(function(i) {
             var n = parseInt($(this).attr('id').split('-')[1]);
             endLine = Math.max(endLine, n);
             startLine = Math.min(startLine, n);
@@ -95,9 +95,9 @@ $('.delete-button').button({
 // hook up some more behavior for each comment
 $.each(commentBoundaries, function(index, comment) {
 
-    if (!$('#line-' + comment.start).has('.comment-marker').size()) {
+    if (!$('#chunk-line-' + comment.start).has('.comment-marker').size()) {
         $('<img src="{{ STATIC_URL }}img/balloon.png">')
-          .prependTo('#line-' + comment.start)
+          .prependTo('#chunk-line-' + comment.start)
           .addClass('comment-marker');
     }
 
@@ -119,7 +119,7 @@ $.each(commentBoundaries, function(index, comment) {
             comment_id: comment.id
         }, function(data) {
             $(comment.elt).remove();        
-            $('.chunk-line').removeClass('highlighted');            
+            $('.line').removeClass('highlighted');            
         });
     });
 
@@ -165,7 +165,7 @@ $.each(commentBoundaries, function(index, comment) {
     });
     $(comment.elt).mouseout(function() {
         $('.comment-actions', this).hide();
-        $('.chunk-line').removeClass('highlighted');            
+        $('.line').removeClass('highlighted');            
     });
 
 });
@@ -204,14 +204,6 @@ $.each(commentBoundaries, function(index, comment) {
 <}/div>
 {% endcomment %}
 
-<div id="chunk-display" class="span-18">
-    {% for n, line in chunk.lines %}
-    <span id="line-{{ n }}" class="chunk-line">
-      <span class="line-number">{{ n }}</span><pre class="line-code">{{ line }}</pre>
-    </span>
-    {% endfor %}
-</div>
-
 <script type="text/javascript">	
 	$(document).ready(function(){
 		//set the initial state
@@ -237,7 +229,7 @@ $.each(commentBoundaries, function(index, comment) {
 	});
 </script>
 
-<div id="comment-display" class="span-6 last">
+<div id="comment-display" class="span-6">
     {% for comment, vote, snippet in comment_data %}
     
     {% include "review/comment.html" %} 
@@ -245,8 +237,18 @@ $.each(commentBoundaries, function(index, comment) {
     {% endfor %}
 </div>
 
+<div id="chunk-display" class="span-18 last">
+    {% for n, line in chunk.lines %}
+    <span id="chunk-line-{{ n }}" class="chunk-line">
+      <span id="line-{{ n }}" class="line">
+        <span class="line-number">{{ n }}</span><pre class="line-code">{{ line }}</pre>
+      </span>
+    </span>
+    {% endfor %}
+</div>
+
 {% if user.is_authenticated %}
-<div id="star_div" class="prepend-18 span-6 last">  
+<div id="star_div" class="span-6">  
   <hr class="space"/>
   <hr/>
   <input type="checkbox" id="star_box" class="star_box_class"/> This code looks good to me. 

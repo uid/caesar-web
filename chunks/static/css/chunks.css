@@ -1,20 +1,36 @@
+#chunk-display {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    padding-left: 18px;
+}
+
 .chunk-line {
     font-family: monospace;
-    font-size: 10px;
+    font-size: 11px;
     margin: 0;
     display: block;
     position: relative;
 }
 
-.chunk-line:hover {
+.line {
+    display: block;
+}
+
+.line:hover {
+    background-color: #eee;
     cursor: pointer;
-    background-color: #eee
 }
 
 .chunk-line .comment-marker {
     vertical-align: middle;
     position: absolute;
     left: -18px;
+}
+
+.chunk-line .comment-marker {
+    cursor: pointer;
 }
 
 .line-code {
@@ -24,7 +40,7 @@
 .line-number {
     display: inline-block;
     text-align: right;
-    width: 3em;
+    width: 2.5em;
     background-color: #ccf;
     margin-right: 1em;
     padding: 0 .25em;
@@ -37,6 +53,6 @@
     background-color: #FFFFCA;
 }
 
-.chunk-line.highlighted {
+.line.highlighted {
     background-color: #FFFFCA;
 }
