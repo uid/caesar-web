@@ -28,7 +28,7 @@ function showCommentForm(startLine, endLine) {
             // find the appropriate place to insert the form
             var added = false;
             $.each(commentBoundaries, function(index, comment) {
-                if ((startLine == comment.start && endLine <= comment.end)
+                if ((startLine == comment.start && endLine >= comment.end)
                     || startLine < comment.start) {
                     $(comment.elt).before(data);                        
                     added = true;

@@ -60,7 +60,7 @@ class Comment(models.Model):
         return all_comments
 
     class Meta:
-        ordering = [ 'start', 'end' ]
+        ordering = [ 'start', '-end' ]
 
 class Vote(models.Model):
     VALUE_CHOICES = (
