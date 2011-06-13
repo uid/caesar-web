@@ -107,6 +107,7 @@
     -webkit-box-sizing:border-box;
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
+    height: auto;
 }
 
 .comment-form, .reply-form {
