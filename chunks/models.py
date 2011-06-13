@@ -31,9 +31,11 @@ class File(models.Model):
 class Chunk(models.Model):
     id = models.AutoField(primary_key=True)
     file = models.ForeignKey(File)
+    name = models.CharField(max_length=200)
     start = models.IntegerField()
     end = models.IntegerField()
     created = models.DateTimeField()
+    modified = models.DateTimeField()
     class Meta:
         db_table = u'chunks'
     

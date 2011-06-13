@@ -19,6 +19,14 @@
     cursor: pointer;
 }
 
+.chunk-name {
+    display: block;
+    position: absolute;
+    width: 25em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 
 .task-snippet {
     display: block; 
@@ -28,6 +36,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    margin-left: 25em;
     clear: none;
 }
 
