@@ -49,7 +49,7 @@ window.clearSelection = function() {
 };
 
 // Clear the selected lines if the user clicks anywhere except the comment form
-$(document).mousedown(function(e) {
+$('body').mousedown(function(e) {
     if ($(e.target).is('.comment-form *')) {
         return true;
     }
