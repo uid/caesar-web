@@ -178,7 +178,7 @@ $.each(commentBoundaries, function(index, comment) {
 
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
-  <a class="breadcrumb" href="{{ chunk.get_permanent_url }}">Review</a>
+  <a class="breadcrumb" href="{{ chunk.get_permanent_url }}">{{ chunk.name }}</a>
 {% endblock %}
 
 {% block actions %}
