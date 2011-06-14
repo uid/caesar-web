@@ -88,6 +88,8 @@ def vote(request):
     except Vote.DoesNotExist:
         vote = Vote(comment=comment, value=value, author=request.user)
     vote.save()
+    # Reload the comment to make sure vote counts are up to date
+    comment = Comment.objects.get(pk=comment_id)
     return render(request, 'review/comment_votes.html', {'comment': comment})
 
 @login_required
