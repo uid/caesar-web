@@ -17,6 +17,7 @@ var commentBoundaries = $('.comment').map(function() {
     return { id: parseInt(idSplit[1]), 
              start: parseInt(idSplit[2]), 
              end: parseInt(idSplit[3]),
+             collapsed: false,
              elt: this };
 });
 
@@ -40,6 +41,22 @@ function showCommentForm(startLine, endLine) {
             }
         }
     );
+};
+
+function collapseComment(comment) {
+    $(comment.elt).removeClass('expanded')
+            .addClass('collapsed');
+
+
+
+    comment.collapsed = true;
+};
+
+function expandComment(comment) {
+    $(comment.elt).removeClass('collapsed')
+            .addClass('expanded');
+
+    comment.collapsed = false;
 };
 
 window.clearSelection = function() {
@@ -101,6 +118,14 @@ $.each(commentBoundaries, function(index, comment) {
           .addClass('comment-marker');
     }
 
+    $('.comment-visibility', comment.elt).click(function() {
+        if (comment.collapsed) {
+            expandComment(comment);
+        } else {
+            collapseComment(comment);
+        }
+    });
+
     //reply button
     $('.reply-button', comment.elt).click(function() {
 		$.get('{% url review.views.reply %}', 
@@ -156,15 +181,12 @@ $.each(commentBoundaries, function(index, comment) {
 
     // mouseover behavior
     $(comment.elt).mouseover(function() {
-        // show little comment action buttons
-        $('.comment-actions', this).show();
         // highlight corresponding code lines
         for (var i = comment.start; i <= comment.end; i++) {
             $('#line-' + i).addClass('highlighted');            
         }
     });
     $(comment.elt).mouseout(function() {
-        $('.comment-actions', this).hide();
         $('.line').removeClass('highlighted');            
     });
 
