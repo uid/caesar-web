@@ -44,11 +44,11 @@ function showCommentForm(startLine, endLine) {
 
 function collapseComment(comment) {
     $(comment.elt).removeClass('expanded')
-            .addClass('collapsed');
+            .addClass('collapsed', 'fast');
 };
 
 function expandComment(comment) {
-    $(comment.elt).removeClass('collapsed')
+    $(comment.elt).removeClass('collapsed', 'fast')
             .addClass('expanded');
 };
 
