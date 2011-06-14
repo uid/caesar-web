@@ -17,7 +17,6 @@ var commentBoundaries = $('.comment').map(function() {
     return { id: parseInt(idSplit[1]), 
              start: parseInt(idSplit[2]), 
              end: parseInt(idSplit[3]),
-             collapsed: false,
              elt: this };
 });
 
@@ -46,17 +45,11 @@ function showCommentForm(startLine, endLine) {
 function collapseComment(comment) {
     $(comment.elt).removeClass('expanded')
             .addClass('collapsed');
-
-
-
-    comment.collapsed = true;
 };
 
 function expandComment(comment) {
     $(comment.elt).removeClass('collapsed')
             .addClass('expanded');
-
-    comment.collapsed = false;
 };
 
 window.clearSelection = function() {
@@ -120,7 +113,7 @@ $.each(commentBoundaries, function(index, comment) {
 
 
     $('.comment-header', comment.elt).click(function() {
-        if (comment.collapsed) {
+        if ($(comment.elt).hasClass('collapsed')) {
             expandComment(comment);
         } else {
             collapseComment(comment);
@@ -129,7 +122,7 @@ $.each(commentBoundaries, function(index, comment) {
     });
     
     $(comment.elt).click(function() {
-        if (comment.collapsed) {
+        if ($(comment.elt).hasClass('collapsed')) {
             expandComment(comment);
         } else {
             return true;
