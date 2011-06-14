@@ -100,24 +100,6 @@ def unvote(request):
     return render(request, 'review/comment_votes.html', {'comment': comment})
 
 @login_required
-def change_star(request):
-    if request.POST['value'] == "check":
-        value = True
-    else:
-        value = False
-    chunk_id = request.POST['chunk_id']
-    chunk = Chunk.objects.get(pk=chunk_id)
-    try:
-        star = Star.objects.get(chunk=chunk, author=request.user)
-        star.value = value
-        star.save()
-    except Star.DoesNotExist:
-        star = Star(chunk=chunk, value=value, author=request.user)
-        star.save()
-        
-    return render(request,'review/change_star.html',{'star':star})
-
-@login_required
 def change_task(request):
     task_id = request.REQUEST['task_id']
     status = request.REQUEST['status']

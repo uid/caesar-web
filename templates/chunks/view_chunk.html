@@ -204,31 +204,6 @@ $.each(commentBoundaries, function(index, comment) {
 <}/div>
 {% endcomment %}
 
-<script type="text/javascript">	
-	$(document).ready(function(){
-		//set the initial state
-		{% if star.value %}
-			$("#star_box").each(function(){ this.checked = true});
-		{% endif %}
-		$("#star_div").show();
-		
-		//set the listener
-		$("#star_box").click(function(){
-			if(this.checked){ //star box was just checked
-				$.post('{% url review.views.change_star %}', 
-					{chunk_id: {{ chunk.id }}, value: "check"} ,
-					function(data){}
-				);
-			} else { // star box was just unchecked
-				$.post('{% url review.views.change_star %}', 
-					{chunk_id: {{ chunk.id }}, value: "uncheck"}, 
-					function(data){}
-				);
-			}
-		});
-	});
-</script>
-
 <div id="comment-display" class="span-6">
     {% for comment, vote, snippet in comment_data %}
     
@@ -246,14 +221,6 @@ $.each(commentBoundaries, function(index, comment) {
     </span>
     {% endfor %}
 </div>
-
-{% if user.is_authenticated %}
-<div id="star_div" class="span-6">  
-  <hr class="space"/>
-  <hr/>
-  <input type="checkbox" id="star_box" class="star_box_class"/> This code looks good to me. 
-</div>
-{% endif %}
 
 {% endblock %}
 
