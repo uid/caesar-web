@@ -118,11 +118,21 @@ $.each(commentBoundaries, function(index, comment) {
           .addClass('comment-marker');
     }
 
-    $('.comment-visibility', comment.elt).click(function() {
+
+    $('.comment-header', comment.elt).click(function() {
         if (comment.collapsed) {
             expandComment(comment);
         } else {
             collapseComment(comment);
+        }
+        return false;
+    });
+    
+    $(comment.elt).click(function() {
+        if (comment.collapsed) {
+            expandComment(comment);
+        } else {
+            return true;
         }
     });
 
