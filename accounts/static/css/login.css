@@ -22,6 +22,10 @@ input[type=submit] {
     margin: 0px;
 }
 
+#register-link {
+    float: right;
+}
+
 #cert-login-box {
     border: 1px solid #ddd;
     padding: 20px;

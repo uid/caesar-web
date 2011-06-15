@@ -2,17 +2,17 @@
 
 {% block content %}
 <div id="register-container" class="span-24">
+    <h2>register</h2>
     <form id="register-form" action="{% url accounts.views.register %}" method="post">
         {% csrf_token %}
-        <legend>Account Information</legend>
         {% for field in form %}
-        <div>
+        <p>
           <label for="{{ field.id }}">
             {{ field.label }}{% if field.field.required %}*{% endif %}
           </label><br/>
           {{ field }} <br/>
           {{ field.help_text }}
-        </div>
+        </p>
 
         {% for error in field.errors %}
         <p class="error">{{ error }}</p>
