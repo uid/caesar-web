@@ -19,6 +19,10 @@
     cursor: pointer;
 }
 
+.new.task-line {
+    font-weight: bold;
+}
+
 .chunk-name {
     display: block;
     position: absolute;

@@ -27,6 +27,10 @@ def view_chunk(request, chunk_id):
     # get the associated task if it exists
     try:
         task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())
+        if task.status == 'N':
+            # Mark the review task as started if it is currently new
+            task.status = 'S'
+            task.save()
     except Task.DoesNotExist:
         task = None
     return render(request, 'chunks/view_chunk.html', { 

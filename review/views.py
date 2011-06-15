@@ -1,5 +1,6 @@
 from review.models import Comment, Vote, Star, Task
 from review.forms import CommentForm, ReplyForm
+from review import app_settings
 from chunks.models import Chunk, Assignment
 
 from django.shortcuts import render, redirect, get_object_or_404
@@ -11,9 +12,10 @@ from django.http import HttpResponse
 @login_required
 def dashboard(request):
     user = request.user
-    if not user.get_profile().tasks.exclude(status='C').count() >= 3:
-        assignment = Assignment.objects.get(pk=1)
-        task = Task.objects.assign_task(assignment, user)
+    assignment = Assignment.objects.get(pk=1)
+    
+    new_task_count = Task.objects.assign_tasks(assignment, user)
+    
     active_tasks = user.get_profile().tasks \
         .select_related('chunk').exclude(status='C')
     completed_tasks = user.get_profile().tasks \
@@ -21,6 +23,7 @@ def dashboard(request):
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
+        'new_task_count': new_task_count,
     })
 
 @login_required

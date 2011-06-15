@@ -24,6 +24,12 @@ $(document).ready(function() {
 
 {% block content %}
 
+<div class="span-24">
+{% if new_task_count > 0 %}
+<div class="info">
+  You have {{ new_task_count }} new review task{{ new_task_count|pluralize }}.
+</div>
+{% endif %}
 <h2 class="task-header">to review</h2>
 <div class="task-list">
   {% for task in active_tasks.all %}
@@ -43,4 +49,5 @@ $(document).ready(function() {
 </div>
 
 
+</div>
 {% endblock %}

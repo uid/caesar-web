@@ -1,4 +1,6 @@
-<div id="task-{{task.id}}-{{task.chunk.id}}" class="task-line">
+<div id="task-{{task.id}}-{{task.chunk.id}}" class="task-line
+  {% if task.status == 'N' %}new{% endif %}
+  ">
   <span class="chunk-name">
     {{ task.chunk.name }}
   </span>
