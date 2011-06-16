@@ -1,11 +1,3 @@
-<script type="text/javascript">
-
-  $('#cancel-reply-button').click(function() {
-      $('.reply-form').parent().remove();
-  });
-
-</script>
-
 <div class="comment comment-reply">
   <div class="reply-form">
     <form action="{% url review.views.reply %}" method="post">

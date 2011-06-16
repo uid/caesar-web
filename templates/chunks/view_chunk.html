@@ -27,17 +27,24 @@ function showCommentForm(startLine, endLine) {
             $('.new-comment').remove();
             // find the appropriate place to insert the form
             var added = false;
+            var elt = $(data);
             $.each(commentBoundaries, function(index, comment) {
                 if ((startLine == comment.start && endLine >= comment.end)
                     || startLine < comment.start) {
-                    $(comment.elt).before(data);                        
+                    $(comment.elt).before(elt);                        
                     added = true;
                     return false;
                 }
             });
             if (!added) {
-                $('#comment-display').append(data);
+                $('#comment-display').append(elt);
             }
+            var commentElt = elt.filter('.comment').get(0);
+            // construct a fake "comment" boundary object to pass in
+            scrollCodeTo({start: startLine, end:endLine, elt:commentElt}); 
+            $(commentElt).effect('highlight', {}, 2000);
+
+            $('textarea').focus();
         }
     );
 };
@@ -155,7 +162,6 @@ $.each(commentBoundaries, function(index, comment) {
           });
     }
 
-
     $('.comment-header', comment.elt).click(function() {
         if ($(comment.elt).hasClass('collapsed')) {
             expandComment(comment);
@@ -164,7 +170,6 @@ $.each(commentBoundaries, function(index, comment) {
         }
         return false;
     });
-    
     $(comment.elt).click(function() {
         if ($(comment.elt).hasClass('collapsed')) {
             expandComment(comment);
@@ -173,6 +178,7 @@ $.each(commentBoundaries, function(index, comment) {
             return false;
         }
     });
+    
 
     //reply button
     $('.reply-button', comment.elt).click(function() {
@@ -181,9 +187,11 @@ $.each(commentBoundaries, function(index, comment) {
 	        function(data) {
 	            $('.reply-form').parent().remove();
 	            // find the appropriate place to insert the form
-	            $(comment.elt).after(data);
+                $(data).insertAfter(comment.elt);
+                $('textarea').focus();
 	        }
 	    );
+        return false;
 	});
 
 	// delete button
@@ -195,6 +203,7 @@ $.each(commentBoundaries, function(index, comment) {
             $('.parent-' + comment.id).remove();
             $('.line').removeClass('highlighted');            
         });
+        return false;
     });
 
     $('.upvote-button,.downvote-button', comment.elt).click(function() {
@@ -226,6 +235,15 @@ $.each(commentBoundaries, function(index, comment) {
                     .effect('highlight', {}, 1000);
             });
         }
+        return false;
+    });
+
+    $('#cancel-button').live('click', function() {
+        clearSelection();
+    });
+
+    $('#cancel-reply-button').live('click', function() {
+        $('.reply-form').parent().remove();
     });
 
     // mouseover behavior
@@ -238,6 +256,7 @@ $.each(commentBoundaries, function(index, comment) {
     $(comment.elt).mouseout(function() {
         $('.line').removeClass('highlighted');            
     });
+
 
 });
 
