@@ -15,6 +15,10 @@
     height: 16px;
     overflow: hidden;
 }
+.collapsed.comment.comment-reply {
+    height: 0px; /* this is here to help with the animation */
+    display: none;
+}
 
 .comment.comment-reply {
     border-top: 0px;

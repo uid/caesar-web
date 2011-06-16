@@ -25,9 +25,16 @@ class Comment(models.Model):
     # fields added for denormalization purposes
     upvote_count = models.IntegerField(default=0)
     downvote_count = models.IntegerField(default=0)
+    # Set to either self.id for root comments or parent.id for replies, mostly
+    # to allow for retrieving comments in threaded order in one query
+    thread_id = models.IntegerField()
 
     def __unicode__(self):
         return self.text
+
+    def save(self, *args, **kwargs):
+        self.thread_id = self.parent_id or self.id
+        super(Comment, self).save(*args, **kwargs)
 
     #returns child and vote counts for child as a tuple
     def get_child_comment_vote(self):
@@ -41,27 +48,14 @@ class Comment(models.Model):
         return (self, vote)
 
     def is_reply(self):
-        if self.parent:
-            return True
-        else:
-            return False
+        return self.parent_id is not None
             
     @staticmethod
     def get_comments_for_chunk(chunk):
-        all_comments = []
-        parent_comments= \
-            Comment.objects.select_related('author') \
-                   .filter(chunk=chunk).filter(parent=None)
-        for parent_comment in parent_comments:
-            temp_stack = [parent_comment]
-            while len(temp_stack) != 0:
-                temp_child = temp_stack.pop(0)
-                all_comments.append(temp_child)
-                temp_stack = list(temp_child.child_comments.all()) + temp_stack
-        return all_comments
+        return chunk.comments.select_related('author')
 
     class Meta:
-        ordering = [ 'start', '-end' ]
+        ordering = [ 'start', '-end', 'thread_id', 'created' ]
 
 class Vote(models.Model):
     VALUE_CHOICES = (

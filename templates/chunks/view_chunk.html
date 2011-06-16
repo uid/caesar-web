@@ -45,10 +45,14 @@ function showCommentForm(startLine, endLine) {
 function collapseComment(comment) {
     $(comment.elt).removeClass('expanded')
             .addClass('collapsed', 'fast');
+    $('.parent-' + comment.id).removeClass('expanded')
+            .addClass('collapsed', 'fast');
 };
 
 function expandComment(comment) {
     $(comment.elt).removeClass('collapsed', 'fast')
+            .addClass('expanded');
+    $('.parent-' + comment.id).removeClass('collapsed', 'fast')
             .addClass('expanded');
 };
 

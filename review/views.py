@@ -69,6 +69,9 @@ def reply(request):
             comment.chunk = parent.chunk
             comment.end = parent.end
             comment.start = parent.start 
+            if parent.is_reply():
+                # strictly single threads for discussion
+                comment.parent = parent.parent
             comment.save()
             return redirect(comment.chunk)
 

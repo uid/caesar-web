@@ -2,7 +2,11 @@
 
 <!-- comment node ids are named like comment-$ID-$START-$END -->
 <div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}" 
-  class="comment {% if comment.is_reply %}comment-reply{% endif %}
+  class="comment 
+         {% if comment.is_reply %}
+           comment-reply 
+           parent-{{ comment.parent_id }}
+         {% endif %}
          {% if comment.type != 'U' %}comment-auto{% endif %}
          expanded">
 
