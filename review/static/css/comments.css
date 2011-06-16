@@ -1,3 +1,10 @@
+#comment-display {
+}
+#comment-display-inner {
+    position: relative;
+    margin-left: 5px;
+}
+
 .comment {
     border: 1px solid #ddd;
     margin: 0px 0px 10px 0px;
@@ -5,6 +12,7 @@
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
     box-shadow: 1px 1px 2px #aaa;
+    background-color: #fff;
 }
 .comment:hover {
     cursor: pointer;
@@ -16,8 +24,8 @@
     overflow: hidden;
 }
 .collapsed.comment.comment-reply {
-    height: 0px; /* this is here to help with the animation */
-    display: none;
+    height: 0px; 
+    border: 0px;
 }
 
 .comment.comment-reply {

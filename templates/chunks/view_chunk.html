@@ -56,6 +56,37 @@ function expandComment(comment) {
             .addClass('expanded');
 };
 
+function scrollCodeTo(comment, doScroll) {
+    if (doScroll === undefined) {
+        doScroll = true;
+    }
+    var SCROLL_THRESHOLD = 75;
+    var targetLine = $('#chunk-line-' + comment.start);
+    var commentTop = $(comment.elt).offset().top;
+    var commentHeight = $(comment.elt).height();
+    var yDelta = targetLine.offset().top - commentTop ;
+
+    $('#comment-display-inner').animate({
+        top: '+=' + yDelta,
+    }, 500);
+
+    if (!doScroll) return;
+
+    var windowHeight = $(window).height();
+    if (commentTop + yDelta + commentHeight >
+            windowHeight + $(window).scrollTop()) {
+        $('html,body').animate({
+            scrollTop: commentTop - windowHeight + 
+                commentHeight + yDelta + SCROLL_THRESHOLD
+        }, 500); 
+    } else if (commentTop + yDelta < $(window).scrollTop()) {
+        $('html,body').animate({
+            scrollTop: commentTop + yDelta - SCROLL_THRESHOLD}, 500); 
+    }
+
+    return yDelta;
+};
+
 window.clearSelection = function() {
     isSelecting = false;
     $('.line').removeClass('ui-selected');
@@ -73,6 +104,7 @@ $('body').mousedown(function(e) {
 
 $('#chunk-display').selectable({
     filter: '.line',
+    cancel: '.comment-marker',
     start: function(event, ui) {
         isSelecting = true;
     },
@@ -112,7 +144,10 @@ $.each(commentBoundaries, function(index, comment) {
     if (!$('#chunk-line-' + comment.start).has('.comment-marker').size()) {
         $('<img src="{{ STATIC_URL }}img/balloon.png">')
           .prependTo('#chunk-line-' + comment.start)
-          .addClass('comment-marker');
+          .addClass('comment-marker')
+          .click(function(e) { 
+              scrollCodeTo(comment);
+          });
     }
 
 
@@ -129,7 +164,8 @@ $.each(commentBoundaries, function(index, comment) {
         if ($(comment.elt).hasClass('collapsed')) {
             expandComment(comment);
         } else {
-            return true;
+            scrollCodeTo(comment);
+            return false;
         }
     });
 
@@ -235,11 +271,11 @@ $.each(commentBoundaries, function(index, comment) {
 {% endcomment %}
 
 <div id="comment-display" class="span-6">
-    {% for comment, vote, snippet in comment_data %}
-    
-    {% include "review/comment.html" %} 
-
-    {% endfor %}
+    <div id="comment-display-inner">
+        {% for comment, vote, snippet in comment_data %}
+        {% include "review/comment.html" %} 
+        {% endfor %}
+    </div>
 </div>
 
 <div id="chunk-display" class="span-18 last">
