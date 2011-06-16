@@ -151,6 +151,7 @@ $.each(commentBoundaries, function(index, comment) {
             comment_id: comment.id
         }, function(data) {
             $(comment.elt).remove();        
+            $('.parent-' + comment.id).remove();
             $('.line').removeClass('highlighted');            
         });
     });

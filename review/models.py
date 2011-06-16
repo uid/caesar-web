@@ -27,14 +27,14 @@ class Comment(models.Model):
     downvote_count = models.IntegerField(default=0)
     # Set to either self.id for root comments or parent.id for replies, mostly
     # to allow for retrieving comments in threaded order in one query
-    thread_id = models.IntegerField()
+    thread_id = models.IntegerField(null=True)
 
     def __unicode__(self):
         return self.text
 
     def save(self, *args, **kwargs):
-        self.thread_id = self.parent_id or self.id
         super(Comment, self).save(*args, **kwargs)
+        self.thread_id = self.parent_id or self.id
 
     #returns child and vote counts for child as a tuple
     def get_child_comment_vote(self):

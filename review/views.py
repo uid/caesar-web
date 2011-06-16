@@ -80,6 +80,7 @@ def delete_comment(request):
     comment_id = request.GET['comment_id']
     comment = Comment.objects.get(pk=comment_id)
     if comment.author == request.user:
+        # This will cascade and delete all replies as well
         comment.delete()
     return HttpResponse('deleted')
 
