@@ -37,7 +37,7 @@ function showCommentForm(startLine, endLine) {
                 }
             });
             if (!added) {
-                $('#comment-display').append(elt);
+                $('#comment-display-inner').append(elt);
             }
             var commentElt = elt.filter('.comment').get(0);
             // construct a fake "comment" boundary object to pass in
