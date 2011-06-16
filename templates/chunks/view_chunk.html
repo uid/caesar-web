@@ -147,6 +147,11 @@ $.each(commentBoundaries, function(index, comment) {
           .addClass('comment-marker')
           .click(function(e) { 
               scrollCodeTo(comment);
+              $.each(commentBoundaries, function(index, innerComment) {
+                  if (innerComment.start == comment.start) {
+                      $(innerComment.elt).effect('highlight', {}, 2000);
+                  }
+              });
           });
     }
 
