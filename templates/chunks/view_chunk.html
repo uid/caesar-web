@@ -42,7 +42,7 @@ function showCommentForm(startLine, endLine) {
             var commentElt = elt.filter('.comment').get(0);
             // construct a fake "comment" boundary object to pass in
             scrollCodeTo({start: startLine, end:endLine, elt:commentElt}); 
-            $(commentElt).effect('highlight', {}, 2000);
+            $(commentElt).effect('highlight', {queue: false}, 2000);
 
             $('textarea').focus();
         }
@@ -75,7 +75,7 @@ function scrollCodeTo(comment, doScroll) {
 
     $('#comment-display-inner').animate({
         top: '+=' + yDelta,
-    }, 500);
+    }, { duration: 500, queue: false, easing: 'easeInOutQuad' });
 
     if (!doScroll) return;
 
@@ -85,13 +85,20 @@ function scrollCodeTo(comment, doScroll) {
         $('html,body').animate({
             scrollTop: commentTop - windowHeight + 
                 commentHeight + yDelta + SCROLL_THRESHOLD
-        }, 500); 
+        }, { duration: 500, queue: false, easing: 'easeInOutQuad' }); 
     } else if (commentTop + yDelta < $(window).scrollTop()) {
         $('html,body').animate({
-            scrollTop: commentTop + yDelta - SCROLL_THRESHOLD}, 500); 
+            scrollTop: commentTop + yDelta - SCROLL_THRESHOLD
+        }, { duration: 500, queue: false, easing: 'easeInOutQuad' }); 
     }
 
     return yDelta;
+};
+
+function resetScroll() {
+    $('#comment-display-inner').animate({
+        top: 0,
+    }, { duration: 500, queue: false });
 };
 
 window.clearSelection = function() {
@@ -102,10 +109,13 @@ window.clearSelection = function() {
 
 // Clear the selected lines if the user clicks anywhere except the comment form
 $('body').mousedown(function(e) {
-    if ($(e.target).is('.comment-form *')) {
+    if ($(e.target).is('.new-comment *')) {
         return true;
     }
     clearSelection();
+    if (!$(e.target).is('.comment *, .chunk-line *')) {
+        resetScroll();
+    }
     return true;
 });
 
@@ -187,7 +197,12 @@ $.each(commentBoundaries, function(index, comment) {
 	        function(data) {
 	            $('.reply-form').parent().remove();
 	            // find the appropriate place to insert the form
-                $(data).insertAfter(comment.elt);
+                var replyElt = $(data).insertAfter(comment.elt);
+                scrollCodeTo({
+                    start: comment.start, 
+                    end: comment.end, 
+                    elt: replyElt.get(0), 
+                }); 
                 $('textarea').focus();
 	        }
 	    );
@@ -239,10 +254,12 @@ $.each(commentBoundaries, function(index, comment) {
     });
 
     $('#cancel-button').live('click', function() {
+        resetScroll();
         clearSelection();
     });
 
     $('#cancel-reply-button').live('click', function() {
+        resetScroll();
         $('.reply-form').parent().remove();
     });
 
