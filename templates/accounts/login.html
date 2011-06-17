@@ -25,16 +25,15 @@
     {{ form.password }}
 
     <input type="hidden" name="next" value="{{ next }}" />
-    <input type="submit" value="Login"/>
+    <button type="submit">Login</button>
   </form>
 
   <a id="register-link" href="{% url accounts.views.register %}">Register</a>
 </div>
 
 <div id="cert-login-box">
-    <h3>MIT Certificates</h3>
     <form action="https://{{ request.get_host }}{{ next }}">
-      <input type="submit"  value="Login with certificates"/>
+        <button id="cert-login-button" type="submit">Login with MIT certificates</button>
     </form>
 
 </div>

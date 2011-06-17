@@ -4,7 +4,7 @@
     text-size: .75em; 
     z-index: 1000;
     position: relative;
-    box-shadow: 1px 1px 2px #ccc;
+    box-shadow: 1px 1px 3px #777;
 }
 
 #toolbar-breadcrumbs {

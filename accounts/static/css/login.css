@@ -33,5 +33,11 @@ input[type=submit] {
     width: 288px;
     position: absolute;
     left: 350px;
+    text-align: center;
 }
 
+#cert-login-button {
+    margin: 0px auto;
+    display: inline-block;
+    padding: 8px 8px;
+}
