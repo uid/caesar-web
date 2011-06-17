@@ -3,6 +3,7 @@
 #comment-display-inner {
     position: relative;
     margin-left: 5px;
+    min-height: 5px;
 }
 
 .comment {

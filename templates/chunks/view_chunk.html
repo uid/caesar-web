@@ -49,6 +49,17 @@ function showCommentForm(startLine, endLine) {
     );
 };
 
+function highlightCommentLines(comment) {
+    // highlight corresponding code lines
+    for (var i = comment.start; i <= comment.end; i++) {
+        $('#line-' + i).addClass('highlighted');            
+    }
+};
+
+function unhighlightCommentLines() {
+    $('.line').removeClass('highlighted');            
+};
+
 function collapseComment(comment) {
     $(comment.elt).removeClass('expanded')
             .addClass('collapsed', 'fast');
@@ -253,29 +264,27 @@ $.each(commentBoundaries, function(index, comment) {
         return false;
     });
 
-    $('#cancel-button').live('click', function() {
-        resetScroll();
-        clearSelection();
-    });
-
-    $('#cancel-reply-button').live('click', function() {
-        resetScroll();
-        $('.reply-form').parent().remove();
-    });
-
     // mouseover behavior
     $(comment.elt).mouseover(function() {
-        // highlight corresponding code lines
-        for (var i = comment.start; i <= comment.end; i++) {
-            $('#line-' + i).addClass('highlighted');            
-        }
+        highlightCommentLines(comment);
     });
     $(comment.elt).mouseout(function() {
-        $('.line').removeClass('highlighted');            
+        unhighlightCommentLines();
     });
 
 
 });
+
+$('#cancel-button').live('click', function() {
+    resetScroll();
+    clearSelection();
+});
+
+$('#cancel-reply-button').live('click', function() {
+    resetScroll();
+    $('.reply-form').parent().remove();
+});
+
 
 
 });
@@ -314,7 +323,7 @@ $.each(commentBoundaries, function(index, comment) {
 <div id="comment-display" class="span-6">
     <div id="comment-display-inner">
         {% for comment, vote, snippet in comment_data %}
-        {% include "review/comment.html" %} 
+          {% include "review/comment.html" %} 
         {% endfor %}
     </div>
 </div>
