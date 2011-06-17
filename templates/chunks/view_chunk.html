@@ -39,12 +39,16 @@ function showCommentForm(startLine, endLine) {
             if (!added) {
                 $('#comment-display-inner').append(elt);
             }
-            var commentElt = elt.filter('.comment').get(0);
             // construct a fake "comment" boundary object to pass in
-            scrollCodeTo({start: startLine, end:endLine, elt:commentElt}); 
+            var commentElt = elt.filter('.comment').get(0);
+            scrollCodeTo({
+                start: startLine, 
+                end: endLine, 
+                elt: commentElt
+            }, true, function() {
+                $('textarea').focus();
+            }); 
             $(commentElt).effect('highlight', {queue: false}, 2000);
-
-            $('textarea').focus();
         }
     );
 };
@@ -74,9 +78,12 @@ function expandComment(comment) {
             .addClass('expanded');
 };
 
-function scrollCodeTo(comment, doScroll) {
+function scrollCodeTo(comment, doScroll, callback) {
     if (doScroll === undefined) {
         doScroll = true;
+    }
+    if (callback === undefined) {
+        callback = function() { return; };
     }
     var SCROLL_THRESHOLD = 75;
     var targetLine = $('#chunk-line-' + comment.start);
@@ -84,11 +91,32 @@ function scrollCodeTo(comment, doScroll) {
     var commentHeight = $(comment.elt).height();
     var yDelta = targetLine.offset().top - commentTop ;
 
+    // Wraps the callback so it is only executed the nth time it is called
+    // This guarantees that the callback is called exactly once and after all
+    // animations have run.
+    // FIXME Because of the way this code is structured, it is extremely 
+    // easy to forget to call the callback in all cases to guarantee execution.
+    function wrapCallback(f, n) {
+        var i = 0;
+        return function() {
+            if (i + 1 == n) {
+                return f();
+            } else {
+                i++;
+            }
+        };
+    };
+
+    var cb = wrapCallback(callback, 3);
+
     $('#comment-display-inner').animate({
         top: '+=' + yDelta,
-    }, { duration: 500, queue: false, easing: 'easeInOutQuad' });
+    }, { duration: 500, queue: false, easing: 'easeInOutQuad', complete: cb });
 
-    if (!doScroll) return;
+    if (!doScroll) {
+        cb(); cb();
+        return;
+    }
 
     var windowHeight = $(window).height();
     if (commentTop + yDelta + commentHeight >
@@ -96,11 +124,15 @@ function scrollCodeTo(comment, doScroll) {
         $('html,body').animate({
             scrollTop: commentTop - windowHeight + 
                 commentHeight + yDelta + SCROLL_THRESHOLD
-        }, { duration: 500, queue: false, easing: 'easeInOutQuad' }); 
+        }, { duration: 500, queue: false, easing: 'easeInOutQuad',
+             complete: cb }); 
     } else if (commentTop + yDelta < $(window).scrollTop()) {
         $('html,body').animate({
             scrollTop: commentTop + yDelta - SCROLL_THRESHOLD
-        }, { duration: 500, queue: false, easing: 'easeInOutQuad' }); 
+        }, { duration: 500, queue: false, easing: 'easeInOutQuad', 
+             complete: cb }); 
+    } else {
+        cb(); cb();
     }
 
     return yDelta;
@@ -213,8 +245,9 @@ $.each(commentBoundaries, function(index, comment) {
                     start: comment.start, 
                     end: comment.end, 
                     elt: replyElt.get(0), 
-                }); 
-                $('textarea').focus();
+                }, true, function() { 
+                    $('textarea').focus();
+                });
 	        }
 	    );
         return false;
