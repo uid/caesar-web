@@ -331,15 +331,27 @@ $('#cancel-reply-button').live('click', function() {
 {% endblock %}
 
 {% block actions %}
-  {% if task %}
-  <form method="post" 
-    action="{% url review.views.change_task %}?task_id={{ task.id }}&status=C">
-    {% csrf_token %}
-    <button id="done-button" type="submit">Done</button>
-  </form>
-  {% endif %}
 {% endblock %}
 
+{% block instructions %}
+
+{% if task %}
+<p>Review this code. Please do at least one of the following:</p>
+<ul>
+  <li>Leave a comment on one or more lines of code.</li>
+  <li>Reply to an existing comment.</li>
+  <li>Upvote or downvote an existing comment.</li>
+</ul>
+<p>When you are done, please click the button, which will take you to the next
+function to review.</p>
+<form method="post" 
+  action="{% url review.views.change_task %}?task_id={{ task.id }}&status=C">
+  {% csrf_token %}
+  <button id="done-button" type="submit">Next</button>
+</form>
+
+{% endif %}
+{% endblock %}
 
 {% block content %}
 
@@ -352,6 +364,7 @@ $('#cancel-reply-button').live('click', function() {
     </h3>
 <}/div>
 {% endcomment %}
+
 
 <div id="comment-display" class="span-6">
     <div id="comment-display-inner">

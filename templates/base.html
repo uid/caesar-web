@@ -68,32 +68,38 @@
 
       {% block header %}
       <div id="toolbar" class="span-24">
-        <div id="toolbar-breadcrumbs">
-            {% block breadcrumbs %}
+        <div id="toolbar-main" class="span-24">
+          <div id="toolbar-breadcrumbs">
+              {% block breadcrumbs %}
 
-            {% endblock %}
-        </div>
-        <div id="toolbar-user">
-            {% if user.is_authenticated %}
-            <div id="toolbar-logged-in">
+              {% endblock %}
+          </div>
+          <div id="toolbar-user">
+              {% if user.is_authenticated %}
+              <div id="toolbar-logged-in">
 
-              {% thumbnail user.get_profile.photo "20x20" crop="center" as photo %}
-              <img class="user-photo" src="{{ photo.url }}"/>
-              {% empty %}
-              <img class="user-photo" src="{{ STATIC_URL }}img/user-silhouette.png"/>
-              {% endthumbnail %}
+                {% thumbnail user.get_profile.photo "20x20" crop="center" as photo %}
+                <img class="user-photo" src="{{ photo.url }}"/>
+                {% empty %}
+                <img class="user-photo" src="{{ STATIC_URL }}img/user-silhouette.png"/>
+                {% endthumbnail %}
 
-              {{ user.username }}
-              {% if user.is_staff %}
-              <a href="{% url admin:index %}">Admin</a>
+                {{ user.username }}
+                {% if user.is_staff %}
+                <a href="{% url admin:index %}">Admin</a>
+                {% endif %}
+                <a href="{% url django.contrib.auth.views.logout %}">Logout</a>
+              </div>
               {% endif %}
-              <a href="{% url django.contrib.auth.views.logout %}">Logout</a>
-            </div>
-            {% endif %}
-        </div>
-        <div id="toolbar-actions">
-            {% block actions %}
+          </div>
+          <div id="toolbar-actions">
+              {% block actions %}
 
+              {% endblock %}
+          </div>
+        </div>
+        <div id="toolbar-instructions" class="span-24">
+            {% block instructions %}
             {% endblock %}
         </div>
       </div>

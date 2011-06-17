@@ -1,10 +1,21 @@
 #toolbar {
-    margin-bottom: 25px;
-    background: #eee;
-    text-size: .75em; 
     z-index: 1000;
     position: relative;
-    box-shadow: 1px 1px 3px #777;
+    box-shadow: 1px 1px 3px #999;
+    margin-bottom: 25px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+}
+
+#toolbar-main {
+    background: #eee;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
 }
 
 #toolbar-breadcrumbs {
@@ -13,19 +24,19 @@
 
 #toolbar-breadcrumbs a.breadcrumb {
     display: inline-block;
-    padding: 4px 15px;
+    padding: 5px 15px;
     border-radius: 0px 10px 10px 0px / 0px 15px 15px 0px;
     text-decoration: none;
     color: #000;
-    margin: 0px;
-    margin-left: -11px;
+    margin: -1px;
+    margin-left: -12px;
 
     border: 1px solid #ccc;
     border-left: 0px;
 }
 
 #toolbar-breadcrumbs a.breadcrumb.first-breadcrumb {
-    margin-left: 0px;
+    margin-left: -1px;
     border-left: 1px solid #ccc;
     padding-left: 10px;
 }
@@ -47,5 +58,17 @@
 #toolbar-logged-in .user-photo {
     vertical-align: middle;    
     border: 1px solid #fff;
+}
+
+#toolbar-instructions {
+    font-size: 1.2em;
+    background: #fafafa; 
+    border: 1px solid #ccc;
+    border-top: 0px;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    padding: 1em ;
 }
 
