@@ -318,7 +318,13 @@ $('#cancel-reply-button').live('click', function() {
     $('.reply-form').parent().remove();
 });
 
-
+var toggleInstructionsText = [ 'Hide instructions', 'Show instructions' ];
+var textIndex = 0;
+$('#toggle-instructions-button').click(function() {
+    $('#instructions-text').toggle(400);
+    textIndex = 1 - textIndex;
+    $(this).text(toggleInstructionsText[textIndex]);
+});
 
 });
 </script>
@@ -334,9 +340,14 @@ $('#cancel-reply-button').live('click', function() {
 {% endblock %}
 
 {% block instructions %}
-
 {% if task %}
-<p>Review this code. Please do at least one of the following:</p>
+<style type="text/css">
+#chunk-navigation {
+    float: right;
+}
+</style>
+<div id="instructions-text">
+<p>Please review this code by doing at least one of the following:</p>
 <ul>
   <li>Leave a comment on one or more lines of code.</li>
   <li>Reply to an existing comment.</li>
@@ -344,11 +355,16 @@ $('#cancel-reply-button').live('click', function() {
 </ul>
 <p>When you are done, please click the button, which will take you to the next
 function to review.</p>
+</div>
+<button id="toggle-instructions-button" type="button">Hide instructions</button>
+<div id="chunk-navigation">
 <form method="post" 
   action="{% url review.views.change_task %}?task_id={{ task.id }}&status=C">
   {% csrf_token %}
+N functions remaining for review
   <button id="done-button" type="submit">Next</button>
 </form>
+</div>
 
 {% endif %}
 {% endblock %}

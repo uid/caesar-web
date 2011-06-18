@@ -65,7 +65,7 @@ def reply(request):
         if form.is_valid():
             comment = form.save(commit=False)
             comment.author = request.user
-            parent = Comment.objects.get(id=comment.parent.id)
+            parent = Comment.objects.get(id=comment.parent_id)
             comment.chunk = parent.chunk
             comment.end = parent.end
             comment.start = parent.start 

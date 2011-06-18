@@ -35,6 +35,7 @@ class Comment(models.Model):
     def save(self, *args, **kwargs):
         super(Comment, self).save(*args, **kwargs)
         self.thread_id = self.parent_id or self.id
+        super(Comment, self).save(*args, **kwargs)
 
     #returns child and vote counts for child as a tuple
     def get_child_comment_vote(self):
