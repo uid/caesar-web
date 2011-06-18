@@ -141,20 +141,51 @@
     display: block;
 }
 
+.vote-buttons {
+
+}
+
+.vote-buttons .vote {
+    display: inline-block;
+    width: 21px;
+    height: 21px;
+    vertical-align: middle;
+    background: #eee;
+    border: 1px solid #ccc;
+    border-bottom: 1px solid #bbb;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    color: #333;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+}
+
+.vote-buttons .vote:hover {
+    border: 1px solid #000;
+    background-color: #ccc;
+    cursor: pointer;
+}
+
+.vote-buttons .vote.up {
+    background-image: url('../img/thumb-up.png'); 
+    background-repeat: no-repeat; 
+    background-position: 2px 2px;
+}
+
+.vote-buttons .vote.down {
+    background-image: url('../img/thumb-down.png');
+    background-repeat: no-repeat;
+    background-position: 2px 2px;
+}
+.vote-buttons .vote.selected {
+    background-color: #ffff5a;
+}
+
 .ui-button-text {
     font-size: 75%;
-}
-
-.ui-button .ui-icon-thumb-up {
-    background-image: url('../img/thumb-up.png');
-    width: 16px;
-    height: 16px;
-}
-
-.ui-button .ui-icon-thumb-down {
-    background-image: url('../img/thumb-down.png');
-    width: 16px;
-    height: 16px;
 }
 
 .ui-button .ui-icon-reply {

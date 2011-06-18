@@ -180,15 +180,6 @@ $('#chunk-display').selectable({
     }
 });
 
-$('.vote-buttons').buttonset();
-$('.upvote-button').button('option', {
-    icons: { primary: 'ui-icon-thumb-up', secondary: null },
-    text: false
-});
-$('.downvote-button').button('option', {
-    icons: { primary: 'ui-icon-thumb-down', secondary: null },
-    text: false
-});
 $('.reply-button').button({
     icons: { primary: 'ui-icon-reply', secondary: null },
     text: false
@@ -223,6 +214,7 @@ $.each(commentBoundaries, function(index, comment) {
         }
         return false;
     });
+
     $(comment.elt).click(function() {
         if ($(comment.elt).hasClass('collapsed')) {
             expandComment(comment);
@@ -231,7 +223,6 @@ $.each(commentBoundaries, function(index, comment) {
             return false;
         }
     });
-    
 
     //reply button
     $('.reply-button', comment.elt).click(function() {
@@ -265,32 +256,28 @@ $.each(commentBoundaries, function(index, comment) {
         return false;
     });
 
-    $('.upvote-button,.downvote-button', comment.elt).click(function() {
+    $('.vote-buttons .vote', comment.elt).click(function(e) {
         var button = this;
-        var isUp = ($(this).val() == 'up');
-        if ($(this).is(':checked')) {
+        var isUp = $(this).hasClass('up');
+        if (!$(this).is('.selected')) {
             $.post('{% url review.views.vote %}', {
                 comment_id: comment.id,
                 value: (isUp ? 1 : -1)
             }, function(data) {
+                $(button).addClass('selected');
                 // deselect the other vote button if it is selected
-                if (isUp && $(button).nextAll('input').is(':checked')) {
-                    // trigger it this way to prevent hitting the handler on the
-                    // other checkbox
-                    $(button).nextAll('input').attr('checked', false).change();
-                } else if (!isUp && $(button).prevAll('input').is(':checked')) {
-                    // trigger it this way to prevent hitting the handler on the
-                    // other checkbox
-                    $(button).prevAll('input').attr('checked', false).change();
-                }
-                $('.comment-votes', comment.elt).html(data)
+                var otherButton = isUp ? $(button).nextAll('.vote') :
+                    $(button).prevAll('.vote');
+                otherButton.removeClass('selected');
+                $('.comment-votes', comment.elt).text(data)
                     .effect('highlight', {}, 1000);
             });
         } else {
             $.post('{% url review.views.unvote %}', {
                 comment_id: comment.id
             }, function(data) {
-                $('.comment-votes', comment.elt).html(data)
+                $(button).removeClass('selected');
+                $('.comment-votes', comment.elt).text(data)
                     .effect('highlight', {}, 1000);
             });
         }
