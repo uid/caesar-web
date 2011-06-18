@@ -3,3 +3,4 @@ South
 django-piston
 sorl-thumbnail
 django-extensions
+Pygments

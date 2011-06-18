@@ -6,6 +6,9 @@ from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 
+from pygments import highlight
+from pygments.lexers import JavaLexer
+from pygments.formatters import HtmlFormatter
 
 @login_required
 def view_chunk(request, chunk_id):
@@ -21,9 +24,14 @@ def view_chunk(request, chunk_id):
 
     comment_data = map(get_comment_data,
             Comment.get_comments_for_chunk(chunk))
+
+    lexer = JavaLexer()
+    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
+    def highlight_line(line):
+        return (line[0], highlight(line[1], lexer, formatter))
+
+    highlighted_lines = map(highlight_line, chunk.lines)
     
-    #get the star data, or create it if it doesn't exist
-    star = Star.objects.get_or_create(author=user,chunk=chunk)
     # get the associated task if it exists
     try:
         task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())
@@ -35,7 +43,7 @@ def view_chunk(request, chunk_id):
         task = None
     return render(request, 'chunks/view_chunk.html', { 
         'chunk': chunk,
+        'highlighted_lines': highlighted_lines,
         'comment_data': comment_data,
-        'star': star,
         'task': task,
     }) 

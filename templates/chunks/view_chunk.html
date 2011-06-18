@@ -5,6 +5,7 @@
 
 <link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/syntax.css" type="text/css" />
 
 <script type="text/javascript">
 var chunkId = {{ chunk.id }};
@@ -378,13 +379,15 @@ N functions remaining for review
 </div>
 
 <div id="chunk-display" class="span-18 last">
-    {% for n, line in chunk.lines %}
+    <div class="syntax">
+    {% for n, line in highlighted_lines %}
     <span id="chunk-line-{{ n }}" class="chunk-line">
       <span id="line-{{ n }}" class="line">
-        <span class="line-number">{{ n }}</span><pre class="line-code">{{ line }}</pre>
+        <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
       </span>
     </span>
     {% endfor %}
+    </div>
 </div>
 
 {% endblock %}
