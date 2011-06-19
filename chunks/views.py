@@ -33,15 +33,13 @@ def view_chunk(request, chunk_id):
     highlighted_lines = zip(numbers, 
             highlight('\n'.join(lines), lexer, formatter).split('\n'))
     
+    task_count = Task.objects.filter(reviewer=user.get_profile()) \
+            .exclude(status='C').count()
     # get the associated task if it exists
     try:
         task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())
         if task.status == 'N':
-            # Mark the review task as opened if it is currently new
-            task.status = 'O'
-            task.save()
-        task_count = Task.objects.filter(reviewer=user.get_profile()) \
-                .exclude(status='C').count()
+            task.mark_as('O')
     except Task.DoesNotExist:
         task = None
     return render(request, 'chunks/view_chunk.html', { 

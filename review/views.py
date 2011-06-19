@@ -57,8 +57,7 @@ def new_comment(request):
                 task = Task.objects.get(chunk=chunk_id,
                         reviewer=user.get_profile())
                 if task.status == 'N' or task.status == 'O':
-                    task.status = 'S'
-                    task.save()
+                    task.mark_as('S')
             except Task.DoesNotExist:
                 pass
             return redirect(comment.chunk)
@@ -87,8 +86,7 @@ def reply(request):
                 task = Task.objects.get(chunk=comment.chunk,
                         reviewer=request.user.get_profile())
                 if task.status == 'N' or task.status == 'O':
-                    task.status = 'S'
-                    task.save()
+                    task.mark_as('S')
             except Task.DoesNotExist:
                 pass
             return redirect(comment.chunk)
@@ -119,8 +117,7 @@ def vote(request):
         task = Task.objects.get(chunk=comment.chunk,
                 reviewer=request.user.get_profile())
         if task.status == 'N' or task.status == 'O':
-            task.status = 'S'
-            task.save()
+            task.mark_as('S')
     except Task.DoesNotExist:
         pass
     return render(request, 'review/comment_votes.html', {'comment': comment})
@@ -139,8 +136,7 @@ def change_task(request):
     task_id = request.REQUEST['task_id']
     status = request.REQUEST['status']
     task = get_object_or_404(Task, pk=task_id)
-    task.status = status
-    task.save()
+    task.mark_as(status)
     try:
         next_task = request.user.get_profile().tasks.exclude(status='C') \
                                               .order_by('created')[0:1].get()

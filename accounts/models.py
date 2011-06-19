@@ -20,6 +20,9 @@ class UserProfile(models.Model):
     photo = ImageField(upload_to=get_photo_path)
     assigned_chunks = models.ManyToManyField(Chunk, through='review.Task',
         related_name='reviewers')
+    
+    def __unicode__(self):
+        return self.user.__unicode__()
 
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
