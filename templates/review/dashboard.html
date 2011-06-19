@@ -13,6 +13,14 @@ $(document).ready(function() {
       return false;
     });
 
+    var toggleInstructionsText = [ 'Hide instructions', 'Show instructions' ];
+    var textIndex = 0;
+    $('#toggle-instructions-button').click(function() {
+        $('#instructions-text').toggle(400);
+        textIndex = 1 - textIndex;
+        $(this).text(toggleInstructionsText[textIndex]);
+    });
+
 });
 </script>
 
@@ -20,6 +28,14 @@ $(document).ready(function() {
 
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+{% endblock %}
+
+{% block instructions %}
+<div id="instructions-text">
+  <p>Please start reviewing code by clicking one of the functions below.
+  </p>
+</div>
+<button id="toggle-instructions-button" type="button">Hide instructions</button>
 {% endblock %}
 
 {% block content %}
