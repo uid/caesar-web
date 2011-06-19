@@ -308,12 +308,34 @@ $('#cancel-reply-button').live('click', function() {
     $('.reply-form').parent().remove();
 });
 
+var toggleCommentsText = {
+    collapse: 'Collapse all comments', 
+    expand: 'Expand all comments'
+};
+$('#toggle-comments-button').data('state', 'collapse');
+$('#toggle-comments-button').click(function() {
+    var state = $(this).data('state');
+    if (state === 'collapse') {
+        $.each(commentBoundaries, function(index, comment) {
+            collapseComment(comment);
+        });
+        state = 'expand';
+    } else {
+        $.each(commentBoundaries, function(index, comment) {
+            expandComment(comment);
+        });
+        state = 'collapse';
+    }
+    $(this).text(toggleCommentsText[state]).data('state', state);
+
+});
+
 var toggleInstructionsText = [ 'Hide instructions', 'Show instructions' ];
-var textIndex = 0;
+var instructionsTextIndex = 0;
 $('#toggle-instructions-button').click(function() {
     $('#instructions-text').toggle(400);
-    textIndex = 1 - textIndex;
-    $(this).text(toggleInstructionsText[textIndex]);
+    instructionsTextIndex = 1 - instructionsTextIndex;
+    $(this).text(toggleInstructionsText[instructionsTextIndex]);
 });
 
 });
@@ -363,8 +385,10 @@ wrote the code by doing at least one of the following:</p>
   <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
   {% endif %}
 </div>
+{% endif %}
+<button id="toggle-comments-button" type="button">Collapse all comments</button>
+{% if task %}
 <button id="toggle-instructions-button" type="button">Hide instructions</button>
-
 {% endif %}
 {% endblock %}
 
