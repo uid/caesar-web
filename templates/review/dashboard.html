@@ -32,17 +32,22 @@ $(document).ready(function() {
 
 {% block instructions %}
 <div id="instructions-text">
-  <p>Please start reviewing code by clicking one of the functions below.
-  </p>
+    <p>Welcome to Caesar, a tool for crowd-sourcing code review in the 
+    classroom. Rather than the traditional model of code review where reviewers
+    look at a commit at a time, the system divides entire code submissions into
+    individual functions and assigns them for review.</p>
+    <p>We are asking that you review 5 functions, and then complete a 
+    <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">short
+        feedback survey</a> about the tool.</p>
+    <p class="bottom">Please start reviewing code by clicking one of the functions below.</p>
 </div>
-<button id="toggle-instructions-button" type="button">Hide instructions</button>
 {% endblock %}
 
 {% block content %}
 
 <div class="span-24">
 {% if new_task_count > 0 %}
-<div class="info">
+<div class="success">
   You have {{ new_task_count }} new review task{{ new_task_count|pluralize }}.
 </div>
 {% endif %}
@@ -51,7 +56,7 @@ $(document).ready(function() {
   {% for task in active_tasks.all %}
     {% include "review/task.html" %}
   {% empty %}
-  No tasks found
+  No functions left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>.
   {% endfor %}
 </div>
 
