@@ -58,8 +58,8 @@
 
     </script>
 
+    {% if "caesar" in request.get_host %}
     <!-- GhostRec usability tracking -->
-    {% if not DEBUG %}
     <script type="text/javascript">
     (function() {
         var host = ("https:" == document.location.protocol ? "https://secure." : "http://www.") + 'eemt.se';

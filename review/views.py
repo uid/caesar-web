@@ -85,7 +85,7 @@ def reply(request):
             comment.save()
             try:
                 task = Task.objects.get(chunk=comment.chunk,
-                        reviewer=user.get_profile())
+                        reviewer=request.user.get_profile())
                 if task.status == 'N' or task.status == 'O':
                     task.status = 'S'
                     task.save()
