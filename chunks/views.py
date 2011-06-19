@@ -27,10 +27,11 @@ def view_chunk(request, chunk_id):
 
     lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-    def highlight_line(line):
-        return (line[0], highlight(line[1], lexer, formatter))
-
-    highlighted_lines = map(highlight_line, chunk.lines)
+    numbers, lines = zip(*chunk.lines)
+    # highlight the code this way to correctly identify multi-line constructs
+    # TODO implement a custom formatter to do this instead
+    highlighted_lines = zip(numbers, 
+            highlight('\n'.join(lines), lexer, formatter).split('\n'))
     
     # get the associated task if it exists
     try:

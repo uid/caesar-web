@@ -271,7 +271,7 @@ $.each(commentBoundaries, function(index, comment) {
                     $(button).prevAll('.vote');
                 otherButton.removeClass('selected');
                 $('.comment-votes', comment.elt).text(data)
-                    .effect('highlight', {}, 1000);
+                    .effect('highlight', {queue: false}, 1000);
             });
         } else {
             $.post('{% url review.views.unvote %}', {
@@ -279,7 +279,7 @@ $.each(commentBoundaries, function(index, comment) {
             }, function(data) {
                 $(button).removeClass('selected');
                 $('.comment-votes', comment.elt).text(data)
-                    .effect('highlight', {}, 1000);
+                    .effect('highlight', {queue: false}, 1000);
             });
         }
         return false;
