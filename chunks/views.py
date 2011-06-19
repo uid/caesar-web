@@ -31,7 +31,7 @@ def view_chunk(request, chunk_id):
     # highlight the code this way to correctly identify multi-line constructs
     # TODO implement a custom formatter to do this instead
     highlighted_lines = zip(numbers, 
-            highlight('\n'.join(lines), lexer, formatter).split('\n'))
+            highlight(chunk.data, lexer, formatter).splitlines())
     
     task_count = Task.objects.filter(reviewer=user.get_profile()) \
             .exclude(status='C').count()

@@ -51,8 +51,8 @@ class Chunk(models.Model):
         # TODO: make tab expansion configurable
         # TODO: more robust (custom) dedenting code
         data = file_data[first_line_offset:self.end].expandtabs(4)
-        self.lines = list(enumerate(textwrap.dedent(data).splitlines(), 
-            start=first_line))
+        self.data = textwrap.dedent(data)
+        self.lines = list(enumerate(self.data.splitlines(), start=first_line))
 
     def __init__(self, *args, **kwargs):
         super(Chunk, self).__init__(*args, **kwargs)
