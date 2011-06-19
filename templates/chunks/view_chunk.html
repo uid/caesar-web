@@ -194,9 +194,10 @@ $('.delete-button').button({
 $.each(commentBoundaries, function(index, comment) {
 
     if (!$('#chunk-line-' + comment.start).has('.comment-marker').size()) {
-        $('<img src="{{ STATIC_URL }}img/balloon.png">')
+        $('<span></span>')
           .prependTo('#chunk-line-' + comment.start)
           .addClass('comment-marker')
+          .data('count', 1)
           .click(function(e) { 
               scrollCodeTo(comment);
               $.each(commentBoundaries, function(index, innerComment) {
@@ -205,6 +206,12 @@ $.each(commentBoundaries, function(index, comment) {
                   }
               });
           });
+    } else {
+        var marker = $('#chunk-line-' + comment.start)
+                .children('.comment-marker');
+        var count = marker.data('count') + 1;
+        marker.data('count', count);
+        marker.text(count);
     }
 
     $('.comment-header', comment.elt).click(function() {
