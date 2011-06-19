@@ -51,6 +51,16 @@ def new_comment(request):
             comment = form.save(commit=False)
             comment.author = request.user
             comment.save()
+            chunk_id = comment.chunk
+            user = request.user
+            try:
+                task = Task.objects.get(chunk=chunk_id,
+                        reviewer=user.get_profile())
+                if task.status == 'N' or task.status == 'O':
+                    task.status = 'S'
+                    task.save()
+            except Task.DoesNotExist:
+                pass
             return redirect(comment.chunk)
 
 @login_required
@@ -73,6 +83,14 @@ def reply(request):
                 # strictly single threads for discussion
                 comment.parent = parent.parent
             comment.save()
+            try:
+                task = Task.objects.get(chunk=comment.chunk,
+                        reviewer=user.get_profile())
+                if task.status == 'N' or task.status == 'O':
+                    task.status = 'S'
+                    task.save()
+            except Task.DoesNotExist:
+                pass
             return redirect(comment.chunk)
 
 @login_required
@@ -97,6 +115,14 @@ def vote(request):
     vote.save()
     # Reload the comment to make sure vote counts are up to date
     comment = Comment.objects.get(pk=comment_id)
+    try:
+        task = Task.objects.get(chunk=comment.chunk,
+                reviewer=request.user.get_profile())
+        if task.status == 'N' or task.status == 'O':
+            task.status = 'S'
+            task.save()
+    except Task.DoesNotExist:
+        pass
     return render(request, 'review/comment_votes.html', {'comment': comment})
 
 @login_required

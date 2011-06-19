@@ -117,6 +117,7 @@ class TaskManager(models.Manager):
 class Task(models.Model):
     STATUS_CHOICES=(
         ('N', 'New'),
+        ('O', 'Opened'),
         ('S', 'Started'),
         ('C', 'Complete'),
     )

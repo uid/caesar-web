@@ -253,6 +253,7 @@ $.each(commentBoundaries, function(index, comment) {
             $(comment.elt).remove();        
             $('.parent-' + comment.id).remove();
             $('.line').removeClass('highlighted');            
+            commentBoundaries.splice(index, 1);
         });
         return false;
     });
@@ -272,6 +273,7 @@ $.each(commentBoundaries, function(index, comment) {
                 otherButton.removeClass('selected');
                 $('.comment-votes', comment.elt).text(data)
                     .effect('highlight', {queue: false}, 1000);
+                $('#done-button').removeAttr('disabled');
             });
         } else {
             $.post('{% url review.views.unvote %}', {
@@ -344,15 +346,18 @@ $('#toggle-instructions-button').click(function() {
 <p>When you are done, please click the button, which will take you to the next
 function to review.</p>
 </div>
-<button id="toggle-instructions-button" type="button">Hide instructions</button>
 <div id="chunk-navigation">
 <form method="post" 
   action="{% url review.views.change_task %}?task_id={{ task.id }}&status=C">
   {% csrf_token %}
-N functions remaining for review
-  <button id="done-button" type="submit">Next</button>
+  <div id="task-count">
+    {{ task_count }} functions remaining for review
+  </div>
+  <button id="done-button" type="submit" 
+    {% if task.status == 'O' %}disabled{% endif %}>Next</button>
 </form>
 </div>
+<button id="toggle-instructions-button" type="button">Hide instructions</button>
 
 {% endif %}
 {% endblock %}
