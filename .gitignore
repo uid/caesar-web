@@ -3,3 +3,4 @@ settings_local.*
 .DS_Store
 /sitestatic
 /media
+/data
