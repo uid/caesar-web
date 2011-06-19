@@ -58,6 +58,16 @@
 
     </script>
 
+    <!-- GhostRec usability tracking -->
+    {% if not DEBUG %}
+    <script type="text/javascript">
+    (function() {
+        var host = ("https:" == document.location.protocol ? "https://secure." : "http://www.") + 'eemt.se';
+        document.write(unescape("%3Cscript src='" + host + "/gt/js/1207.js' type='text/javascript'%3E%3C/script%3E"));
+    })();
+    </script>
+    {% endif %}
+
     {% block extrahead %}
 
     {% endblock %}
