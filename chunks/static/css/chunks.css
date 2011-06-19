@@ -3,6 +3,9 @@
     font-weight: bold;
     font-size: 1em;
 }
+#chunk-navigation form {
+    display: inline-block;
+}
 
 #chunk-display {
     box-sizing: border-box;
