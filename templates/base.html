@@ -60,11 +60,19 @@
 
     {% if "caesar" in request.get_host %}
     <!-- GhostRec usability tracking -->
+    <!-- 
     <script type="text/javascript">
     (function() {
         var host = ("https:" == document.location.protocol ? "https://secure." : "http://www.") + 'eemt.se';
         document.write(unescape("%3Cscript src='" + host + "/gt/js/1207.js' type='text/javascript'%3E%3C/script%3E"));
     })();
+    </script>
+    -->
+
+    <!-- Userfly usability tracking -->
+    <script type="text/javascript">
+    var userflyHost = (("https:" == document.location.protocol) ? "https://secure.userfly.com" : "http://asset.userfly.com");
+    document.write(unescape("%3Cscript src='" + userflyHost + "/users/70508/userfly.js' type='text/javascript'%3E%3C/script%3E"));
     </script>
     {% endif %}
 
