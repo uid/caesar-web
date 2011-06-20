@@ -1,3 +1,6 @@
+.js #instructions-text {
+    display: none;
+}
 #task-count {
     display: inline-block;
     font-weight: bold;

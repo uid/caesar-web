@@ -199,6 +199,60 @@ $('.delete-button').button({
     text: false
 });
 
+$('#cancel-button').live('click', function() {
+    resetScroll();
+    clearSelection();
+});
+
+$('#cancel-reply-button').live('click', function() {
+    resetScroll();
+    $('.reply-form').parent().remove();
+});
+
+var toggleCommentsText = {
+    collapse: 'Collapse all comments', 
+    expand: 'Expand all comments'
+};
+$('#toggle-comments-button').data('state', 'collapse');
+$('#toggle-comments-button').click(function() {
+    var state = $(this).data('state');
+    if (state === 'collapse') {
+        collapseAllComments();
+        state = 'expand';
+    } else {
+        expandAllComments();
+        state = 'collapse';
+    }
+    $(this).text(toggleCommentsText[state]).data('state', state);
+});
+
+
+var toggleInstructionsText = {
+    visible: 'Hide instructions', 
+    hidden: 'Show instructions' 
+};
+var instructionsState = $.cookie('instructionsState') || 'visible';
+
+if (instructionsState === 'visible') {
+    $('#instructions-text').show();
+} else {
+    $('#instructions-text').hide();
+}
+$('#toggle-instructions-button')
+        .text(toggleInstructionsText[instructionsState]);
+
+$('#toggle-instructions-button').click(function() {
+    if (instructionsState === 'visible') {
+        $('#instructions-text').slideUp(400);
+        instructionsState = 'hidden';
+    } else {
+        $('#instructions-text').slideDown(400);
+        instructionsState = 'visible';
+    }
+    $.cookie('instructionsState', instructionsState);
+    $(this).text(toggleInstructionsText[instructionsState]);
+});
+
 // hook up some more behavior for each comment
 $.each(commentBoundaries, function(index, comment) {
 
@@ -312,42 +366,6 @@ $.each(commentBoundaries, function(index, comment) {
     });
 
 
-});
-
-$('#cancel-button').live('click', function() {
-    resetScroll();
-    clearSelection();
-});
-
-$('#cancel-reply-button').live('click', function() {
-    resetScroll();
-    $('.reply-form').parent().remove();
-});
-
-var toggleCommentsText = {
-    collapse: 'Collapse all comments', 
-    expand: 'Expand all comments'
-};
-$('#toggle-comments-button').data('state', 'collapse');
-$('#toggle-comments-button').click(function() {
-    var state = $(this).data('state');
-    if (state === 'collapse') {
-        collapseAllComments();
-        state = 'expand';
-    } else {
-        expandAllComments();
-        state = 'collapse';
-    }
-    $(this).text(toggleCommentsText[state]).data('state', state);
-
-});
-
-var toggleInstructionsText = [ 'Hide instructions', 'Show instructions' ];
-var instructionsTextIndex = 0;
-$('#toggle-instructions-button').click(function() {
-    $('#instructions-text').toggle(400);
-    instructionsTextIndex = 1 - instructionsTextIndex;
-    $(this).text(toggleInstructionsText[instructionsTextIndex]);
 });
 
 });
