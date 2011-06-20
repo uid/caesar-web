@@ -381,45 +381,47 @@ $.each(commentBoundaries, function(index, comment) {
 {% block actions %}
 {% endblock %}
 
-{% block instructions %}
+{% block secondary-toolbar %}
 {% if task %}
-<style type="text/css">
-#chunk-navigation {
-    float: right;
-}
-</style>
-<div id="instructions-text">
-<p>Please review this code as if the feedback were going to the student who 
-wrote the code by doing at least one of the following:</p>
-<ul>
-  <li>Leave a comment on one or more lines of code. You can either click on a 
-  single line of code, or click and drag to select multiple lines.</li>
-  <li>Reply to an existing comment.</li>
-  <li>Upvote or downvote an existing comment.</li>
-</ul>
-<p>After you have left some feedback, please click the "Next" button, which will take you to the next function to review.</p>
-</div>
-<div id="chunk-navigation">
-  <div id="task-count">
-    {{ task_count|default:"No" }} function{{ task_count|pluralize }}
-    remaining for review
+<div id="secondary-toolbar-inner">
+  <div id="instructions-text">
+    <p>Please review this code as if the feedback were going to the student who 
+    wrote the code by doing at least one of the following:</p>
+    <ul>
+      <li>Leave a comment on one or more lines of code. You can either click 
+      on a single line of code, or click and drag to select multiple lines.</li>
+      <li>Reply to an existing comment.</li>
+      <li>Upvote or downvote an existing comment.</li>
+    </ul>
+    <p>After you have left some feedback, please click the "Next" button, which
+    will take you to the next function to review.</p>
   </div>
-  {% if task_count > 0 %}
-  <form method="post" 
-    action="{% url review.views.change_task %}?task_id={{ task.id }}&status=C">
-    {% csrf_token %}
-  <button id="done-button" type="submit" 
-    {% if task.status == 'O' %}disabled{% endif %}>Next</button>
-  </form>
-  {% else %}
-  <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
+  <div id="chunk-navigation">
+    <div id="task-count">
+      {{ task_count|default:"No" }} function{{ task_count|pluralize }}
+      remaining for review
+    </div>
+    {% if task_count > 0 %}
+    <form method="post" 
+      action="{% url review.views.change_task %}?task_id={{task.id}}&status=C">
+      {% csrf_token %}
+      <button id="done-button" type="submit" 
+        {% if task.status == 'O' %}disabled{% endif %}>Next</button>
+    </form>
+    {% else %}
+    <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
+    {% endif %}
+  </div>
+  {% endif %}
+  <button id="toggle-comments-button" type="button">
+    Collapse all comments
+  </button>
+  {% if task %}
+  <button id="toggle-instructions-button" type="button">
+    Hide instructions
+  </button>
   {% endif %}
 </div>
-{% endif %}
-<button id="toggle-comments-button" type="button">Collapse all comments</button>
-{% if task %}
-<button id="toggle-instructions-button" type="button">Hide instructions</button>
-{% endif %}
 {% endblock %}
 
 {% block content %}

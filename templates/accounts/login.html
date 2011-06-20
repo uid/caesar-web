@@ -28,7 +28,7 @@
     <button type="submit">Login</button>
   </form>
 
-  <a id="register-link" href="{% url accounts.views.register %}">Register</a>
+  <a id="register-link" href="{% url accounts.views.register %}?next={{ next }}">Register</a>
 </div>
 
 <div id="cert-login-box">

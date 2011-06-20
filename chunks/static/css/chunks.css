@@ -1,3 +1,4 @@
+
 .js #instructions-text {
     display: none;
 }
@@ -5,6 +6,10 @@
     display: inline-block;
     font-weight: bold;
     font-size: 1em;
+}
+
+#chunk-navigation {
+    float: right;
 }
 #chunk-navigation form {
     display: inline-block;
