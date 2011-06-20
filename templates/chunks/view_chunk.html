@@ -67,25 +67,25 @@ function unhighlightCommentLines() {
 };
 
 function collapseComment(comment) {
-    $(comment.elt).removeClass('expanded')
-            .addClass('collapsed', 'fast');
-    $('.parent-' + comment.id).removeClass('expanded')
-            .addClass('collapsed', 'fast');
+    $(comment.elt).stop(true, true)
+            .switchClass('expanded', 'collapsed', 'fast');
+    $('.parent-' + comment.id).stop(true, true)
+            .switchClass('expanded', 'collapsed', 'fast');
 };
 
 function expandComment(comment) {
-    $(comment.elt).removeClass('collapsed', 'fast')
-            .addClass('expanded');
-    $('.parent-' + comment.id).removeClass('collapsed', 'fast')
-            .addClass('expanded');
+    $(comment.elt).stop(true, true)
+            .switchClass('collapsed', 'expanded', 'fast');
+    $('.parent-' + comment.id).stop(true, true)
+            .switchClass('collapsed', 'expanded', 'fast');
 };
 
 function collapseAllComments() {
-    $('.comment').removeClass('expanded').addClass('collapsed', 'fast');
+    $('.comment').stop(true, true).switchClass('expanded', 'collapsed', 'fast');
 };
 
 function expandAllComments() {
-    $('.comment').removeClass('collapsed', 'fast').addClass('expanded');
+    $('.comment').stop(true, true).switchClass('collapsed', 'expanded', 'fast');
 };
 
 function scrollCodeTo(comment, doScroll, callback) {
