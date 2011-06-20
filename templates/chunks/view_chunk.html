@@ -11,8 +11,10 @@
 {% endblock %}
 
 {% block js %}
+
 {{ block.super }}
-<script type="text/javascript">
+
+<script type="text/javascript" charset="utf-8">
 var chunkId = {{ chunk.id }};
 window.isSelecting = false;
 
@@ -125,7 +127,7 @@ function scrollCodeTo(comment, doScroll, callback) {
     var cb = wrapCallback(callback, 3);
 
     $('#comment-display-inner').animate({
-        top: '+=' + yDelta,
+        top: '+=' + yDelta
     }, { duration: 500, queue: false, easing: 'easeInOutQuad', complete: cb });
 
     if (!doScroll) {
@@ -155,7 +157,7 @@ function scrollCodeTo(comment, doScroll, callback) {
 
 function resetScroll() {
     $('#comment-display-inner').animate({
-        top: 0,
+        top: 0
     }, { duration: 500, queue: false });
 };
 
@@ -311,7 +313,7 @@ $.each(commentBoundaries, function(index, comment) {
                 scrollCodeTo({
                     start: comment.start, 
                     end: comment.end, 
-                    elt: replyElt.get(0), 
+                    elt: replyElt.get(0) 
                 }, true, function() { 
                     $('textarea').focus();
                 });
@@ -400,23 +402,29 @@ $.each(commentBoundaries, function(index, comment) {
     <p>After you have left some feedback, please click the "Next" button, which
     will take you to the next function to review.</p>
   </div>
+  {% endif %}
   <div id="chunk-navigation">
     <div id="task-count">
+      {% if task %}
       {{ task_count|default:"No" }} function{{ task_count|pluralize }}
       remaining for review
+      {% else %}
+      You have not been assigned to review this function
+      {% endif %}
     </div>
-    {% if task_count > 0 %}
-    <form method="post" 
-      action="{% url review.views.change_task %}?task_id={{task.id}}&status=C">
-      {% csrf_token %}
-      <button id="done-button" type="submit" 
-        {% if task.status == 'O' %}disabled{% endif %}>Next</button>
-    </form>
-    {% else %}
-    <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
+    {% if task %}
+      {% if task_count > 0 %}
+      <form method="post" 
+        action="{% url review.views.change_task %}?task_id={{task.id}}&status=C">
+        {% csrf_token %}
+        <button id="done-button" type="submit" 
+          {% if task.status == 'O' %}disabled{% endif %}>Next</button>
+      </form>
+      {% else %}
+      <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
+      {% endif %}
     {% endif %}
   </div>
-  {% endif %}
   <button id="toggle-comments-button" type="button">
     Collapse all comments
   </button>
