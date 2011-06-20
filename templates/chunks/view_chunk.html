@@ -18,6 +18,7 @@ var commentBoundaries = $('.comment').map(function() {
     return { id: parseInt(idSplit[1]), 
              start: parseInt(idSplit[2]), 
              end: parseInt(idSplit[3]),
+             isReply: $(this).hasClass('comment-reply'),
              elt: this };
 });
 
@@ -324,12 +325,16 @@ $('#toggle-comments-button').click(function() {
     var state = $(this).data('state');
     if (state === 'collapse') {
         $.each(commentBoundaries, function(index, comment) {
-            collapseComment(comment);
+            if (!comment.isReply) {
+                collapseComment(comment);
+            }
         });
         state = 'expand';
     } else {
         $.each(commentBoundaries, function(index, comment) {
-            expandComment(comment);
+            if (!comment.isReply) {
+                expandComment(comment);
+            }
         });
         state = 'collapse';
     }
