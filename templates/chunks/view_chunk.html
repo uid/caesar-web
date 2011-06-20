@@ -80,6 +80,14 @@ function expandComment(comment) {
             .addClass('expanded');
 };
 
+function collapseAllComments() {
+    $('.comment').removeClass('expanded').addClass('collapsed', 'fast');
+};
+
+function expandAllComments() {
+    $('.comment').removeClass('collapsed', 'fast').addClass('expanded');
+};
+
 function scrollCodeTo(comment, doScroll, callback) {
     if (doScroll === undefined) {
         doScroll = true;
@@ -324,18 +332,10 @@ $('#toggle-comments-button').data('state', 'collapse');
 $('#toggle-comments-button').click(function() {
     var state = $(this).data('state');
     if (state === 'collapse') {
-        $.each(commentBoundaries, function(index, comment) {
-            if (!comment.isReply) {
-                collapseComment(comment);
-            }
-        });
+        collapseAllComments();
         state = 'expand';
     } else {
-        $.each(commentBoundaries, function(index, comment) {
-            if (!comment.isReply) {
-                expandComment(comment);
-            }
-        });
+        expandAllComments();
         state = 'collapse';
     }
     $(this).text(toggleCommentsText[state]).data('state', state);
