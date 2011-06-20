@@ -382,8 +382,8 @@ $.each(commentBoundaries, function(index, comment) {
 {% endblock %}
 
 {% block secondary-toolbar %}
-{% if task %}
 <div id="secondary-toolbar-inner">
+  {% if task %}
   <div id="instructions-text">
     <p>Please review this code as if the feedback were going to the student who 
     wrote the code by doing at least one of the following:</p>

@@ -45,9 +45,9 @@
     {% if user.is_authenticated %}
     <span class="comment-actions">
       <span class="vote-buttons">
-        <div id="upvote-{{ comment.id }}" 
+        <div id="upvote-{{ comment.id }}"  title="Upvote"
           class="vote up {% if vote == 1 %} selected {% endif %}"></div>
-        <div id="downvote-{{ comment.id }}" 
+        <div id="downvote-{{ comment.id }}" title="Downvote"
           class="vote down {% if vote == -1 %} selected {% endif %}"></div>
       </span>
       <button id="reply-{{ comment.id }}-button" class="reply-button"
