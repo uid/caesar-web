@@ -44,8 +44,6 @@ class Chunk(models.Model):
     modified = models.DateTimeField()
     class Meta:
         db_table = u'chunks'
-    def __unicode__(self):
-        return self.name
     
     def __split_lines(self):
         file_data = self.file.data
@@ -101,5 +99,5 @@ class Chunk(models.Model):
         return ('chunks.views.view_chunk', [str(self.id)])
 
     def __unicode__(self):
-        return u'%s' % (self.id,)
+        return u'%s' % (self.name,)
 
