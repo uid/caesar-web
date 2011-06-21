@@ -198,6 +198,10 @@
     height: 16px;
 }
 
+.new-comment, .new-reply, .new-comment:hover, .new-reply:hover {
+    background-color: #ffff88;
+}
+
 .new-comment textarea, .reply-form textarea {
     width: 100%;
     overflow: auto;
