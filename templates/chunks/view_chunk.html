@@ -307,8 +307,16 @@ $.each(commentBoundaries, function(index, comment) {
 	        { parent: comment.id }	,
 	        function(data) {
 	            $('.reply-form').parent().remove();
+
 	            // find the appropriate place to insert the form
-                var replyElt = $(data).insertAfter(comment.elt);
+                var previousComment = comment.elt;
+                var lastReply = $(comment.elt)
+                        .nextUntil('.comment:not(.comment-reply)').last();
+                if (lastReply.length) {
+                    previousComment = lastReply;
+                }
+
+                var replyElt = $(data).insertAfter(previousComment);
                 scrollCodeTo({
                     start: comment.start, 
                     end: comment.end, 
