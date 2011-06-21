@@ -9,6 +9,8 @@ class Assignment(models.Model):
     created = models.DateTimeField()
     class Meta:
         db_table = u'assignments'
+    def __unicode__(self):
+        return self.name
 
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
@@ -17,6 +19,8 @@ class Submission(models.Model):
     created = models.DateTimeField()
     class Meta:
         db_table = u'submissions'
+    def __unicode__(self):
+        return self.name
 
 class File(models.Model):
     id = models.AutoField(primary_key=True)
@@ -27,6 +31,8 @@ class File(models.Model):
     class Meta:
         db_table = u'files'
         unique_together = (('path', 'submission'))
+    def __unicode__(self):
+        return self.path
 
 class Chunk(models.Model):
     id = models.AutoField(primary_key=True)
@@ -38,6 +44,8 @@ class Chunk(models.Model):
     modified = models.DateTimeField()
     class Meta:
         db_table = u'chunks'
+    def __unicode__(self):
+        return self.name
     
     def __split_lines(self):
         file_data = self.file.data
