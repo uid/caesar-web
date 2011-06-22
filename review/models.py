@@ -76,10 +76,15 @@ class Vote(models.Model):
 
 def denormalize_votes(sender, instance, created=False, **kwargs):
     """This recalculates the vote totals for the comment being voted on"""
-    comment = instance.comment
-    comment.upvote_count = comment.votes.filter(value=1).count()
-    comment.downvote_count = comment.votes.filter(value=-1).count()
-    comment.save()
+    try:
+        comment = instance.comment
+        comment.upvote_count = comment.votes.filter(value=1).count()
+        comment.downvote_count = comment.votes.filter(value=-1).count()
+        comment.save()
+    except Comment.DoesNotExist:
+        # vote is getting deleted from a comment delete cascade, do nothing
+        pass
+
 models.signals.post_save.connect(denormalize_votes, sender=Vote)
 models.signals.post_delete.connect(denormalize_votes, sender=Vote)
 
