@@ -3,10 +3,12 @@ from review.forms import CommentForm, ReplyForm
 from review import app_settings
 from chunks.models import Chunk, Assignment
 
+from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required 
+from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 
 @login_required
@@ -24,6 +26,23 @@ def dashboard(request):
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
         'new_task_count': new_task_count,
+    })
+
+@staff_member_required
+def stats(request):
+    chunks = Chunk.objects.all()
+    chunks_with_comments = \
+            Chunk.objects.filter(comments__type='U') \
+            .annotate(user_comment_count=Count('comments'))
+    tasks = Task.objects.all()
+    completed_tasks = Task.objects.filter(status='C')
+    recent_comments = Comment.objects.filter(type='U').order_by('-created')[:10]
+    return render(request, 'review/stats.html', {
+        'chunks': chunks,
+        'chunks_with_comments': chunks_with_comments,
+        'tasks': tasks,
+        'completed_tasks': completed_tasks,
+        'recent_comments': recent_comments,
     })
 
 @login_required
