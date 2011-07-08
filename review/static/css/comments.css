@@ -186,6 +186,10 @@
     font-size: 75%;
 }
 
+.ui-button-text-icon-primary .ui-button-text, .ui-button-text-icons .ui-button-text {
+    padding-left: 2.4em;
+}
+
 .ui-button .ui-icon-reply {
     background-image: url('../img/arrow-curve-180-left.png');
     width: 16px;
