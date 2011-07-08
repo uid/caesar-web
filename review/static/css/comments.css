@@ -55,7 +55,7 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-family: monospace;
+    font-family: 'andale mono', 'lucida console', monospace;
 }
 
 .collapsed .comment-header {
