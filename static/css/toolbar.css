@@ -24,7 +24,7 @@
     display: inline-block;
 }
 
-#toolbar-breadcrumbs a.breadcrumb {
+#toolbar-breadcrumbs .breadcrumb {
     display: inline-block;
     padding: 5px 15px;
     border-radius: 0px 10px 10px 0px / 0px 15px 15px 0px;
