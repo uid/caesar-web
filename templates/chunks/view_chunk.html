@@ -34,6 +34,7 @@ function showCommentForm(startLine, endLine) {
         { start: startLine, end: endLine, chunk: chunkId },
         function(data) {
             $('.new-comment').remove();
+            $('.reply-form').parent().remove();
             // find the appropriate place to insert the form
             var added = false;
             var elt = $(data);
@@ -171,6 +172,9 @@ $('body').mousedown(function(e) {
     if ($(e.target).is('.new-comment *')) {
         return true;
     }
+    if ($('.new-comment textarea').val()) {
+        return false;
+    }
     clearSelection();
     if (!$(e.target).is('.comment *, .chunk-line *')) {
         resetScroll();
@@ -307,6 +311,7 @@ $.each(commentBoundaries, function(index, comment) {
 	        { parent: comment.id }	,
 	        function(data) {
 	            $('.reply-form').parent().remove();
+                clearSelection();
 
 	            // find the appropriate place to insert the form
                 var previousComment = comment.elt;
