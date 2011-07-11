@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+
+{% block css %}
+{{ block.super }}
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/syntax.css" type="text/css" />
+
+{% endblock %}
+
+{% block content %}
+
+{% for chunk in chunks%}
+	<div align="right">
+	{{ chunk.name }}
+	</div>
+	
+	<div class="span-6">
+		<div>
+		    {% for comment in chunk.comments.all %}
+		    	{% include "review/comment.html" %} 
+			{% empty %}
+				No comment found
+			{% endfor %}
+		</div>
+	</div>
+
+	<div class="span-18 last">
+	    <div class="syntax">
+	    {% for n, line in chunk.get_highlighted_lines %}
+	    <span id="chunk-line-{{ n }}" class="chunk-line">
+	      <span id="line-{{ n }}" class="line">
+	        <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+	      </span>
+	    </span>
+	    {% endfor %}
+	    </div>
+	</div>
+	<hr>
+{% empty %}
+  No chunks found
+{% endfor %}
+
+{% endblock %}
