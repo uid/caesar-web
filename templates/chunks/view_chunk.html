@@ -426,12 +426,13 @@ $.each(commentBoundaries, function(index, comment) {
     </div>
     {% if task %}
       {% if task_count > 0 %}
-      <form method="post" 
-        action="{% url review.views.change_task %}?task_id={{task.id}}&status=C">
-        {% csrf_token %}
-        <button id="done-button" type="submit" 
-          {% if task.status == 'O' %}disabled{% endif %}>Next</button>
-      </form>
+        {% if task.status == 'O' %}
+          <button id="done-button" type="button" disabled>Next</button>
+        {% else %}
+          <a href="{% url review.views.change_task %}?task_id={{task.id}}&status=C">
+            <button id="done-button" type="button">Next</button>
+          </a>
+        {% endif %}
       {% else %}
       <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
       {% endif %}

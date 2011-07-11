@@ -87,7 +87,7 @@ def reply(request):
         form = ReplyForm(initial={
             'parent': request.GET['parent']
         })
-        return render(request, 'review/reply_form.html', {'form': form,})
+        return render(request, 'review/reply_form.html', {'form': form})
     else:
         form = ReplyForm(request.POST)
         if form.is_valid():
