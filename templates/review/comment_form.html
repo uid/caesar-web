@@ -10,7 +10,8 @@
     </span>
   </div>
   <div class="comment-form">
-    <form action="{% url review.views.new_comment %}" method="post">
+    <form id="new-comment-form" 
+      action="{% url review.views.new_comment %}" method="post">
       {% csrf_token %}
       {{ form.text }}
       {{ form.start }}

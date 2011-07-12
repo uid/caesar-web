@@ -13,21 +13,93 @@
 {% block js %}
 
 {{ block.super }}
+<script type="text/javascript" charset="utf-8">
+
+var model = new function() {
+    var self = this;
+    var listeners = {};
+    
+    this.addListener = function(eventName, listener) {
+        if (!listeners[eventName]) {
+            listeners[eventName] = [];
+        }
+        listeners[eventName].push(listener);
+    };
+
+    var fireEvent = function(eventName, data) {
+        if (listeners[eventName]) {
+            $.each(listeners[eventName], function(index, listener) {
+                listener(data);
+            });
+        }
+    };
+
+    this.comments = [];
+
+    this.computeIndex = function(start, end, isReply, parentId) {
+        var target;
+        if (!isReply) {
+            target = self.comments.length;
+            $.each(self.comments, function(index, comment) {
+                if ((start == comment.start && end > comment.end) ||
+                        start < comment.start) {
+                    target = index;
+                    return false;
+                }
+            });
+        } else {
+            // iterate backwards over the comments
+            for (var i = self.comments.length - 1; i >= 0; i--) {
+                var comment = self.comments[i];
+                // find the parent or another reply in the same thread
+                if (comment.id == parentId || comment.parentId == parentId) {
+                    target = i + 1;
+                    break;
+                }
+            }
+        }
+        console.log(target);
+        return target;
+    };
+
+    this.addComment = function(comment) {
+        var target = self.computeIndex(comment.start, comment.end, 
+                                       comment.isReply, comment.parentId);
+        self.comments.splice(target, 0, comment);
+        fireEvent('commentAdded', comment);
+    };
+
+    this.addCommentFromDOM = function(elt) {
+        var idSplit = elt.id.split('-');
+        var isReply = $(elt).hasClass('comment-reply') 
+        var comment =  { 
+            id: parseInt(idSplit[1]), 
+            start: parseInt(idSplit[2]), 
+            end: parseInt(idSplit[3]),
+            isReply: isReply,
+            parentId: isReply ? parseInt(
+                    $(elt).attr('class').match(/parent-(\d+)/)[1]) : null,
+            elt: elt 
+        };
+        self.addComment(comment);
+        return comment;
+    };
+
+    this.removeComment = function(comment) {
+        var index = self.comments.indexOf(comment);
+        if (index != -1) {
+            self.comments.splice(index, 1);
+            fireEvent('commentRemoved', comment);    
+        }
+    };
+
+};
+
+</script>
 
 <script type="text/javascript" charset="utf-8">
 var chunkId = {{ chunk.id }};
 window.isSelecting = false;
-
-$(document).ready(function() {
-
-var commentBoundaries = $('.comment').map(function() {
-    var idSplit = this.id.split('-');
-    return { id: parseInt(idSplit[1]), 
-             start: parseInt(idSplit[2]), 
-             end: parseInt(idSplit[3]),
-             isReply: $(this).hasClass('comment-reply'),
-             elt: this };
-});
 
 function showCommentForm(startLine, endLine) {
     $.get('{% url review.views.new_comment %}', 
@@ -38,8 +110,9 @@ function showCommentForm(startLine, endLine) {
             // find the appropriate place to insert the form
             var added = false;
             var elt = $(data);
-            $.each(commentBoundaries, function(index, comment) {
-                if ((startLine == comment.start && endLine >= comment.end)
+            var index = model.computeIndex(startLine, endLine);
+            $.each(model.comments, function(index, comment) {
+                if ((startLine == comment.start && endLine > comment.end)
                     || startLine < comment.start) {
                     $(comment.elt).before(elt);                        
                     added = true;
@@ -167,105 +240,7 @@ window.clearSelection = function() {
     $('.new-comment').remove();
 };
 
-// Clear the selected lines if the user clicks anywhere except the comment form
-$('body').mousedown(function(e) {
-    if ($(e.target).is('.new-comment *')) {
-        return true;
-    }
-    if ($('.new-comment textarea').val()) {
-        return false;
-    }
-    clearSelection();
-    if (!$(e.target).is('.comment *, .chunk-line *')) {
-        resetScroll();
-    }
-    return true;
-});
-
-$('#chunk-display').selectable({
-    filter: '.line',
-    cancel: '.comment-marker',
-    start: function(event, ui) {
-        isSelecting = true;
-    },
-    stop: function(event, ui) {
-        var startLine = Number.MAX_VALUE;
-        var endLine = Number.MIN_VALUE;
-        $('.line.ui-selected').each(function(i) {
-            var n = parseInt($(this).attr('id').split('-')[1]);
-            endLine = Math.max(endLine, n);
-            startLine = Math.min(startLine, n);
-        });
-        showCommentForm(startLine, endLine);
-    }
-});
-
-$('.reply-button').button({
-    icons: { primary: 'ui-icon-reply', secondary: null },
-    text: true
-});
-$('.delete-button').button({
-    icons: { primary: 'ui-icon-delete', secondary: null },
-    text: false
-});
-
-$('#cancel-button').live('click', function() {
-    resetScroll();
-    clearSelection();
-});
-
-$('#cancel-reply-button').live('click', function() {
-    resetScroll();
-    $('.reply-form').parent().remove();
-});
-
-var toggleCommentsText = {
-    collapse: 'Collapse all comments', 
-    expand: 'Expand all comments'
-};
-$('#toggle-comments-button').data('state', 'collapse');
-$('#toggle-comments-button').click(function() {
-    var state = $(this).data('state');
-    if (state === 'collapse') {
-        collapseAllComments();
-        state = 'expand';
-    } else {
-        expandAllComments();
-        state = 'collapse';
-    }
-    $(this).text(toggleCommentsText[state]).data('state', state);
-});
-
-
-var toggleInstructionsText = {
-    visible: 'Hide instructions', 
-    hidden: 'Show instructions' 
-};
-var instructionsState = $.cookie('instructionsState') || 'visible';
-
-if (instructionsState === 'visible') {
-    $('#instructions-text').show();
-} else {
-    $('#instructions-text').hide();
-}
-$('#toggle-instructions-button')
-        .text(toggleInstructionsText[instructionsState]);
-
-$('#toggle-instructions-button').click(function() {
-    if (instructionsState === 'visible') {
-        $('#instructions-text').slideUp(400);
-        instructionsState = 'hidden';
-    } else {
-        $('#instructions-text').slideDown(400);
-        instructionsState = 'visible';
-    }
-    $.cookie('instructionsState', instructionsState);
-    $(this).text(toggleInstructionsText[instructionsState]);
-});
-
-// hook up some more behavior for each comment
-$.each(commentBoundaries, function(index, comment) {
-
+function drawCommentMarker(comment) {
     if (!$('#chunk-line-' + comment.start).has('.comment-marker').size()) {
         $('<span></span>')
           .prependTo('#chunk-line-' + comment.start)
@@ -273,7 +248,7 @@ $.each(commentBoundaries, function(index, comment) {
           .data('count', 1)
           .click(function(e) { 
               scrollCodeTo(comment);
-              $.each(commentBoundaries, function(index, innerComment) {
+              $.each(model.comments, function(index, innerComment) {
                   if (innerComment.start == comment.start) {
                       $(innerComment.elt).effect('highlight', {}, 2000);
                   }
@@ -286,7 +261,20 @@ $.each(commentBoundaries, function(index, comment) {
         marker.data('count', count);
         marker.text(count);
     }
+}
 
+function drawCommentButtons(comment) {
+    $('.reply-button', comment.elt).button({
+        icons: { primary: 'ui-icon-reply', secondary: null },
+        text: true
+    });
+    $('.delete-button', comment.elt).button({
+        icons: { primary: 'ui-icon-delete', secondary: null },
+        text: false
+    });
+}
+
+function attachCommentHandlers(comment) {
     $('.comment-header', comment.elt).click(function() {
         if ($(comment.elt).hasClass('collapsed')) {
             expandComment(comment);
@@ -342,7 +330,7 @@ $.each(commentBoundaries, function(index, comment) {
             $(comment.elt).remove();        
             $('.parent-' + comment.id).remove();
             $('.line').removeClass('highlighted');            
-            commentBoundaries.splice(index, 1);
+            model.removeComment(comment);
         });
         return false;
     });
@@ -383,8 +371,131 @@ $.each(commentBoundaries, function(index, comment) {
     $(comment.elt).mouseout(function() {
         unhighlightCommentLines();
     });
+}
+
+model.addListener('commentAdded', function(comment) {
+    drawCommentMarker(comment);
+    drawCommentButtons(comment);
+    attachCommentHandlers(comment);
+});
+
+$(document).ready(function() {
+
+$('.comment').each(function() {
+    model.addCommentFromDOM(this);
+});
+
+// Clear the selected lines if the user clicks anywhere except the comment form
+$('body').mousedown(function(e) {
+    if ($(e.target).is('.new-comment *')) {
+        return true;
+    }
+    if ($('.new-comment textarea').val()) {
+        return false;
+    }
+    clearSelection();
+    if (!$(e.target).is('.comment *, .chunk-line *')) {
+        resetScroll();
+    }
+    return true;
+});
+
+$('#chunk-display').selectable({
+    filter: '.line',
+    cancel: '.comment-marker',
+    start: function(event, ui) {
+        isSelecting = true;
+    },
+    stop: function(event, ui) {
+        var startLine = Number.MAX_VALUE;
+        var endLine = Number.MIN_VALUE;
+        $('.line.ui-selected').each(function(i) {
+            var n = parseInt($(this).attr('id').split('-')[1]);
+            endLine = Math.max(endLine, n);
+            startLine = Math.min(startLine, n);
+        });
+        showCommentForm(startLine, endLine);
+    }
+});
+
+$('#new-comment-form').live('submit', function() {
+    var dataString = $(this).serialize();
+    $.post('{% url review.views.new_comment %}', dataString, function(data) {
+        var newNode = $(data);
+        $('.new-comment').replaceWith(newNode);
+        model.addCommentFromDOM(newNode.get(0));
+        newNode.effect('highlight', {}, 2000);
+        resetScroll();
+        clearSelection();
+    });
+    return false;
+});
+
+$('#reply-comment-form').live('submit', function() {
+    var dataString = $(this).serialize();
+    $.post('{% url review.views.reply %}', dataString, function(data) {
+        var newNode = $(data);
+        $('.new-reply').replaceWith(newNode);
+        model.addCommentFromDOM(newNode.get(0));
+        newNode.effect('highlight', {}, 2000);
+        resetScroll();
+        clearSelection();
+    });
+    return false;
+});
+
+$('#cancel-button').live('click', function() {
+    resetScroll();
+    clearSelection();
+});
+
+$('#cancel-reply-button').live('click', function() {
+    resetScroll();
+    $('.reply-form').parent().remove();
+});
+
+var toggleCommentsText = {
+    collapse: 'Collapse all comments', 
+    expand: 'Expand all comments'
+};
+$('#toggle-comments-button').data('state', 'collapse');
+$('#toggle-comments-button').click(function() {
+    var state = $(this).data('state');
+    if (state === 'collapse') {
+        collapseAllComments();
+        state = 'expand';
+    } else {
+        expandAllComments();
+        state = 'collapse';
+    }
+    $(this).text(toggleCommentsText[state]).data('state', state);
+});
 
 
+var toggleInstructionsText = {
+    visible: 'Hide instructions', 
+    hidden: 'Show instructions' 
+};
+var instructionsState = $.cookie('instructionsState') || 'visible';
+
+if (instructionsState === 'visible') {
+    $('#instructions-text').show();
+} else {
+    $('#instructions-text').hide();
+}
+$('#toggle-instructions-button')
+        .text(toggleInstructionsText[instructionsState]);
+
+$('#toggle-instructions-button').click(function() {
+    if (instructionsState === 'visible') {
+        $('#instructions-text').slideUp(400);
+        instructionsState = 'hidden';
+    } else {
+        $('#instructions-text').slideDown(400);
+        instructionsState = 'visible';
+    }
+    $.cookie('instructionsState', instructionsState);
+    $(this).text(toggleInstructionsText[instructionsState]);
 });
 
 });

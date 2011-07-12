@@ -1,6 +1,4 @@
 {% load extra_tags %}
-
-<!-- comment node ids are named like comment-$ID-$START-$END -->
 <div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}" 
   class="comment 
          {% if comment.is_reply %}

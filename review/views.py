@@ -73,13 +73,15 @@ def new_comment(request):
             chunk_id = comment.chunk
             user = request.user
             try:
-                task = Task.objects.get(chunk=chunk_id,
-                        reviewer=user.get_profile())
+                task = Task.objects.get(
+                    chunk=chunk_id, reviewer=user.get_profile())
                 if task.status == 'N' or task.status == 'O':
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
-            return redirect(comment.chunk)
+            return render(request, 'review/comment.html', {
+                'comment': comment
+            })
 
 @login_required
 def reply(request):
@@ -108,7 +110,9 @@ def reply(request):
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
-            return redirect(comment.chunk)
+            return render(request, 'review/comment.html', {
+                'comment': comment
+            })
 
 @login_required
 def delete_comment(request):
