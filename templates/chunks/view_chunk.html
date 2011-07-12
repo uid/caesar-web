@@ -19,24 +19,39 @@ var model = new function() {
     var self = this;
     var listeners = {};
     
-    this.addListener = function(eventName, listener) {
+    self.addListener = function(eventName, listener) {
         if (!listeners[eventName]) {
             listeners[eventName] = [];
         }
         listeners[eventName].push(listener);
     };
 
-    var fireEvent = function(eventName, data) {
+    var fireEvent = function(eventName) {
+        var args = Array.prototype.slice.call(arguments);
+        args.shift();
+    
         if (listeners[eventName]) {
             $.each(listeners[eventName], function(index, listener) {
-                listener(data);
+                listener.apply(self, args);
             });
         }
     };
 
-    this.comments = [];
+    self.comments = [];
+    self.task = {
+        status: '{{ task.status }}'
+    };
 
-    this.computeIndex = function(start, end, isReply, parentId) {
+    var startTask = function() {
+        if (self.task.status === 'O') {
+            self.task.status = 'S';
+            fireEvent('taskStarted');
+        }
+    };
+    self.addListener('commentAdded', startTask);
+    self.addListener('commentVoted', startTask);
+
+    self.computeIndex = function(start, end, isReply, parentId) {
         var target;
         if (!isReply) {
             target = self.comments.length;
@@ -58,18 +73,17 @@ var model = new function() {
                 }
             }
         }
-        console.log(target);
         return target;
     };
 
-    this.addComment = function(comment) {
+    self.addComment = function(comment) {
         var target = self.computeIndex(comment.start, comment.end, 
                                        comment.isReply, comment.parentId);
         self.comments.splice(target, 0, comment);
         fireEvent('commentAdded', comment);
     };
 
-    this.addCommentFromDOM = function(elt) {
+    self.addCommentFromDOM = function(elt) {
         var idSplit = elt.id.split('-');
         var isReply = $(elt).hasClass('comment-reply') 
         var comment =  { 
@@ -85,12 +99,20 @@ var model = new function() {
         return comment;
     };
 
-    this.removeComment = function(comment) {
+    self.removeComment = function(comment) {
         var index = self.comments.indexOf(comment);
         if (index != -1) {
             self.comments.splice(index, 1);
             fireEvent('commentRemoved', comment);    
         }
+    };
+
+    self.voteComment = function(comment, voteValue) {
+        fireEvent('commentVoted', comment, voteValue);
+    };
+
+    self.unvoteComment = function(comment) {
+        fireEvent('commentUnvoted', comment);
     };
 
 };
@@ -263,6 +285,17 @@ function drawCommentMarker(comment) {
     }
 }
 
+function removeCommentMarker(comment) {
+    var marker = $('#chunk-line-' + comment.start).children('.comment-marker');
+    if (marker.data('count') <= 1) {
+        marker.remove();
+    } else {
+        var count = marker.data('count') - 1;
+        marker.data('count', count);
+        marker.text(count);
+    }
+}
+
 function drawCommentButtons(comment) {
     $('.reply-button', comment.elt).button({
         icons: { primary: 'ui-icon-reply', secondary: null },
@@ -327,9 +360,6 @@ function attachCommentHandlers(comment) {
         $.get('{% url review.views.delete_comment %}', {
             comment_id: comment.id
         }, function(data) {
-            $(comment.elt).remove();        
-            $('.parent-' + comment.id).remove();
-            $('.line').removeClass('highlighted');            
             model.removeComment(comment);
         });
         return false;
@@ -339,9 +369,10 @@ function attachCommentHandlers(comment) {
         var button = this;
         var isUp = $(this).hasClass('up');
         if (!$(this).is('.selected')) {
+            var value = isUp ? 1 : -1;
             $.post('{% url review.views.vote %}', {
                 comment_id: comment.id,
-                value: (isUp ? 1 : -1)
+                value: value,
             }, function(data) {
                 $(button).addClass('selected');
                 // deselect the other vote button if it is selected
@@ -350,7 +381,7 @@ function attachCommentHandlers(comment) {
                 otherButton.removeClass('selected');
                 $('.comment-votes', comment.elt).text(data)
                     .effect('highlight', {queue: false}, 1000);
-                $('#done-button').removeAttr('disabled');
+                model.voteComment(comment, value);
             });
         } else {
             $.post('{% url review.views.unvote %}', {
@@ -359,6 +390,7 @@ function attachCommentHandlers(comment) {
                 $(button).removeClass('selected');
                 $('.comment-votes', comment.elt).text(data)
                     .effect('highlight', {queue: false}, 1000);
+                model.unvoteComment(comment);
             });
         }
         return false;
@@ -377,6 +409,18 @@ model.addListener('commentAdded', function(comment) {
     drawCommentMarker(comment);
     drawCommentButtons(comment);
     attachCommentHandlers(comment);
+});
+
+model.addListener('commentRemoved', function(comment) {
+    $(comment.elt).remove();        
+    $('.parent-' + comment.id).remove();
+    $('.line').removeClass('highlighted');            
+    removeCommentMarker(comment);
+    resetScroll();
+});
+
+model.addListener('taskStarted', function() {
+    $('#done-button').removeAttr('disabled');
 });
 
 $(document).ready(function() {
@@ -537,13 +581,12 @@ $('#toggle-instructions-button').click(function() {
     </div>
     {% if task %}
       {% if task_count > 0 %}
-        {% if task.status == 'O' %}
-          <button id="done-button" type="button" disabled>Next</button>
-        {% else %}
-          <a href="{% url review.views.change_task %}?task_id={{task.id}}&status=C">
-            <button id="done-button" type="button">Next</button>
-          </a>
-        {% endif %}
+      <form method="get" action="{% url review.views.change_task %}">
+        <input type="hidden" name="task_id" value="{{ task.id }}"/>
+        <input type="hidden" name="status" value="C"/>
+        <button id="done-button" type="submit"
+        {% if task.status == 'O' %}disabled{% endif %}>Next</button>
+      </form>
       {% else %}
       <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
       {% endif %}
