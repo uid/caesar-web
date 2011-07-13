@@ -1,5 +1,5 @@
 from django.contrib import admin
-from review.models import Comment, Vote, Task
+from review.models import Comment, Vote
 
 class VoteInline(admin.TabularInline):
     model = Vote
@@ -10,10 +10,4 @@ class CommentAdmin(admin.ModelAdmin):
     search_fields = ('chunk__name', 'text', 'author__username', 
             'author__first_name', 'author__last_name')
 
-class TaskAdmin(admin.ModelAdmin):
-    list_display = ('id', 'status', 'reviewer', 'chunk')
-    fields = ('chunk', 'reviewer', 'status', 'due', 'created', 'opened', 'started', 'completed',)
-    readonly_fields = ('created', 'opened', 'started', 'completed')
-
 admin.site.register(Comment, CommentAdmin)
-admin.site.register(Task, TaskAdmin)

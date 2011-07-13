@@ -138,6 +138,7 @@ INSTALLED_APPS = (
     'accounts',
     'chunks',
     'review',
+    'tasks',
 )
 
 AUTH_PROFILE_MODULE = 'accounts.UserProfile'

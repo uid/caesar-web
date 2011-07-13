@@ -1,7 +1,8 @@
-from review.models import Comment, Vote, Star, Task
+from review.models import Comment, Vote, Star 
 from review.forms import CommentForm, ReplyForm
 from review import app_settings
 from chunks.models import Chunk, Assignment
+from tasks.models import Task
 
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
