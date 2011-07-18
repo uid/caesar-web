@@ -32,11 +32,18 @@ class File(models.Model):
     data = models.TextField()
     submission = models.ForeignKey(Submission)
     created = models.DateTimeField()
+    #lines = list(enumerate(data.expandtabs(4).splitlines()))
+    def __split_lines(self):
+        self.lines = list(enumerate(self.data.splitlines(), start = 1))
+    def __init__(self, *args, **kwargs):
+        super(File, self).__init__(*args, **kwargs)
+        self.__split_lines()
     class Meta:
         db_table = u'files'
         unique_together = (('path', 'submission'))
     def __unicode__(self):
         return self.path
+
 
 class Chunk(models.Model):
     id = models.AutoField(primary_key=True)

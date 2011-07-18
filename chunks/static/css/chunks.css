@@ -22,6 +22,24 @@
     -ms-box-sizing: border-box;
     padding-left: 18px;
 }
+#nonchunk-display {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    padding-left: 18px;
+}
+
+#file-name-display {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 18px;
+    display: block;
+}
 
 .chunk-line {
     font-family: monospace;
@@ -29,6 +47,14 @@
     margin: 0;
     display: block;
     position: relative;
+}
+.nonchunk-line {
+    font-family: monospace;
+    font-size: 11px;
+    margin: 0;
+    display: block;
+    position: relative;
+    background-color: #FFF;
 }
 
 .line {
