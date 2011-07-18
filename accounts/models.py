@@ -18,7 +18,7 @@ class UserProfile(models.Model):
 
     user = models.OneToOneField(User)
     photo = ImageField(upload_to=get_photo_path)
-    assigned_chunks = models.ManyToManyField(Chunk, through='review.Task',
+    assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
         related_name='reviewers')
     
     def __unicode__(self):

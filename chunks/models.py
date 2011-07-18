@@ -7,6 +7,8 @@ from pygments.formatters import HtmlFormatter
 
 import textwrap
 
+from chunks import app_settings
+
 class Assignment(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
@@ -15,6 +17,7 @@ class Assignment(models.Model):
         db_table = u'assignments'
     def __unicode__(self):
         return self.name
+
 
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
@@ -25,6 +28,7 @@ class Submission(models.Model):
         db_table = u'submissions'
     def __unicode__(self):
         return self.name
+ 
 
 class File(models.Model):
     id = models.AutoField(primary_key=True)
@@ -117,11 +121,30 @@ class Chunk(models.Model):
         lexer = JavaLexer()
         formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
         numbers, lines = zip(*self.lines)
-        # highlight the code this way to correctly identify multi-line constructs
+        # highlight the code this way to correctly identify multi-line
+        # constructs
         # TODO implement a custom formatter to do this instead
         highlighted_lines = zip(numbers, 
                 highlight(self.data, lexer, formatter).splitlines())
         return highlighted_lines
+
+    def get_similar_chunks(self):
+        threshold = app_settings.CHUNK_SIMILARITY_THRESHOLD
+        limit = app_settings.SIMILAR_CHUNK_LIMIT
+        score_threshold = round(threshold * self.fingerprints.count())
+        chunks = Chunk.objects.raw('''
+            SELECT chunks.*, count(f2.value) as score
+            FROM fingerprints f1, fingerprints f2, chunks
+            WHERE f1.chunk_id = %(chunk_id)s AND f1.value=f2.value AND 
+                  chunks.id=f2.chunk_id
+            GROUP BY f2.chunk_id
+            HAVING score >= %(threshold)s AND f2.chunk_id != %(chunk_id)s
+            ORDER BY score DESC
+            LIMIT %(limit)s
+            ''', {'chunk_id': self.id, 
+                  'threshold': score_threshold,
+                  'limit': limit})
+        return list(chunks)
 
     @models.permalink
     def get_absolute_url(self):
@@ -130,3 +153,19 @@ class Chunk(models.Model):
     def __unicode__(self):
         return u'%s' % (self.name,)
 
+
+class Fingerprint(models.Model):
+    # This ID is basically useless, but Django currently doesn't support
+    # composite primary keys
+    id = models.AutoField(primary_key=True)
+    chunk = models.ForeignKey(Chunk, related_name='fingerprints', 
+                              db_index=True, editable=False)
+    value = models.IntegerField(db_index=True, editable=False)
+    position = models.IntegerField(editable=False)
+
+    class Meta:
+        unique_together = ('chunk', 'position',)
+        db_table = u'fingerprints'
+
+    def __unicode__(self):
+        return u'%d: [%d, %d]' % (self.chunk_id, self.position, self.value)

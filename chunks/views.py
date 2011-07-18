@@ -1,5 +1,6 @@
 from chunks.models import Chunk, File, Assignment
-from review.models import Comment, Vote, Star, Task
+from review.models import Comment, Vote, Star 
+from tasks.models import Task
 
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404
