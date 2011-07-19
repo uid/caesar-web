@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.conf import settings
 
 from pygments import highlight
@@ -24,6 +25,7 @@ class Submission(models.Model):
     name = models.CharField(max_length=50)
     assignment = models.ForeignKey(Assignment)
     created = models.DateTimeField()
+    author = models.ForeignKey(User)
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
@@ -36,6 +38,12 @@ class File(models.Model):
     data = models.TextField()
     submission = models.ForeignKey(Submission)
     created = models.DateTimeField()
+    #lines = list(enumerate(data.expandtabs(4).splitlines()))
+    def __split_lines(self):
+        self.lines = list(enumerate(self.data.splitlines(), start = 1))
+    def __init__(self, *args, **kwargs):
+        super(File, self).__init__(*args, **kwargs)
+        self.__split_lines()
     class Meta:
         db_table = u'files'
         unique_together = (('path', 'submission'))

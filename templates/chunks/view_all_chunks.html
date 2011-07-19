@@ -10,37 +10,124 @@
 
 {% endblock %}
 
+
+{% block js %}
+
+{{ block.super }}
+<script type="text/javascript" charset="utf-8">
+
+
+
+$(document).ready(function() {
+    var fileSystemText = {
+        visible: 'Hide file system', 
+        hidden: 'Show file system' 
+    };
+    var fileState = 'visible';
+
+    if (fileState === 'visible') {
+        $('#filesystem-text').show();
+    } else {
+        $('#filesystem-text').hide();
+    }
+    $('#toggle-filesystem-button')
+            .text(fileSystemText[fileState]);
+
+    $('#toggle-filesystem-button').click(function() {
+        if (fileState === 'visible') {
+            $('#filesystem-text').slideUp(400);
+            fileState = 'hidden';
+        } else {
+            $('#filesystem-text').slideDown(400);
+            fileState = 'visible';
+        }
+        $(this).text(fileSystemText[fileState]);
+    });
+
+});
+</script>
+{% endblock %}
+
+
 {% block content %}
 
-{% for chunk in chunks%}
-    <div align="right">
-    {{ chunk.name }}
-    </div>
-    
-    <div class="span-6">
-        <div>
-            {% for comment in chunk.comments.all %}
-                {% include "review/comment.html" %} 
-            {% empty %}
-                No comment found
-            {% endfor %}
+<div id="filesystem-text">
+    Navigate to file: 
+    {% for path in paths%}
+        <div id="file-name-title">
+        <A HREF="#{{path}}">{{ path }} </A>
         </div>
-    </div>
+    {% empty %}
+      No files found.
+    {% endfor %}
+</div>
+<button id="toggle-filesystem-button" type="button">
+  Show file system
+</button>
 
-    <div class="span-18 last">
-        <div class="syntax">
-        {% for n, line in chunk.get_highlighted_lines %}
-        <span id="chunk-line-{{ n }}" class="chunk-line">
-          <span id="line-{{ n }}" class="line">
-            <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
-          </span>
-        </span>
-        {% endfor %}
+
+
+{% for path, highlighted_lines_for_file in file_data %}
+<div id="file-name-display">
+<A NAME="{{path}}"></A> {{ path }}
+</div>
+
+<table>
+{% for highlighted_lines, is_chunk, chunk in highlighted_lines_for_file %}
+
+    {% if is_chunk %}
+    <tr>
+    <td>
+        <div id="comment-display" class="span-6">
+            <div id="comment-display-inner">
+                {% for comment in chunk.comments.all %}
+                    {% include "review/comment.html" %} 
+                {% empty %}
+                {% endfor %}
+            </div>
         </div>
-    </div>
-    <hr>
+    </td>
+    <td>
+        <div id="chunk-display" class="span-18 last">
+            <div id="chunk-{{chunk.id}}-dispaly" class="syntax">
+            {% for n, line in highlighted_lines %}
+            <span id="chunk-line-{{ n }}" class="chunk-line">
+              <span id="line-{{ n }}" class="line">
+                <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+              </span>
+            </span>
+            {% endfor %}
+            </div>
+        </div>
+    </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td>
+        <div id="comment-display" class="span-6">
+            <div id="comment-display-inner">
+            </div>
+        </div>
+        </td>
+    <td>
+        <div id="nonchunk-display" class="span-18 last">
+            <div class="syntax">
+            {% for n, line in highlighted_lines %}
+            <span id="chunk-line-{{ n }}" class="nonchunk-line">
+              <span id="line-{{ n }}" class="line">
+                <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+              </span>
+            </span>
+            {% endfor %}
+            </div>
+        </div>
+        </td>
+    </tr>
+    {% endif %}
+    {% empty %}
+    {% endfor %}
+</table>
 {% empty %}
-  No chunks found
 {% endfor %}
 
 {% endblock %}
