@@ -13,7 +13,7 @@ from chunks import app_settings
 class Assignment(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    created = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):
@@ -24,8 +24,8 @@ class Submission(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     assignment = models.ForeignKey(Assignment)
-    created = models.DateTimeField()
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
@@ -37,8 +37,7 @@ class File(models.Model):
     path = models.CharField(max_length=200)
     data = models.TextField()
     submission = models.ForeignKey(Submission)
-    created = models.DateTimeField()
-    #lines = list(enumerate(data.expandtabs(4).splitlines()))
+    created = models.DateTimeField(auto_now_add=True)
     def __split_lines(self):
         self.lines = list(enumerate(self.data.splitlines(), start = 1))
     def __init__(self, *args, **kwargs):
@@ -57,8 +56,8 @@ class Chunk(models.Model):
     name = models.CharField(max_length=200)
     start = models.IntegerField()
     end = models.IntegerField()
-    created = models.DateTimeField()
-    modified = models.DateTimeField()
+    created = models.DateTimeField(auto_now_add=True)
+    modified = models.DateTimeField(auto_now=True)
     class Meta:
         db_table = u'chunks'
     
