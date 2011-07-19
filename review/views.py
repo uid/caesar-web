@@ -15,9 +15,9 @@ from django.http import HttpResponse
 @login_required
 def dashboard(request):
     user = request.user
-    assignment = Assignment.objects.get(pk=1)
-    
-    new_task_count = Task.objects.assign_tasks(assignment, user)
+    new_task_count = 0
+    for assignment in Assignment.objects.all():
+        new_task_count += Task.objects.assign_tasks(assignment, user)
     
     active_tasks = user.get_profile().tasks \
         .select_related('chunk').exclude(status='C')

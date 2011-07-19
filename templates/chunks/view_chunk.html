@@ -543,13 +543,36 @@ $('#toggle-instructions-button').click(function() {
     $(this).text(toggleInstructionsText[instructionsState]);
 });
 
+$('.dropdown-link').click(function() {
+    var menu = $(this).next('.dropdown-menu');
+    var position = $(this).position();
+    var height = $(this).outerHeight();
+    menu.css({ top: position.top + height, left: position.left });
+    menu.slideDown(400);
+    return false;
+});
+
+$('body').click(function() {
+    $('.dropdown-menu').slideUp(400); 
+});
+
 });
 </script>
 {% endblock %}
 
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
-  <span class="breadcrumb" href="{{ chunk.get_permanent_url }}">{{ chunk.name }}</span>
+  <span class="breadcrumb" href="{{ chunk.get_absolute_url }}">{{ chunk.name }}</span>
+  {% if similar_chunks %}
+  <div class="dropdown">
+    <a id="similar-link" class="breadcrumb dropdown-link">Similar code..</a>
+    <ul class="dropdown-menu">
+      {% for c in similar_chunks %}
+      <li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
 {% endblock %}
 
 {% block actions %}
@@ -616,25 +639,24 @@ $('#toggle-instructions-button').click(function() {
 <}/div>
 {% endcomment %}
 
-
 <div id="comment-display" class="span-6">
-    <div id="comment-display-inner">
-        {% for comment, vote, snippet in comment_data %}
-          {% include "review/comment.html" %} 
-        {% endfor %}
-    </div>
+  <div id="comment-display-inner">
+     {% for comment, vote, snippet in comment_data %}
+       {% include "review/comment.html" %} 
+     {% endfor %}
+  </div>
 </div>
 
 <div id="chunk-display" class="span-18 last">
-    <div class="syntax">
-    {% for n, line in highlighted_lines %}
-    <span id="chunk-line-{{ n }}" class="chunk-line">
-      <span id="line-{{ n }}" class="line">
-        <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
-      </span>
+  <div class="syntax">
+  {% for n, line in highlighted_lines %}
+  <span id="chunk-line-{{ n }}" class="chunk-line">
+    <span id="line-{{ n }}" class="line">
+      <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
     </span>
-    {% endfor %}
-    </div>
+  </span>
+  {% endfor %}
+  </div>
 </div>
 
 {% endblock %}

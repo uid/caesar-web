@@ -45,6 +45,7 @@ def view_chunk(request, chunk_id):
         task = None
     return render(request, 'chunks/view_chunk.html', { 
         'chunk': chunk,
+        'similar_chunks': chunk.get_similar_chunks(),
         'highlighted_lines': highlighted_lines,
         'comment_data': comment_data,
         'task': task,

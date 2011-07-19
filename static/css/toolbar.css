@@ -47,6 +47,23 @@
     color: #09f;
 }
 
+#toolbar-breadcrumbs .dropdown {
+    display: inline-block;
+}
+
+#toolbar-breadcrumbs .dropdown-link {
+    cursor: pointer;
+}
+
+#toolbar-breadcrumbs .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #eee;
+    padding: 5px;
+    list-style: none;
+    border: 1px solid #ccc;
+}
+
 #toolbar-actions {
     display: inline-block;
     float: right;

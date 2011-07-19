@@ -129,15 +129,13 @@ class Chunk(models.Model):
         chunks = Chunk.objects.raw('''
             SELECT chunks.*, count(f2.value) as score
             FROM fingerprints f1, fingerprints f2, chunks
-            WHERE f1.chunk_id = %(chunk_id)s AND f1.value=f2.value AND 
+            WHERE f1.chunk_id = %s AND f1.value=f2.value AND 
                   chunks.id=f2.chunk_id
             GROUP BY f2.chunk_id
-            HAVING score >= %(threshold)s AND f2.chunk_id != %(chunk_id)s
+            HAVING score >= %s AND f2.chunk_id != %s
             ORDER BY score DESC
-            LIMIT %(limit)s
-            ''', {'chunk_id': self.id, 
-                  'threshold': score_threshold,
-                  'limit': limit})
+            LIMIT %s
+            ''', (self.id, score_threshold, self.id, limit))
         return list(chunks)
 
     @models.permalink
