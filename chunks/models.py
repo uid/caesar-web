@@ -1,12 +1,12 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.conf import settings
+import textwrap
 
 from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
-import textwrap
+from django.db import models
+from django.contrib.auth.models import User
+from django.conf import settings
 
 from chunks import app_settings
 
