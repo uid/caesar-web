@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.conf import settings
 
 from pygments import highlight
@@ -24,6 +25,7 @@ class Submission(models.Model):
     name = models.CharField(max_length=50)
     assignment = models.ForeignKey(Assignment)
     created = models.DateTimeField()
+    author = models.ForeignKey(User)
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):

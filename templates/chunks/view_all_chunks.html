@@ -23,7 +23,7 @@ $(document).ready(function() {
         visible: 'Hide file system', 
         hidden: 'Show file system' 
     };
-    var fileState = 'hidden';
+    var fileState = 'visible';
 
     if (fileState === 'visible') {
         $('#filesystem-text').show();
@@ -52,11 +52,11 @@ $(document).ready(function() {
 {% block content %}
 
 <div id="filesystem-text">
+    Navigate to file: 
     {% for path in paths%}
-        <div>
+        <div id="file-name-title">
         <A HREF="#{{path}}">{{ path }} </A>
         </div>
-        <hr>
     {% empty %}
       No files found.
     {% endfor %}
@@ -68,7 +68,7 @@ $(document).ready(function() {
 
 
 {% for path, highlighted_lines_for_file in file_data %}
-<div id="file-name-display" class="file title">
+<div id="file-name-display">
 <A NAME="{{path}}"></A> {{ path }}
 </div>
 

@@ -39,8 +39,11 @@
     font-size: 14px;
     padding-left: 18px;
     display: block;
+    background-color: #eee;
 }
-
+#file-name-title {
+    padding-left: 18px;
+}
 .chunk-line {
     font-family: monospace;
     font-size: 11px;
