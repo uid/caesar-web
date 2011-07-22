@@ -8,6 +8,7 @@ from django.http import HttpResponse
 
 from chunks.models import Chunk, Assignment
 from tasks.models import Task
+from tasks.routing import assign_tasks
 from models import Comment, Vote, Star 
 from forms import CommentForm, ReplyForm
 
@@ -16,7 +17,7 @@ def dashboard(request):
     user = request.user
     new_task_count = 0
     for assignment in Assignment.objects.all():
-        new_task_count += Task.objects.assign_tasks(assignment, user)
+        new_task_count += assign_tasks(assignment, user)
     
     active_tasks = user.get_profile().tasks \
         .select_related('chunk').exclude(status='C')
