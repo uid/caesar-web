@@ -117,11 +117,11 @@ def generate_users(student_count, reputation_alpha=REPUTATION_SHAPE):
 
 def assign_tasks(users, chunks):
     CHUNKS_PER_ROLE = {
-            'student': 5,
+            'student': 8,
             'staff': 28,
-            'other': 3,
+            'other': 5,
     }
-    REVIEWERS_PER_CHUNK = 3
+    REVIEWERS_PER_CHUNK = 2
 
     # simulate random arrival order of users
     random.shuffle(users)
@@ -146,9 +146,11 @@ def assign_tasks(users, chunks):
     # of students that get to review a chunk along with staff.
 
     def compute_affinity(user1, user2):
+        distance_affinity = 0
         if user2 in user1.other_reviewers:
-            # if the other reviewer is already assigned to a common chunk
-            return 0
+            distance_affinity -= 50
+        
+        reputation_affinity = abs(user1.reputation - user2.reputation)
 
         role_affinity = 0
         role1, role2 = user1.role, user2.role
@@ -161,7 +163,7 @@ def assign_tasks(users, chunks):
             role_affinity = (role1 != role2)
         role_affinity *= ROLE_AFFINITY_MULTIPLIER
 
-        return abs(user1.reputation - user2.reputation) + role_affinity
+        return distance_affinity + reputation_affinity + role_affinity
 
     def make_chunk_sort_key(user):
         def total_affinity(user, reviewers):
