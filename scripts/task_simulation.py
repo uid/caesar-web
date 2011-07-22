@@ -5,6 +5,7 @@ import itertools
 import operator
 import math
 import csv
+from collections import defaultdict
 from functools import total_ordering
 
 from chunks.models import *
@@ -14,15 +15,14 @@ STAFF_PER_STUDENT = 0.05
 OTHER_PER_STUDENT = 0.5
 REPUTATION_SHAPE = 1.2 # justify this?
 REPUTATION_STAFF_SHIFT = 20
-ROLE_DISTANCE_MULTIPLIER = 100
-REPUTATION_DISTANCE_MULTIPLIER = 0.5
+ROLE_AFFINITY_MULTIPLIER = 100
+REPUTATION_AFFINITY_MULTIPLIER = 0.5
 
 def dot_prod(v1, v2):
     return sum(itertools.imap(operator.mul, v1, v2))
 
 
 class SimulatedUser:
-    distance_cache = dict()
     def __init__(self, id, role, reputation):
         self.id = id
         self.role = role
@@ -30,25 +30,6 @@ class SimulatedUser:
         self.submissions = []
         self.chunks = []
         self.other_reviewers = set()
-
-    @staticmethod
-    def __role_distance(role1, role2):
-        base_distance = 0
-        if role1 == 'student' and role2 == 'staff' or \
-                role1 == 'staff' and role2 == 'student':
-            base_distance = 2
-        elif role1 == 'staff' and role2 == 'staff':
-            base_distance = -100
-        else:
-            base_distance = (role1 != role2)
-        return base_distance * ROLE_DISTANCE_MULTIPLIER
-
-    def distance(self, other):
-        if other in self.other_reviewers:
-            # if the other reviewer is already assigned to a common chunk
-            return 0
-        return abs(self.reputation - other.reputation) \
-                + self.__role_distance(self.role, other.role)
 
     def __unicode__(self):
         return u"User(id=%d, role=%s, reputation=%d)" % \
@@ -135,7 +116,11 @@ def generate_users(student_count, reputation_alpha=REPUTATION_SHAPE):
 
 
 def assign_tasks(users, chunks):
-    CHUNKS_PER_REVIEWER = 5
+    CHUNKS_PER_ROLE = {
+            'student': 5,
+            'staff': 28,
+            'other': 3,
+    }
     REVIEWERS_PER_CHUNK = 3
 
     # simulate random arrival order of users
@@ -143,17 +128,52 @@ def assign_tasks(users, chunks):
     users.sort(key=lambda u: u.role == 'staff')
     chunks = list(chunks)
 
+    # Sort the chunks according to these criteria:
+    # 
+    # For students and other:
+    #  1. Remove chunks already assigned to the user
+    #  2. Remove chunks with maximum number of reviewers
+    #  3. Find chunks with largest number of reviewers
+    #  4. Sort those chunks by number of reviewers assigned to submission,
+    #     which tries to distribute reviewers fairly among submissions.
+    #  5. Maximize affinity between user and reviewers on the submission,
+    #     which increases diversity of reviewers for submitter.
+    #  6. Maximize affinity between user and reviewers on the chunk, which
+    #     increases diversity of other reviewers for reviewer.
+    #
+    # For staff, we simply try to spread them out to maximize number of 
+    # submissions with at least one staff member, and then maximize the number
+    # of students that get to review a chunk along with staff.
+
+    def compute_affinity(user1, user2):
+        if user2 in user1.other_reviewers:
+            # if the other reviewer is already assigned to a common chunk
+            return 0
+
+        role_affinity = 0
+        role1, role2 = user1.role, user2.role
+        if role1 == 'student' and role2 == 'staff' or \
+                role1 == 'staff' and role2 == 'student':
+            role_affinity = 2
+        elif role1 == 'staff' and role2 == 'staff':
+            role_affinity = -100
+        else:
+            role_affinity = (role1 != role2)
+        role_affinity *= ROLE_AFFINITY_MULTIPLIER
+
+        return abs(user1.reputation - user2.reputation) + role_affinity
+
     def make_chunk_sort_key(user):
-        def total_distance(user, reviewers):
-            distance = 0
+        def total_affinity(user, reviewers):
+            affinity = 0
             for reviewer in reviewers:
-                distance += user.distance(reviewer)
-            return distance
+                affinity += compute_affinity(user, reviewer)
+            return affinity
         if user.role == 'staff':
             def chunk_sort_key(chunk):
                 return (
-                    -total_distance(user, chunk.submission.reviewers),
-                    -total_distance(user, chunk.reviewers),
+                    -total_affinity(user, chunk.submission.reviewers),
+                    -total_affinity(user, chunk.reviewers),
                 )
             return chunk_sort_key
         else:
@@ -161,17 +181,18 @@ def assign_tasks(users, chunks):
                 return (
                     user in chunk.reviewers,
                     len(chunk.reviewers) >= REVIEWERS_PER_CHUNK,
-                    len(chunk.submission.reviewers),
-                    -total_distance(user, chunk.submission.reviewers),
                     -len(chunk.reviewers),
-                    -total_distance(user, chunk.reviewers),
+                    len(chunk.submission.reviewers),
+                    -total_affinity(user, chunk.submission.reviewers),
+                    -total_affinity(user, chunk.reviewers),
                 )
             return chunk_sort_key
 
     i = 0
     for user in users:
         key = make_chunk_sort_key(user)
-        for _ in itertools.repeat(None, CHUNKS_PER_REVIEWER):
+        chunk_count = CHUNKS_PER_ROLE[user.role]
+        for _ in itertools.repeat(None, chunk_count):
             chunk_to_assign = min(chunks, key=key)
             chunk_to_assign.assign_reviewer(user)
         i += 1
@@ -218,7 +239,11 @@ def write_output(output_file, assignment, users, submissions):
     submissions_without_reviewers = 0
     minimum_reviewer_count = min(len(s.reviewers) for s in submissions)
     maximum_reviewer_count = max(len(s.reviewers) for s in submissions)
+    chunk_reviewer_counts = defaultdict(lambda : 0)
     for submission in submissions:
+        for chunk in submission.chunks:
+            chunk_reviewer_counts[len(chunk.reviewers)] += 1
+
         chunk_count = len(submission.chunks)
         write_header_line('Submission #%d' % submission.author.id, 3)
         write('Chunks: %d' % chunk_count)
@@ -241,7 +266,6 @@ def write_output(output_file, assignment, users, submissions):
             submissions_without_reviewers += (len(submission.reviewers) == 0)
         write()
 
-
     write_header_line('Summary statistics', 2)
     write('Population:')
     for role, count in role_counts.items():
@@ -258,6 +282,10 @@ def write_output(output_file, assignment, users, submissions):
     write('  Without reviewers: %d' % submissions_without_reviewers)
     write('  With staff reviewers: %d' % submissions_with_staff)
     write()
+    write('Chunks')
+    for n, count in sorted(chunk_reviewer_counts.items()):
+        write('  %d reviewers: %d' % (n, count))
+    write()  
     write()
 
 
