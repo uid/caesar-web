@@ -4,7 +4,6 @@ from django.db.models import Count
 
 from accounts.models import UserProfile
 from chunks.models import Chunk
-from review import app_settings
 
 class Comment(models.Model):
     TYPE_CHOICES = (

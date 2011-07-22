@@ -8,7 +8,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from chunks import app_settings
+import app_settings
 
 class Assignment(models.Model):
     id = models.AutoField(primary_key=True)
@@ -23,8 +23,9 @@ class Assignment(models.Model):
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    assignment = models.ForeignKey(Assignment)
-    author = models.ForeignKey(User, blank=True, null=True)
+    assignment = models.ForeignKey(Assignment, related_name='submissions')
+    author = models.ForeignKey(User, 
+            blank=True, null=True, related_name='submissions')
     created = models.DateTimeField(auto_now_add=True)
     class Meta:
         db_table = u'submissions'
@@ -36,7 +37,7 @@ class File(models.Model):
     id = models.AutoField(primary_key=True)
     path = models.CharField(max_length=200)
     data = models.TextField()
-    submission = models.ForeignKey(Submission)
+    submission = models.ForeignKey(Submission, related_name='files')
     created = models.DateTimeField(auto_now_add=True)
     def __split_lines(self):
         self.lines = list(enumerate(self.data.splitlines(), start = 1))
@@ -52,7 +53,7 @@ class File(models.Model):
 
 class Chunk(models.Model):
     id = models.AutoField(primary_key=True)
-    file = models.ForeignKey(File)
+    file = models.ForeignKey(File, related_name='chunks')
     name = models.CharField(max_length=200)
     start = models.IntegerField()
     end = models.IntegerField()
