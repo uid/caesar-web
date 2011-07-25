@@ -111,7 +111,7 @@
                 <img class="user-photo" src="{{ STATIC_URL }}img/user-silhouette.png"/>
                 {% endthumbnail %}
 
-                {{ user.username }}
+                {{ user.username }} ({{ user.get_profile.reputation }})
                 {% if user.is_staff %}
                 <a href="{% url admin:index %}">Admin</a>
                 <a href="{% url review.views.stats %}">Stats</a>
