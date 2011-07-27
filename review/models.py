@@ -57,10 +57,6 @@ class Comment(models.Model):
     def generate_snippet(self):
         return self.chunk.generate_snippet(self.start, self.end)
             
-    @staticmethod
-    def get_comments_for_chunk(chunk):
-        return chunk.comments.select_related('author')
-
     class Meta:
         ordering = [ 'start', '-end', 'thread_id', 'created' ]
 
