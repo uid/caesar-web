@@ -18,18 +18,26 @@
     <span class="comment-visibility">
     </span>
     <span class="comment-snippet">
-    {{ comment.generate_snippet }}
+      {{ snippet }}
     </span>
   </div>
   {% endif %}
 
   <div class="comment-author">
+    {% with author=comment.author %}
     {% if comment.type == 'U' %}
     {{comment.created|timesince_human}} ago 
     {% else %}
     automatically generated 
     {% endif %}
-    by {{ comment.author.get_full_name|default:comment.author.username }}
+    {% with is_staff=author.profile.is_staff is_student=author.profile.is_student %}
+    by <span class="comment-author-name
+      {% if is_staff %}staff{% endif %}
+      {% if is_student %}student{% endif %}">
+      {{ author.get_full_name|default:author.username }}
+    </span>
+    {% endwith %}
+    {% endwith %}
   </div>
   
   <p class="comment-text">

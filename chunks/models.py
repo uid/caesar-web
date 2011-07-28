@@ -61,8 +61,20 @@ class Chunk(models.Model):
     modified = models.DateTimeField(auto_now=True)
     class Meta:
         db_table = u'chunks'
+
+    @property
+    def data(self):
+        if not hasattr(self, '_data'): 
+            self._split_lines()
+        return self._data
+
+    @property
+    def lines(self):
+        if not hasattr(self, '_lines'): 
+            self._split_lines()
+        return self._lines
     
-    def __split_lines(self):
+    def _split_lines(self):
         file_data = self.file.data
         # Rewind backwards from the offset to the beginning of the line
         first_line_offset = self.start
@@ -74,16 +86,12 @@ class Chunk(models.Model):
         # TODO: make tab expansion configurable
         # TODO: more robust (custom) dedenting code
         data = file_data[first_line_offset:self.end].expandtabs(4)
-        self.data = textwrap.dedent(data)
-        self.lines = list(enumerate(self.data.splitlines(), start=first_line))
-
-    def __init__(self, *args, **kwargs):
-        super(Chunk, self).__init__(*args, **kwargs)
-        self.__split_lines()
+        self._data = textwrap.dedent(data)
+        self._lines = list(enumerate(self.data.splitlines(), start=first_line))
 
     def save(self, *args, **kwargs):
         super(Chunk, self).save(*args, **kwargs)
-        self.__split_lines()
+        self._split_lines()
 
     # def get_comment_vote_snippet(self, comment):
     #   vote = user_votes.get(comment.id, None)

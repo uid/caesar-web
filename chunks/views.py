@@ -26,7 +26,7 @@ def view_chunk(request, chunk_id):
         return (comment, vote, snippet)
 
     comment_data = map(get_comment_data, 
-                       chunk.comments.select_related('author'))
+                       chunk.comments.select_related('author__profile'))
 
     lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
@@ -53,6 +53,8 @@ def view_chunk(request, chunk_id):
         'task': task,
         'task_count': task_count
     }) 
+
+
 def view_all_chunks(request, assign, username):
     files = File.objects.filter(submission__name=username).filter(submission__assignment__name=assign)
     paths = []

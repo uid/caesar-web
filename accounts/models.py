@@ -17,14 +17,27 @@ class UserProfile(models.Model):
                 instance.user.username, 
                 filename)
 
-    user = models.OneToOneField(User)
+    ROLE_CHOICES = (
+        ('T', 'Teaching staff'),
+        ('S', 'Student'),
+    )
+
+    user = models.OneToOneField(User, related_name='profile')
     photo = ImageField(upload_to=get_photo_path)
     assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
         related_name='reviewers')
     reputation = models.IntegerField(default=0, editable=False)
+    role = models.CharField(max_length=1, choices=ROLE_CHOICES,
+                            blank=True, null=True)
     
     def __unicode__(self):
         return self.user.__unicode__()
+
+    def is_staff(self):
+        return self.role == 'T'
+
+    def is_student(self):
+        return self.role == 'S'
 
 
 @receiver(post_save, sender=User)
