@@ -28,13 +28,16 @@
     {% if comment.type == 'U' %}
     {{comment.created|timesince_human}} ago 
     {% else %}
-    automatically generated 
+    generated 
     {% endif %}
     {% with is_staff=author.profile.is_staff is_student=author.profile.is_student %}
     by <span class="comment-author-name
       {% if is_staff %}staff{% endif %}
       {% if is_student %}student{% endif %}">
       {{ author.get_full_name|default:author.username }}
+      {% if comment.type == 'U' %}
+      ({{author.profile.reputation}})
+      {% endif %}
     </span>
     {% endwith %}
     {% endwith %}
