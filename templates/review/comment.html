@@ -28,7 +28,7 @@
     {% if comment.type == 'U' %}
     {{comment.created|timesince_human}} ago 
     {% else %}
-    generated 
+    automatically generated 
     {% endif %}
     {% with is_staff=author.profile.is_staff is_student=author.profile.is_student %}
     by <span class="comment-author-name
