@@ -20,9 +20,15 @@ def dashboard(request):
         new_task_count += assign_tasks(assignment, user)
     
     active_tasks = user.get_profile().tasks \
-        .select_related('chunk').exclude(status='C')
+        .select_related('chunk__file').exclude(status='C') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+
     completed_tasks = user.get_profile().tasks \
-        .select_related('chunk').filter(status='C')
+        .select_related('chunk__file').filter(status='C') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+   
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
