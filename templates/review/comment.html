@@ -1,5 +1,5 @@
 {% load extra_tags %}
-<div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}" 
+<div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}-{{ comment.chunk.id }}" 
   class="comment 
          {% if comment.is_reply %}
            comment-reply 
@@ -53,15 +53,17 @@
     </span>
     {% if user.is_authenticated %}
     <span class="comment-actions">
-      <span class="vote-buttons">
-        <div id="upvote-{{ comment.id }}"  title="Upvote"
-          class="vote up {% if vote == 1 %} selected {% endif %}"></div>
-        <div id="downvote-{{ comment.id }}" title="Downvote"
-          class="vote down {% if vote == -1 %} selected {% endif %}"></div>
-      </span>
-      <button id="reply-{{ comment.id }}-button" class="reply-button"
-        type="button">Reply</button>
-      {% if comment.author == user %}
+      {% if full_view %}
+          <span class="vote-buttons">
+            <div id="upvote-{{ comment.id }}"  title="Upvote"
+              class="vote up {% if vote == 1 %} selected {% endif %}"></div>
+            <div id="downvote-{{ comment.id }}" title="Downvote"
+              class="vote down {% if vote == -1 %} selected {% endif %}"></div>
+          </span>
+          <button id="reply-{{ comment.id }}-button" class="reply-button"
+            type="button">Reply</button>
+      {% endif %}
+      {% if comment.author == user  and full_view %}
       <button id="delete-{{ comment.id }}-button" class="delete-button" 
         type="button">Delete</button>
       {% endif %}

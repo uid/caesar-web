@@ -31,6 +31,9 @@ class Submission(models.Model):
         db_table = u'submissions'
     def __unicode__(self):
         return self.name
+    @models.permalink
+    def get_absolute_url(self):
+        return ('chunks.views.view_all_chunks', [str(self.assignment.name), str(self.name)])
  
 
 class File(models.Model):

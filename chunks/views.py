@@ -51,7 +51,8 @@ def view_chunk(request, chunk_id):
         'highlighted_lines': highlighted_lines,
         'comment_data': comment_data,
         'task': task,
-        'task_count': task_count
+        'task_count': task_count,
+        'full_view': True
     }) 
 
 
@@ -68,7 +69,7 @@ def view_all_chunks(request, assign, username):
     paths = []
     for afile in files:
         paths.append(os.path.relpath(afile.path, common_prefix))
-        file_to_chunks[afile] = afile.chunk_set.all().order_by('start')
+        file_to_chunks[afile] = afile.chunks.order_by('start')
     
 
     lexer = JavaLexer()
@@ -102,5 +103,9 @@ def view_all_chunks(request, assign, username):
     file_data = zip(paths, all_highlighted_lines)
     return render(request, 'chunks/view_all_chunks.html', {
         'paths': paths,
-        'file_data': file_data
+        'file_data': file_data,
+        'code_only': False,
+        'read_only': False,
+        'comment_view': True,
+        'full_view': False
     })

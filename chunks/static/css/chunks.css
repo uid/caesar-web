@@ -29,20 +29,41 @@
     -ms-box-sizing: border-box;
     padding-left: 18px;
 }
-
-#file-name-display {
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -ms-box-sizing: border-box;
-    font-weight: bold;
+#file-action {
+    color: #000;
     font-size: 14px;
-    padding-left: 18px;
-    display: block;
+    font-weight: bold;
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    writing-mode: tb-rl;
+    filter: flipv fliph;
+    position: fixed;
+    height: 20px;
+    width: 75px;
+    right: -27px;
+    top: 150px;
+    padding: 5px 5px;
+    text-align: center;
     background-color: #eee;
+    border: 1px solid #000;
+    cursor: pointer;
 }
-#file-name-title {
-    padding-left: 18px;
+#filesystem-text {
+    position: fixed;
+    right: 32px;
+    top: 123px;
+    padding: 5px 5px;
+    background-color: #eee;
+    border: 1px solid #000;
+    z-index: 1;
+    opacity: 0.7;
+}
+#code-table-display {
+    vertical-align:top;
+}
+.file-name-display {
+    padding: 10px 10px;
+    background-color: #eee;
 }
 .chunk-line {
     font-family: monospace;
@@ -50,6 +71,7 @@
     margin: 0;
     display: block;
     position: relative;
+    background-color: #FFC;
 }
 .nonchunk-line {
     font-family: monospace;
@@ -62,11 +84,6 @@
 
 .line {
     display: block;
-}
-
-.line:hover {
-    background-color: #eee;
-    cursor: pointer;
 }
 
 .chunk-line .comment-marker {
@@ -102,12 +119,13 @@
 }
 
 .ui-selected {
-    background-color: #FFFF88;
+    background-color: #FC0;
 }
 .ui-selecting {
-    background-color: #FFFFCA;
+    background-color: #FC0;
 }
 
 .line.highlighted {
-    background-color: #FFFFCA;
+    background-color: #FF0;
 }
+

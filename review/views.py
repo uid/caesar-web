@@ -1,3 +1,9 @@
+from review.models import Comment, Vote, Star 
+from review.forms import CommentForm, ReplyForm
+from review import app_settings
+from chunks.models import Chunk, Assignment, Submission
+from tasks.models import Task
+
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
@@ -174,3 +180,23 @@ def change_task(request):
     except Task.DoesNotExist:
         return redirect('review.views.dashboard')
 
+def summary(request):
+    user = request.user
+    #get all comments that the user wrote
+    comments = Comment.objects.filter(author=user)
+    chunk_stats = dict() #maps chunk and numbers of comments by the user
+    for comment in comments:
+        if not comment.chunk in chunk_stats:
+            chunk_stats[comment.chunk] = 1
+        else:
+            chunk_stats[comment.chunk] += 1
+    review_data = []
+    for key in chunk_stats.keys():
+        review_data.append((key, chunk_stats[key]))
+    #get all the submissions that the user submitted
+    submissions = Submission.objects.filter(author=user)
+    
+    return render(request, 'review/summary.html', {
+        'review_data': review_data,
+        'submissions': submissions,
+    })
