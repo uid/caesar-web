@@ -42,14 +42,12 @@ var model = new function() {
         status: '{{ task.status }}'
     };
 
-    var startTask = function() {
+    self.startTask = function() {
         if (self.task.status === 'O') {
             self.task.status = 'S';
             fireEvent('taskStarted');
         }
     };
-    self.addListener('commentAdded', startTask);
-    self.addListener('commentVoted', startTask);
 
     self.computeIndex = function(start, end, isReply, parentId) {
         var target;
@@ -383,6 +381,7 @@ function attachCommentHandlers(comment) {
                 $('.comment-votes', comment.elt).text(data)
                     .effect('highlight', {queue: false}, 1000);
                 model.voteComment(comment, value);
+                model.startTask();
             });
         } else {
             $.post('{% url review.views.unvote %}', {
@@ -469,6 +468,7 @@ $('#new-comment-form').live('submit', function() {
         var newNode = $(data);
         $('.new-comment').replaceWith(newNode);
         model.addCommentFromDOM(newNode.get(0));
+        model.startTask();
         newNode.effect('highlight', {}, 2000);
         resetScroll();
         clearSelection();
@@ -482,6 +482,7 @@ $('#reply-comment-form').live('submit', function() {
         var newNode = $(data);
         $('.new-reply').replaceWith(newNode);
         model.addCommentFromDOM(newNode.get(0));
+        model.startTask();
         newNode.effect('highlight', {}, 2000);
         resetScroll();
         clearSelection();
@@ -609,7 +610,11 @@ $('body').click(function() {
         <input type="hidden" name="task_id" value="{{ task.id }}"/>
         <input type="hidden" name="status" value="C"/>
         <button id="done-button" type="submit"
-        {% if task.status == 'O' %}disabled{% endif %}>Next</button>
+        {% if task.status == 'O' or task.status == 'N' %}
+          disabled
+        {% endif %}>
+          Next
+        </button>
       </form>
       {% else %}
       <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
