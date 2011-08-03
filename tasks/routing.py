@@ -4,6 +4,7 @@ from collections import namedtuple, defaultdict
 import itertools
 
 from django.db.models import Count
+from django.contrib import auth
 
 from chunks import models
 from models import Task
@@ -75,11 +76,6 @@ def find_chunks(assignment, django_user):
             user.other_reviewers.update(self.reviewers)
 
     django_profile = django_user.get_profile()
-    user = User(
-            id=django_user.id,
-            role=django_profile.role,
-            reputation=django_profile.reputation)
-
     current_task_count = Task.objects.filter(reviewer=django_profile, 
             chunk__file__submission__assignment=assignment).count()
     
@@ -89,6 +85,8 @@ def find_chunks(assignment, django_user):
         return
 
     chunks = []
+    chunk_map = {}
+    user_map = {}
     submissions = {}
     django_submissions = assignment.submissions \
             .exclude(author=django_user).values().all()
@@ -96,6 +94,11 @@ def find_chunks(assignment, django_user):
             .filter(file__submission__assignment=assignment) \
             .exclude(tasks__reviewer=django_profile) \
             .values('id', 'file__submission')
+    django_tasks = Task.objects.filter(
+            chunk__file__submission__assignment=assignment) \
+                    .select_related('reviewer__user') \
+                    .exclude(reviewer=django_profile)
+    django_users = auth.models.User.objects.select_related('profile').all()
 
     django_submission_chunks = defaultdict(list)
     for chunk in django_chunks:
@@ -110,6 +113,22 @@ def find_chunks(assignment, django_user):
             continue
         submissions[submission.id] = submission
         chunks.extend(submission.chunks)
+
+    # load all existing users and their reviewing assignments
+    for u in django_users:
+        user_map[u.id] = User(
+                id=u.id,
+                role=u.profile.role,
+                reputation=u.profile.reputation)
+    user = user_map[django_user.id]
+
+    for chunk in chunks:
+        chunk_map[chunk.id] = chunk
+
+    for django_task in django_tasks:
+        chunk = chunk_map[django_task.chunk_id]
+        reviewer = user_map[django_task.reviewer.user_id]
+        chunk_map[django_task.chunk_id].assign_reviewer(reviewer)
 
     # Sort the chunks according to these criteria:
     # 
@@ -186,12 +205,16 @@ def find_chunks(assignment, django_user):
         for reviewer in chunk.reviewers:
             reviewer.other_reviewers.add(reviewer)
         reviewer.other_reviewers.update(chunk.reviewers)
+        return True
 
     for _ in itertools.repeat(None, assign_count):
         # TODO consider using a priority queue here 
         chunk_to_assign = min(chunks, key=key)
-        assign_reviewer(chunk_to_assign, user)
-        yield chunk_to_assign.id
+        if assign_reviewer(chunk_to_assign, user):
+            yield chunk_to_assign.id
+        else:
+            # we've run out of chunks, most likely
+            return
 
 
 def assign_tasks(assignment, user):
