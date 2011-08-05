@@ -60,6 +60,7 @@ class Chunk(models.Model):
     name = models.CharField(max_length=200)
     start = models.IntegerField()
     end = models.IntegerField()
+    cluster_id = models.IntegerField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     class Meta:
@@ -142,20 +143,12 @@ class Chunk(models.Model):
         return highlighted_lines
 
     def get_similar_chunks(self):
-        threshold = app_settings.CHUNK_SIMILARITY_THRESHOLD
+        if not self.cluster_id:
+            return []
         limit = app_settings.SIMILAR_CHUNK_LIMIT
-        score_threshold = round(threshold * self.fingerprints.count())
-        chunks = Chunk.objects.raw('''
-            SELECT chunks.*, count(f2.value) as score
-            FROM fingerprints f1, fingerprints f2, chunks
-            WHERE f1.chunk_id = %s AND f1.value=f2.value AND 
-                  chunks.id=f2.chunk_id
-            GROUP BY f2.chunk_id
-            HAVING score >= %s AND f2.chunk_id != %s
-            ORDER BY score DESC
-            LIMIT %s
-            ''', (self.id, score_threshold, self.id, limit))
-        return list(chunks)
+        chunks = Chunk.objects.filter(cluster_id=self.cluster_id) \
+                .exclude(id=self.id)[:limit]
+        return chunks
 
     @models.permalink
     def get_absolute_url(self):

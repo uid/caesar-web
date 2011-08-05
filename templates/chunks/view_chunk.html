@@ -67,7 +67,11 @@
         <input type="hidden" name="task_id" value="{{ task.id }}"/>
         <input type="hidden" name="status" value="C"/>
         <button id="done-button" type="submit"
-        {% if task.status == 'O' %}disabled{% endif %}>Next</button>
+        {% if task.status == 'O' or task.status == 'N' %}
+          disabled
+        {% endif %}>
+          Next
+        </button>
       </form>
       {% else %}
       <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>

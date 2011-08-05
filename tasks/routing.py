@@ -4,6 +4,7 @@ from collections import namedtuple, defaultdict
 import itertools
 
 from django.db.models import Count
+from django.contrib import auth
 
 from chunks import models
 from models import Task
@@ -30,6 +31,7 @@ def find_chunks(assignment, django_user):
             self.submissions = []
             self.chunks = []
             self.other_reviewers = set()
+            self.clusters = defaultdict(lambda : 0) 
 
         def __unicode__(self):
             return u"User(id=%d, role=%s, reputation=%d)" % \
@@ -60,42 +62,53 @@ def find_chunks(assignment, django_user):
     class Chunk:
         def __init__(self, chunk, submission):
             self.id = chunk['id']
+            self.cluster_id = chunk['cluster_id']
             self.submission = submission
             self.reviewers = set()
+
         def assign_reviewer(self, user):
             if user in self.reviewers:
                 return False
 
             self.reviewers.add(user)
             self.submission.reviewers.add(user)
+
             user.chunks.append(self)
+            user.other_reviewers.update(self.reviewers)
+            if self.cluster_id:
+                user.clusters[self.cluster_id] += 1
 
             for reviewer in self.reviewers:
                 reviewer.other_reviewers.add(user)
-            user.other_reviewers.update(self.reviewers)
+            return True
 
     django_profile = django_user.get_profile()
-    user = User(
-            id=django_user.id,
-            role=django_profile.role,
-            reputation=django_profile.reputation)
-
     current_task_count = Task.objects.filter(reviewer=django_profile, 
             chunk__file__submission__assignment=assignment).count()
+
     
-    role = {'T': 'staff', 'S': 'student'}.get(django_profile.role, 'other')
+    def convert_role(role):
+        return {'T': 'staff', 'S': 'student'}.get(role, 'other')
+    role = convert_role(django_profile.role)
     assign_count = app_settings.CHUNKS_PER_ROLE[role] - current_task_count
     if assign_count <= 0:
         return
 
     chunks = []
+    chunk_map = {}
+    user_map = {}
     submissions = {}
     django_submissions = assignment.submissions \
             .exclude(author=django_user).values().all()
     django_chunks = models.Chunk.objects \
             .filter(file__submission__assignment=assignment) \
             .exclude(tasks__reviewer=django_profile) \
-            .values('id', 'file__submission')
+            .values('id', 'cluster_id', 'file__submission')
+    django_tasks = Task.objects.filter(
+            chunk__file__submission__assignment=assignment) \
+                    .select_related('reviewer__user') \
+                    .exclude(reviewer=django_profile)
+    django_users = auth.models.User.objects.select_related('profile').all()
 
     django_submission_chunks = defaultdict(list)
     for chunk in django_chunks:
@@ -110,6 +123,22 @@ def find_chunks(assignment, django_user):
             continue
         submissions[submission.id] = submission
         chunks.extend(submission.chunks)
+
+    # load all existing users and their reviewing assignments
+    for u in django_users:
+        user_map[u.id] = User(
+                id=u.id,
+                role=convert_role(u.profile.role),
+                reputation=u.profile.reputation)
+    user = user_map[django_user.id]
+
+    for chunk in chunks:
+        chunk_map[chunk.id] = chunk
+
+    for django_task in django_tasks:
+        chunk = chunk_map[django_task.chunk_id]
+        reviewer = user_map[django_task.reviewer.user_id]
+        chunk_map[django_task.chunk_id].assign_reviewer(reviewer)
 
     # Sort the chunks according to these criteria:
     # 
@@ -148,12 +177,22 @@ def find_chunks(assignment, django_user):
 
         return distance_affinity + reputation_affinity + role_affinity
 
+    def total_affinity(user, reviewers):
+        affinity = 0
+        for reviewer in reviewers:
+            affinity += compute_affinity(user, reviewer)
+        return affinity
+
+    def cluster_score(user, chunk):
+        if not chunk.cluster_id:
+            return 1
+        cluster_count = user.clusters[chunk.cluster_id]
+        if cluster_count >= app_settings.CHUNKS_PER_CLUSTER:
+            return 2
+        else:
+            return -cluster_count
+
     def make_chunk_sort_key(user):
-        def total_affinity(user, reviewers):
-            affinity = 0
-            for reviewer in reviewers:
-                affinity += compute_affinity(user, reviewer)
-            return affinity
         if user.role == 'staff':
             def chunk_sort_key(chunk):
                 return (
@@ -165,6 +204,7 @@ def find_chunks(assignment, django_user):
             def chunk_sort_key(chunk):
                 return (
                     user in chunk.reviewers,
+                    cluster_score(user, chunk),
                     len(chunk.reviewers) >= app_settings.REVIEWERS_PER_CHUNK,
                     -len(chunk.reviewers),
                     len(chunk.submission.reviewers),
@@ -175,23 +215,15 @@ def find_chunks(assignment, django_user):
         
     key = make_chunk_sort_key(user)
 
-    def assign_reviewer(chunk, reviewer):
-        if reviewer in chunk.reviewers:
-            return False
-
-        chunk.reviewers.add(reviewer)
-        chunk.submission.reviewers.add(reviewer)
-        reviewer.chunks.append(chunk)
-
-        for reviewer in chunk.reviewers:
-            reviewer.other_reviewers.add(reviewer)
-        reviewer.other_reviewers.update(chunk.reviewers)
-
     for _ in itertools.repeat(None, assign_count):
         # TODO consider using a priority queue here 
         chunk_to_assign = min(chunks, key=key)
-        assign_reviewer(chunk_to_assign, user)
-        yield chunk_to_assign.id
+        print user.clusters
+        if chunk_to_assign.assign_reviewer(user):
+            yield chunk_to_assign.id
+        else:
+            # we've run out of chunks, most likely
+            return
 
 
 def assign_tasks(assignment, user):
