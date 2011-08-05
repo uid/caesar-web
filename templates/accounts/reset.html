@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>reset your password</h2>
+<p>If you have forgotten your password, you can reset it to a randomly
+generated password by entering your e-mail address in the form below.  Please
+note that you must use the same e-mail as the user account you are trying to
+reset.</p>
+
+<form action="" method="post">
+  {% csrf_token %}
+  {% for field in form %}
+  <label for="{{ field.id }}">{{ field.label }}:</label>
+  <br/>
+  {{ field }}<br/>
+  {{ field.help_text }}
+
+  {% for error in field.errors %}
+  <p class="error">{{ error }}</p>
+  {% endfor %}
+  {% endfor %}
+
+  <button type="submit">Send</button>
+</form>
+
+{% endblock %}
+

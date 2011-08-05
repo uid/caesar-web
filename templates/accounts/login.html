@@ -29,6 +29,10 @@
     <button type="submit">Login</button>
   </form>
 
+  <a id="forgotten-link" 
+     href="{% url django.contrib.auth.views.password_reset %}">
+    Forgotten password?
+  </a>
   <a id="register-link" href="{% url accounts.views.register %}?next={{ next }}">Register</a>
 </div>
 

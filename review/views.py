@@ -1,6 +1,5 @@
 from review.models import Comment, Vote, Star 
 from review.forms import CommentForm, ReplyForm
-from review import app_settings
 from chunks.models import Chunk, Assignment, Submission
 from tasks.models import Task
 
