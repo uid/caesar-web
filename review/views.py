@@ -1,8 +1,3 @@
-from review.models import Comment, Vote, Star 
-from review.forms import CommentForm, ReplyForm
-from chunks.models import Chunk, Assignment, Submission
-from tasks.models import Task
-
 from django.db.models import Count
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
@@ -11,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse
 
-from chunks.models import Chunk, Assignment
+from chunks.models import Chunk, Assignment, Submission
 from tasks.models import Task
 from tasks.routing import assign_tasks
 from models import Comment, Vote, Star 
