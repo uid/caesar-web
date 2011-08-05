@@ -180,23 +180,30 @@ def change_task(request):
     except Task.DoesNotExist:
         return redirect('review.views.dashboard')
 
-def summary(request):
-    user = request.user
+def summary(request, username):
+    user = User.objects.get(username__exact=username)
     #get all comments that the user wrote
     comments = Comment.objects.filter(author=user)
     chunk_stats = dict() #maps chunk and numbers of comments by the user
-    for comment in comments:
-        if not comment.chunk in chunk_stats:
-            chunk_stats[comment.chunk] = 1
-        else:
-            chunk_stats[comment.chunk] += 1
     review_data = []
-    for key in chunk_stats.keys():
-        review_data.append((key, chunk_stats[key]))
+    for comment in comments:
+        if comment.is_reply():
+            review_data.append(("reply-comment", comment))
+        else:
+            review_data.append(("new-comment", comment))
+    
+    votes = Vote.objects.filter(author=user)
+    for vote in votes:
+        if vote.value == 1:
+            review_data.append(("vote-up", vote.comment))
+        elif vote.value == -1:
+            review_data.append(("vote-down", vote.comment))
+    
     #get all the submissions that the user submitted
     submissions = Submission.objects.filter(author=user)
     
     return render(request, 'review/summary.html', {
         'review_data': review_data,
         'submissions': submissions,
+        'user': user,
     })

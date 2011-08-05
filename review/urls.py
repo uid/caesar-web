@@ -9,5 +9,5 @@ urlpatterns = patterns('review.views',
     (r'^delete_comment/', 'delete_comment'),
     (r'^vote/', 'vote'),
     (r'^unvote/', 'unvote'),
-    (r'summary', 'summary'),
+    (r'^user/(?P<username>\w+)', 'summary'),
 )

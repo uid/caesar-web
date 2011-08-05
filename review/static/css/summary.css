@@ -1,0 +1,70 @@
+.type {
+    display: block;
+    float: left;
+    padding: 0px 5px;
+}
+#vote-up {
+    display: inline;
+    background-image: url('../img/thumb-up.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+    margin-right: 4px;
+}
+#vote-down {
+    display: inline;
+    background-image: url('../img/thumb-down.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+    margin-right: 4px;
+}
+#reply-comment {
+    display: inline;
+    background-image: url('../img/arrow-curve-180-left.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+    margin-right: 4px;
+}
+#new-comment {
+    display: inline;
+    background-image: url('../img/balloon.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+    margin-right: 4px;
+}
+.chunk-snippet {
+    font-family: monospace;
+    font-size: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-left: 5em;
+    clear: none;
+}
+.comment-snippet {
+    display: block;
+    font-family: monospace;
+    font-size: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    clear: none;
+}
+.activity-line {
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    height: 18px;
+    padding: 2px 0px;
+}
+
+.activity-line:hover {
+    background-color: #eee;
+    cursor: pointer;
+}
+
+.new.activity-line {
+    font-weight: bold;
+}
