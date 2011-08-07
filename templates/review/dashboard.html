@@ -54,6 +54,32 @@ $(document).ready(function() {
 
 {% block content %}
 
+<h2 class="task-header">submitted</h2>
+<div class="task-list">
+  {% for submission, reviewer_count, last_modified, user_comments, static_comments in submission_data %}
+  
+  <div class="task-line">
+    <span class="chunk-name">
+      {{ submission.assignment.name }}
+    </span>
+    <span class="task-stats">
+      <span class="comment-count" title="User Comments">
+        {{ user_comments }}
+      </span>
+      <span class="robot-count" title="Computer Comments">
+        {{ static_comments }}
+      </span>
+    </span>
+    <span class="task-snippet">
+      {{ last_modified }}
+    </span>
+  </div>
+  
+  {% empty %}
+    No Submissions found.
+  {% endfor %}
+</div>
+
 <div class="span-24">
 {% if new_task_count > 0 %}
 <div class="success">

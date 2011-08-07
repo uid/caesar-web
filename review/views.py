@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Max
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
@@ -31,10 +31,23 @@ def dashboard(request):
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
    
+    #get all the submissions that the user submitted
+    submissions = user.submissions \
+        .select_related('chunk__file__assignment') \
+        .annotate(reviewer_count=Count('files__chunks__tasks', distinct=True),
+                  last_modified = Max('files__chunks__comments__modified'))
+    
+    submission_data = []
+    for submission in submissions:
+        user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
+        static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
+        submission_data.append((submission, submission.reviewer_count, submission.last_modified, 
+                                  user_comments, static_comments))
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
         'new_task_count': new_task_count,
+        'submission_data': submission_data,
     })
 
 @staff_member_required

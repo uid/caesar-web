@@ -36,6 +36,7 @@
     margin-right: 4px;
 }
 .chunk-snippet {
+    display: inline;
     font-family: monospace;
     font-size: 12px;
     overflow: hidden;
@@ -45,7 +46,7 @@
     clear: none;
 }
 .comment-snippet {
-    display: block;
+    display: inline;
     font-family: monospace;
     font-size: 12px;
     overflow: hidden;

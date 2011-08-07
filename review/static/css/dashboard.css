@@ -65,3 +65,10 @@
     height: 16px;
     padding-left: 18px;
 }
+.robot-count {
+    display: inline;
+    background-image: url('../img/robot.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+}
