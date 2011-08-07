@@ -18,6 +18,18 @@
     background-color: #eee;
     cursor: pointer;
 }
+.submission-line {
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    height: 18px;
+    clear: both;
+    padding: 2px 0px;
+}
+
+.submission-line:hover {
+    background-color: #eee;
+    cursor: pointer;
+}
 
 .new.task-line {
     font-weight: bold;
