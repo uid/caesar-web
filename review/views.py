@@ -96,17 +96,20 @@ def new_comment(request):
             comment = form.save(commit=False)
             comment.author = request.user
             comment.save()
-            chunk_id = comment.chunk
             user = request.user
+            chunk = comment.chunk
             try:
                 task = Task.objects.get(
-                    chunk=chunk_id, reviewer=user.get_profile())
+                    chunk=chunk, reviewer=user.get_profile())
                 if task.status == 'N' or task.status == 'O':
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
             return render(request, 'review/comment.html', {
-                'comment': comment
+                'comment': comment,
+                'chunk': chunk,
+                'snippet': chunk.generate_snippet(comment.start, comment.end),
+                'full_view': True,
             })
 
 @login_required
