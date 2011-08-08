@@ -56,7 +56,7 @@ def view_chunk(request, chunk_id):
     }) 
 
 
-def view_all_chunks(request, assign, username, type):
+def view_all_chunks(request, assign, username, viewtype):
     files = File.objects.filter(submission__name=username).filter(submission__assignment__name=assign)
     paths = []
     all_highlighted_lines = []
@@ -102,7 +102,7 @@ def view_all_chunks(request, assign, username, type):
     
     code_only = False
     comment_view = True
-    if type == "code":
+    if viewtype == "code":
         code_only = True
         comment_view = False
     
@@ -112,5 +112,5 @@ def view_all_chunks(request, assign, username, type):
         'code_only': code_only,
         'read_only': False,
         'comment_view': comment_view,
-        'full_view': False
+        'full_view': False,
     })

@@ -23,7 +23,7 @@
   </div>
   {% endif %}
 
-{% if full_view %}
+{% if full_view or activity_view %}
   <div class="comment-author">
     {% with author=comment.author %}
     {% if comment.type == 'U' %}
@@ -45,9 +45,15 @@
   </div>
 {% endif %} 
   
+  {% if activity_view and highlight_comment.id == comment.id and not vote%}
+  <p id = "highlight-comment-text" class="comment-text">
+    {{ comment.text }}
+  </p>
+  {% else %}
   <p class="comment-text">
     {{ comment.text }}
   </p>
+  {% endif %}
 
   <div class="comment-footer">
     <span class="comment-votes">

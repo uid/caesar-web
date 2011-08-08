@@ -1,5 +1,5 @@
 .type {
-    display: block;
+    display: inline;
     float: left;
     padding: 0px 5px;
 }
@@ -36,23 +36,28 @@
     margin-right: 4px;
 }
 .chunk-snippet {
-    display: inline;
+    display: inline; 
+    color: #777;
     font-family: monospace;
     font-size: 12px;
+    height: 16px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    margin-left: 5em;
-    clear: none;
+    left-margin: 25em;
+    max-width: 50em;
+    float: left;
 }
 .comment-snippet {
-    display: inline;
+    display: inline; 
     font-family: monospace;
     font-size: 12px;
+    height: 16px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    clear: none;
+    width: 25em;
+    float: left;
 }
 .activity-line {
     border-bottom: 1px solid #aaa;

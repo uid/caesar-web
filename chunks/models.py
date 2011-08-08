@@ -34,7 +34,7 @@ class Submission(models.Model):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('chunks.views.view_all_chunks', [str(self.assignment.name), str(self.name)])
+        return ('chunks.views.view_all_chunks', [str(self.assignment.name), str(self.name), "code"])
  
 
 class File(models.Model):

@@ -12,6 +12,10 @@ from tasks.routing import assign_tasks
 from models import Comment, Vote, Star 
 from forms import CommentForm, ReplyForm
 
+from pygments import highlight
+from pygments.lexers import JavaLexer
+from pygments.formatters import HtmlFormatter
+
 @login_required
 def dashboard(request):
     user = request.user
@@ -197,22 +201,51 @@ def summary(request, username):
     review_data = []
     for comment in comments:
         if comment.is_reply():
-            review_data.append(("reply-comment", comment))
+            #false means not a vote activity
+            review_data.append(("reply-comment", comment, False, None))
         else:
-            review_data.append(("new-comment", comment))
+            review_data.append(("new-comment", comment, False, None))
     
     votes = Vote.objects.filter(author=user)
     for vote in votes:
         if vote.value == 1:
-            review_data.append(("vote-up", vote.comment))
+            #true means vote activity
+            review_data.append(("vote-up", vote.comment, True, vote))
         elif vote.value == -1:
-            review_data.append(("vote-down", vote.comment))
-    
-    #get all the submissions that the user submitted
-    submissions = Submission.objects.filter(author=user)
-    
+            review_data.append(("vote-down", vote.comment, True, vote))
+    review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
     return render(request, 'review/summary.html', {
         'review_data': review_data,
-        'submissions': submissions,
         'user': user,
+    })
+def activity(request, element_id, element_type):
+    vote = None
+    comment = None
+    chunk = None
+    if element_type == "vote":
+        vote = Vote.objects.get(id__exact = element_id)
+        comment = (vote.comment)
+        chunk = vote.comment.chunk
+    elif element_type == "comment":
+        comment = Comment.objects.get(id__exact = element_id)
+        chunk = comment.chunk
+    comments = [comment]
+    if comment.is_reply():
+        comments = Comment.objects.filter(thread_id = comment.thread_id)
+    
+    lexer = JavaLexer()
+    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
+    numbers, lines = zip(*chunk.lines)
+    # highlight the code this way to correctly identify multi-line constructs
+    # TODO implement a custom formatter to do this instead
+    highlighted_lines = zip(numbers, 
+            highlight(chunk.data, lexer, formatter).splitlines())
+    return render(request, 'review/activity.html', {
+        'chunk': chunk,
+        'vote': vote,
+        'highlight_comment': comment,
+        'comments': comments,
+        'highlighted_lines': highlighted_lines,
+        'full_view': False,
+        'activity_view': True
     })

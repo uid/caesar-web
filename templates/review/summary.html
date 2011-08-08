@@ -13,8 +13,9 @@
 $(document).ready(function() {
 
     $('.activity-line').click(function(e) {
-      var chunkId = this.id.split('-')[1];
-      window.location = "/chunks/view/" + chunkId;
+      var activityType = this.id.split('-')[0]
+      var element_Id = this.id.split('-')[1];
+      window.location = "/review/activity/" + activityType + "/" + element_Id;
       return false;
     });
 
@@ -31,23 +32,13 @@ $(document).ready(function() {
 {% block content %}
 
 <h2 class="task-header">{{user.username}}</h2>
-
-<h2 class="task-header">submitted</h2>
-
-<div class="task-list">
-  {% for submission in submissions %}
-    <a href="{{ submission.get_absolute_url }}"> {{ submission.assignment.name }} </a>
-  {% empty %}
-    No Submissions found.
-  {% endfor %}
-</div>
-
+<h2 class="task header"> reputation: {{user.profile.reputation}}
 
 <h2 class="task-header">activity stream</h2>
 <div class="task-list">
-  {% for type, comment in review_data %}
-  <div id="comment-{{comment.chunk.id}}" class="activity-line">
-    <span class="type" id="{{type}}" title="Upvote">
+  {% for type, comment, is_vote, vote in review_data %}
+  <div id="{% if is_vote %}vote-{{vote.id}}{% else %}comment-{{comment.id}}{% endif %}" class="activity-line">
+    <span class="type" id="{{type}}" title="{{type}}">
     </span>
     <span class="comment-snippet" title="Comments">
         {{ comment.text }}
