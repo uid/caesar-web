@@ -104,14 +104,14 @@
           <div id="toolbar-user">
               {% if user.is_authenticated %}
               <div id="toolbar-logged-in">
-
+                <a href="/review/allusers"> view all users</a> |
                 {% thumbnail user.get_profile.photo "20x20" crop="center" as photo %}
                 <img class="user-photo" src="{{ photo.url }}"/>
                 {% empty %}
                 <img class="user-photo" src="{{ STATIC_URL }}img/user-silhouette.png"/>
                 {% endthumbnail %}
 
-                {{ user.username }} ({{ user.get_profile.reputation }})
+                <a href="/review/user/{{ user.username }}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
                 {% if user.is_staff %}
                 <a href="{% url admin:index %}">Admin</a>
                 <a href="{% url review.views.stats %}">Stats</a>
