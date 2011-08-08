@@ -60,31 +60,32 @@ def view_all_chunks(request, assign, username):
     files = File.objects.filter(submission__name=username).filter(submission__assignment__name=assign)
     paths = []
     all_highlighted_lines = []
+    all_comments = []
     for afile in files:
         paths.append(afile.path)
     common_prefix = os.path.commonprefix(paths)
     
-    file_to_chunks = dict() #file - list of chunks
     #get a list of only the relative paths
     paths = []
     for afile in files:
-        paths.append(os.path.relpath(afile.path, common_prefix))
-        file_to_chunks[afile] = afile.chunks.order_by('start')
-    
+        paths.append(os.path.relpath(afile.path, common_prefix))    
 
     lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)   
     for afile in files:
+        #find all comments for the file
+        all_comments.append(Comment.objects.filter(chunk__file__id=afile.id))
+        #prepare the file - get the lines that are part of chunk and the ones that aren't
         highlighted_lines_for_file = []
         numbers, lines = zip(*afile.lines)
         highlighted_lines = zip(numbers, 
                 highlight(afile.data, lexer, formatter).splitlines())
-        chunks = file_to_chunks[afile]
+        chunks = afile.chunks.order_by('start')
         total_lines = len(afile.lines)
         start = 0
         end = 0
-        for i in range(len(chunks)):
-            numbers, lines = zip(*chunks[i].lines)
+        for chunk in chunks:
+            numbers, lines = zip(*chunk.lines)
             chunk_start = numbers[0]-1
             chunk_end = chunk_start + len(numbers)
             if end != chunk_start and chunk_start > end: #some lines between chunks
@@ -92,15 +93,15 @@ def view_all_chunks(request, assign, username):
                 start = end
                 end = chunk_start
                 #True means it's a chunk, False it's not a chunk
-                highlighted_lines_for_file.append((highlighted_lines[start:end], False, None))
+                highlighted_lines_for_file.append((highlighted_lines[start:end], False, None, None))
             if end == chunk_start:
                 #now for the chunk part
                 start = chunk_start
                 end = chunk_end
                 #True means it's a chunk, False it's not a chunk
-                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunks[i]))
+                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk))
         all_highlighted_lines.append(highlighted_lines_for_file)
-    file_data = zip(paths, all_highlighted_lines)
+    file_data = zip(paths, all_highlighted_lines, all_comments)
     return render(request, 'chunks/view_all_chunks.html', {
         'paths': paths,
         'file_data': file_data,

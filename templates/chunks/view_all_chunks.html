@@ -25,7 +25,7 @@
 $(document).ready(function() {
     var fileSystemText = {
         visible: 'Hide Files', 
-        hidden: 'Open Files' 
+        hidden: 'Show Files' 
     };
     var fileState = 'visible';
 
@@ -77,11 +77,11 @@ $(document).ready(function() {
       No files found.
     {% endfor %}
 </div>
-<div id="file-action">Open Files</div>
+<div id="file-action">Show Files</div>
 
 
 
-{% for path, highlighted_lines_for_file in file_data %}
+{% for path, highlighted_lines_for_file, comments in file_data %}
 <h2 class="file-name-display">
 <A NAME="{{path}}"></A> {{ path }}
 </h2>
@@ -92,16 +92,11 @@ $(document).ready(function() {
 <td id="code-table-display">
 <div id="comment-display" class="span-6">
     <div id="comment-display-inner">
-{% for highlighted_lines, is_chunk, chunk in highlighted_lines_for_file %}
-    {% if is_chunk %}
-        {% for comment in chunk.comments.all %}
+        {% for comment in comments %}
             {% include "review/comment.html" %} 
         {% empty %}
         {% endfor %}
-    {% endif %}
-{% empty %}
-{% endfor %}
-</div>
+    </div>
 </div>
 </td>
 {% endif %}
