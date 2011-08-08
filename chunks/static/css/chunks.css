@@ -8,6 +8,12 @@
     font-size: 1em;
 }
 
+#view-all-code {
+    display: block;
+    float: right;
+    padding: 0px 5px;
+}
+
 #chunk-navigation {
     float: right;
 }

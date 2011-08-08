@@ -81,7 +81,7 @@ $(document).ready(function() {
 
 
 
-{% for path, highlighted_lines_for_file, comments in file_data %}
+{% for path, highlighted_lines_for_file in file_data %}
 <h2 class="file-name-display">
 <A NAME="{{path}}"></A> {{ path }}
 </h2>
@@ -92,8 +92,13 @@ $(document).ready(function() {
 <td id="code-table-display">
 <div id="comment-display" class="span-6">
     <div id="comment-display-inner">
-        {% for comment in comments %}
-            {% include "review/comment.html" %} 
+        {% for highlighted_lines, is_chunk, chunk, comments in highlighted_lines_for_file %}
+            {% if is_chunk %}
+                {% for comment in comments %}
+                    {% include "review/comment.html" %} 
+                {% empty %}
+                {% endfor %}
+            {% endif %}
         {% empty %}
         {% endfor %}
     </div>
@@ -101,7 +106,7 @@ $(document).ready(function() {
 </td>
 {% endif %}
 <td id="code-table-display">
-{% for highlighted_lines, is_chunk, chunk in highlighted_lines_for_file %}
+{% for highlighted_lines, is_chunk, chunk, comments in highlighted_lines_for_file %}
     {% if is_chunk %}
         <div id="chunk-display" class="span-18 last">
             <div id="chunk-{{chunk.id}}-dispaly" class="syntax">

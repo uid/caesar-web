@@ -56,11 +56,10 @@ def view_chunk(request, chunk_id):
     }) 
 
 
-def view_all_chunks(request, assign, username):
+def view_all_chunks(request, assign, username, type):
     files = File.objects.filter(submission__name=username).filter(submission__assignment__name=assign)
     paths = []
     all_highlighted_lines = []
-    all_comments = []
     for afile in files:
         paths.append(afile.path)
     common_prefix = os.path.commonprefix(paths)
@@ -73,8 +72,6 @@ def view_all_chunks(request, assign, username):
     lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)   
     for afile in files:
-        #find all comments for the file
-        all_comments.append(Comment.objects.filter(chunk__file__id=afile.id))
         #prepare the file - get the lines that are part of chunk and the ones that aren't
         highlighted_lines_for_file = []
         numbers, lines = zip(*afile.lines)
@@ -99,14 +96,21 @@ def view_all_chunks(request, assign, username):
                 start = chunk_start
                 end = chunk_end
                 #True means it's a chunk, False it's not a chunk
-                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk))
+                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk, chunk.comments.all))
         all_highlighted_lines.append(highlighted_lines_for_file)
-    file_data = zip(paths, all_highlighted_lines, all_comments)
+    file_data = zip(paths, all_highlighted_lines)
+    
+    code_only = False
+    comment_view = True
+    if type == "code":
+        code_only = True
+        comment_view = False
+    
     return render(request, 'chunks/view_all_chunks.html', {
         'paths': paths,
         'file_data': file_data,
-        'code_only': False,
+        'code_only': code_only,
         'read_only': False,
-        'comment_view': True,
+        'comment_view': comment_view,
         'full_view': False
     })
