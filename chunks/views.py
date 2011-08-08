@@ -92,11 +92,12 @@ def view_all_chunks(request, assign, username, viewtype):
                 #True means it's a chunk, False it's not a chunk
                 highlighted_lines_for_file.append((highlighted_lines[start:end], False, None, None))
             if end == chunk_start:
+                comments = chunk.comments.select_related('author__profile')
                 #now for the chunk part
                 start = chunk_start
                 end = chunk_end
                 #True means it's a chunk, False it's not a chunk
-                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk, chunk.comments.all))
+                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk, comments))
         all_highlighted_lines.append(highlighted_lines_for_file)
     file_data = zip(paths, all_highlighted_lines)
     

@@ -23,7 +23,6 @@
   </div>
   {% endif %}
 
-{% if full_view or activity_view %}
   <div class="comment-author">
     {% with author=comment.author %}
     {% if comment.type == 'U' %}
@@ -43,7 +42,6 @@
     {% endwith %}
     {% endwith %}
   </div>
-{% endif %} 
   
   {% if activity_view and highlight_comment.id == comment.id and not vote%}
   <p id = "highlight-comment-text" class="comment-text">

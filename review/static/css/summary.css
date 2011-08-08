@@ -2,40 +2,23 @@
     display: inline;
     float: left;
     padding: 0px 5px;
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
 }
 #vote-up {
-    display: inline;
     background-image: url('../img/thumb-up.png');
-    background-repeat: no-repeat;
-    height: 16px;
-    padding-left: 18px;
-    margin-right: 4px;
 }
 #vote-down {
-    display: inline;
     background-image: url('../img/thumb-down.png');
-    background-repeat: no-repeat;
-    height: 16px;
-    padding-left: 18px;
-    margin-right: 4px;
 }
 #reply-comment {
-    display: inline;
     background-image: url('../img/arrow-curve-180-left.png');
-    background-repeat: no-repeat;
-    height: 16px;
-    padding-left: 18px;
-    margin-right: 4px;
 }
 #new-comment {
-    display: inline;
     background-image: url('../img/balloon.png');
-    background-repeat: no-repeat;
-    height: 16px;
-    padding-left: 18px;
-    margin-right: 4px;
 }
-.chunk-snippet {
+.chunk-name {
     display: inline; 
     color: #777;
     font-family: monospace;
@@ -44,9 +27,21 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    left-margin: 25em;
-    max-width: 50em;
     float: left;
+    padding-left: 18px;
+}
+.last-modified {
+    display: inline; 
+    color: #777;
+    font-family: monospace;
+    font-size: 12px;
+    height: 16px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    float: left;
+    width: 15em;
+    padding-left: 18px;
 }
 .comment-snippet {
     display: inline; 
@@ -58,6 +53,7 @@
     text-overflow: ellipsis;
     width: 25em;
     float: left;
+    padding-left: 18px;
 }
 .activity-line {
     border-bottom: 1px solid #aaa;

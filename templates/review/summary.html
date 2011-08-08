@@ -43,8 +43,11 @@ $(document).ready(function() {
     <span class="comment-snippet" title="Comments">
         {{ comment.text }}
     </span>
-    <span class="chunk-snippet" title="Code">
-        {{ comment.generate_snippet }}
+    <span class="chunk-name" title="Task">
+        {{ comment.chunk.name }}
+    </span>
+    <span class="last-modified" title="Modified">
+        {{ comment.modified }}
     </span>
   </div>
   {% empty %}

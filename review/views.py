@@ -196,7 +196,7 @@ def change_task(request):
 def summary(request, username):
     user = User.objects.get(username__exact=username)
     #get all comments that the user wrote
-    comments = Comment.objects.filter(author=user)
+    comments = Comment.objects.filter(author=user).select_related('chunk')
     chunk_stats = dict() #maps chunk and numbers of comments by the user
     review_data = []
     for comment in comments:
@@ -206,7 +206,7 @@ def summary(request, username):
         else:
             review_data.append(("new-comment", comment, False, None))
     
-    votes = Vote.objects.filter(author=user)
+    votes = Vote.objects.filter(author=user).select_related('comment__chunk')
     for vote in votes:
         if vote.value == 1:
             #true means vote activity
