@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+
+<script>
+$(document).ready(function() {
+
+    $('.activity-line').click(function(e) {
+      var username = this.id.split('-')[1];
+      window.location = "/review/user/" + username
+      return false;
+    });
+
+});
+</script>
+
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+{% endblock %}
+
+
+{% block content %}
+
+<h2 class="task-header">all users</h2>
+<div class="task-list">
+  {% for participant in participants %}
+  <div id="participant-{{participant.username}}" class="activity-line">
+    <span class="comment-snippet" title="Username">
+        {{ participant.username }}
+    </span>
+    <span class="chunk-name" title="Reputation">
+        {{ participant.profile.reputation }}
+    </span>
+    <span class="last-modified" title="Role">
+        {{ participant.profile.role }}
+    </span>
+  </div>
+  {% empty %}
+    No comments found.
+  {% endfor %}
+</div>
+{% endblock %}

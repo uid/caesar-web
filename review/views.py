@@ -252,3 +252,10 @@ def activity(request, element_id, element_type):
         'full_view': False,
         'activity_view': True
     })
+
+
+def allusers(request):
+    participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile')
+    return render(request, 'review/allusers.html', {
+        'participants': participants,
+    })
