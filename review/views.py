@@ -112,6 +112,7 @@ def new_comment(request):
                 'full_view': True,
             })
 
+
 @login_required
 def reply(request):
     if request.method == 'GET':
@@ -125,7 +126,8 @@ def reply(request):
             comment = form.save(commit=False)
             comment.author = request.user
             parent = Comment.objects.get(id=comment.parent_id)
-            comment.chunk = parent.chunk
+            chunk = parent.chunk
+            comment.chunk = chunk
             comment.end = parent.end
             comment.start = parent.start 
             if parent.is_reply():
@@ -141,7 +143,11 @@ def reply(request):
                 pass
             return render(request, 'review/comment.html', {
                 'comment': comment
+                'chunk': chunk,
+                'snippet': chunk.generate_snippet(comment.start, comment.end),
+                'full_view': True,
             })
+
 
 @login_required
 def delete_comment(request):
