@@ -18,6 +18,13 @@
 #new-comment {
     background-image: url('../img/balloon.png');
 }
+#view-all-activity {
+    display: block;
+    float: right;
+    padding: 0px 5px;
+    height: 20em;
+    clear: none;
+}
 .chunk-name {
     display: inline; 
     color: #777;
@@ -56,6 +63,7 @@
     padding-left: 18px;
 }
 .activity-line {
+    display: block;
     border-bottom: 1px solid #aaa;
     position: relative;
     height: 18px;
@@ -73,4 +81,8 @@
 .assignment-display {
     padding: 10px 10px;
     background-color: #eee;
+}
+.stream-list {
+    display: block;
+    margin-bottom: 18px;
 }

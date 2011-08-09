@@ -202,6 +202,7 @@ def change_task(request):
     except Task.DoesNotExist:
         return redirect('review.views.dashboard')
 
+@login_required
 def summary(request, username):
     participant = User.objects.get(username__exact=username)
     assignment_data = []
@@ -231,6 +232,7 @@ def summary(request, username):
         'assignment_data': assignment_data,
         'participant': participant
     })
+@login_required
 def activity(request, element_id, element_type):
     user = request.user
     vote = None
@@ -273,9 +275,47 @@ def activity(request, element_id, element_type):
         'user': user
     })
 
-
+@login_required
 def allusers(request):
     participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile')
     return render(request, 'review/allusers.html', {
         'participants': participants,
+    })
+
+@login_required
+def all_activity(request, assign, username):
+    participant = User.objects.get(username__exact=username)
+    user = request.user
+    #get all assignments
+    assignment = Assignment.objects.get(name__exact=assign)
+    #get all relevant chunks
+    chunks = Chunk.objects.filter(file__submission__assignment = assignment).filter(comments__author=participant).select_related('comments')
+    chunk_set = set()
+    assignment_data = []
+
+    lexer = JavaLexer()
+    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)   
+    for chunk in chunks:
+        if chunk in chunk_set:
+            continue
+        else:
+            chunk_set.add(chunk)
+        numbers, lines = zip(*chunk.lines)
+        highlighted_lines = zip(numbers, 
+                highlight(chunk.data, lexer, formatter).splitlines())
+        comments = chunk.comments.select_related('author__profile')
+        highlighted_comments = []
+        for comment in comments:
+            if comment.author == participant:
+                highlighted_comments.append(comment)
+            else:
+                highlighted_comments.append(None)
+        comment_data = zip(comments, highlighted_comments)
+        assignment_data.append((chunk, highlighted_lines, comment_data))
+
+    return render(request, 'review/all_activity.html', {
+        'assignment_data': assignment_data,
+        'participant': participant,
+        'activity_view': True,
+        'full_view': False
     })

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+
+{% block css %}
+{{ block.super }}
+
+<link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/syntax.css" type="text/css" />
+
+{% if full_view %}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/fullchunks.css" type="text/css" />
+{% endif %}
+
+{% endblock %}
+
+
+{% block js %}
+
+{{ block.super }}
+{% include "chunks/chunk.html" %}
+
+<script type="text/javascript" charset="utf-8">
+
+$(document).ready(function() {
+    var fileSystemText = {
+        visible: 'Hide Files', 
+        hidden: 'Show Files' 
+    };
+    var fileState = 'visible';
+
+    if (fileState === 'visible') {
+        $('#filesystem-text').show();
+    } else {
+        $('#filesystem-text').hide();
+    }
+    $('#file-action')
+            .text(fileSystemText[fileState]);
+
+    $('#file-action').click(function() {
+        if (fileState === 'visible') {
+            $('#filesystem-text').hide();
+            fileState = 'hidden';
+        } else {
+            $('#filesystem-text').show();
+            fileState = 'visible';
+        }
+        $(this).text(fileSystemText[fileState]);
+    });
+
+});
+</script>
+{% endblock %}
+
+
+
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+{% endblock %}
+
+{% block secondary-toolbar %}
+{% endblock %}
+
+{% block content %}
+
+{% for chunk, highlighted_lines, comment_data in assignment_data%}
+<h2 class="file-name-display">
+<A NAME="{{chunk.name}}"></A> {{ chunk.name }}
+</h2>
+
+<table>
+<tr>   
+<td id="code-table-display">
+<div id="comment-display" class="span-6">
+    <div id="comment-display-inner">
+        {% for comment, highlight_comment in comment_data %}
+            {% include "review/comment.html" %} 
+        {% empty %}
+        {% endfor %}
+    </div>
+</div>
+</td>
+<td id="code-table-display">
+    <div id="chunk-display" class="span-18 last">
+        <div id="chunk-{{chunk.id}}-dispaly" class="syntax">
+        {% for n, line in highlighted_lines %}
+        <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line">
+          <span id="line-{{chunk.id}}-{{ n }}" class="line">
+            <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+          </span>
+        </span>
+        {% endfor %}
+        </div>
+    </div>
+</td></tr>
+</table>
+{% empty %}
+{% endfor %}
+
+{% endblock %}
+

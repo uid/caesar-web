@@ -36,11 +36,16 @@ $(document).ready(function() {
 
 <h2 class="task-header">activity stream</h2>
 {% for assignment, review_data in assignment_data %}
+<div id ="view-all-activity">
+    <a href="/review/activity/{{assignment.name}}/{{participant.username}}"> view all activity</a>
+</div>
 <h3 class="assignment-display">
     <A NAME="assignment-display"></A> {{ assignment.name }}
 </h3>
 
-<div class="task-list">
+
+
+<div class="stream-list">
   {% for type, comment, is_vote, vote in review_data %}
   <div id="{% if is_vote %}vote-{{vote.id}}{% else %}comment-{{comment.id}}{% endif %}" class="activity-line">
     <span class="type" id="{{type}}" title="{{type}}">

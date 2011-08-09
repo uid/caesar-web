@@ -55,7 +55,7 @@ def view_chunk(request, chunk_id):
         'full_view': True
     }) 
 
-
+@login_required
 def view_all_chunks(request, assign, username, viewtype):
     files = File.objects.filter(submission__name=username).filter(submission__assignment__name=assign)
     paths = []
