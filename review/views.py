@@ -142,7 +142,7 @@ def reply(request):
             except Task.DoesNotExist:
                 pass
             return render(request, 'review/comment.html', {
-                'comment': comment
+                'comment': comment,
                 'chunk': chunk,
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
