@@ -69,9 +69,17 @@ $(document).ready(function() {
 
 {% block content %}
 <div id="filesystem-text">
-    {% for path in paths%}
+    {% for path, user_comments, static_comments in path_and_stats%}
         <div id="file-name-title">
-        <A HREF="#{{path}}">{{ path }} </A>
+            <A HREF="#{{path}}">{{ path }} </A>
+            {% if read_only or comment_view %}
+            <span class="comment-count" title="User Comments">
+                {{ user_comments }}
+            </span>
+            <span class="robot-count" title="Computer Comments">
+                {{ static_comments }}
+            </span>
+            {% endif %}
         </div>
     {% empty %}
       No files found.

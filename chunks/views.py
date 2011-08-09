@@ -59,6 +59,8 @@ def view_chunk(request, chunk_id):
 def view_all_chunks(request, assign, username, viewtype):
     files = File.objects.filter(submission__name=username).filter(submission__assignment__name=assign)
     paths = []
+    user_stats = []
+    static_stats = []
     all_highlighted_lines = []
     for afile in files:
         paths.append(afile.path)
@@ -81,6 +83,8 @@ def view_all_chunks(request, assign, username, viewtype):
         total_lines = len(afile.lines)
         start = 0
         end = 0
+        user_comments = 0
+        static_comments = 0
         for chunk in chunks:
             numbers, lines = zip(*chunk.lines)
             chunk_start = numbers[0]-1
@@ -92,12 +96,18 @@ def view_all_chunks(request, assign, username, viewtype):
                 #True means it's a chunk, False it's not a chunk
                 highlighted_lines_for_file.append((highlighted_lines[start:end], False, None, None))
             if end == chunk_start:
+                #get comments and count them
                 comments = chunk.comments.select_related('author__profile')
+                user_comments += comments.filter(type='U').count()
+                static_comments += comments.filter(type='S').count()
+                
                 #now for the chunk part
                 start = chunk_start
                 end = chunk_end
                 #True means it's a chunk, False it's not a chunk
                 highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk, comments))
+        user_stats.append(user_comments)
+        static_stats.append(static_comments)
         all_highlighted_lines.append(highlighted_lines_for_file)
     file_data = zip(paths, all_highlighted_lines)
     
@@ -107,8 +117,10 @@ def view_all_chunks(request, assign, username, viewtype):
         code_only = True
         comment_view = False
     
+    path_and_stats = zip(paths, user_stats, static_stats)
+    
     return render(request, 'chunks/view_all_chunks.html', {
-        'paths': paths,
+        'path_and_stats': path_and_stats,
         'file_data': file_data,
         'code_only': code_only,
         'read_only': False,

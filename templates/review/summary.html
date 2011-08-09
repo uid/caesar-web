@@ -31,10 +31,15 @@ $(document).ready(function() {
 
 {% block content %}
 
-<h2 class="task-header">{{user.username}}</h2>
-<h2 class="task header"> reputation: {{user.profile.reputation}}
+<h2 class="task-header">{{participant.username}}</h2>
+<h2 class="task header"> reputation: {{participant.profile.reputation}}
 
 <h2 class="task-header">activity stream</h2>
+{% for assignment, review_data in assignment_data %}
+<h3 class="assignment-display">
+    <A NAME="assignment-display"></A> {{ assignment.name }}
+</h3>
+
 <div class="task-list">
   {% for type, comment, is_vote, vote in review_data %}
   <div id="{% if is_vote %}vote-{{vote.id}}{% else %}comment-{{comment.id}}{% endif %}" class="activity-line">
@@ -51,7 +56,8 @@ $(document).ready(function() {
     </span>
   </div>
   {% empty %}
-    No comments found.
   {% endfor %}
 </div>
+{% empty %}
+{% endfor %}
 {% endblock %}

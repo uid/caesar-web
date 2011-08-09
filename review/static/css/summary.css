@@ -70,3 +70,7 @@
 .new.activity-line {
     font-weight: bold;
 }
+.assignment-display {
+    padding: 10px 10px;
+    background-color: #eee;
+}

@@ -197,41 +197,53 @@ def change_task(request):
         return redirect('review.views.dashboard')
 
 def summary(request, username):
-    user = User.objects.get(username__exact=username)
-    #get all comments that the user wrote
-    comments = Comment.objects.filter(author=user).select_related('chunk')
-    chunk_stats = dict() #maps chunk and numbers of comments by the user
-    review_data = []
-    for comment in comments:
-        if comment.is_reply():
-            #false means not a vote activity
-            review_data.append(("reply-comment", comment, False, None))
-        else:
-            review_data.append(("new-comment", comment, False, None))
+    participant = User.objects.get(username__exact=username)
+    assignment_data = []
+    #get all assignments
+    assignments = Assignment.objects.all()
+    for assignment in assignments: 
+        #get all comments that the user wrote
+        comments = Comment.objects.filter(author=participant).filter(chunk__file__submission__assignment = assignment).select_related('chunk')
+        review_data = []
+        for comment in comments:
+            if comment.is_reply():
+                #false means not a vote activity
+                review_data.append(("reply-comment", comment, False, None))
+            else:
+                review_data.append(("new-comment", comment, False, None))
     
-    votes = Vote.objects.filter(author=user).select_related('comment__chunk')
-    for vote in votes:
-        if vote.value == 1:
-            #true means vote activity
-            review_data.append(("vote-up", vote.comment, True, vote))
-        elif vote.value == -1:
-            review_data.append(("vote-down", vote.comment, True, vote))
-    review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
+        votes = Vote.objects.filter(author=participant).filter(comment__chunk__file__submission__assignment = assignment).select_related('comment__chunk')
+        for vote in votes:
+            if vote.value == 1:
+                #true means vote activity
+                review_data.append(("vote-up", vote.comment, True, vote))
+            elif vote.value == -1:
+                review_data.append(("vote-down", vote.comment, True, vote))
+        review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
+        assignment_data.append((assignment, review_data))
     return render(request, 'review/summary.html', {
-        'review_data': review_data,
-        'user': user,
+        'assignment_data': assignment_data,
+        'participant': participant
     })
 def activity(request, element_id, element_type):
+    user = request.user
     vote = None
     comment = None
     chunk = None
+    full_view = False
+    highlight_comment = None
     if element_type == "vote":
         vote = Vote.objects.get(id__exact = element_id)
         comment = (vote.comment)
         chunk = vote.comment.chunk
+        if vote.author == user:
+            full_view = True
     elif element_type == "comment":
         comment = Comment.objects.get(id__exact = element_id)
         chunk = comment.chunk
+        if comment.author == user:
+            full_view = True
+        highlight_comment = comment
     comments = [comment]
     if comment.is_reply():
         comments = Comment.objects.filter(thread_id = comment.thread_id)
@@ -243,14 +255,16 @@ def activity(request, element_id, element_type):
     # TODO implement a custom formatter to do this instead
     highlighted_lines = zip(numbers, 
             highlight(chunk.data, lexer, formatter).splitlines())
+    
     return render(request, 'review/activity.html', {
         'chunk': chunk,
         'vote': vote,
-        'highlight_comment': comment,
+        'highlight_comment': highlight_comment,
         'comments': comments,
         'highlighted_lines': highlighted_lines,
-        'full_view': False,
-        'activity_view': True
+        'full_view': full_view,
+        'activity_view': True,
+        'user': user
     })
 
 

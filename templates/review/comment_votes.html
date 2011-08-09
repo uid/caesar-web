@@ -1,2 +1,2 @@
-{% if activity_view and highlight_comment.id == comment.id and vote.value == 1 %} <span class="voteup">+ {{ comment.upvote_count }} </span> {% else %} + {{ comment.upvote_count }} {% endif %} / 
-{% if activity_view and highlight_comment.id == comment.id and vote.value == -1 %} <span class="votedown">-{{ comment.downvote_count }} </span> {% else %} -{{ comment.downvote_count }} {% endif %}
+{% if activity_view and vote.comment.id == comment.id and vote.value == 1 %} <span class="voteup">+ {{ comment.upvote_count }} </span> {% else %} + {{ comment.upvote_count }} {% endif %} / 
+{% if activity_view and vote.comment.id == comment.id and vote.value == -1 %} <span class="votedown">-{{ comment.downvote_count }} </span> {% else %} -{{ comment.downvote_count }} {% endif %}

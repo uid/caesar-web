@@ -43,7 +43,7 @@
     {% endwith %}
   </div>
   
-  {% if activity_view and highlight_comment.id == comment.id and not vote%}
+  {% if activity_view and highlight_comment.id == comment.id %}
   <p id = "highlight-comment-text" class="comment-text">
     {{ comment.text }}
   </p>
