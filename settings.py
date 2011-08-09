@@ -143,6 +143,7 @@ INSTALLED_APPS = (
     'chunks',
     'review',
     'tasks',
+    'notifications',
 )
 
 LOGIN_REDIRECT_URL = '/'
@@ -154,7 +155,18 @@ def show_debug_toolbar(request):
 DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': show_debug_toolbar,
     'INTERCEPT_REDIRECTS': False,
+    'SHOW_TEMPLATE_CONTEXT': False,
 }
+DEBUG_TOOLBAR_PANELS = (
+    'debug_toolbar.panels.version.VersionDebugPanel',
+    'debug_toolbar.panels.timer.TimerDebugPanel',
+    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+    'debug_toolbar.panels.headers.HeaderDebugPanel',
+    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+    'debug_toolbar.panels.sql.SQLDebugPanel',
+    'debug_toolbar.panels.signals.SignalDebugPanel',
+    'debug_toolbar.panels.logger.LoggingPanel',
+)
 
 # PROJECT SPECIFIC SETTINGS
 MINIMUM_SNIPPET_LENGTH = 80
