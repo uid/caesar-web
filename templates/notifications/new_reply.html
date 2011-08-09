@@ -1,0 +1,4 @@
+{{ comment.author.get_full_name|default:comment.author.username }} replied to your comment at {% if comment.start != comment.end %}lines {{ comment.start }} - {{ comment.end }}{% else %}line {{ comment.start }}{% endif %} of <a href="http://{{ site.domain }}{{ chunk.get_absolute_url }}">{{ chunk.name }}</a>.
+<blockquote>
+  {{ comment.text }}
+</blockquote>
