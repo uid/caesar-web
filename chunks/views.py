@@ -106,6 +106,8 @@ def view_all_chunks(request, assign, username, viewtype):
                 end = chunk_end
                 #True means it's a chunk, False it's not a chunk
                 highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk, comments))
+        #see if there is anything else to grab 
+        highlighted_lines_for_file.append((highlighted_lines[end:], False, None, None))
         user_stats.append(user_comments)
         static_stats.append(static_comments)
         all_highlighted_lines.append(highlighted_lines_for_file)
