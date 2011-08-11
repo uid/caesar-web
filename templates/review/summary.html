@@ -32,37 +32,29 @@ $(document).ready(function() {
 {% block content %}
 
 <h2 class="task-header">{{participant.username}}</h2>
-<h2 class="task header"> reputation: {{participant.profile.reputation}}
+<h4 class="task header"> reputation: {{participant.profile.reputation}}
 
 <h2 class="task-header">activity stream</h2>
 {% for assignment, review_data in assignment_data %}
-<div id ="view-all-activity">
-    <a href="/review/activity/{{assignment.name}}/{{participant.username}}"> view all activity</a>
-</div>
+
 <h3 class="assignment-display">
     <A NAME="assignment-display"></A> {{ assignment.name }}
 </h3>
-
-
-
-<div class="stream-list">
+<div id ="view-all-activity">
+    <a href="/review/activity/{{assignment.name}}/{{participant.username}}"> view with code</a>
+</div>
+<table>
   {% for type, comment, is_vote, vote in review_data %}
-  <div id="{% if is_vote %}vote-{{vote.id}}{% else %}comment-{{comment.id}}{% endif %}" class="activity-line">
-    <span class="type" id="{{type}}" title="{{type}}">
-    </span>
-    <span class="comment-snippet" title="Comments">
-        {{ comment.text }}
-    </span>
-    <span class="chunk-name" title="Task">
-        {{ comment.chunk.name }}
-    </span>
-    <span class="last-modified" title="Modified">
-        {{ comment.modified }}
-    </span>
-  </div>
+  <tr id="{% if is_vote %}vote-{{vote.id}}{% else %}comment-{{comment.id}}{% endif %}" class="activity-line">
+    <td class="black-text"><span class="type" id="{{type}}" title="{{type}}">
+    </span></td>
+    <td class="black-text"> {{ comment.text }} </td>
+    <td class="grey-text"> {{ comment.chunk.name }} </td>
+    <td class="grey-text"> {{ comment.modified }} </td>
+  </tr>
   {% empty %}
   {% endfor %}
-</div>
+</table>
 {% empty %}
 {% endfor %}
 {% endblock %}

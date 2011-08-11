@@ -29,23 +29,15 @@ $(document).ready(function() {
 
 
 {% block content %}
-
 <h2 class="task-header">all users</h2>
-<div class="task-list">
+<table>
   {% for participant in participants %}
-  <div id="participant-{{participant.username}}" class="activity-line">
-    <span class="comment-snippet" title="Username">
-        {{ participant.username }}
-    </span>
-    <span class="chunk-name" title="Reputation">
-        {{ participant.profile.reputation }}
-    </span>
-    <span class="last-modified" title="Role">
-        {{ participant.profile.role }}
-    </span>
-  </div>
+  <tr id="participant-{{participant.username}}" class="activity-line">
+    <td class="black-text"> {{ participant.username }} </td>
+    <td class="grey-text"> {{ participant.profile.reputation }} </td>
+    <td class="grey-text"> [{{ participant.profile.role }}] </td>
+  </tr>
   {% empty %}
-    No comments found.
   {% endfor %}
-</div>
+</table>
 {% endblock %}

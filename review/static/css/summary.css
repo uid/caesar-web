@@ -4,7 +4,7 @@
     padding: 0px 5px;
     background-repeat: no-repeat;
     height: 16px;
-    padding-left: 18px;
+    padding-left: 10px;
 }
 #vote-up {
     background-image: url('../img/thumb-up.png');
@@ -22,54 +22,20 @@
     display: block;
     float: right;
     padding: 0px 5px;
-    height: 20em;
-    clear: none;
 }
-.chunk-name {
-    display: inline; 
+.black-text{
+    border: solid black 1px;
+    border-right: none;
+    border-left: none;
+    border-top: none;
+}
+.grey-text {
     color: #777;
-    font-family: monospace;
-    font-size: 12px;
-    height: 16px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    float: left;
-    padding-left: 18px;
+    border: solid black 1px;
+    border-right: none;
+    border-left: none;
+    border-top: none;
 }
-.last-modified {
-    display: inline; 
-    color: #777;
-    font-family: monospace;
-    font-size: 12px;
-    height: 16px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    float: left;
-    width: 15em;
-    padding-left: 18px;
-}
-.comment-snippet {
-    display: inline; 
-    font-family: monospace;
-    font-size: 12px;
-    height: 16px;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    width: 25em;
-    float: left;
-    padding-left: 18px;
-}
-.activity-line {
-    display: block;
-    border-bottom: 1px solid #aaa;
-    position: relative;
-    height: 18px;
-    padding: 2px 0px;
-}
-
 .activity-line:hover {
     background-color: #eee;
     cursor: pointer;
