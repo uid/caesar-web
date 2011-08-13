@@ -15,7 +15,7 @@ Deployment
 ==========
 Before doing anything, make sure you have a few packages installed:
 
-    sudo aptitude install python-imaging python-ldap postfix
+    sudo aptitude install python-imaging python-ldap python-numpy python-psycopg2 postfix
 
 Configuring SSL is a bit trickier, but assuming you already have `mod_ssl` 
 installed and your working directory is the project root:

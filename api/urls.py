@@ -1,11 +1,17 @@
 from api.handlers import CommentHandler
 
+from django.utils import simplejson
 from django.conf.urls.defaults import *
 from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication
+from piston.utils import Mimer
 
 auth = HttpBasicAuthentication(realm="Caesar")
 ad = { 'authentication': auth }
+
+# Workaround for django-piston bug in charset handling
+Mimer.register(simplejson.loads, 
+        ('application/json', 'application/json; charset=UTF-8',))
 
 class CsrfExemptResource(Resource):
     def __init__(self, handler, authentication=None):
