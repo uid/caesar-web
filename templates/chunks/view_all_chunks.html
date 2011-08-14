@@ -18,7 +18,13 @@
 {% block js %}
 
 {{ block.super }}
-{% include "chunks/chunk.html" %}
+<script type="text/javascript" charset="utf-8">
+    caesar.state = {
+        fullView: {% if full_view %}true{% else %}false{% endif %}
+    };
+</script>
+
+<script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js"></script>
 
 <script type="text/javascript" charset="utf-8">
 
@@ -50,6 +56,7 @@ $(document).ready(function() {
 
 });
 </script>
+
 {% endblock %}
 
 

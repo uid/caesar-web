@@ -1,5 +1,3 @@
-<script type="text/javascript" charset="utf-8">
-
 var model = new function() {
     var self = this;
     var listeners = {};
@@ -24,7 +22,7 @@ var model = new function() {
 
     self.comments = [];
     self.task = {
-        status: '{{ task.status }}'
+        status: caesar.state.taskStatus 
     };
 
     var startTask = function() {
@@ -103,13 +101,11 @@ var model = new function() {
 
 };
 
-</script>
 
-<script type="text/javascript" charset="utf-8">
 window.isSelecting = false;
 
 function showCommentForm(startLine, endLine, chunkId) {
-    $.get('{% url review.views.new_comment %}', 
+    $.get(caesar.urls.new_comment, 
         { start: startLine, end: endLine, chunk: chunkId },
         function(data) {
             $('.new-comment').remove();
@@ -313,78 +309,78 @@ function attachCommentHandlers(comment) {
         }
     });
 
-    {% if full_view %}
-    //reply button
-    $('.reply-button', comment.elt).click(function() {
-		$.get('{% url review.views.reply %}', 
-	        { parent: comment.id }	,
-	        function(data) {
-	            $('.reply-form').parent().remove();
-                clearSelection();
+    if (caesar.state.fullView) {
+        //reply button
+        $('.reply-button', comment.elt).click(function() {
+            $.get(caesar.urls.reply, 
+                { parent: comment.id }	,
+                function(data) {
+                    $('.reply-form').parent().remove();
+                    clearSelection();
 
-	            // find the appropriate place to insert the form
-                var previousComment = comment.elt;
-                var lastReply = $(comment.elt)
-                        .nextUntil('.comment:not(.comment-reply)').last();
-                if (lastReply.length) {
-                    previousComment = lastReply;
+                    // find the appropriate place to insert the form
+                    var previousComment = comment.elt;
+                    var lastReply = $(comment.elt)
+                            .nextUntil('.comment:not(.comment-reply)').last();
+                    if (lastReply.length) {
+                        previousComment = lastReply;
+                    }
+
+                    var replyElt = $(data).insertAfter(previousComment);
+                    scrollCodeTo({
+                        start: comment.start, 
+                        end: comment.end, 
+                        chunk: comment.chunk,
+                        elt: replyElt.get(0) 
+                    }, true, function() { 
+                        $('textarea').focus();
+                    });
                 }
-
-                var replyElt = $(data).insertAfter(previousComment);
-                scrollCodeTo({
-                    start: comment.start, 
-                    end: comment.end, 
-                    chunk: comment.chunk,
-                    elt: replyElt.get(0) 
-                }, true, function() { 
-                    $('textarea').focus();
-                });
-	        }
-	    );
-        return false;
-	});
-
-	// delete button
-    $('.delete-button', comment.elt).click(function() {
-        $.get('{% url review.views.delete_comment %}', {
-            comment_id: comment.id
-        }, function(data) {
-            model.removeComment(comment);
+            );
+            return false;
         });
-        return false;
-    });
 
-    $('.vote-buttons .vote', comment.elt).click(function(e) {
-        var button = this;
-        var isUp = $(this).hasClass('up');
-        if (!$(this).is('.selected')) {
-            var value = isUp ? 1 : -1;
-            $.post('{% url review.views.vote %}', {
-                comment_id: comment.id,
-                value: value,
-            }, function(data) {
-                $(button).addClass('selected');
-                // deselect the other vote button if it is selected
-                var otherButton = isUp ? $(button).nextAll('.vote') :
-                    $(button).prevAll('.vote');
-                otherButton.removeClass('selected');
-                $('.comment-votes', comment.elt).text(data)
-                    .effect('highlight', {queue: false}, 1000);
-                model.voteComment(comment, value);
-            });
-        } else {
-            $.post('{% url review.views.unvote %}', {
+        // delete button
+        $('.delete-button', comment.elt).click(function() {
+            $.get(caesar.urls.delete, {
                 comment_id: comment.id
             }, function(data) {
-                $(button).removeClass('selected');
-                $('.comment-votes', comment.elt).text(data)
-                    .effect('highlight', {queue: false}, 1000);
-                model.unvoteComment(comment);
+                model.removeComment(comment);
             });
-        }
-        return false;
-    });
-    {% endif %}
+            return false;
+        });
+
+        $('.vote-buttons .vote', comment.elt).click(function(e) {
+            var button = this;
+            var isUp = $(this).hasClass('up');
+            if (!$(this).is('.selected')) {
+                var value = isUp ? 1 : -1;
+                $.post(caesar.urls.vote, {
+                    comment_id: comment.id,
+                    value: value,
+                }, function(data) {
+                    $(button).addClass('selected');
+                    // deselect the other vote button if it is selected
+                    var otherButton = isUp ? $(button).nextAll('.vote') :
+                        $(button).prevAll('.vote');
+                    otherButton.removeClass('selected');
+                    $('.comment-votes', comment.elt).text(data)
+                        .effect('highlight', {queue: false}, 1000);
+                    model.voteComment(comment, value);
+                });
+            } else {
+                $.post(caesar.urls.unvote, {
+                    comment_id: comment.id
+                }, function(data) {
+                    $(button).removeClass('selected');
+                    $('.comment-votes', comment.elt).text(data)
+                        .effect('highlight', {queue: false}, 1000);
+                    model.unvoteComment(comment);
+                });
+            }
+            return false;
+        });
+    }
 
     // mouseover behavior
     $(comment.elt).mouseover(function() {
@@ -398,9 +394,9 @@ function attachCommentHandlers(comment) {
 
 model.addListener('commentAdded', function(comment) {
     drawCommentMarker(comment);
-    {% if full_view %}
+    if (caesar.state.fullView) {
         drawCommentButtons(comment);
-    {% endif %}
+    }
     attachCommentHandlers(comment);
 });
 
@@ -437,31 +433,31 @@ $('body').mousedown(function(e) {
     return true;
 });
 
-{% if full_view %}
-$('#chunk-display').selectable({
-    filter: '.line',
-    cancel: '.comment-marker',
-    start: function(event, ui) {
-        isSelecting = true;
-    },
-    stop: function(event, ui) {
-        var startLine = Number.MAX_VALUE;
-        var endLine = Number.MIN_VALUE;
-        var chunkId = 0;
-        $('.line.ui-selected').each(function(i) {
-            var n = parseInt($(this).attr('id').split('-')[2]);
-            endLine = Math.max(endLine, n);
-            startLine = Math.min(startLine, n);
-            chunkId = parseInt($(this).attr('id').split('-')[1]);
-        });
-        showCommentForm(startLine, endLine, chunkId);
-    }
-});
-{% endif %}
+if (caesar.state.fullView) {
+    $('#chunk-display').selectable({
+        filter: '.line',
+        cancel: '.comment-marker',
+        start: function(event, ui) {
+            isSelecting = true;
+        },
+        stop: function(event, ui) {
+            var startLine = Number.MAX_VALUE;
+            var endLine = Number.MIN_VALUE;
+            var chunkId = 0;
+            $('.line.ui-selected').each(function(i) {
+                var n = parseInt($(this).attr('id').split('-')[2]);
+                endLine = Math.max(endLine, n);
+                startLine = Math.min(startLine, n);
+                chunkId = parseInt($(this).attr('id').split('-')[1]);
+            });
+            showCommentForm(startLine, endLine, chunkId);
+        }
+    });
+}
 
 $('#new-comment-form').live('submit', function() {
     var dataString = $(this).serialize();
-    $.post('{% url review.views.new_comment %}', dataString, function(data) {
+    $.post(caesar.urls.new_comment, dataString, function(data) {
         var newNode = $(data);
         $('.new-comment').replaceWith(newNode);
         model.addCommentFromDOM(newNode.get(0));
@@ -474,7 +470,7 @@ $('#new-comment-form').live('submit', function() {
 
 $('#reply-comment-form').live('submit', function() {
     var dataString = $(this).serialize();
-    $.post('{% url review.views.reply %}', dataString, function(data) {
+    $.post(caesar.urls.reply, dataString, function(data) {
         var newNode = $(data);
         $('.new-reply').replaceWith(newNode);
         model.addCommentFromDOM(newNode.get(0));
@@ -553,4 +549,3 @@ $('body').click(function() {
 });
 
 });
-</script>

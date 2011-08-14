@@ -5,6 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>{% block title %}Caesar{% endblock %}</title>
+
     {% block css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/print.css" type="text/css" media="print" />
@@ -20,6 +21,18 @@
     <script type="text/javascript">
         // Allow us to only style elements if Javascript is enabled
         document.documentElement.className = "js";
+    </script>
+
+    <script type="text/javascript">
+        window.caesar = {
+            urls: {
+                new_comment: '{% url review.views.new_comment %}',
+                reply: '{% url review.views.reply %}',
+                delete: '{% url review.views.delete_comment %}',
+                vote: '{% url review.views.vote %}',
+                unvote: '{% url review.views.unvote %}'
+            }
+        };
     </script>
 
     <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.5.2.min.js"></script>
