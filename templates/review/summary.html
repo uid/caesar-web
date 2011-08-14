@@ -38,12 +38,12 @@ $(document).ready(function() {
 {% for assignment, review_data in assignment_data %}
 
 <h3 class="assignment-display">
-    <A NAME="assignment-display"></A> {{ assignment.name }}
+    <a name="assignment-display"></a> {{ assignment.name }}
+    <div class="view-all-activity">
+        <a href="{% url review.views.all_activity assignment.id participant.username %}"> view with code</a>
+    </div>
 </h3>
-<div id ="view-all-activity">
-    <a href="/review/activity/{{assignment.id}}/{{participant.username}}"> view with code</a>
-</div>
-<table>
+<table class="assignment-stream">
   {% for type, comment, is_vote, vote in review_data %}
   <tr id="{% if is_vote %}vote-{{vote.id}}{% else %}comment-{{comment.id}}{% endif %}" class="activity-line">
     <td class="black-text"><span class="type" id="{{type}}" title="{{type}}">

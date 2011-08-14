@@ -18,10 +18,14 @@
 #new-comment {
     background-image: url('../img/balloon.png');
 }
-#view-all-activity {
+.view-all-activity {
+    font-size: small;
     display: block;
     float: right;
     padding: 0px 5px;
+}
+.assignment-stream {
+    margin-bottom: 2em;
 }
 .black-text{
     border: solid black 1px;
@@ -47,6 +51,7 @@
 .assignment-display {
     padding: 10px 10px;
     background-color: #eee;
+    margin-bottom: 0px;
 }
 .stream-list {
     display: block;
