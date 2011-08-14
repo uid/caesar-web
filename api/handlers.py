@@ -1,8 +1,11 @@
-from review.models import Comment
-from chunks.models import Chunk
+import re
+
 from piston.handler import BaseHandler, AnonymousBaseHandler
 from piston.utils import rc
-import re
+
+from review.models import Comment
+from chunks.models import Chunk
+
 
 class CommentHandler(BaseHandler):
     allowed_methods = ('GET', 'POST')

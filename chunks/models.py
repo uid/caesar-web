@@ -55,6 +55,11 @@ class File(models.Model):
         return self.path
 
 
+class ChunkManager(models.Manager):
+    def find_by_assignment(self, assignment):
+        return self.filter(file__submission__assignment=assignment)
+
+
 class Chunk(models.Model):
     id = models.AutoField(primary_key=True)
     file = models.ForeignKey(File, related_name='chunks')
@@ -64,6 +69,7 @@ class Chunk(models.Model):
     cluster_id = models.IntegerField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    objects = ChunkManager()
     class Meta:
         db_table = u'chunks'
 

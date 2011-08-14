@@ -134,7 +134,8 @@ function showCommentForm(startLine, endLine, chunkId) {
             scrollCodeTo({
                 start: startLine, 
                 end: endLine, 
-                elt: commentElt
+                elt: commentElt,
+                chunk: chunkId
             }, true, function() {
                 $('textarea').focus();
             }); 
@@ -333,6 +334,7 @@ function attachCommentHandlers(comment) {
                 scrollCodeTo({
                     start: comment.start, 
                     end: comment.end, 
+                    chunk: comment.chunk,
                     elt: replyElt.get(0) 
                 }, true, function() { 
                     $('textarea').focus();
