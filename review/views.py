@@ -215,9 +215,9 @@ def summary(request, username):
         for comment in comments:
             if comment.is_reply():
                 #false means not a vote activity
-                review_data.append(("reply-comment", comment, False, None))
+                review_data.append(("reply-comment", comment, comment.generate_snippet(), False, None))
             else:
-                review_data.append(("new-comment", comment, False, None))
+                review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
     
         votes = Vote.objects.filter(author=participant) \
                     .filter(comment__chunk__file__submission__assignment = assignment) \
@@ -225,9 +225,9 @@ def summary(request, username):
         for vote in votes:
             if vote.value == 1:
                 #true means vote activity
-                review_data.append(("vote-up", vote.comment, True, vote))
+                review_data.append(("vote-up", vote.comment, vote.comment.generate_snippet(), True, vote))
             elif vote.value == -1:
-                review_data.append(("vote-down", vote.comment, True, vote))
+                review_data.append(("vote-down", vote.comment, vote.comment.generate_snippet(), True, vote))
         review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
         assignment_data.append((assignment, review_data))
     return render(request, 'review/summary.html', {

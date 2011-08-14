@@ -4,7 +4,7 @@ from django.db.models import Count
 from django.db.models.signals import pre_save, post_save,\
         pre_delete, post_delete
 from django.dispatch import receiver
-
+from django.conf import settings
 
 from accounts.models import UserProfile
 from chunks.models import Chunk
@@ -55,8 +55,11 @@ class Comment(models.Model):
         return self.parent_id is not None
 
     def generate_snippet(self):
-        return self.chunk.generate_snippet(self.start, self.end)
-            
+        snippet_length = 90
+        if len(self.text) < snippet_length:
+            return self.text
+        return self.text[0:snippet_length] + "..."
+        
     class Meta:
         ordering = [ 'start', '-end', 'thread_id', 'created' ]
 

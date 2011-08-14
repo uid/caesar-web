@@ -78,6 +78,7 @@
     margin: 0;
     display: block;
     position: relative;
+    background-color: #E0E0E0;
 }
 .nonchunk-line {
     font-family: monospace;
@@ -132,7 +133,7 @@
 }
 
 .line.highlighted {
-    background-color: #FF0;
+    background-color: #FF6;
 }
 
 .comment-count {

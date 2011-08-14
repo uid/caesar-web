@@ -44,11 +44,11 @@ $(document).ready(function() {
     </div>
 </h3>
 <table class="assignment-stream">
-  {% for type, comment, is_vote, vote in review_data %}
+  {% for type, comment, snippet, is_vote, vote in review_data %}
   <tr id="{% if is_vote %}vote-{{vote.id}}{% else %}comment-{{comment.id}}{% endif %}" class="activity-line">
     <td class="black-text"><span class="type" id="{{type}}" title="{{type}}">
     </span></td>
-    <td class="black-text"> {{ comment.text }} </td>
+    <td class="black-text"> {{ snippet }} </td>
     <td class="grey-text"> {{ comment.chunk.name }} </td>
     <td class="grey-text"> {{ comment.modified }} </td>
   </tr>

@@ -119,7 +119,7 @@
     clear: both;
 }
 #highlight-comment-text {
-    background-color: yellow;
+    background-color: #FF6;
 }
 
 .collapsed .comment-text {
@@ -150,10 +150,10 @@
     left: 5px;
 }
 .voteup {
-    background-color: yellow;
+    background-color: #FF6;
 }
 .votedown {
-    background-color: yellow;
+    background-color: #FF6;
 }
 .comment-footer .comment-actions {
     float: right;

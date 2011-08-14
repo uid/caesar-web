@@ -30,7 +30,7 @@ $(document).ready(function() {
 
 {% block content %}
 <h2 class="task-header">all users</h2>
-<table>
+<table class="assignment-stream">
   {% for participant in participants %}
   <tr id="participant-{{participant.username}}" class="activity-line">
     <td class="black-text"> {{ participant.username }} </td>
