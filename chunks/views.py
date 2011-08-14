@@ -57,22 +57,24 @@ def view_chunk(request, chunk_id):
 
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
-    files = File.objects.filter(submission=submission_id)
+    files = File.objects.filter(submission=submission_id).select_related('chunks')
     paths = []
     user_stats = []
     static_stats = []
     all_highlighted_lines = []
     for afile in files:
         paths.append(afile.path)
-    common_prefix = os.path.commonprefix(paths)
+    common_prefix = ""
+    if len(paths) > 1:
+        common_prefix = os.path.commonprefix(paths)
     
     #get a list of only the relative paths
     paths = []
     for afile in files:
-        paths.append(os.path.relpath(afile.path, common_prefix))    
+        paths.append(os.path.relpath(afile.path, common_prefix))
 
     lexer = JavaLexer()
-    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)   
+    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     for afile in files:
         #prepare the file - get the lines that are part of chunk and the ones that aren't
         highlighted_lines_for_file = []
@@ -97,7 +99,13 @@ def view_all_chunks(request, viewtype, submission_id):
                 highlighted_lines_for_file.append((highlighted_lines[start:end], False, None, None))
             if end == chunk_start:
                 #get comments and count them
-                comments = chunk.comments.select_related('author__profile')
+                def get_comment_data(comment):
+                    snippet = chunk.generate_snippet(comment.start, comment.end)
+                    return (comment, snippet)
+                
+                comments = chunk.comments.select_related('chunk', 'author__profile')
+                comment_data = map(get_comment_data, comments)
+                
                 user_comments += comments.filter(type='U').count()
                 static_comments += comments.filter(type='S').count()
                 
@@ -105,7 +113,7 @@ def view_all_chunks(request, viewtype, submission_id):
                 start = chunk_start
                 end = chunk_end
                 #True means it's a chunk, False it's not a chunk
-                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk, comments))
+                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk, comment_data))
         #see if there is anything else to grab 
         highlighted_lines_for_file.append((highlighted_lines[end:], False, None, None))
         user_stats.append(user_comments)

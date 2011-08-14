@@ -109,10 +109,10 @@ $(document).ready(function() {
 <td id="code-table-display">
 <div id="comment-display" class="span-6">
     <div id="comment-display-inner">
-        {% for highlighted_lines, is_chunk, chunk, comments in highlighted_lines_for_file %}
+        {% for highlighted_lines, is_chunk, chunk, comment_data in highlighted_lines_for_file %}
             {% if is_chunk %}
-                {% for comment in comments %}
-                    {% include "review/comment.html" %} 
+                {% for comment, snippet in comment_data %}
+                    {% include "review/comment.html" %}
                 {% empty %}
                 {% endfor %}
             {% endif %}

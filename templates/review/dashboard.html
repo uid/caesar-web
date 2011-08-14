@@ -11,9 +11,8 @@
 $(document).ready(function() {
 
     $('.submission-line').click(function(e) {
-      var assignment_name = this.id.split('-')[2];
-      var username = this.id.split('-')[1];
-      window.location = "/chunks/all/" + assignment_name + "/" + username;
+      var submission_id = this.id.split('-')[1];
+      window.location = "/chunks/submission/all/" + submission_id;
       return false;
     });
     $('.task-line').click(function(e) {
@@ -64,7 +63,7 @@ $(document).ready(function() {
 <div class="task-list">
   {% for submission, reviewer_count, last_modified, user_comments, static_comments in submission_data %}
   
-  <div id ="submission-{{submission.name}}-{{submission.assignment.name}}" class="submission-line">
+  <div id ="submission-{{submission.id}}" class="submission-line">
     <span class="chunk-name">
       {{ submission.assignment.name }}
     </span>
@@ -72,7 +71,7 @@ $(document).ready(function() {
       <span class="comment-count" title="User Comments">
         {{ user_comments }}
       </span>
-      <span class="robot-count" title="Computer Comments">
+      <span class="robot-count" title="Automatic Comments">
         {{ static_comments }}
       </span>
     </span>
