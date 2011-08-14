@@ -24,22 +24,19 @@
     float: right;
     padding: 0px 5px;
 }
-.assignment-stream {
+table.assignment-stream {
     margin-bottom: 2em;
+    border-collapse: collapse;
 }
-.black-text{
-    border: solid black 1px;
-    border-right: none;
-    border-left: none;
-    border-top: none;
-}
+
 .grey-text {
     color: #777;
-    border: solid black 1px;
-    border-right: none;
-    border-left: none;
-    border-top: none;
 }
+
+.activity-line {
+    border-bottom: 1px solid #aaa;
+}
+
 .activity-line:hover {
     background-color: #eee;
     cursor: pointer;

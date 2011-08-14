@@ -109,7 +109,9 @@
 <}/div>
 {% endcomment %}
 <div id ="view-all-code">
-    <a href="chunks/code/{{chunk.file.submission.assignment.name}}/{{chunk.file.submission.name}}"> view all code</a>
+    <a href="{% url chunks.views.view_all_chunks 'code' chunk.file.submission.id %}">
+      view all code
+    </a>
 </div>
 
 <div id="comment-display" class="span-6">

@@ -56,8 +56,8 @@ def view_chunk(request, chunk_id):
     }) 
 
 @login_required
-def view_all_chunks(request, assign, username, viewtype):
-    files = File.objects.filter(submission__name=username).filter(submission__assignment__name=assign)
+def view_all_chunks(request, viewtype, submission_id):
+    files = File.objects.filter(submission=submission_id)
     paths = []
     user_stats = []
     static_stats = []
