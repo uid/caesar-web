@@ -74,7 +74,7 @@ $(document).ready(function() {
 <td id="code-table-display">
 <div id="comment-display" class="span-6">
     <div id="comment-display-inner">
-        {% for comment, highlight_comment in comment_data %}
+        {% for comment, highlight_comment, vote in comment_data %}
             {% include "review/comment.html" %} 
         {% empty %}
         {% endfor %}

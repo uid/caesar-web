@@ -1,4 +1,4 @@
-from django.db.models import Count, Max
+from django.db.models import Q, Count, Max
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
@@ -219,7 +219,9 @@ def summary(request, username):
             else:
                 review_data.append(("new-comment", comment, False, None))
     
-        votes = Vote.objects.filter(author=participant).filter(comment__chunk__file__submission__assignment = assignment).select_related('comment__chunk')
+        votes = Vote.objects.filter(author=participant) \
+                    .filter(comment__chunk__file__submission__assignment = assignment) \
+                    .select_related('comment__chunk')
         for vote in votes:
             if vote.value == 1:
                 #true means vote activity
@@ -287,9 +289,12 @@ def all_activity(request, assign, username):
     participant = User.objects.get(username__exact=username)
     user = request.user
     #get all assignments
-    assignment = Assignment.objects.get(name__exact=assign)
+    assignment = Assignment.objects.get(id__exact=assign)
     #get all relevant chunks
-    chunks = Chunk.objects.filter(file__submission__assignment = assignment).filter(comments__author=participant).select_related('comments')
+    chunks = Chunk.objects \
+        .filter(file__submission__assignment = assignment) \
+        .filter(Q(comments__author=participant) | Q(comments__votes__author=participant)) \
+        .select_related('comments__votes', 'comments__author_profile')
     chunk_set = set()
     assignment_data = []
 
@@ -300,17 +305,24 @@ def all_activity(request, assign, username):
             continue
         else:
             chunk_set.add(chunk)
+        participant_votes = dict((vote.comment.id, vote) \
+                for vote in participant.votes.filter(comment__chunk=chunk.id))
         numbers, lines = zip(*chunk.lines)
         highlighted_lines = zip(numbers, 
                 highlight(chunk.data, lexer, formatter).splitlines())
-        comments = chunk.comments.select_related('author__profile')
+        comments = chunk.comments.select_related('votes', 'author__profile')
         highlighted_comments = []
+        highlighted_votes = []
         for comment in comments:
+            if comment.id in participant_votes:
+                highlighted_votes.append(participant_votes[comment.id])
+            else: 
+                highlighted_votes.append(None)
             if comment.author == participant:
                 highlighted_comments.append(comment)
             else:
                 highlighted_comments.append(None)
-        comment_data = zip(comments, highlighted_comments)
+        comment_data = zip(comments, highlighted_comments, highlighted_votes)
         assignment_data.append((chunk, highlighted_lines, comment_data))
 
     return render(request, 'review/all_activity.html', {

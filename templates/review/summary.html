@@ -41,7 +41,7 @@ $(document).ready(function() {
     <A NAME="assignment-display"></A> {{ assignment.name }}
 </h3>
 <div id ="view-all-activity">
-    <a href="/review/activity/{{assignment.name}}/{{participant.username}}"> view with code</a>
+    <a href="/review/activity/{{assignment.id}}/{{participant.username}}"> view with code</a>
 </div>
 <table>
   {% for type, comment, is_vote, vote in review_data %}
