@@ -5,3 +5,4 @@ sorl-thumbnail
 django-extensions
 Pygments
 django-email-templates
+django-debug-toolbar
