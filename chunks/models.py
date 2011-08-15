@@ -46,10 +46,13 @@ class File(models.Model):
     def __split_lines(self):
         # move forward
         first_line_offset = 0
-        while self.data[first_line_offset] == '\n':
+        offset = 0
+        while self.data[first_line_offset] == '\n' or self.data[first_line_offset] == '\r':
+            if self.data[first_line_offset] == '\n':
+                offset += 1
             first_line_offset += 1
-        first_line_offset +=1
-        self.lines = list(enumerate(self.data.splitlines(), start = first_line_offset))
+        offset +=1
+        self.lines = list(enumerate(self.data.splitlines(), start = offset))
         
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)

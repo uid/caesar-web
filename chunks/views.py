@@ -85,20 +85,21 @@ def view_all_chunks(request, viewtype, submission_id):
                 highlight(afile.data, lexer, formatter).splitlines())
         chunks = afile.chunks.order_by('start')
         total_lines = len(afile.lines)
-        start = 0
-        end = 0
+        offset = numbers[0]
+        start = offset
+        end = offset
         user_comments = 0
         static_comments = 0
         for chunk in chunks:
             numbers, lines = zip(*chunk.lines)
-            chunk_start = numbers[0]-1
+            chunk_start = numbers[0]
             chunk_end = chunk_start + len(numbers)
             if end != chunk_start and chunk_start > end: #some lines between chunks
                 #non chunk part
                 start = end
                 end = chunk_start
                 #True means it's a chunk, False it's not a chunk
-                highlighted_lines_for_file.append((highlighted_lines[start:end], False, None, None))
+                highlighted_lines_for_file.append((highlighted_lines[start-offset:end - offset], False, None, None))
             if end == chunk_start:
                 #get comments and count them
                 def get_comment_data(comment):
@@ -115,9 +116,9 @@ def view_all_chunks(request, viewtype, submission_id):
                 start = chunk_start
                 end = chunk_end
                 #True means it's a chunk, False it's not a chunk
-                highlighted_lines_for_file.append((highlighted_lines[start:end], True, chunk, comment_data))
+                highlighted_lines_for_file.append((highlighted_lines[start-offset:end-offset], True, chunk, comment_data))
         #see if there is anything else to grab 
-        highlighted_lines_for_file.append((highlighted_lines[end:], False, None, None))
+        highlighted_lines_for_file.append((highlighted_lines[end-offset:], False, None, None))
         user_stats.append(user_comments)
         static_stats.append(static_comments)
         all_highlighted_lines.append(highlighted_lines_for_file)
