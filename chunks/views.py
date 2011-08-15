@@ -12,6 +12,7 @@ from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
 import os
+import sys
 
 @login_required
 def view_chunk(request, chunk_id):
@@ -58,6 +59,7 @@ def view_chunk(request, chunk_id):
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
     files = File.objects.filter(submission=submission_id).select_related('chunks')
+    assignment_name = files[0].submission.assignment.name
     paths = []
     user_stats = []
     static_stats = []
@@ -130,6 +132,7 @@ def view_all_chunks(request, viewtype, submission_id):
     path_and_stats = zip(paths, user_stats, static_stats)
     
     return render(request, 'chunks/view_all_chunks.html', {
+        'assignment_name': assignment_name,
         'path_and_stats': path_and_stats,
         'file_data': file_data,
         'code_only': code_only,

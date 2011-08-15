@@ -11,10 +11,13 @@ from tasks.models import Task
 from tasks.routing import assign_tasks
 from models import Comment, Vote, Star 
 from forms import CommentForm, ReplyForm
+from accounts.models import UserProfile
 
 from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
+
+import sys
 
 @login_required
 def dashboard(request):
@@ -37,15 +40,17 @@ def dashboard(request):
    
     #get all the submissions that the user submitted
     submissions = user.submissions \
+        .order_by('files__chunks__comments__modified') \
         .select_related('chunk__file__assignment') \
-        .annotate(reviewer_count=Count('files__chunks__tasks', distinct=True),
-                  last_modified = Max('files__chunks__comments__modified'))
+        .annotate(last_modified=Max('files__chunks__comments__modified'))
     
     submission_data = []
     for submission in submissions:
         user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
         static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
-        submission_data.append((submission, submission.reviewer_count, submission.last_modified, 
+        reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
+        sys.stderr.write("id: " + str(submission.id) + " reviewer_count: " + str(reviewer_count))
+        submission_data.append((submission, reviewer_count, submission.last_modified, 
                                   user_comments, static_comments))
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,

@@ -64,6 +64,11 @@ $(document).ready(function() {
 
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  {% if participant != user %}
+    <a class="breadcrumb" href="{% url review.views.allusers %}">all users</a>
+  {% endif %}
+  <a class="breadcrumb" href="{% url review.views.summary participant.username %}">{{participant.username}}</a>
+  <span class="breadcrumb">all activity</span>
 {% endblock %}
 
 {% block secondary-toolbar %}

@@ -44,7 +44,13 @@ class File(models.Model):
     submission = models.ForeignKey(Submission, related_name='files')
     created = models.DateTimeField(auto_now_add=True)
     def __split_lines(self):
-        self.lines = list(enumerate(self.data.splitlines(), start = 1))
+        # move forward
+        first_line_offset = 0
+        while self.data[first_line_offset] == '\n':
+            first_line_offset += 1
+        first_line_offset +=1
+        self.lines = list(enumerate(self.data.splitlines(), start = first_line_offset))
+        
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         self.__split_lines()
