@@ -12,7 +12,6 @@ from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
 import os
-import sys
 
 @login_required
 def view_chunk(request, chunk_id):

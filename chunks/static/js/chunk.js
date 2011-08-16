@@ -290,6 +290,31 @@ function drawCommentButtons(comment) {
     });
 }
 
+function checkIfSpecial(comment) {  
+    var myFile = document.location.toString();
+    if (myFile.match('#')) { // the URL contains an anchor
+      var myAnchor = myFile.split('#')[1];
+      var highlight_type = myAnchor.split('-')[0];
+      var highlight_id = myAnchor.split('-')[1];
+      if (comment.id == highlight_id){        
+          if (highlight_type == "comment"){
+              $('#comment-text-'+ highlight_id).addClass('highlight');
+          }
+          if (highlight_type == "voteup"){
+              $('#voteup-' + highlight_id).addClass('highlight');
+          }
+          if (highlight_type == "votedown"){
+              $('#votedown-' + highlight_id).addClass('highlight');
+          }
+          //highlight comment lines
+          for (var i = comment.start; i <= comment.end; i++) {
+              $('#line-' + comment.chunk + '-' + i).addClass('highlight');
+          }
+          scrollCodeTo(comment, null, null)
+       }
+    }
+}
+
 function attachCommentHandlers(comment) {
     $('.comment-header', comment.elt).click(function() {
         if ($(comment.elt).hasClass('collapsed')) {
@@ -398,6 +423,7 @@ model.addListener('commentAdded', function(comment) {
         drawCommentButtons(comment);
     }
     attachCommentHandlers(comment);
+    checkIfSpecial(comment);
 });
 
 model.addListener('commentRemoved', function(comment) {
@@ -507,7 +533,6 @@ $('#toggle-comments-button').click(function() {
     }
     $(this).text(toggleCommentsText[state]).data('state', state);
 });
-
 
 var toggleInstructionsText = {
     visible: 'Hide instructions', 

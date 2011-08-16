@@ -149,10 +149,10 @@
     bottom: 5px;
     left: 5px;
 }
-.voteup {
+.voteup-highlighted {
     background-color: #FF6;
 }
-.votedown {
+.votedown-highlighted {
     background-color: #FF6;
 }
 .comment-footer .comment-actions {

@@ -239,48 +239,6 @@ def summary(request, username):
         'assignment_data': assignment_data,
         'participant': participant
     })
-@login_required
-def activity(request, element_id, element_type):
-    user = request.user
-    vote = None
-    comment = None
-    chunk = None
-    full_view = False
-    highlight_comment = None
-    if element_type == "vote":
-        vote = Vote.objects.get(id__exact = element_id)
-        comment = (vote.comment)
-        chunk = vote.comment.chunk
-        if vote.author == user:
-            full_view = True
-    elif element_type == "comment":
-        comment = Comment.objects.get(id__exact = element_id)
-        chunk = comment.chunk
-        if comment.author == user:
-            full_view = True
-        highlight_comment = comment
-    comments = [comment]
-    if comment.is_reply():
-        comments = Comment.objects.filter(thread_id = comment.thread_id)
-    
-    lexer = JavaLexer()
-    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-    numbers, lines = zip(*chunk.lines)
-    # highlight the code this way to correctly identify multi-line constructs
-    # TODO implement a custom formatter to do this instead
-    highlighted_lines = zip(numbers, 
-            highlight(chunk.data, lexer, formatter).splitlines())
-    
-    return render(request, 'review/activity.html', {
-        'chunk': chunk,
-        'vote': vote,
-        'highlight_comment': highlight_comment,
-        'comments': comments,
-        'highlighted_lines': highlighted_lines,
-        'full_view': full_view,
-        'activity_view': True,
-        'user': user
-    })
 
 @login_required
 def allusers(request):

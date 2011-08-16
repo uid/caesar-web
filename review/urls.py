@@ -11,6 +11,5 @@ urlpatterns = patterns('review.views',
     (r'^unvote/', 'unvote'),
     (r'^user/(?P<username>\w+)', 'summary'),
     (r'^allusers/', 'allusers'),
-    (r'activity/(?P<element_type>(vote|comment))/(?P<element_id>\w+)', 'activity'),
     (r'activity/(?P<assign>\d+)/(?P<username>\w+)', 'all_activity')
 )

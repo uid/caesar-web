@@ -14,8 +14,9 @@ $(document).ready(function() {
 
     $('.activity-line').click(function(e) {
       var activityType = this.id.split('-')[0]
-      var element_Id = this.id.split('-')[1];
-      window.location = "/review/activity/" + activityType + "/" + element_Id;
+      var comment_Id = this.id.split('-')[1];
+      var chunk_Id = this.id.split('-')[2];
+      window.location = "/chunks/view/" + chunk_Id + "#" + activityType + "-" + comment_Id;
       return false;
     });
 
@@ -49,7 +50,7 @@ $(document).ready(function() {
 </h3>
 <table class="assignment-stream">
   {% for type, comment, snippet, is_vote, vote in review_data %}
-  <tr id="{% if is_vote %}vote-{{vote.id}}{% else %}comment-{{comment.id}}{% endif %}" class="activity-line">
+  <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}{% else %}votedown-{{comment.id}}-{{comment.chunk.id}}{% endif %}{% else %}comment-{{comment.id}}-{{comment.chunk.id}}{% endif %}" class="activity-line">
     <td class="black-text"><span class="type" id="{{type}}" title="{{type}}">
     </span></td>
     <td class="black-text"> {{ snippet }} </td>
