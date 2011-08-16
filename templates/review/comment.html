@@ -48,7 +48,7 @@
   </div>
   
   {% if activity_view and highlight_comment.id == comment.id %}
-  <p id="highlight-comment-text" class="comment-text">
+  <p id="highlight-comment-text-{{comment.id}}" class="comment-text">
     {{ comment.text }}
   </p>
   {% else %}

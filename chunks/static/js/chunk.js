@@ -310,8 +310,17 @@ function checkIfSpecial(comment) {
           for (var i = comment.start; i <= comment.end; i++) {
               $('#line-' + comment.chunk + '-' + i).addClass('highlight');
           }
-          scrollCodeTo(comment, null, null)
+          scrollCodeTo(comment)
        }
+    }
+    else{
+        $('#highlight-comment-text-'+ comment.id).addClass('highlight');
+        if ($('#highlight-comment-text-'+ comment.id).hasClass('highlight')){
+            //highlight comment lines
+            for (var i = comment.start; i <= comment.end; i++) {
+                $('#line-' + comment.chunk + '-' + i).addClass('highlight');
+            }
+        }
     }
 }
 

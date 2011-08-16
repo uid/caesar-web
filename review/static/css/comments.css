@@ -118,9 +118,6 @@
     margin: 0px;
     clear: both;
 }
-#highlight-comment-text {
-    background-color: #FF6;
-}
 
 .collapsed .comment-text {
     color: #777;
