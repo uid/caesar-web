@@ -63,7 +63,7 @@
     </span>
     {% if user.is_authenticated %}
     <span class="comment-actions">
-      {% if full_view %}
+      {% if full_view and user !=  comment.author %}
           <span class="vote-buttons">
             <div id="upvote-{{ comment.id }}"  title="Upvote"
               class="vote up {% if vote == 1 %} selected {% endif %}"></div>
