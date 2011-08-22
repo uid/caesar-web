@@ -4,6 +4,7 @@ env.project_name = 'caesar'
 env.project_path = '/var/django/caesar'
 
 env.roledefs = {
+    'demo': ['cookie.csail.mit.edu'],
     'prod': ['caesar.xvm.mit.edu'],
 }
 
