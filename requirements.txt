@@ -6,3 +6,6 @@ django-extensions
 Pygments
 django-email-templates
 django-debug-toolbar
+pillow
+python-ldap
+MySQL-python
