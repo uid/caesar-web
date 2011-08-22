@@ -11,8 +11,10 @@ class Migration(SchemaMigration):
         # Adding model 'UserProfile'
         db.create_table('accounts_userprofile', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
+            ('user', self.gf('django.db.models.fields.related.OneToOneField')(related_name='profile', unique=True, to=orm['auth.User'])),
             ('photo', self.gf('sorl.thumbnail.fields.ImageField')(max_length=100)),
+            ('reputation', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('role', self.gf('django.db.models.fields.CharField')(max_length=1, null=True, blank=True)),
         ))
         db.send_create_signal('accounts', ['UserProfile'])
 
@@ -29,7 +31,9 @@ class Migration(SchemaMigration):
             'assigned_chunks': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'reviewers'", 'symmetrical': 'False', 'through': "orm['tasks.Task']", 'to': "orm['chunks.Chunk']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'photo': ('sorl.thumbnail.fields.ImageField', [], {'max_length': '100'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+            'reputation': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'role': ('django.db.models.fields.CharField', [], {'max_length': '1', 'null': 'True', 'blank': 'True'}),
+            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.User']"})
         },
         'auth.group': {
             'Meta': {'object_name': 'Group'},
@@ -62,33 +66,34 @@ class Migration(SchemaMigration):
         },
         'chunks.assignment': {
             'Meta': {'object_name': 'Assignment', 'db_table': "u'assignments'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'chunks.chunk': {
             'Meta': {'object_name': 'Chunk', 'db_table': "u'chunks'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'cluster_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'end': ('django.db.models.fields.IntegerField', [], {}),
-            'file': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['chunks.File']"}),
+            'file': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'chunks'", 'to': "orm['chunks.File']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'start': ('django.db.models.fields.IntegerField', [], {})
         },
         'chunks.file': {
             'Meta': {'unique_together': "(('path', 'submission'),)", 'object_name': 'File', 'db_table': "u'files'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'data': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'path': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'submission': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['chunks.Submission']"})
+            'submission': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'files'", 'to': "orm['chunks.Submission']"})
         },
         'chunks.submission': {
             'Meta': {'object_name': 'Submission', 'db_table': "u'submissions'"},
-            'assignment': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['chunks.Assignment']"}),
-            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'assignment': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['chunks.Assignment']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'submissions'", 'null': 'True', 'to': "orm['auth.User']"}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },

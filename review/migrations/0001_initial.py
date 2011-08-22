@@ -20,6 +20,9 @@ class Migration(SchemaMigration):
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('parent', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='child_comments', null=True, to=orm['review.Comment'])),
+            ('upvote_count', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('downvote_count', self.gf('django.db.models.fields.IntegerField')(default=0)),
+            ('thread_id', self.gf('django.db.models.fields.IntegerField')(null=True)),
         ))
         db.send_create_signal('review', ['Comment'])
 
@@ -29,6 +32,8 @@ class Migration(SchemaMigration):
             ('value', self.gf('django.db.models.fields.SmallIntegerField')()),
             ('comment', self.gf('django.db.models.fields.related.ForeignKey')(related_name='votes', to=orm['review.Comment'])),
             ('author', self.gf('django.db.models.fields.related.ForeignKey')(related_name='votes', to=orm['auth.User'])),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
         db.send_create_signal('review', ['Vote'])
 
@@ -94,30 +99,34 @@ class Migration(SchemaMigration):
         },
         'chunks.assignment': {
             'Meta': {'object_name': 'Assignment', 'db_table': "u'assignments'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'chunks.chunk': {
             'Meta': {'object_name': 'Chunk', 'db_table': "u'chunks'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'cluster_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'end': ('django.db.models.fields.IntegerField', [], {}),
-            'file': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['chunks.File']"}),
+            'file': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'chunks'", 'to': "orm['chunks.File']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'start': ('django.db.models.fields.IntegerField', [], {})
         },
         'chunks.file': {
             'Meta': {'unique_together': "(('path', 'submission'),)", 'object_name': 'File', 'db_table': "u'files'"},
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'data': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'path': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
-            'submission': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['chunks.Submission']"})
+            'submission': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'files'", 'to': "orm['chunks.Submission']"})
         },
         'chunks.submission': {
             'Meta': {'object_name': 'Submission', 'db_table': "u'submissions'"},
-            'assignment': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['chunks.Assignment']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {}),
+            'assignment': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['chunks.Assignment']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'submissions'", 'null': 'True', 'to': "orm['auth.User']"}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
@@ -129,17 +138,20 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'review.comment': {
-            'Meta': {'ordering': "['start', 'end']", 'object_name': 'Comment'},
+            'Meta': {'ordering': "['start', '-end', 'thread_id', 'created']", 'object_name': 'Comment'},
             'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'chunk': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'comments'", 'to': "orm['chunks.Chunk']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'downvote_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'end': ('django.db.models.fields.IntegerField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'child_comments'", 'null': 'True', 'to': "orm['review.Comment']"}),
             'start': ('django.db.models.fields.IntegerField', [], {}),
             'text': ('django.db.models.fields.TextField', [], {}),
-            'type': ('django.db.models.fields.CharField', [], {'default': "'U'", 'max_length': '1'})
+            'thread_id': ('django.db.models.fields.IntegerField', [], {'null': 'True'}),
+            'type': ('django.db.models.fields.CharField', [], {'default': "'U'", 'max_length': '1'}),
+            'upvote_count': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'review.star': {
             'Meta': {'object_name': 'Star'},
@@ -154,7 +166,9 @@ class Migration(SchemaMigration):
             'Meta': {'unique_together': "(('comment', 'author'),)", 'object_name': 'Vote'},
             'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'votes'", 'to': "orm['auth.User']"}),
             'comment': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'votes'", 'to': "orm['review.Comment']"}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'value': ('django.db.models.fields.SmallIntegerField', [], {})
         }
     }
