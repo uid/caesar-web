@@ -1,4 +1,4 @@
-settings_local.*
+settings_local.py
 *.pyc
 .DS_Store
 /sitestatic
