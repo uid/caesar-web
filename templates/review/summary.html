@@ -51,7 +51,7 @@ $(document).ready(function() {
 <table class="assignment-stream">
   {% for type, comment, snippet, is_vote, vote in review_data %}
   <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}{% else %}votedown-{{comment.id}}-{{comment.chunk.id}}{% endif %}{% else %}comment-{{comment.id}}-{{comment.chunk.id}}{% endif %}" class="activity-line">
-    <td class="black-text"><span class="type" id="{{type}}" title="{{type}}">
+    <td><span class="type" id="{{type}}" title="{{type}}">
     </span></td>
     <td class="black-text"> {{ snippet }} </td>
     <td class="grey-text"> {{ comment.chunk.name }} </td>

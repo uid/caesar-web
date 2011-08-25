@@ -14,6 +14,7 @@ class Assignment(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
+    duedate = models.DateTimeField(null=True, blank=True)
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):

@@ -17,6 +17,7 @@ from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
+import datetime
 import sys
 
 @login_required
@@ -52,11 +53,16 @@ def dashboard(request):
         sys.stderr.write("id: " + str(submission.id) + " reviewer_count: " + str(reviewer_count))
         submission_data.append((submission, reviewer_count, submission.last_modified, 
                                   user_comments, static_comments))
+    
+    #find the current assignments
+    current_assignments = Assignment.objects.filter(duedate__gt=datetime.datetime.now())
+    
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
         'new_task_count': new_task_count,
         'submission_data': submission_data,
+        'current_assignments': current_assignments,
     })
 
 @staff_member_required

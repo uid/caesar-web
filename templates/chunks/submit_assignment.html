@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <span class="breadcrumb">submit assignment</span>
+{% endblock %}
+
+
+{% block content %}
+
+{{ message }}
+{% endblock %}

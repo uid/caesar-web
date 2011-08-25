@@ -225,7 +225,9 @@ def find_chunks(user, chunks, count):
     key = make_chunk_sort_key(user)
 
     for _ in itertools.repeat(None, count):
-        # TODO consider using a priority queue here 
+        # TODO consider using a priority queue here
+        if len(chunks) == 0:
+            return
         chunk_to_assign = min(chunks, key=key)
         if chunk_to_assign.assign_reviewer(user):
             yield chunk_to_assign.id

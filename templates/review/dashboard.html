@@ -59,6 +59,23 @@ $(document).ready(function() {
 
 {% block content %}
 
+
+<h2 class="task-header">current assignments</h2>
+
+<table class="current-assignment">
+  {% for assignment in current_assignments %}
+  <tr class="assignment-line">
+    <td class="black-text"> {{ assignment.name }} </td>
+    <td class="grey-text"> Due on: {{ assignment.duedate }} </td>
+    {% if user.profile.is_student %}
+    <td class="=submit-text"><a href="{% url chunks.views.submit_assignment assignment.id %}"> submit current revision</a></td>
+    {% endif %}
+  </tr>
+  {% empty %}
+  {% endfor %}
+</table>
+
+
 <h2 class="task-header">submitted</h2>
 <div class="task-list">
   {% for submission, reviewer_count, last_modified, user_comments, static_comments in submission_data %}

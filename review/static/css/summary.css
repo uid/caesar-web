@@ -4,7 +4,7 @@
     padding: 0px 5px;
     background-repeat: no-repeat;
     height: 16px;
-    padding-left: 10px;
+    padding-left: 16px;
 }
 #vote-up {
     background-image: url('../img/thumb-up.png');
@@ -31,8 +31,11 @@ table.assignment-stream {
 
 .grey-text {
     color: #777;
+    width: 25em;
 }
-
+.black-text{
+    width: 60em;
+}
 .activity-line {
     border-bottom: 1px solid #aaa;
 }

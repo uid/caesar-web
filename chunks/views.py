@@ -1,5 +1,6 @@
 from chunks.models import Chunk, File, Assignment
 from review.models import Comment, Vote, Star 
+from chunks.forms import AssignmentForm
 from tasks.models import Task
 
 from django.http import Http404
@@ -139,4 +140,9 @@ def view_all_chunks(request, viewtype, submission_id):
         'read_only': False,
         'comment_view': comment_view,
         'full_view': False,
+    })
+@login_required
+def submit_assignment(request, assignment):
+    return render(request, 'chunks/submit_assignment.html', {
+        'message': "Hi",
     })
