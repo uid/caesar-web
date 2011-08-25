@@ -1,6 +1,5 @@
 from chunks.models import Chunk, File, Assignment
 from review.models import Comment, Vote, Star 
-from chunks.forms import AssignmentForm
 from tasks.models import Task
 
 from django.http import Http404
