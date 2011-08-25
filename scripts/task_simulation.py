@@ -61,14 +61,18 @@ def write_output(output_file, assignment, users, submissions):
     students_with_staff = 0
     total = 0
     role_counts = {'student': 0, 'staff': 0, 'other': 0}
+    reviewer_stats = []
     for user in users:
         write_header_line(str(user), 3)
+        student_count = sum(r.role == 'student' for r in user.other_reviewers)
         staff_count = sum(r.role == 'staff' for r in user.other_reviewers)
         other_count = sum(r.role == 'other' for r in user.other_reviewers)
         write('Interactions:')
         write('  Staff: %d\n  Other: %d' % (staff_count, other_count))
         write()
 
+        if user.role == 'student':
+            reviewer_stats.append((student_count, staff_count, other_count))
         role_counts[user.role] += 1
         if user.role == 'student' and staff_count > 0:
             students_with_staff += 1
@@ -118,21 +122,41 @@ def write_output(output_file, assignment, users, submissions):
                                  reviewer_count, coverage))
         write()
 
-    min_stats = numpy.amin(submission_stats, axis=0)
-    max_stats = numpy.amax(submission_stats, axis=0)
-    avg_stats = numpy.mean(submission_stats, axis=0)
-    std_stats = numpy.std(submission_stats, axis=0)
 
     write_header_line('Summary statistics', 2)
-    write('Population:')
+
+    write('Reviewers:')
+    min_reviewer_stats = numpy.amin(reviewer_stats, axis=0)
+    max_reviewer_stats = numpy.amax(reviewer_stats, axis=0)
+    avg_reviewer_stats = numpy.mean(reviewer_stats, axis=0)
+    std_reviewer_stats = numpy.std(reviewer_stats, axis=0)
+    reviewer_stats_summary = zip(
+            min_reviewer_stats,
+            max_reviewer_stats,
+            avg_reviewer_stats,
+            std_reviewer_stats
+    )
     for role, count in role_counts.items():
         write("  %s: %d" % (role.capitalize(), count))
         total += count
     write("  Total: %d" % total)
     write()
     write('  Students with staff on chunk: %d' % students_with_staff)
-    write()
+    write('  Student Interactions:')
+    write('    Min: %f\n    Max: %f\n    Avg: %f\n    Std: %f' 
+            % reviewer_stats_summary[0]) 
+    write('  Staff Interactions:')
+    write('    Min: %f\n    Max: %f\n    Avg: %f\n    Std: %f' 
+            % reviewer_stats_summary[1]) 
+    write('  Other Interactions:')
+    write('    Min: %f\n    Max: %f\n    Avg: %f\n    Std: %f' 
+            % reviewer_stats_summary[2]) 
+
     write('Submissions:')
+    min_stats = numpy.amin(submission_stats, axis=0)
+    max_stats = numpy.amax(submission_stats, axis=0)
+    avg_stats = numpy.mean(submission_stats, axis=0)
+    std_stats = numpy.std(submission_stats, axis=0)
     write('  Total: %d' % len(submissions))
     write('  Without reviewers: %d' % submissions_without_reviewers)
     write('  With staff reviewers: %d' % submissions_with_staff)

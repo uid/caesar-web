@@ -4,3 +4,5 @@ settings_local.py
 /sitestatic
 /media
 /data
+/task_sim_data.csv
+/task_sim_output.txt
