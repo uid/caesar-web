@@ -1,3 +1,6 @@
+import json
+
+from django.core import serializers
 from django.db.models import Q, Count, Max
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
@@ -189,7 +192,12 @@ def vote(request):
             task.mark_as('S')
     except Task.DoesNotExist:
         pass
-    return render(request, 'review/comment_votes.html', {'comment': comment})
+    response_json = json.dumps({
+        'comment_id': comment_id,
+        'upvote_count': comment.upvote_count,
+        'downvote_count': comment.downvote_count,
+    })
+    return HttpResponse(response_json, mimetype='application/javascript')
 
 @login_required
 def unvote(request):
@@ -198,7 +206,12 @@ def unvote(request):
     # need to make sure to load the comment after deleting the vote to make sure
     # the vote counts are correct
     comment = Comment.objects.get(pk=comment_id)
-    return render(request, 'review/comment_votes.html', {'comment': comment})
+    response_json = json.dumps({
+        'comment_id': comment_id,
+        'upvote_count': comment.upvote_count,
+        'downvote_count': comment.downvote_count,
+    })
+    return HttpResponse(response_json, mimetype='application/javascript')
 
 @login_required
 def change_task(request):
@@ -274,7 +287,7 @@ def all_activity(request, assign, username):
             continue
         else:
             chunk_set.add(chunk)
-        participant_votes = dict((vote.comment.id, vote) \
+        participant_votes = dict((vote.comment.id, vote.value) \
                 for vote in participant.votes.filter(comment__chunk=chunk.id))
         numbers, lines = zip(*chunk.lines)
         highlighted_lines = zip(numbers, 

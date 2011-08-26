@@ -59,20 +59,23 @@
 
   <div class="comment-footer">
     <span class="comment-votes">
-      {% include "review/comment_votes.html" %}
+      <span class="vote-buttons
+        {% if full_view and user.is_authenticated and user != comment.author %}
+          enabled{% endif %}">
+          <div id="upvote-{{ comment.id }}"  title="Upvote"
+            class="vote up {% if vote == 1 %} selected {% endif %}">
+            {{ comment.upvote_count }}
+          </div>
+          <div id="downvote-{{ comment.id }}" title="Downvote"
+            class="vote down {% if vote == -1 %} selected {% endif %}">
+            {{ comment.downvote_count }}
+          </div>
+        </span>
     </span>
     {% if user.is_authenticated %}
     <span class="comment-actions">
-      {% if full_view and user !=  comment.author %}
-          <span class="vote-buttons">
-            <div id="upvote-{{ comment.id }}"  title="Upvote"
-              class="vote up {% if vote == 1 %} selected {% endif %}"></div>
-            <div id="downvote-{{ comment.id }}" title="Downvote"
-              class="vote down {% if vote == -1 %} selected {% endif %}"></div>
-          </span>
-          <button id="reply-{{ comment.id }}-button" class="reply-button"
-            type="button">Reply</button>
-      {% endif %}
+      <button id="reply-{{ comment.id }}-button" class="reply-button"
+        type="button">Reply</button>
       {% if full_view and comment.author == user %}
       <button id="delete-{{ comment.id }}-button" class="delete-button" 
         type="button">Delete</button>
