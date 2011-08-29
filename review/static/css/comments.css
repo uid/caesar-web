@@ -167,10 +167,10 @@
 
 .vote-buttons .vote {
     display: inline-block;
-    width: 21px;
     height: 21px;
+    padding-left: 21px;
+    padding-right: 2px;
     vertical-align: middle;
-    background: #eee;
     border: 1px solid #ccc;
     border-bottom: 1px solid #bbb;
     -moz-border-radius: 3px;
@@ -183,8 +183,7 @@
     -ms-box-sizing: border-box;
 }
 
-.vote-buttons .vote:hover {
-    border: 1px solid #000;
+.vote-buttons.enabled .vote:hover {
     background-color: #ccc;
     cursor: pointer;
 }
@@ -193,12 +192,25 @@
     background-image: url('../img/thumb-up.png'); 
     background-repeat: no-repeat; 
     background-position: 2px 2px;
+    -webkit-border-top-right-radius: 0px;
+    -webkit-border-bottom-right-radius: 0px;
+    -moz-border-radius-topright: 0px;
+    -moz-border-radius-bottomright: 0px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
 
 .vote-buttons .vote.down {
     background-image: url('../img/thumb-down.png');
     background-repeat: no-repeat;
     background-position: 2px 2px;
+    margin-left: -4px;
+    -webkit-border-top-left-radius: 0px;
+    -webkit-border-bottom-left-radius: 0px;
+    -moz-border-radius-topleft: 0px;
+    -moz-border-radius-bottomleft: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
 }
 .vote-buttons .vote.selected {
     background-color: #ffff5a;

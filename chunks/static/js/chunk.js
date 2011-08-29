@@ -384,7 +384,7 @@ function attachCommentHandlers(comment) {
             return false;
         });
 
-        $('.vote-buttons .vote', comment.elt).click(function(e) {
+        $('.vote-buttons.enabled .vote', comment.elt).click(function(e) {
             var button = this;
             var isUp = $(this).hasClass('up');
             if (!$(this).is('.selected')) {
@@ -398,7 +398,11 @@ function attachCommentHandlers(comment) {
                     var otherButton = isUp ? $(button).nextAll('.vote') :
                         $(button).prevAll('.vote');
                     otherButton.removeClass('selected');
-                    $('.comment-votes', comment.elt).html(data)
+                    $('.comment-votes .vote.up', comment.elt)
+                        .text(data.upvote_count)
+                        .effect('highlight', {queue: false}, 1000);
+                    $('.comment-votes .vote.down', comment.elt)
+                        .text(data.downvote_count)
                         .effect('highlight', {queue: false}, 1000);
                     model.voteComment(comment, value);
                 });
@@ -407,7 +411,11 @@ function attachCommentHandlers(comment) {
                     comment_id: comment.id
                 }, function(data) {
                     $(button).removeClass('selected');
-                    $('.comment-votes', comment.elt).text(data)
+                    $('.comment-votes .vote.up', comment.elt)
+                        .text(data.upvote_count)
+                        .effect('highlight', {queue: false}, 1000);
+                    $('.comment-votes .vote.down', comment.elt)
+                        .text(data.downvote_count)
                         .effect('highlight', {queue: false}, 1000);
                     model.unvoteComment(comment);
                 });
