@@ -1,10 +1,10 @@
-from chunks.models import Chunk, File, Assignment
+from chunks.models import Chunk, File, Assignment, Submission
 from review.models import Comment, Vote, Star 
 from chunks.forms import AssignmentForm
 from tasks.models import Task
 
 from django.http import Http404
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 
@@ -13,6 +13,8 @@ from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
 import os
+import subprocess
+import datetime
 
 @login_required
 def view_chunk(request, chunk_id):
@@ -142,7 +144,42 @@ def view_all_chunks(request, viewtype, submission_id):
         'full_view': False,
     })
 @login_required
-def submit_assignment(request, assignment):
-    return render(request, 'chunks/submit_assignment.html', {
-        'message': "Hi",
-    })
+def submit_assignment(request, assignment_id):
+    user = request.user
+    current_assignment = Assignment.objects.get(id=assignment_id)
+    if datetime.datetime.now() > current_assignment.duedate:
+        return render(request, 'chunks/submit_assignment.html', {
+            'submission': submission,
+            'author': author,
+            'new_submission': False,
+            'late': True
+        })
+    #check if there is an existing submission 
+    submission = Submission.objects.get(author=user, assignment=current_assignment)
+    p = subprocess.Popen(['/Users/elena/Documents/Praetor/praetor/codeTester', '/Users/elena/Documents/Praetor/server_files/trunk'], stdout=subprocess.PIPE)
+    afile, err = p.communicate()
+    changedate = "Last Changed Date: "
+    changerevision = "Last Changed Rev: "
+    changeauthor = "Last Changed Author: "
+    dateindex = afile.find(changedate)
+    date = afile[dateindex + len(changedate):]
+    year, month, day = date.split(" ")[0].split("-")
+    hour, minute, sec = date.split(" ")[1].split(":")
+    submission.revision_date = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(sec))
+    #warn about time since last submission
+    hour_buffer = datetime.datetime.now() - datetime.timedelta(hours=1)
+    warn_hours = False
+    if submission.revision_date < hour_buffer:
+        warn_hours = True
+    revindex = afile.find(changerevision)
+    rev = int(afile[revindex + len(changerevision): dateindex])
+    #check that this is a new revision and not the one that was already stored
+    new_submission = True
+    if rev == submission.revision:
+        new_submission = False
+    submission.revision = rev
+    #verify author
+    authorindex = afile.find(changeauthor)
+    author = afile[authorindex + len(changeauthor): revindex]
+    submission.save()
+    return redirect('review.views.dashboard')

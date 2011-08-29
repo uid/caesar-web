@@ -1,7 +1,9 @@
 .task-header {
     margin: 0px;
 }
-
+div.assignment-header {
+    padding-top: 2em;
+}
 .task-list {
     margin-bottom: 18px;
 }
@@ -115,13 +117,16 @@ table.current-assignment {
 
 .grey-text {
     color: #777;
-    width: 40em;
+    width: 20em;
 }
 .submit-text {
 }
 .black-text {
     color: black;
-    width: 25em;
+    width: 10em;
+}
+.red-text{
+    color: red;
 }
 .assignment-line {
     border-bottom: 1px solid #aaa;

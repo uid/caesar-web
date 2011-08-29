@@ -10,7 +10,7 @@ from chunks.models import Chunk, Assignment, Submission
 from tasks.models import Task
 from tasks.routing import assign_tasks
 from models import Comment, Vote, Star 
-from forms import CommentForm, ReplyForm
+from review.forms import CommentForm, ReplyForm
 from accounts.models import UserProfile
 
 from pygments import highlight
@@ -41,6 +41,7 @@ def dashboard(request):
    
     #get all the submissions that the user submitted
     submissions = user.submissions \
+        .filter(duedate__lt=datetime.datetime.now()) \
         .order_by('files__chunks__comments__modified') \
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))
@@ -55,14 +56,14 @@ def dashboard(request):
                                   user_comments, static_comments))
     
     #find the current assignments
-    current_assignments = Assignment.objects.filter(duedate__gt=datetime.datetime.now())
+    current_submissions = user.submissions.filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
     
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
         'new_task_count': new_task_count,
         'submission_data': submission_data,
-        'current_assignments': current_assignments,
+        'current_submissions': current_submissions,
     })
 
 @staff_member_required
@@ -300,3 +301,35 @@ def all_activity(request, assign, username):
         'activity_view': True,
         'full_view': False
     })
+@login_required
+def request_extension(request, assignment_id):
+    user = request.user
+    if request.method == 'GET':
+        current_assignment = Assignment.objects.get(id=assignment_id)
+        submission = Submission.objects.get(assignment=current_assignment, author=user)
+        extension = user.profile.extension_days
+        extended_days = (submission.duedate - current_assignment.duedate).days
+        late_days = 0
+        if datetime.datetime.now() > current_assignment.duedate:
+            late_days = (datetime.datetime.now() - current_assignment.duedate).days + 1
+        return render(request, 'review/extension_form.html', {
+            'days': range(late_days, extension+extended_days+1),
+        })  
+    else:
+        days = request.POST.get('dayselect', None)
+        try:
+            extension = int(days)
+            old_extension = user.profile.extension_days
+            current_assignment = Assignment.objects.get(id=assignment_id)
+            submission = Submission.objects.get(assignment=current_assignment, author=user)
+            extended_days = (submission.duedate - current_assignment.duedate).days
+            full_extension = old_extension + extended_days
+            if extension > full_extension or extension < 0:
+                return redirect('review.views.dashboard')
+            user.profile.extension_days = full_extension - extension
+            user.profile.save()
+            submission.duedate = current_assignment.duedate+datetime.timedelta(days=extension)
+            submission.save()
+            return redirect('review.views.dashboard')
+        except ValueError:
+            return redirect('review.views.dashboard')

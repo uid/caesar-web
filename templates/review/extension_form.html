@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/submit.css" type="text/css" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <span class="breadcrumb">request extension</span>
+{% endblock %}
+
+
+{% block content %}
+<div class="grey-container success">
+<form id="extension-form" method="post">
+  {% csrf_token %}
+I would like
+  <select name="dayselect">
+      {%for day in days %}
+      <option value="{{day}}" class="bigger-selector"> {{day}} </option>
+      {%endfor%}
+  </select> total extension day{{ days|pluralize }}.
+  </br>
+  <button type="submit">Save</button>
+  <button onclick="document.location = '/review';" id="cancel-button" type="button">Cancel</button>
+</form>
+</div>
+{% endblock %}

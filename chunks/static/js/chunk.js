@@ -398,7 +398,7 @@ function attachCommentHandlers(comment) {
                     var otherButton = isUp ? $(button).nextAll('.vote') :
                         $(button).prevAll('.vote');
                     otherButton.removeClass('selected');
-                    $('.comment-votes', comment.elt).text(data)
+                    $('.comment-votes', comment.elt).html(data)
                         .effect('highlight', {queue: false}, 1000);
                     model.voteComment(comment, value);
                 });

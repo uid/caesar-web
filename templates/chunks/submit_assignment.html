@@ -4,6 +4,7 @@
 {{ block.super }}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/submit.css" type="text/css" />
 {% endblock %}
 
 {% block js %}
@@ -18,6 +19,26 @@
 
 
 {% block content %}
-
-{{ message }}
+<div class="grey-container ui-corner-all">
+    {% if new_submission %}
+    <div class="success">
+    Thanks for your submission {{ submission.name }}. Revision {{ submission.revision }}, committed on {{ submission.revision_date }} will be graded.
+    </div>
+    {% endif %}
+    {% if not new_submission %}
+    <div class="failure">
+    There have been no new commits since your last submission for grading. Revision {{ submission.revision }} committed on {{ submission.revision_date }} will be used for grading.
+    </div>
+    {% endif %}
+    {% if late %}
+    <div class="failure">
+    Your submission for assignment {{ submission.assignment.name }} is late. Please email your TA.
+    </div>
+    {% endif %}
+    {% if warn_hours %}
+    <div class="failure">
+    Your code was committed over an hour ago. The current revision, Revision {{ submission.revision }} committed on {{submission.revision_date}} will be graded.
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

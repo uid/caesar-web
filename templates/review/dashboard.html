@@ -59,17 +59,24 @@ $(document).ready(function() {
 
 {% block content %}
 
-
-<h2 class="task-header">current assignments</h2>
+{% if user.profile.is_student %}
+<div class="assignment-header">
+    <h2 class="task-header">current assignments</h2>
+</div>
 
 <table class="current-assignment">
-  {% for assignment in current_assignments %}
+  {% for submission in current_submissions %}
   <tr class="assignment-line">
-    <td class="black-text"> {{ assignment.name }} </td>
-    <td class="grey-text"> Due on: {{ assignment.duedate }} </td>
-    {% if user.profile.is_student %}
-    <td class="=submit-text"><a href="{% url chunks.views.submit_assignment assignment.id %}"> submit current revision</a></td>
-    {% endif %}
+    <td class="black-text"> {{ submission.assignment.name }} </td>
+    <td class="grey-text"> Due on: {{ submission.assignment.duedate }} 
+        {%if submission.assignment.duedate != submission.duedate %}
+        <span class="red-text"> </br> Extended to: {{submission.duedate}} </span>
+        {% endif %}
+    </td>
+    <td class="black-text"> Revision: {%if submission.revision %}{{ submission.revision }} {% else %} N/A {% endif %}</td>
+    <td class="grey-text"> Modified on: {%if submission.revision_date %} {{ submission.revision_date }} {% else %} N/A {% endif %} </td>
+    <td class="=submit-text"><a href="{% url chunks.views.submit_assignment submission.assignment.id %}"> update to current revision</a></td>
+    <td class="=submit-text"><a href="{% url review.views.request_extension submission.assignment.id %}"> request extension</a></td>
   </tr>
   {% empty %}
   {% endfor %}
@@ -99,12 +106,11 @@ $(document).ready(function() {
       {{ last_modified }}
     </span>
   </div>
-  
   {% empty %}
     No submissions found.
   {% endfor %}
 </div>
-
+{% endif %}
 <div class="span-24">
 {% if new_task_count > 0 %}
 <div class="success">

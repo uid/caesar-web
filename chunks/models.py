@@ -6,7 +6,9 @@ from pygments.formatters import HtmlFormatter
 
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 from django.conf import settings
+from django.dispatch import receiver
 
 import app_settings
 
@@ -28,6 +30,9 @@ class Submission(models.Model):
     author = models.ForeignKey(User, 
             blank=True, null=True, related_name='submissions')
     created = models.DateTimeField(auto_now_add=True)
+    revision = models.IntegerField(null=True, blank=True)
+    revision_date = models.DateTimeField(null=True, blank=True)
+    duedate = models.DateTimeField(null=True, blank=True)
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
@@ -37,6 +42,14 @@ class Submission(models.Model):
     def get_absolute_url(self):
         return ('chunks.views.view_all_chunks', [str(self.assignment.name), str(self.name), "code"])
  
+
+@receiver(post_save, sender=Assignment)
+def create_user_submission(sender, instance, created, **kwargs):
+    if created:
+        users = User.objects.filter(profile__role='S')
+        for auser in users:
+            submission, created = Submission.objects.get_or_create(assignment=instance, name=auser.username,
+                                                                   author=auser, duedate=instance.duedate)
 
 class File(models.Model):
     id = models.AutoField(primary_key=True)

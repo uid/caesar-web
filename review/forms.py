@@ -1,7 +1,8 @@
 from review.models import *
+from accounts.models import UserProfile
 
-from django.forms import ModelForm
-from django.forms import Textarea, HiddenInput
+from django.forms import ModelForm, Form
+from django.forms import Textarea, HiddenInput, ChoiceField
 
 class CommentForm(ModelForm):
     class Meta:

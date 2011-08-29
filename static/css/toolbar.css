@@ -2,7 +2,6 @@
     z-index: 1000;
     position: relative;
     box-shadow: 1px 1px 3px #999;
-    margin-bottom: 25px;
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
@@ -93,4 +92,7 @@
 
 #secondary-toolbar-inner {
     margin: 1em;
+}
+div.clear-both{
+    clear: both;
 }
