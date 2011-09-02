@@ -325,21 +325,28 @@ def request_extension(request, assignment_id):
         late_days = 0
         if datetime.datetime.now() > current_assignment.duedate:
             late_days = (datetime.datetime.now() - current_assignment.duedate).days + 1
+        days = range(late_days, min(extension+extended_days+1, current_assignment.max_extension+1))
+        written_days = []
+        for day in days:
+            written_days.append(current_assignment.duedate + datetime.timedelta(days=day))
         return render(request, 'review/extension_form.html', {
-            'days': range(late_days, extension+extended_days+1),
+            'days': days,
+            'current_day': extended_days,
+            'written_days': written_days,
+            'total_days': user.profile.extension_days + extended_days
         })  
     else:
         days = request.POST.get('dayselect', None)
         try:
             extension = int(days)
-            old_extension = user.profile.extension_days
+            total_left = user.profile.extension_days
             current_assignment = Assignment.objects.get(id=assignment_id)
             submission = Submission.objects.get(assignment=current_assignment, author=user)
             extended_days = (submission.duedate - current_assignment.duedate).days
-            full_extension = old_extension + extended_days
-            if extension > full_extension or extension < 0:
+            total_days = total_left + extended_days
+            if extension > total_days or extension < 0 or extension > current_assignment.max_extension:
                 return redirect('review.views.dashboard')
-            user.profile.extension_days = full_extension - extension
+            user.profile.extension_days = total_days - extension
             user.profile.save()
             submission.duedate = current_assignment.duedate+datetime.timedelta(days=extension)
             submission.save()

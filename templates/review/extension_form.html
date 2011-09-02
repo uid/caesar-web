@@ -8,7 +8,28 @@
 
 {% block js %}
 {{ block.super }}
-
+<script>
+$(document).ready(function(){
+    $("select").change(function () {
+          var written_days = [
+          {% for date in written_days %}
+           '{{date}}',
+          {% endfor %}
+          ]
+          var str = "";
+          $("select option:selected").each(function () {
+                str = $(this).text();
+              });
+          var day = parseInt(str);
+          var left = {{total_days}} - day;
+          $("#duedate").text("After this request, the current assignment will be due on " + written_days[day]);
+          if (left == 1)
+            $("#slackleft").text("I will have " + left + " slack day left for the rest of the semester.");
+          else
+            $("#slackleft").text("I will have " + left + " slack days left for the rest of the semester.");
+        }).change();
+});
+</script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -21,15 +42,23 @@
 <div class="grey-container success">
 <form id="extension-form" method="post">
   {% csrf_token %}
-I would like
+I would like to use 
   <select name="dayselect">
       {%for day in days %}
+      {%if day == current_day %}
+      <option value="{{day}}" class="bigger-selector" selected="selected"> {{day}} </option>
+      {%else%}
       <option value="{{day}}" class="bigger-selector"> {{day}} </option>
+      {%endif%}
       {%endfor%}
-  </select> total extension day{{ days|pluralize }}.
+  </select> slack day{{ current_day|pluralize }} on this assignment.
   </br>
   <button type="submit">Save</button>
   <button onclick="document.location = '/review';" id="cancel-button" type="button">Cancel</button>
 </form>
+<div id="duedate">
+</div>
+<div id="slackleft">
+</div>
 </div>
 {% endblock %}

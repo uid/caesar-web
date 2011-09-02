@@ -34,7 +34,7 @@ class UserProfile(models.Model):
     reputation = models.IntegerField(default=0, editable=False)
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
-    extension_days = models.IntegerField(default=3)
+    extension_days = models.IntegerField(default=5)
     semester_taken = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
                                       blank=True, null=True)
     def __unicode__(self):

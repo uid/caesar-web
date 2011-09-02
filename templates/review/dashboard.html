@@ -83,7 +83,7 @@ $(document).ready(function() {
 </table>
 
 
-<h2 class="task-header">submitted</h2>
+<h2 class="task-header">submitted assignments</h2>
 <div class="task-list">
   {% for submission, reviewer_count, last_modified, user_comments, static_comments in submission_data %}
   
@@ -107,7 +107,6 @@ $(document).ready(function() {
     </span>
   </div>
   {% empty %}
-    No submissions found.
   {% endfor %}
 </div>
 {% endif %}
@@ -117,7 +116,7 @@ $(document).ready(function() {
   You have {{ new_task_count }} new review task{{ new_task_count|pluralize }}.
 </div>
 {% endif %}
-<h2 class="task-header">to review</h2>
+<h2 class="task-header">code to review</h2>
 <div class="task-list">
   {% for task in active_tasks.all %}
     {% include "review/task.html" %}
@@ -126,7 +125,7 @@ $(document).ready(function() {
   {% endfor %}
 </div>
 
-<h2 class="task-header">recently reviewed</h2>
+<h2 class="task-header">code recently reviewed</h2>
 <div class="task-list">
   {% for task in completed_tasks.all %}
     {% include "review/task.html" %}
