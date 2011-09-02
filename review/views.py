@@ -327,7 +327,7 @@ def request_extension(request, assignment_id):
             late_days = (datetime.datetime.now() - current_assignment.duedate).days + 1
         days = range(late_days, min(extension+extended_days+1, current_assignment.max_extension+1))
         written_days = []
-        for day in days:
+        for day in range(days[-1]+1):
             written_days.append(current_assignment.duedate + datetime.timedelta(days=day))
         return render(request, 'review/extension_form.html', {
             'days': days,
