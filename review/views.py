@@ -54,7 +54,6 @@ def dashboard(request):
         user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
         static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
         reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
-        sys.stderr.write("id: " + str(submission.id) + " reviewer_count: " + str(reviewer_count))
         submission_data.append((submission, reviewer_count, submission.last_modified, 
                                   user_comments, static_comments))
     
@@ -207,6 +206,7 @@ def unvote(request):
     # need to make sure to load the comment after deleting the vote to make sure
     # the vote counts are correct
     comment = Comment.objects.get(pk=comment_id)
+    sys.stderr.write("\ncomment: " + comment_id)
     response_json = json.dumps({
         'comment_id': comment_id,
         'upvote_count': comment.upvote_count,

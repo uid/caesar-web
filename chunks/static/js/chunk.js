@@ -399,26 +399,26 @@ function attachCommentHandlers(comment) {
                         $(button).prevAll('.vote');
                     otherButton.removeClass('selected');
                     $('.comment-votes .vote.up', comment.elt)
-                        .text(data.upvote_count)
-                        .effect('highlight', {queue: false}, 1000);
+                        .text(data.upvote_count);
+                        // .effect('highlight', {queue: false}, 1000);
                     $('.comment-votes .vote.down', comment.elt)
-                        .text(data.downvote_count)
-                        .effect('highlight', {queue: false}, 1000);
+                        .text(data.downvote_count);
+                        // .effect('highlight', {queue: false}, 1000);
                     model.voteComment(comment, value);
-                });
+                },"json");
             } else {
                 $.post(caesar.urls.unvote, {
                     comment_id: comment.id
                 }, function(data) {
                     $(button).removeClass('selected');
                     $('.comment-votes .vote.up', comment.elt)
-                        .text(data.upvote_count)
-                        .effect('highlight', {queue: false}, 1000);
+                        .text(data.upvote_count);
+                        // .effect('highlight', {queue: false}, 1000);
                     $('.comment-votes .vote.down', comment.elt)
-                        .text(data.downvote_count)
-                        .effect('highlight', {queue: false}, 1000);
+                        .text(data.downvote_count);
+                        // .effect('highlight', {queue: false}, 1000);
                     model.unvoteComment(comment);
-                });
+                },"json");
             }
             return false;
         });
