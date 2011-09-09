@@ -43,7 +43,7 @@ def dashboard(request):
                   reviewer_count=Count('chunk__tasks', distinct=True))
    
     #get all the submissions that the user submitted
-    submissions = user.submissions \
+    submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
         .order_by('files__chunks__comments__modified') \
         .select_related('chunk__file__assignment') \
@@ -58,7 +58,7 @@ def dashboard(request):
                                   user_comments, static_comments))
     
     #find the current assignments
-    current_submissions = user.submissions.filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
+    current_submissions = Submission.objects.filter(name=user.username).filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
     
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
