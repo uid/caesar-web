@@ -72,13 +72,11 @@ $(document).ready(function() {
         {%if submission.assignment.duedate != submission.duedate %}
         <span class="red-text"> </br> Extended to: {{submission.duedate}} </span>
         {% endif %}
+        {%if user.profile.extension_days != 0 or submission.assignment.duedate != submission.duedate %}
+            <span class="=submit-text"><a href="{% url review.views.request_extension submission.assignment.id %}"> request extension</a></td>
+        {%endif%}
     </td>
-    <td class="black-text"> Revision: {%if submission.revision %}{{ submission.revision }} {% else %} N/A {% endif %}</td>
-    <td class="grey-text"> Modified on: {%if submission.revision_date %} {{ submission.revision_date }} {% else %} N/A {% endif %} </td>
-    <td class="=submit-text"><a href="{% url chunks.views.submit_assignment submission.assignment.id %}"> update to current revision</a></td>
-    {%if user.profile.extension_days != 0 or submission.assignment.duedate != submission.duedate %}
-        <td class="=submit-text"><a href="{% url review.views.request_extension submission.assignment.id %}"> request extension</a></td>
-    {%endif%}
+
   </tr>
   {% empty %}
   {% endfor %}
