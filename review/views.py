@@ -28,7 +28,10 @@ def dashboard(request):
     user = request.user
     new_task_count = 0
     for assignment in Assignment.objects.all():
-        new_task_count += assign_tasks(assignment, user)
+        active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
+        #do not give tasks to students who got extensions
+        if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
+            new_task_count += assign_tasks(assignment, user)
     
     active_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission_assignment') \
