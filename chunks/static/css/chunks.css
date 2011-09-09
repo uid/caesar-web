@@ -27,6 +27,7 @@
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     padding-left: 18px;
+    float: right;
 }
 #nonchunk-display {
     box-sizing: border-box;
