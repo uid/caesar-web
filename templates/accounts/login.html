@@ -12,6 +12,13 @@
 <div id="login-container">
 <h2>log in</h2>
 
+<div id="cert-login-box">
+    <form action="https://{{ request.get_host }}{{ next }}">
+        <button id="cert-login-button" type="submit">Login with MIT certificates</button>
+    </form>
+
+</div>
+
 <div id="standard-login-box" >
   {% if form.errors %}
   <p>Your username and password didn't match. Please try again.</p>
@@ -33,15 +40,17 @@
      href="{% url django.contrib.auth.views.password_reset %}">
     Forgotten password?
   </a>
-  <a id="register-link" href="{% url accounts.views.register %}?next={{ next }}">Register</a>
+
+  {% comment %}
+   rcm: turned off open registration
+
+    <a id="register-link" href="{% url accounts.views.register 
+%}?next={{ next }}">Register</a> 
+  
+  {% endcomment %}
+
 </div>
 
-<div id="cert-login-box">
-    <form action="https://{{ request.get_host }}{{ next }}">
-        <button id="cert-login-button" type="submit">Login with MIT certificates</button>
-    </form>
-
-</div>
 
 </div>
 
