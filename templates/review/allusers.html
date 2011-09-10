@@ -36,7 +36,7 @@ $(document).ready(function() {
   <tr id="participant-{{participant.username}}" class="activity-line">
     <td class="black-text"> {{ participant.username }} </td>
     <td class="grey-text"> {{ participant.profile.reputation }} </td>
-    <td class="grey-text"> [{{ participant.profile.role }}] </td>
+    <td class="grey-text"> {%if participant.profile.role %}[{{ participant.profile.role }}] {%endif%}</td>
   </tr>
   {% empty %}
   {% endfor %}
