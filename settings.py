@@ -29,6 +29,7 @@ DATABASES = {
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
 EMAIL_SUBJECT_PREFIX = '[Caesar] '
+SERVER_EMAIL = 'Caesar code reviewing system <caesar@csail.mit.edu>'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

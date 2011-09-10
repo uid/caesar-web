@@ -9,7 +9,6 @@ Alias /media /var/django/caesar/media
 Alias /static /var/django/caesar/sitestatic
 Alias /favicon.ico /var/django/caesar/sitestatic/favicon.ico
 
-
 <Directory /var/django/caesar/media>
 Order deny,allow
 Allow from all
