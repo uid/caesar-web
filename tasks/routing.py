@@ -95,7 +95,7 @@ def load_chunks(assignment, user_map, django_user):
     chunk_map = {}
     submissions = {}
 
-    django_submissions = assignment.submissions.values().all()
+    django_submissions = assignment.submissions.filter(author=django_user).values()
     django_chunks = models.Chunk.objects \
             .filter(file__submission__assignment=assignment) \
             .exclude(file__submission__author=django_user) \
