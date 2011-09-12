@@ -27,7 +27,7 @@ import sys
 def dashboard(request):
     user = request.user
     new_task_count = 0
-    for assignment in Assignment.objects.all():
+    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
         #do not give tasks to students who got extensions
         if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
