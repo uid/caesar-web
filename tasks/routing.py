@@ -102,6 +102,7 @@ def load_chunks(assignment, user_map, django_user):
             .values('id', 'name', 'cluster_id', 'file__submission')
     django_tasks = Task.objects.filter(
             chunk__file__submission__assignment=assignment) \
+            .exclude(chunk__file__submission__author=django_user) \
                     .select_related('reviewer__user') \
 
     # load all submissions and chunks into lightweight internal objects
