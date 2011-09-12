@@ -217,7 +217,7 @@ def find_chunks(user, chunks, count):
                     len(chunk.reviewers) >= app_settings.REVIEWERS_PER_CHUNK,
                     cluster_score(user, chunk),
                     -cluster_sizes[chunk.cluster_id],
-                    -len(chunk.reviewers),
+                    len(chunk.reviewers),
                     len(chunk.submission.reviewers),
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
