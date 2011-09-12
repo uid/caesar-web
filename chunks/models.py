@@ -10,6 +10,7 @@ from django.db.models.signals import post_save
 from django.conf import settings
 from django.dispatch import receiver
 
+import datetime
 import app_settings
 
 class Assignment(models.Model):
@@ -17,11 +18,17 @@ class Assignment(models.Model):
     name = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
     duedate = models.DateTimeField(null=True, blank=True)
+    code_review_end_date = models.DateTimeField(null=True, blank=True)
     max_extension = models.IntegerField(default=3)
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):
         return self.name
+@receiver(post_save, sender=Assignment)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        instance.code_review_end_date = instance.duedate + datetime.timedelta(days=3)
+        instance.save()
 
 
 class Submission(models.Model):
