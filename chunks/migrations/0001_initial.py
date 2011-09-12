@@ -13,6 +13,8 @@ class Migration(SchemaMigration):
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('duedate', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('max_extension', self.gf('django.db.models.fields.IntegerField')(default=3)),
         ))
         db.send_create_signal('chunks', ['Assignment'])
 
@@ -23,6 +25,9 @@ class Migration(SchemaMigration):
             ('assignment', self.gf('django.db.models.fields.related.ForeignKey')(related_name='submissions', to=orm['chunks.Assignment'])),
             ('author', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='submissions', null=True, to=orm['auth.User'])),
             ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('revision', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
+            ('revision_date', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
+            ('duedate', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
         ))
         db.send_create_signal('chunks', ['Submission'])
 
@@ -122,7 +127,9 @@ class Migration(SchemaMigration):
         'chunks.assignment': {
             'Meta': {'object_name': 'Assignment', 'db_table': "u'assignments'"},
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'duedate': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'max_extension': ('django.db.models.fields.IntegerField', [], {'default': '3'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'chunks.chunk': {
@@ -156,8 +163,11 @@ class Migration(SchemaMigration):
             'assignment': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['chunks.Assignment']"}),
             'author': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'submissions'", 'null': 'True', 'to': "orm['auth.User']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'duedate': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+            'revision': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'revision_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'})
         },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
