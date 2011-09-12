@@ -90,7 +90,7 @@ def load_users():
     return user_map
 
 
-def load_chunks(assignment, user_map):
+def load_chunks(assignment, user_map, django_user):
     chunks = []
     chunk_map = {}
     submissions = {}
@@ -98,6 +98,7 @@ def load_chunks(assignment, user_map):
     django_submissions = assignment.submissions.values().all()
     django_chunks = models.Chunk.objects \
             .filter(file__submission__assignment=assignment) \
+            .exclude(file__submission__author=django_user) \
             .values('id', 'name', 'cluster_id', 'file__submission')
     django_tasks = Task.objects.filter(
             chunk__file__submission__assignment=assignment) \
@@ -251,8 +252,9 @@ def assign_tasks(assignment, django_user):
         return 0
 
     user_map = load_users()
-    chunks = load_chunks(assignment, user_map)
     user = user_map[django_user.id]
+    chunks = load_chunks(assignment, user_map, django_user)
+
 
     assigned = 0
     for chunk_id in find_chunks(user, chunks, assign_count):
