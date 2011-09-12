@@ -8,6 +8,7 @@ from django.contrib import auth
 
 from chunks import models
 from models import Task
+import random
 import app_settings
 
 __all__ = ['assign_tasks']
@@ -197,7 +198,7 @@ def find_chunks(user, chunks, count):
         if cluster_count >= app_settings.CHUNKS_PER_CLUSTER:
             return 2
         else:
-            return -cluster_count
+            return cluster_count
 
     def make_chunk_sort_key(user):
         if user.role == 'staff':
@@ -230,6 +231,7 @@ def find_chunks(user, chunks, count):
         return
     for _ in itertools.repeat(None, count):
         # TODO consider using a priority queue here
+        random.shuffle(chunks)
         chunk_to_assign = min(chunks, key=key)
         if chunk_to_assign.assign_reviewer(user):
             yield chunk_to_assign.id

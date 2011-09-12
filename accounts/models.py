@@ -11,11 +11,11 @@ from django.conf import settings
 from django.dispatch import receiver
 
 class UserProfile(models.Model):
-    def get_photo_path(instance, filename):
-        return os.path.join(
-                settings.PROFILE_PHOTO_DIR, 
-                instance.user.username, 
-                filename)
+    # def get_photo_path(instance, filename):
+    #     return os.path.join(
+    #             settings.PROFILE_PHOTO_DIR, 
+    #             instance.user.username, 
+    #             filename)
 
     ROLE_CHOICES = (
         ('T', 'Teaching staff'),
@@ -28,7 +28,7 @@ class UserProfile(models.Model):
         ('SP13', "Spring 2013"),
     )
     user = models.OneToOneField(User, related_name='profile')
-    photo = ImageField(upload_to=get_photo_path)
+    # photo = ImageField(upload_to=get_photo_path)
     assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
         related_name='reviewers')
     reputation = models.IntegerField(default=0, editable=False)
