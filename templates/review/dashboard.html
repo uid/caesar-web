@@ -64,9 +64,10 @@ reviewing instructions</a> on Stellar if you haven't already.</p>
         {%if submission.assignment.duedate != submission.duedate %}
         <span class="red-text"> </br> Extended to: {{submission.duedate}} </span>
         {% endif %}
-        {%if user.profile.extension_days != 0 or submission.assignment.duedate != submission.duedate %}
-            <span class="=submit-text"><a href="{% url review.views.request_extension submission.assignment.id %}"> request extension</a></td>
-        {%endif%}
+    </td>
+    {%if user.profile.extension_days != 0 or submission.assignment.duedate != submission.duedate %}
+        <td class="=grey-text"><a href="{% url review.views.request_extension submission.assignment.id %}"> request extension</a></td>
+    {%endif%}
     </td>
 
   </tr>
@@ -113,8 +114,7 @@ reviewing instructions</a> on Stellar if you haven't already.</p>
   {% for task in active_tasks.all %}
     {% include "review/task.html" %}
   {% empty %}
-  No functions left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>.
-  {% endfor %}
+ No tasks left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>.  {% endfor %}
 </div>
 
 <h2 class="task-header">code recently reviewed</h2>
@@ -122,7 +122,7 @@ reviewing instructions</a> on Stellar if you haven't already.</p>
   {% for task in completed_tasks.all %}
     {% include "review/task.html" %}
   {% empty %}
-  No tasks found
+  No tasks found.
   {% endfor %}
 </div>
 
