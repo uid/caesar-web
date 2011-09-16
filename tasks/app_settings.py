@@ -1,8 +1,8 @@
 from django.conf import settings
 
 CHUNKS_PER_ROLE = getattr(settings, 'TASKS_CHUNKS_PER_ROLE', {
-    'student': 7,
-    'staff': 16,
+    'student': 10,
+    'staff': 20,
     'other': 5,
 })
 
