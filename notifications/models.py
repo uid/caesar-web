@@ -76,25 +76,26 @@ NEW_REPLY_SUBJECT_TEMPLATE = Template(
 
 @receiver(post_save, sender=Comment)
 def send_comment_notification(sender, instance, created=False, **kwargs):
-    if created:
-        submission_author = instance.chunk.file.submission.author
-        site = Site.objects.get_current()
-        context = Context({
-            'site': site,
-            'comment': instance,
-            'chunk': instance.chunk
-        })
-        if submission_author and submission_author.email:
-            to = submission_author.email
-            subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
-            send_templated_mail(
-                    subject, None, (to,), 'new_submission_comment', 
-                    context, template_prefix='notifications/')
-        if instance.parent and instance.parent.author.email \
-                and instance.parent.author != instance.author:
-            to = instance.parent.author.email
-            subject = NEW_REPLY_SUBJECT_TEMPLATE.render(context)
-            send_templated_mail(
-                    subject, None, (to,), 'new_reply', 
-                    context, template_prefix='notifications/')
+    pass
+    # if created:
+    #     submission_author = instance.chunk.file.submission.author
+    #     site = Site.objects.get_current()
+    #     context = Context({
+    #         'site': site,
+    #         'comment': instance,
+    #         'chunk': instance.chunk
+    #     })
+    #     if submission_author and submission_author.email:
+    #         to = submission_author.email
+    #         subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
+    #         send_templated_mail(
+    #                 subject, None, (to,), 'new_submission_comment', 
+    #                 context, template_prefix='notifications/')
+    #     if instance.parent and instance.parent.author.email \
+    #             and instance.parent.author != instance.author:
+    #         to = instance.parent.author.email
+    #         subject = NEW_REPLY_SUBJECT_TEMPLATE.render(context)
+    #         send_templated_mail(
+    #                 subject, None, (to,), 'new_reply', 
+    #                 context, template_prefix='notifications/')
 
