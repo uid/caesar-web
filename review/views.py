@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required 
 from django.contrib.admin.views.decorators import staff_member_required
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from chunks.models import Chunk, Assignment, Submission
 from tasks.models import Task
@@ -233,6 +233,8 @@ def change_task(request):
 @login_required
 def summary(request, username):
     participant = User.objects.get(username__exact=username)
+    if not participant:
+        raise Http404
     assignment_data = []
     #get all assignments
     assignments = Assignment.objects.all()
@@ -273,6 +275,8 @@ def allusers(request):
 @login_required
 def all_activity(request, assign, username):
     participant = User.objects.get(username__exact=username)
+    if not particiapnt:
+        raise Http404
     user = request.user
     #get all assignments
     assignment = Assignment.objects.get(id__exact=assign)

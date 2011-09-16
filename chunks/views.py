@@ -60,6 +60,8 @@ def view_chunk(request, chunk_id):
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
     files = File.objects.filter(submission=submission_id).select_related('chunks')
+    if not files:
+        raise Http404
     assignment_name = files[0].submission.assignment.name
     paths = []
     user_stats = []

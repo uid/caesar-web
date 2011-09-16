@@ -27,6 +27,7 @@ DATABASES = {
 }
 
 EMAIL_HOST = 'localhost'
+DEFAULT_FROM_EMAIL = 'caesar@csail.mit.edu'
 EMAIL_PORT = 25
 EMAIL_SUBJECT_PREFIX = '[Caesar] '
 SERVER_EMAIL = 'Caesar code reviewing system <caesar@csail.mit.edu>'
