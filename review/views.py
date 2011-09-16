@@ -275,7 +275,7 @@ def allusers(request):
 @login_required
 def all_activity(request, assign, username):
     participant = User.objects.get(username__exact=username)
-    if not particiapnt:
+    if not participant:
         raise Http404
     user = request.user
     #get all assignments
