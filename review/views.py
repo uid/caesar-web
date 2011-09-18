@@ -237,7 +237,7 @@ def summary(request, username):
         raise Http404
     assignment_data = []
     #get all assignments
-    assignments = Assignment.objects.all()
+    assignments = Assignment.objects.all().order_by('created').reverse()
     for assignment in assignments: 
         #get all comments that the user wrote
         comments = Comment.objects.filter(author=participant).filter(chunk__file__submission__assignment = assignment).select_related('chunk')
