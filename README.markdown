@@ -122,7 +122,7 @@ it will live at `/var/django/caesar`:
     sudo chmod g+w .
     sudo chmod g+s .
     cd ..
-    git clone git://github.com/masont/caesar-web.git caesar
+    git clone git://github.com:uid/caesar-web.git caesar
 
 Finally, Caesar itself needs some setup:
 
