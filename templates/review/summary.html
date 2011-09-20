@@ -43,17 +43,21 @@ $(document).ready(function() {
 {% for assignment, review_data in assignment_data %}
 
 <h3 class="assignment-display">
-    <a name="assignment-display"></a> {{ assignment.name }}
-    <div class="view-all-activity">
-        <a href="{% url review.views.all_activity assignment.id participant.username %}"> view with code</a>
-    </div>
+  <a name="assignment-display"></a> {{ assignment.name }}
+  <div class="view-all-activity">
+    <a href="{% url review.views.all_activity assignment.id participant.username %}"> view with code</a>
+  </div>
 </h3>
 <table class="assignment-stream">
   {% for type, comment, snippet, is_vote, vote in review_data %}
-  <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}{% else %}votedown-{{comment.id}}-{{comment.chunk.id}}{% endif %}{% else %}comment-{{comment.id}}-{{comment.chunk.id}}{% endif %}" class="activity-line">
+  <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}
+                          {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
+                          {% endif %}
+          {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
+          {% endif %}" class="activity-line">
     <td><span class="type" id="{{type}}" title="{{type}}">
     </span></td>
-    <td class="black-text"> {{ snippet }} </td>
+    <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
     <td class="grey-text"> {{ comment.chunk.name }} </td>
     <td class="grey-text"> {{ comment.modified }} </td>
   </tr>
