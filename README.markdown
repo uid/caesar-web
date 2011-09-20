@@ -111,6 +111,10 @@ To install Caesar's Python dependencies, just run:
 
     cd /var/django/caesar
     sudo pip-2.7 install -r requirements.txt
+    
+Note: This may not install ldap correctly if you're running OS X. If importing ldap causes errors, run:
+
+    pip-2.7 install python-ldap==2.3.13    
 
 ### Initializing the application
 Now, checkout the code (creating any necessary directories). Caesar assumes that
@@ -122,7 +126,7 @@ it will live at `/var/django/caesar`:
     sudo chmod g+w .
     sudo chmod g+s .
     cd ..
-    git clone git://github.com/masont/caesar-web.git caesar
+    git clone git://github.com:uid/caesar-web.git caesar
 
 Finally, Caesar itself needs some setup:
 
