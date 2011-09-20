@@ -172,6 +172,14 @@ function expandAllComments() {
     $('.comment').stop(true, true).switchClass('collapsed', 'expanded', 'fast');
 };
 
+function collapseAllAutoComments() {
+    $('.comment-auto').stop(true, true).switchClass('expanded', 'collapsed', 'fast');
+};
+
+function expandAllAutoComments() {
+    $('.comment-auto').stop(true, true).switchClass('collapsed', 'expanded', 'fast');
+};
+
 function scrollCodeTo(comment, doScroll, callback) {
     if (doScroll === undefined) {
         doScroll = true;
@@ -549,6 +557,23 @@ $('#toggle-comments-button').click(function() {
         state = 'collapse';
     }
     $(this).text(toggleCommentsText[state]).data('state', state);
+});
+
+var toggleAutoCommentsText = {
+    collapse: 'Collapse all checkstyle comments', 
+    expand: 'Expand all checkstyle comments'
+};
+$('#toggle-auto-comments-button').data('state', 'collapse');
+$('#toggle-auto-comments-button').click(function() {
+    var state = $(this).data('state');
+    if (state === 'collapse') {
+        collapseAllAutoComments();
+        state = 'expand';
+    } else {
+        expandAllAutoComments();
+        state = 'collapse';
+    }
+    $(this).text(toggleAutoCommentsText[state]).data('state', state);
 });
 
 var toggleInstructionsText = {
