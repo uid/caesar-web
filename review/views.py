@@ -48,9 +48,10 @@ def dashboard(request):
     #get all the submissions that the user submitted
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('files__chunks__comments__modified').reverse() \
+        .order_by('files__chunks__comments__modified')\
         .select_related('chunk__file__assignment') \
-        .annotate(last_modified=Max('files__chunks__comments__modified'))
+        .annotate(last_modified=Max('files__chunks__comments__modified'))\
+        .reverse()
     
     submission_data = []
     for submission in submissions:
@@ -389,9 +390,10 @@ def student_dashboard(request, username):
     #get all the submissions that the participant submitted
     submissions = Submission.objects.filter(name=participant.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('files__chunks__comments__modified').reverse() \
+        .order_by('files__chunks__comments__modified')\
         .select_related('chunk__file__assignment') \
-        .annotate(last_modified=Max('files__chunks__comments__modified'))
+        .annotate(last_modified=Max('files__chunks__comments__modified'))\
+        .reverse()
     
     submission_data = []
     for submission in submissions:
