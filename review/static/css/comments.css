@@ -39,6 +39,10 @@
     -webkit-border-top-right-radius: 0px;
 }
 
+.comment.comment-auto {
+    color: #888;
+}
+
 .comment-header {
     font-size: 10px;
     border-bottom: 1px dashed #ddd;
