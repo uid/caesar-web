@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script>
+$(document).ready(function() {
+
+    $('.submission-line').click(function(e) {
+      var submission_id = this.id.split('-')[1];
+      window.location = "/chunks/submission/all/" + submission_id;
+      return false;
+    });
+    $('.task-line').click(function(e) {
+      var chunkId = this.id.split('-')[2];
+      window.location = "/chunks/view/" + chunkId;
+      return false;
+    });
+
+    var toggleInstructionsText = [ 'Hide instructions', 'Show instructions' ];
+    var textIndex = 0;
+    $('#toggle-instructions-button').click(function() {
+        $('#instructions-text').toggle(400);
+        textIndex = 1 - textIndex;
+        $(this).text(toggleInstructionsText[textIndex]);
+    });
+
+});
+</script>
+
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+{% endblock %}
+
+{% block secondary-toolbar %}
+<div id="secondary-toolbar-inner">
+  <div id="instructions-text">
+    <p>Welcome to Caesar, the 6.005 code reviewing system.
+    Please read the <a 
+href="https://stellar.mit.edu/S/course/6/fa11/6.005/courseMaterial/topics/topic1/resource/text/text">code 
+reviewing instructions</a> on Stellar if you haven't already.</p>
+    <p>The problem set being reviewed now is <a href="http://web.mit.edu/6.005/www/fa11/psets/ps1/assignment.html"> PS1: PiPoetry. </a> </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% if participant.profile.is_student %}
+<div class="assignment-header">
+    <h2 class="task-header">current assignments</h2>
+</div>
+
+<table class="current-assignment">
+  {% for submission in current_submissions %}
+  <tr class="assignment-line">
+    <td class="black-text"> {{ submission.assignment.name }} </td>
+    <td class="grey-text"> Due on: {{ submission.assignment.duedate }} 
+        {%if submission.assignment.duedate != submission.duedate %}
+        <span class="red-text"> </br> Extended to: {{submission.duedate}} </span>
+        {% endif %}
+    </td>
+    {%if participant.profile.extension_days != 0 or submission.assignment.duedate != submission.duedate %}
+        <td class="=grey-text">[ {{participant.profile.extension_days}} slack days left] </td>
+    {%endif%}
+    </td>
+
+  </tr>
+  {% empty %}
+  {% endfor %}
+</table>
+
+
+<h2 class="task-header">submitted assignments</h2>
+<div class="task-list">
+  {% for submission, reviewer_count, last_modified, user_comments, static_comments in submission_data %}
+  
+  <div id ="submission-{{submission.id}}" class="submission-line">
+    <span class="chunk-name">
+      {{ submission.assignment.name }}
+    </span>
+    <span class="task-stats">
+      <span class="reviewer-count" title="Reviewers">
+          {{ reviewer_count }}
+      </span>
+      <span class="comment-count" title="User Comments">
+        {{ user_comments }}
+      </span>
+      <span class="robot-count" title="Automatic Comments">
+        {{ static_comments }}
+      </span>
+    </span>
+    <span class="task-snippet">
+      {{ last_modified }}
+    </span>
+  </div>
+  {% empty %}
+  {% endfor %}
+</div>
+{% endif %}
+<div class="span-24">
+{% if new_task_count > 0 %}
+<div class="success">
+  You have {{ new_task_count }} new review task{{ new_task_count|pluralize }}.
+</div>
+{% endif %}
+<h2 class="task-header">code to review</h2>
+<div class="task-list">
+  {% for task in active_tasks.all %}
+    {% include "review/task.html" %}
+  {% empty %}
+ No tasks left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>.  {% endfor %}
+</div>
+
+<h2 class="task-header">code recently reviewed</h2>
+<div class="task-list">
+  {% for task in completed_tasks.all %}
+    {% include "review/task.html" %}
+  {% empty %}
+  No tasks found.
+  {% endfor %}
+</div>
+
+
+</div>
+{% endblock %}

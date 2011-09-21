@@ -9,6 +9,7 @@ from django.contrib import auth
 from chunks import models
 from models import Task
 import random
+import sys
 import app_settings
 
 __all__ = ['assign_tasks']

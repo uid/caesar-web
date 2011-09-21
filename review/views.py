@@ -48,7 +48,7 @@ def dashboard(request):
     #get all the submissions that the user submitted
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('files__chunks__comments__modified') \
+        .order_by('files__chunks__comments__modified').reverse() \
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))
     
@@ -360,3 +360,55 @@ def request_extension(request, assignment_id):
             return redirect('review.views.dashboard')
         except ValueError:
             return redirect('review.views.dashboard')
+
+@login_required
+def student_dashboard(request, username):
+    participant = User.objects.get(username=username)
+    user = request.user
+    if participant.profile.role != 'S' or user.profile.role != 'T':
+        raise Http404
+    new_task_count = 0
+    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
+        active_sub = Submission.objects.filter(name=participant.username).filter(assignment=assignment)
+        #do not give tasks to students who got extensions
+        if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
+            new_task_count += assign_tasks(assignment, participant)
+    
+    active_tasks = participant.get_profile().tasks \
+        .select_related('chunk__file__submission_assignment') \
+        .exclude(status='C') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+
+    completed_tasks = participant.get_profile().tasks \
+        .select_related('chunk__file__submission__assignment') \
+        .filter(status='C') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+   
+    #get all the submissions that the participant submitted
+    submissions = Submission.objects.filter(name=participant.username) \
+        .filter(duedate__lt=datetime.datetime.now()) \
+        .order_by('files__chunks__comments__modified').reverse() \
+        .select_related('chunk__file__assignment') \
+        .annotate(last_modified=Max('files__chunks__comments__modified'))
+    
+    submission_data = []
+    for submission in submissions:
+        user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
+        static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
+        reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
+        submission_data.append((submission, reviewer_count, submission.last_modified, 
+                                  user_comments, static_comments))
+    
+    #find the current assignments
+    current_submissions = Submission.objects.filter(name=participant.username).filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
+    
+    return render(request, 'review/student_dashboard.html', {
+        'participant': participant,
+        'active_tasks': active_tasks,
+        'completed_tasks': completed_tasks,
+        'new_task_count': new_task_count,
+        'submission_data': submission_data,
+        'current_submissions': current_submissions,
+    })
