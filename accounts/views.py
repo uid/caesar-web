@@ -41,6 +41,7 @@ def register(request):
         redirect_to = request.POST.get('next', '/')
         # create a new user
         form = UserForm(request.POST)
+        #check if username, first_name, or last_name ar in the list of permitted users
         if form.is_valid():
             user = form.save()
         username = request.POST['username']

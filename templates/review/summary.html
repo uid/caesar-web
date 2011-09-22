@@ -37,7 +37,7 @@ $(document).ready(function() {
 {% block content %}
 
 <h2 class="task-header">{{participant.username}}</h2> 
-{%if participant.profile.is_student %}
+{%if participant.profile.is_student and user.profile.is_staff %}
     <a class="breadcrumb first-breadcrumb" href="{% url review.views.student_dashboard participant.username%}"> [Student Dashboard]</a> {%endif%}
 <h4 class="task header"> reputation: {{participant.profile.reputation}}
 

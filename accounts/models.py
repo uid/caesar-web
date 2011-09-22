@@ -37,6 +37,7 @@ class UserProfile(models.Model):
     extension_days = models.IntegerField(default=5)
     semester_taken = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
                                       blank=True, null=True)
+    
     def __unicode__(self):
         return self.user.__unicode__()
 
