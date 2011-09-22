@@ -34,7 +34,8 @@ $(document).ready(function() {
 <table class="assignment-stream">
   {% for participant in participants %}
   <tr id="participant-{{participant.username}}" class="activity-line">
-    <td class="black-text"> {{ participant.username }} </td>
+    <td class="black-text"> {{ participant.first_name }} {{ participant.last_name }}</td>
+    <td class="grey-text"> {{ participant.username }} </td>
     <td class="grey-text"> {{ participant.profile.reputation }} </td>
     <td class="grey-text"> {%if participant.profile.role %}[{{ participant.profile.role }}] {%endif%}</td>
   </tr>
