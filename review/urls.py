@@ -13,4 +13,5 @@ urlpatterns = patterns('review.views',
     (r'^allusers/', 'allusers'),
     (r'activity/(?P<assign>\d+)/(?P<username>\w+)', 'all_activity'),
     (r'^request_extension/(?P<assignment_id>\d+)', 'request_extension'),
+    (r'^dashboard/(?P<username>\w+)', 'student_dashboard'),
 )

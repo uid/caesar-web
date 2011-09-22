@@ -9,6 +9,7 @@ from django.contrib import auth
 from chunks import models
 from models import Task
 import random
+import sys
 import app_settings
 
 __all__ = ['assign_tasks']
@@ -212,10 +213,14 @@ def find_chunks(user, chunks, count):
             return chunk_sort_key
         else:
             def chunk_sort_key(chunk):
+                review_priority = len(chunk.reviewers)
+                if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
+                    review_priority=-len(chunk.reviewers)
+                
                 return (
                     user in chunk.reviewers,
                     user is chunk.submission.author,
-                    len(chunk.reviewers) >= app_settings.REVIEWERS_PER_CHUNK,
+                    review_priority,
                     cluster_score(user, chunk),
                     -cluster_sizes[chunk.cluster_id],
                     -len(chunk.reviewers),
