@@ -19,6 +19,9 @@
         {% endfor %}
 
         {% endfor %}
+        {% if invalid_invitation %}
+            <p class="error">{{ invalid_invitation }}</p>
+        {% endif %}
         <button type="submit">Register</button>
 
     </form>
