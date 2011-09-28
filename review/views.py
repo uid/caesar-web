@@ -84,11 +84,12 @@ def student_stats(request):
         total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
         total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
         total_tasks = Task.objects.filter(chunk__file__submission__assignment=assignment).count()
+        assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__assignment=assignment).distinct().count()
         total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__assignment=assignment).distinct().count()
         total_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).count()
         total_checkstyle = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='S').count()
         total_user_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='U').count()
-        assignment_data.append( (assignment.name, total_chunks, total_extension, total_tasks, total_chunks_with_human, total_comments, total_checkstyle, total_user_comments) )
+        assignment_data.append( (assignment.name, total_chunks, total_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_user_comments) )
     return render(request, 'review/studentstats.html', {
         'assignment_data': assignment_data,
         'total_students': total_students,
