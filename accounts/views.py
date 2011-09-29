@@ -6,8 +6,10 @@ from django.contrib import auth
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
 from limit_registration import check_name
+from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Token
 import datetime
+import sys
 
 def login(request):
     if request.method == 'GET':
@@ -34,13 +36,32 @@ def login(request):
             'form': form,
             'next': redirect_to
         })
-
-def register(request, code):
-    token = get_object_or_404(Token, code=code)
-    invalid_invitation = ""
-    if token.expire < datetime.datetime.now():
-        raise Http404
+def invalid_registration(request):
+    invalid_invitation = "Sorry, you need an invitation token to register. Please contact caesar@csail.mit.edu to \
+                            get an invitation to register. "
+    return render(request, 'accounts/invalidreg.html', {
+        'invalid_invitation': invalid_invitation,
+    })
     
+def register(request, code):
+    sys.stderr.write('In register. \n')
+    invalid_invitation = ""
+    token = None
+    try:
+        token = Token.objects.get(code=code)
+    except  ObjectDoesNotExist:
+        sys.stderr.write('Failed.')
+        invalid_invitation = "Sorry, your token does not exist. Please contact caesar@csail.mit.edu to get a new\
+                                invitation to register."
+        return render(request, 'accounts/invalidreg.html', {
+            'invalid_invitation': invalid_invitation,
+        })
+    if token.expire < datetime.datetime.now():
+        invalid_invitation = "Sorry, your token has expired. Please contact caesar@csail.mit.edu to get a new\
+                                invitation to register"
+        return render(request, 'accounts/invalidreg.html', {
+            'invalid_invitation': invalid_invitation,
+        })
     if request.method == 'GET':
         redirect_to = request.GET.get('next', '/')
         # render a registration form

@@ -6,7 +6,7 @@ urlpatterns = patterns('',
     }),
     (r'logout/', 'django.contrib.auth.views.logout'),
     (r'register/(?P<code>[0-9A-Za-z]+)', 'accounts.views.register'),
-
+    (r'register/', 'accounts.views.invalid_registration'),
     (r'^reset/$', 'django.contrib.auth.views.password_reset', 
                   {'template_name': 'accounts/reset.html'}),
     (r'^reset/done/$', 'django.contrib.auth.views.password_reset_done',
