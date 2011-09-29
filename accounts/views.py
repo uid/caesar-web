@@ -37,8 +37,7 @@ def login(request):
             'next': redirect_to
         })
 def invalid_registration(request):
-    invalid_invitation = "Sorry, you need an invitation token to register. Please contact caesar@csail.mit.edu to \
-                            get an invitation to register. "
+    invalid_invitation = "Sorry, this invitation has expired. "
     return render(request, 'accounts/invalidreg.html', {
         'invalid_invitation': invalid_invitation,
     })
@@ -51,14 +50,12 @@ def register(request, code):
         token = Token.objects.get(code=code)
     except  ObjectDoesNotExist:
         sys.stderr.write('Failed.')
-        invalid_invitation = "Sorry, your token does not exist. Please contact caesar@csail.mit.edu to get a new\
-                                invitation to register."
+        invalid_invitation = "Sorry, this invitation has expired."
         return render(request, 'accounts/invalidreg.html', {
             'invalid_invitation': invalid_invitation,
         })
     if token.expire < datetime.datetime.now():
-        invalid_invitation = "Sorry, your token has expired. Please contact caesar@csail.mit.edu to get a new\
-                                invitation to register"
+        invalid_invitation = "Sorry, this invitation has expired."
         return render(request, 'accounts/invalidreg.html', {
             'invalid_invitation': invalid_invitation,
         })
