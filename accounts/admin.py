@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
-from accounts.models import UserProfile
+from accounts.models import UserProfile, Token
 from sorl.thumbnail.admin import AdminImageMixin
  
 admin.site.unregister(User)
@@ -13,3 +13,4 @@ class UserProfileAdmin(UserAdmin):
     inlines = [UserProfileInline]
  
 admin.site.register(User, UserProfileAdmin)
+admin.site.register(Token)

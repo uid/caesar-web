@@ -1,5 +1,5 @@
 import os
-
+import datetime
 from chunks.models import Chunk
 
 from sorl.thumbnail import ImageField
@@ -9,6 +9,10 @@ from django.db.models.signals import post_save
 from django.contrib.auth.models import User
 from django.conf import settings
 from django.dispatch import receiver
+
+class Token(models.Model):
+    expire = models.DateTimeField(null=True, blank=True)
+    code = models.CharField(null=True, blank=True, max_length=20)
 
 class UserProfile(models.Model):
     # def get_photo_path(instance, filename):
@@ -38,6 +42,7 @@ class UserProfile(models.Model):
     semester_taken = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
                                       blank=True, null=True)
     
+    token = models.ForeignKey(Token, related_name='invited', default=None, null=True)
     def __unicode__(self):
         return self.user.__unicode__()
 
@@ -55,4 +60,4 @@ def create_user_profile(sender, instance, created, **kwargs):
         # if created:
         #     profile.role = 'S'
         #     profile.save()
-        
+    

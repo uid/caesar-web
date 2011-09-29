@@ -3,9 +3,11 @@ from accounts.forms import *
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate 
 from django.contrib import auth
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
 from limit_registration import check_name
+from accounts.models import Token
+import datetime
 
 def login(request):
     if request.method == 'GET':
@@ -33,8 +35,12 @@ def login(request):
             'next': redirect_to
         })
 
-def register(request):
+def register(request, code):
+    token = get_object_or_404(Token, code=code)
     invalid_invitation = ""
+    if token.expire < datetime.datetime.now():
+        raise Http404
+    
     if request.method == 'GET':
         redirect_to = request.GET.get('next', '/')
         # render a registration form
@@ -52,6 +58,8 @@ def register(request):
         username = request.POST['username']
         password = request.POST['password1']
         user = authenticate(username=username, password=password)
+        user.profile.token = token
+        user.profile.save()
         if user is not None:
             if user.is_active:
                 auth.login(request, user)
