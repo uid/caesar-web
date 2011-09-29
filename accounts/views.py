@@ -58,9 +58,9 @@ def register(request, code):
         username = request.POST['username']
         password = request.POST['password1']
         user = authenticate(username=username, password=password)
-        user.profile.token = token
-        user.profile.save()
         if user is not None:
+            user.profile.token = token
+            user.profile.save()
             if user.is_active:
                 auth.login(request, user)
                 return HttpResponseRedirect(redirect_to)
