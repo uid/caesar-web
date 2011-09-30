@@ -18,6 +18,6 @@ def check_name(first, last, email):
     user_parts = get_names()
     if email.lower() in user_parts:
         return True
-    if first.lower() in user_parts and last.lower() in user_parts:
+    if first.lower() in user_parts or last.lower() in user_parts:
         return True
     return False
