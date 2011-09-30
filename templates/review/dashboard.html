@@ -39,15 +39,7 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block secondary-toolbar %}
-<div id="secondary-toolbar-inner">
-  <div id="instructions-text">
-    <p>Welcome to Caesar, the 6.005 code reviewing system.
-    Please read the <a 
-href="https://stellar.mit.edu/S/course/6/fa11/6.005/courseMaterial/topics/topic1/resource/text/text">code 
-reviewing instructions</a> on Stellar if you haven't already.</p>
-    <p>The problem set being reviewed now is <a href="http://web.mit.edu/njoliat/www/ps2/ps2.html"> PS2: Midi Piano. </a> </p>
-  </div>
-</div>
+{% include "review/dashboard_toolbar.html" %}
 {% endblock %}
 
 {% block content %}
