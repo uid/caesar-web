@@ -14,10 +14,10 @@ def get_names():
     
     return user_parts
     
-def check_name(first, last, email):
+def check_name(first, last, email, username):
     user_parts = get_names()
     if email.lower() in user_parts:
         return True
-    if first.lower() in user_parts or last.lower() in user_parts:
+    if first.lower() in user_parts or last.lower() in user_parts or username.lower() in user_parts:
         return True
     return False

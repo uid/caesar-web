@@ -68,7 +68,7 @@ def register(request, code):
         # create a new user
         form = UserForm(request.POST)
         #check if username, first_name, or last_name ar in the list of permitted users
-        valid_name = check_name(request.POST['first_name'], request.POST['last_name'], request.POST['email'])
+        valid_name = check_name(request.POST['first_name'], request.POST['last_name'], request.POST['email'], request.POST['username'])
         if not valid_name:
             invalid_invitation = "Your name/email does not appear on the invitation list."
         if form.is_valid() and valid_name:
