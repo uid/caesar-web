@@ -136,7 +136,7 @@ def load_chunks(assignment, user_map, django_user):
     return chunks
 
 
-def find_chunks(user, chunks, count):
+def find_chunks(user, chunks, count, total_fewer):
     """
     Computes the IDs of the chunks for this user to review on this assignment.
 
@@ -200,7 +200,8 @@ def find_chunks(user, chunks, count):
             return 2
         else:
             return -cluster_count
-
+        
+        
     def make_chunk_sort_key(user):
         if user.role == 'staff':
             def chunk_sort_key(chunk):
@@ -216,14 +217,15 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority=-len(chunk.reviewers)
-                
+                if total_fewer < 41:
+                    if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK:
+                        review_priority=0
                 return (
                     user in chunk.reviewers,
                     user is chunk.submission.author,
                     review_priority,
                     cluster_score(user, chunk),
                     -cluster_sizes[chunk.cluster_id],
-                    -len(chunk.reviewers),
                     len(chunk.submission.reviewers),
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
@@ -264,12 +266,22 @@ def assign_tasks(assignment, django_user):
     chunks = load_chunks(assignment, user_map, django_user)
 
 
+    def count_chunks_fewer_reviewers_than_goal():
+        total_fewer = 0
+        for chunk in chunks:
+            if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK and len(chunk.reviewers) > 0:
+                total_fewer += 1
+        return total_fewer
+    
+    fewer = count_chunks_fewer_reviewers_than_goal()
+    
     assigned = 0
-    for chunk_id in find_chunks(user, chunks, assign_count):
+    for chunk_id in find_chunks(user, chunks, assign_count, fewer):
         task = Task(reviewer=django_user.get_profile(), chunk_id=chunk_id)
         task.save()
         assigned += 1
         
+    
     return assigned
 
 
