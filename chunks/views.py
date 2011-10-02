@@ -142,7 +142,7 @@ def view_all_chunks(request, viewtype, submission_id):
         'code_only': code_only,
         'read_only': False,
         'comment_view': comment_view,
-        'full_view': False,
+        'full_view': True,
     })
 @login_required
 def submit_assignment(request, assignment_id):
