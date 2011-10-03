@@ -115,8 +115,8 @@ function showCommentForm(startLine, endLine, chunkId) {
             var elt = $(data);
             var index = model.computeIndex(startLine, endLine);
             $.each(model.comments, function(index, comment) {
-                if ((startLine == comment.start && endLine > comment.end)
-                    || startLine < comment.start) {
+                if (comment.chunk == chunkId && ((startLine == comment.start && endLine > comment.end)
+                    || startLine < comment.start)) {
                     $(comment.elt).before(elt);                        
                     added = true;
                     return false;
@@ -485,7 +485,7 @@ $('body').mousedown(function(e) {
 });
 
 if (caesar.state.fullView) {
-    $('#chunk-display').selectable({
+    $('div#chunk-display').selectable({
         filter: '.line',
         cancel: '.comment-marker',
         start: function(event, ui) {
