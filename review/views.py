@@ -345,7 +345,7 @@ def all_activity(request, assign, username):
         'assignment_data': assignment_data,
         'participant': participant,
         'activity_view': True,
-        'full_view': False
+        'full_view': True,
     })
 @login_required
 def request_extension(request, assignment_id):
