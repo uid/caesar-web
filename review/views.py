@@ -334,7 +334,7 @@ def all_activity(request, assign, username):
         staff_line_index = 0
         for number, line in highlighted:
             if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
-                if number == staff_lines[staff_line_index].end_line:
+                while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
                     staff_line_index += 1
                 highlighted_lines.append((number, line, True))
             else:

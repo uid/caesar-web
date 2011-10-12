@@ -134,6 +134,8 @@ class Chunk(models.Model):
         while file_data[first_line_offset] != '\n':
             first_line_offset -= 1
         first_line_offset += 1
+        if first_line_offset < 0:
+            first_line_offset=0
         first_line = file_data.count("\n", 0, first_line_offset) + 1
 
         # TODO: make tab expansion configurable
