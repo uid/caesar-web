@@ -92,6 +92,12 @@ class ChunkManager(models.Manager):
 
 
 class Chunk(models.Model):
+    CLASS_TYPE_CHOICES = (
+        ('ENUM', 'enum'),
+        ('EXCE', 'exception'),
+        ('TEST', 'test'),
+        ('NONE', 'none'),
+    )
     id = models.AutoField(primary_key=True)
     file = models.ForeignKey(File, related_name='chunks')
     name = models.CharField(max_length=200)
@@ -100,6 +106,11 @@ class Chunk(models.Model):
     cluster_id = models.IntegerField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    class_type = models.CharField(max_length=4, choices=CLASS_TYPE_CHOICES,
+                            blank=True, null=True)
+                            
+    staff_portion = models.IntegerField(default = 0)
+    
     objects = ChunkManager()
     class Meta:
         db_table = u'chunks'
@@ -130,6 +141,13 @@ class Chunk(models.Model):
         data = file_data[first_line_offset:self.end].expandtabs(4)
         self._data = textwrap.dedent(data)
         self._lines = list(enumerate(self.data.splitlines(), start=first_line))
+    
+    def staff_percentage(self):
+        markers = self.staffmarkers.all()
+        total_lines = 0
+        for marker in markers:
+            total_lines += marker.end_line - marker.start_line
+        return float(total_lines)/len(self.file.lines)
 
     def save(self, *args, **kwargs):
         super(Chunk, self).save(*args, **kwargs)
@@ -195,7 +213,6 @@ class Chunk(models.Model):
     def __unicode__(self):
         return u'%s' % (self.name,)
 
-
 class Fingerprint(models.Model):
     # This ID is basically useless, but Django currently doesn't support
     # composite primary keys
@@ -211,3 +228,7 @@ class Fingerprint(models.Model):
 
     def __unicode__(self):
         return u'%d: [%d, %d]' % (self.chunk_id, self.position, self.value)
+class StaffMarker(models.Model):
+    chunk = models.ForeignKey(Chunk, related_name='staffmarkers')
+    start_line = models.IntegerField(blank=True, null=True)
+    end_line = models.IntegerField(blank=True, null=True)

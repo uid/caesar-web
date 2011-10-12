@@ -1,4 +1,4 @@
-from chunks.models import Chunk, File, Assignment, Submission
+from chunks.models import Chunk, File, Assignment, Submission, StaffMarker
 from review.models import Comment, Vote, Star 
 from tasks.models import Task
 
@@ -22,6 +22,8 @@ def view_chunk(request, chunk_id):
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
 
+    staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
+
     def get_comment_data(comment):
         vote = user_votes.get(comment.id, None)
         snippet = chunk.generate_snippet(comment.start, comment.end)
@@ -35,8 +37,17 @@ def view_chunk(request, chunk_id):
     numbers, lines = zip(*chunk.lines)
     # highlight the code this way to correctly identify multi-line constructs
     # TODO implement a custom formatter to do this instead
-    highlighted_lines = zip(numbers, 
+    highlighted = zip(numbers, 
             highlight(chunk.data, lexer, formatter).splitlines())
+    highlighted_lines = []
+    staff_line_index = 0
+    for number, line in highlighted:
+        if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
+            if number == staff_lines[staff_line_index].end_line:
+                staff_line_index += 1
+            highlighted_lines.append((number, line, True))
+        else:
+            highlighted_lines.append((number, line, False)) 
     
     task_count = Task.objects.filter(reviewer=user.get_profile()) \
             .exclude(status='C').count()
@@ -81,11 +92,24 @@ def view_all_chunks(request, viewtype, submission_id):
     lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     for afile in files:
+        staff_lines = StaffMarker.objects.filter(chunk__file=afile).order_by('start_line', 'end_line')
+        
         #prepare the file - get the lines that are part of chunk and the ones that aren't
         highlighted_lines_for_file = []
         numbers, lines = zip(*afile.lines)
-        highlighted_lines = zip(numbers, 
+        highlighted = zip(numbers, 
                 highlight(afile.data, lexer, formatter).splitlines())
+                
+        highlighted_lines = []
+        staff_line_index = 0
+        for number, line in highlighted:
+            if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
+                if number == staff_lines[staff_line_index].end_line:
+                    staff_line_index += 1
+                highlighted_lines.append((number, line, True))
+            else:
+                highlighted_lines.append((number, line, False))        
+        
         chunks = afile.chunks.order_by('start')
         total_lines = len(afile.lines)
         offset = numbers[0]

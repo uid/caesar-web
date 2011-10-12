@@ -127,12 +127,20 @@ Next
 
 <div id="chunk-display" class="span-18 last">
   <div class="syntax">
-  {% for n, line in highlighted_lines %}
-  <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line">
+  {% for n, line, staff_code in highlighted_lines %}
+  {% if not staff_code %}
+  <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student">
     <span id="line-{{chunk.id}}-{{ n }}" class="line">
       <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
     </span>
   </span>
+  {% else %}
+  <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff">
+    <span id="line-{{chunk.id}}-{{ n }}" class="line">
+      <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+    </span>
+  </span>
+  {% endif %}
   {% endfor %}
   </div>
 </div>

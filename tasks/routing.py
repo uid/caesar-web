@@ -60,6 +60,8 @@ class Chunk:
         self.cluster_id = chunk['cluster_id']
         self.submission = submission
         self.reviewers = set()
+        self.class_type = chunk['class_type']
+        self.staff_portion = chunk['staff_portion']
 
     def assign_reviewer(self, user):
         if user in self.reviewers:
@@ -101,7 +103,7 @@ def load_chunks(assignment, user_map, django_user):
     django_chunks = models.Chunk.objects \
             .filter(file__submission__assignment=assignment) \
             .exclude(file__submission__author=django_user) \
-            .values('id', 'name', 'cluster_id', 'file__submission')
+            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'staff_portion')
     django_tasks = Task.objects.filter(
             chunk__file__submission__assignment=assignment) \
             .exclude(chunk__file__submission__author=django_user) \
@@ -205,9 +207,23 @@ def find_chunks(user, chunks, count, total_fewer):
     def make_chunk_sort_key(user):
         if user.role == 'staff':
             def chunk_sort_key(chunk):
+                review_priority = len(chunk.reviewers)
+                if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
+                    review_priority = 0
+                        
+                type_priority = 0
+                if (chunk.class_type == 'TEST'):
+                    type_priority = 2
+                elif (chunk.class_type == 'ENUM'):
+                    type_priority = 3
+                elif (chunk.class_type == 'EXCE'):
+                    type_priority = 4
                 return (
                     user in chunk.reviewers,
                     user is chunk.submission.author,
+                    review_priority,
+                    type_priority,
+                    chunk.staff_portion,
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
                 )
@@ -216,14 +232,21 @@ def find_chunks(user, chunks, count, total_fewer):
             def chunk_sort_key(chunk):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
-                    review_priority=-len(chunk.reviewers)
-                if total_fewer < 41:
-                    if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK:
-                        review_priority=0
+                    review_priority = 0
+                        
+                type_priority = 0
+                if (chunk.class_type == 'TEST'):
+                    type_priority = 2
+                elif (chunk.class_type == 'ENUM'):
+                    type_priority = 3
+                elif (chunk.class_type == 'EXCE'):
+                    type_priority = 4
                 return (
                     user in chunk.reviewers,
                     user is chunk.submission.author,
                     review_priority,
+                    type_priority,
+                    chunk.staff_portion,
                     cluster_score(user, chunk),
                     -cluster_sizes[chunk.cluster_id],
                     len(chunk.submission.reviewers),
@@ -238,7 +261,7 @@ def find_chunks(user, chunks, count, total_fewer):
         return
     for _ in itertools.repeat(None, count):
         # TODO consider using a priority queue here
-        random.shuffle(chunks)
+        #random.shuffle(chunks)
         chunk_to_assign = min(chunks, key=key)
         if chunk_to_assign.assign_reviewer(user):
             yield chunk_to_assign.id

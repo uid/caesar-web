@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404
 
-from chunks.models import Chunk, Assignment, Submission
+from chunks.models import Chunk, Assignment, Submission, StaffMarker
 from tasks.models import Task
 from tasks.routing import assign_tasks
 from models import Comment, Vote, Star 
@@ -324,8 +324,23 @@ def all_activity(request, assign, username):
         participant_votes = dict((vote.comment.id, vote.value) \
                 for vote in participant.votes.filter(comment__chunk=chunk.id))
         numbers, lines = zip(*chunk.lines)
-        highlighted_lines = zip(numbers, 
+        
+        staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
+        
+        highlighted = zip(numbers, 
                 highlight(chunk.data, lexer, formatter).splitlines())
+                
+        highlighted_lines = []
+        staff_line_index = 0
+        for number, line in highlighted:
+            if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
+                if number == staff_lines[staff_line_index].end_line:
+                    staff_line_index += 1
+                highlighted_lines.append((number, line, True))
+            else:
+                highlighted_lines.append((number, line, False))
+                
+                
         comments = chunk.comments.select_related('votes', 'author__profile')
         highlighted_comments = []
         highlighted_votes = []
@@ -395,11 +410,11 @@ def student_dashboard(request, username):
         raise Http404
     new_task_count = 0
     
-    # for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
-    #     active_sub = Submission.objects.filter(name=participant.username).filter(assignment=assignment)
-    #     #do not give tasks to students who got extensions
-    #     if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
-    #         new_task_count += assign_tasks(assignment, participant)
+    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
+        active_sub = Submission.objects.filter(name=participant.username).filter(assignment=assignment)
+        #do not give tasks to students who got extensions
+        if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
+            new_task_count += assign_tasks(assignment, participant)
     
     
     active_tasks = participant.get_profile().tasks \
