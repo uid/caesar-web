@@ -27,11 +27,11 @@ import sys
 def dashboard(request):
     user = request.user
     new_task_count = 0
-    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
-        active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
-        #do not give tasks to students who got extensions
-        if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
-            new_task_count += assign_tasks(assignment, user)
+    # for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
+    #     active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
+    #     #do not give tasks to students who got extensions
+    #     if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
+    #         new_task_count += assign_tasks(assignment, user)
     
     active_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission_assignment') \
@@ -48,7 +48,7 @@ def dashboard(request):
     #get all the submissions that the user submitted
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('files__chunks__comments__modified')\
+        .order_by('duedate')\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -410,11 +410,11 @@ def student_dashboard(request, username):
         raise Http404
     new_task_count = 0
     
-    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
-        active_sub = Submission.objects.filter(name=participant.username).filter(assignment=assignment)
-        #do not give tasks to students who got extensions
-        if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
-            new_task_count += assign_tasks(assignment, participant)
+    # for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
+    #     active_sub = Submission.objects.filter(name=participant.username).filter(assignment=assignment)
+    #     #do not give tasks to students who got extensions
+    #     if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
+    #         new_task_count += assign_tasks(assignment, participant)
     
     
     active_tasks = participant.get_profile().tasks \
