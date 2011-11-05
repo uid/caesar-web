@@ -218,6 +218,8 @@ def find_chunks(user, chunks, count, total_fewer):
                     type_priority = 3
                 elif (chunk.class_type == 'EXCE'):
                     type_priority = 4
+                if chunk.staff_portion <= 5:
+                    type_priority = 4
                 return (
                     user in chunk.reviewers,
                     user is chunk.submission.author,
@@ -240,6 +242,8 @@ def find_chunks(user, chunks, count, total_fewer):
                 elif (chunk.class_type == 'ENUM'):
                     type_priority = 3
                 elif (chunk.class_type == 'EXCE'):
+                    type_priority = 4
+                if chunk.staff_portion <= 5:
                     type_priority = 4
                 return (
                     user in chunk.reviewers,
