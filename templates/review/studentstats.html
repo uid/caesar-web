@@ -22,7 +22,7 @@
 <h2 class="task-header">Total Staff: {{ total_staff }}</h2>
 
 
-{% for name, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments in assignment_data %}
+{% for name, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, first_20_lines, twenty_to_fourty_lines, fourty_to_sixty_lines, more_than_sixty_lines in assignment_data %}
     <h2 class="task-header">{{ name }}</h2>
     <h4 class="task header"> total chunks: {{total_chunks}} </h4>
     <h4 class="task header"> alums participating: {{alums_participating}} </h4>
@@ -31,5 +31,10 @@
     <h4 class="task header"> assigned_chunks: {{ assigned_chunks }} </h4>
     <h4 class="task header"> total chunks with human comment: {{ total_chunks_with_human }} </h4>
     <h4 class="task header"> total comments: {{total_comments}}  --> checkstyle: {{total_checkstyle}} | user: {{total_user_comments}} | alum: {{total_alum_comments}} | student: {{total_student_comments}} | staff: {{total_staff_comments}}</h4>
+    <h4 class="task header"> comments in first 20 lines of code: {{first_20_lines}} </h4>
+    <h4 class="task header"> comments in 20-40 lines of code: {{twenty_to_fourty_lines}} </h4>
+    <h4 class="task header"> comments in 40-60 lines of code: {{fourty_to_sixty_lines}} </h4>
+    <h4 class="task header"> comments after 60 lines of code: {{more_than_sixty_lines}} </h4>
+    
 {%endfor %}
 {% endblock %}
