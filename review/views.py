@@ -82,14 +82,21 @@ def student_stats(request):
     assignment_data = []
     for assignment in assignments:
         total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
+        alums_participating = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__assignment=assignment).distinct().count()
         total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
+        one_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=1))
+        two_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=2))
+        three_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=3))
         total_tasks = Task.objects.filter(chunk__file__submission__assignment=assignment).count()
         assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__assignment=assignment).distinct().count()
         total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__assignment=assignment).distinct().count()
         total_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).count()
         total_checkstyle = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='S').count()
+        total_staff_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(author__profile__role='T').count()
+        total_student_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(author__profile__role='S').count()
         total_user_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='U').count()
-        assignment_data.append( (assignment.name, total_chunks, total_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_user_comments) )
+        total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
+        assignment_data.append( (assignment.name, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments) )
     return render(request, 'review/studentstats.html', {
         'assignment_data': assignment_data,
         'total_students': total_students,
