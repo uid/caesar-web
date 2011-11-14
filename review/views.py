@@ -74,11 +74,21 @@ def dashboard(request):
     
 @staff_member_required
 def student_stats(request):
+    assignments = Assignment.objects.all().order_by('duedate').reverse()
     total_students = User.objects.filter(profile__role='S').count()
     total_alum = User.objects.exclude(profile__role='S').exclude(profile__role='T').count()
+    all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T')
+    alum_stats = [0]*assignments.count()
+    for alum in all_alums:
+        alum_comments = alum.comments.all()
+        assignment_set = set()
+        for alum_comment in alum_comments:
+            assignment_set.add(alum_comment.chunk.file.submission.assignment)
+        count = len(assignment_set)
+        alum_stats[count] += 1
+    alum_stats = zip(range(assignments.count()), alum_stats)
     total_staff = User.objects.filter(profile__role='T').count()
     
-    assignments = Assignment.objects.all().order_by('duedate').reverse()
     assignment_data = []
     for assignment in assignments:
         total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
@@ -111,6 +121,7 @@ def student_stats(request):
         'assignment_data': assignment_data,
         'total_students': total_students,
         'total_alums': total_alum,
+        'alum_stats': alum_stats,
         'total_staff': total_staff,
     })
 

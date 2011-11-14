@@ -19,6 +19,9 @@
 
 <h2 class="task-header">Total Students: {{ total_students }}</h2>
 <h2 class="task-header">Total Alums: {{ total_alums }}</h2>
+{% for pset_num, alum_num in alum_stats %}
+{{alum_num}} alums participated in {{pset_num}} psets. <br/>
+{% endfor %}
 <h2 class="task-header">Total Staff: {{ total_staff }}</h2>
 
 
