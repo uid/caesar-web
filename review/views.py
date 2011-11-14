@@ -78,21 +78,23 @@ def student_stats(request):
     total_students = User.objects.filter(profile__role='S').count()
     total_alum = User.objects.exclude(profile__role='S').exclude(profile__role='T').count()
     all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T')
-    alum_stats = [0]*assignments.count()
-    for alum in all_alums:
-        alum_comments = alum.comments.all()
-        assignment_set = set()
-        for alum_comment in alum_comments:
-            assignment_set.add(alum_comment.chunk.file.submission.assignment)
-        count = len(assignment_set)
-        alum_stats[count] += 1
-    alum_stats = zip(range(assignments.count()), alum_stats)
     total_staff = User.objects.filter(profile__role='T').count()
     
     assignment_data = []
     for assignment in assignments:
         total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
-        alums_participating = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__assignment=assignment).distinct().count()
+        all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__assignment=assignment).distinct()
+        alums_participating = all_alums.count()
+        alum_stats = [0]*assignments.count()
+        for alum in all_alums:
+            alum_comments = alum.comments.all()
+            assignment_set = set()
+            for alum_comment in alum_comments:
+                assignment_set.add(alum_comment.chunk.file.submission.assignment)
+            count = len(assignment_set)
+            alum_stats[count] += 1
+        alum_stats = zip(range(assignments.count()), alum_stats)
+        
         total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
         one_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=1)).count()
         two_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=2)).count()
@@ -114,7 +116,7 @@ def student_stats(request):
         fourty_to_sixty_lines = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(start__lte=60).filter(start__gt=40).count()
         more_than_sixty_lines = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(start__gt=60).count()
         
-        assignment_data.append( (assignment.name, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, 
+        assignment_data.append( (assignment.name, total_chunks, alums_participating, alum_stats, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, 
                                 total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, first_20_lines, twenty_to_fourty_lines, fourty_to_sixty_lines,
                                 more_than_sixty_lines) )
     return render(request, 'review/studentstats.html', {
