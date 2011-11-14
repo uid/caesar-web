@@ -19,6 +19,7 @@ class Comment(models.Model):
     chunk = models.ForeignKey(Chunk, related_name='comments')
     author = models.ForeignKey(User, related_name='comments')
     start = models.IntegerField() # region start line, inclusive
+    
     end = models.IntegerField() # region end line, exclusive
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='U')
     created = models.DateTimeField(auto_now_add=True)
