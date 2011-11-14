@@ -187,6 +187,8 @@ class Chunk(models.Model):
         #     snippet_length += len(self.lines[start_line][1].strip()) + 1
         #     start_line -= 1
         snippet_lines = self.lines[start_line:end_line + 1]
+        self.start_line = start_line
+        self.end_line = endline+1
         return ' '.join(zip(*snippet_lines)[1])
     
     def get_highlighted_lines(self):
