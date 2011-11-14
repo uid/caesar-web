@@ -83,7 +83,7 @@ def student_stats(request):
     assignment_data = []
     for assignment in assignments:
         total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
-        all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__assignment=assignment).distinct()
+        all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__assignment=assignment).exclude(username='checkstyle').distinct()
         alums_participating = all_alums.count()
         alum_stats = [0]*assignments.count()
         for alum in all_alums:
