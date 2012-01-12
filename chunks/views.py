@@ -65,7 +65,8 @@ def view_chunk(request, chunk_id):
         'comment_data': comment_data,
         'task': task,
         'task_count': task_count,
-        'full_view': True
+        'full_view': True,
+        'file': chunk.file
     }) 
 
 @login_required
@@ -149,7 +150,7 @@ def view_all_chunks(request, viewtype, submission_id):
         user_stats.append(user_comments)
         static_stats.append(static_comments)
         all_highlighted_lines.append(highlighted_lines_for_file)
-    file_data = zip(paths, all_highlighted_lines)
+    file_data = zip(paths, all_highlighted_lines, files)
     
     code_only = False
     comment_view = True

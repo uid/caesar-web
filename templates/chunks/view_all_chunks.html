@@ -102,7 +102,7 @@ $(document).ready(function() {
 
 
 
-{% for path, highlighted_lines_for_file in file_data %}
+{% for path, highlighted_lines_for_file, file in file_data %}
 <h2 class="file-name-display">
 <A NAME="{{path}}"></A> {{ path }}
 </h2>
@@ -112,17 +112,17 @@ $(document).ready(function() {
 {% if read_only or comment_view %}
 <td id="code-table-display">
 <div id="comment-display" class="span-6">
-    <div id="comment-display-inner">
-        {% for highlighted_lines, is_chunk, chunk, comment_data in highlighted_lines_for_file %}
-            {% if is_chunk %}
+    {% for highlighted_lines, is_chunk, chunk, comment_data in highlighted_lines_for_file %}
+        {% if is_chunk %}
+            <div id="comment-display-inner" class="file-{{file.id}} files">
                 {% for comment, snippet in comment_data %}
                     {% include "review/comment.html" %}
                 {% empty %}
                 {% endfor %}
-            {% endif %}
-        {% empty %}
-        {% endfor %}
-    </div>
+            </div>
+        {% endif %}
+    {% empty %}
+    {% endfor %}
 </div>
 </td>
 {% endif %}
@@ -134,13 +134,13 @@ $(document).ready(function() {
             {% for n, line, staff_code in highlighted_lines %}
             {% if not staff_code %}
               <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student">
-                <span id="line-{{chunk.id}}-{{ n }}" class="line">
+                <span id="line-{{chunk.id}}-{{ n }}-{{file.id}}" class="line">
                   <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
                 </span>
               </span>
               {% else %}
               <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff">
-                <span id="line-{{chunk.id}}-{{ n }}" class="line">
+                <span id="line-{{chunk.id}}-{{ n }}-{{file.id}}" class="line">
                   <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
                 </span>
               </span>

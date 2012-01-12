@@ -74,6 +74,7 @@ var model = new function() {
             start: parseInt(idSplit[2]), 
             end: parseInt(idSplit[3]),
             chunk: parseInt(idSplit[4]),
+            file: parseInt(idSplit[5]),
             isReply: isReply,
             parentId: isReply ? parseInt(
                     $(elt).attr('class').match(/parent-(\d+)/)[1]) : null,
@@ -104,9 +105,9 @@ var model = new function() {
 
 window.isSelecting = false;
 
-function showCommentForm(startLine, endLine, chunkId) {
+function showCommentForm(startLine, endLine, chunkId, fileId) {
     $.get(caesar.urls.new_comment, 
-        { start: startLine, end: endLine, chunk: chunkId },
+        { start: startLine, end: endLine, chunk: chunkId},
         function(data) {
             $('.new-comment').remove();
             $('.reply-form').parent().remove();
@@ -123,7 +124,7 @@ function showCommentForm(startLine, endLine, chunkId) {
                 }
             });
             if (!added) {
-                $('#comment-display-inner').append(elt);
+                $('.file-'+fileId).append(elt);
             }
             // construct a fake "comment" boundary object to pass in
             var commentElt = elt.filter('.comment').get(0);
@@ -131,7 +132,8 @@ function showCommentForm(startLine, endLine, chunkId) {
                 start: startLine, 
                 end: endLine, 
                 elt: commentElt,
-                chunk: chunkId
+                chunk: chunkId,
+                file: fileId
             }, true, function() {
                 $('textarea').focus();
             }); 
@@ -182,66 +184,65 @@ function expandAllAutoComments() {
 
 function scrollCodeTo(comment, doScroll, callback) {
     if (doScroll === undefined) {
-        doScroll = true;
-    }
-    if (callback === undefined) {
-        callback = function() { return; };
-    }
-    var SCROLL_THRESHOLD = 75;
-    var targetLine = $('#chunk-' + comment.chunk + '-line-' + comment.start);
-    var commentTop = $(comment.elt).offset().top;
-    var commentHeight = $(comment.elt).height();
-    var yDelta = targetLine.offset().top - commentTop ;
+            doScroll = true;
+        }
+        if (callback === undefined) {
+            callback = function() { return; };
+        }
+        var SCROLL_THRESHOLD = 75;
+        var targetLine = $('#chunk-' + comment.chunk + '-line-' + comment.start);
+        var commentTop = $(comment.elt).offset().top;
+        var commentHeight = $(comment.elt).height();
+        var yDelta = targetLine.offset().top - commentTop ;
 
-    // Wraps the callback so it is only executed the nth time it is called
-    // This guarantees that the callback is called exactly once and after all
-    // animations have run.
-    // FIXME Because of the way this code is structured, it is extremely 
-    // easy to forget to call the callback in all cases to guarantee execution.
-    function wrapCallback(f, n) {
-        var i = 0;
-        return function() {
-            if (i + 1 == n) {
-                return f();
-            } else {
-                i++;
-            }
+        // Wraps the callback so it is only executed the nth time it is called
+        // This guarantees that the callback is called exactly once and after all
+        // animations have run.
+        // FIXME Because of the way this code is structured, it is extremely 
+        // easy to forget to call the callback in all cases to guarantee execution.
+        function wrapCallback(f, n) {
+            var i = 0;
+            return function() {
+                if (i + 1 == n) {
+                    return f();
+                } else {
+                    i++;
+                }
+            };
         };
-    };
 
-    var cb = wrapCallback(callback, 3);
+        var cb = wrapCallback(callback, 3);
+        $('.file-'+comment.file).animate({
+            top: '+=' + yDelta
+        }, { duration: 500, queue: false, easing: 'easeInOutQuad', complete: cb });
 
-    $('#comment-display-inner').animate({
-        top: '+=' + yDelta
-    }, { duration: 500, queue: false, easing: 'easeInOutQuad', complete: cb });
+        if (!doScroll) {
+            cb(); cb();
+            return;
+        }
 
-    if (!doScroll) {
-        cb(); cb();
-        return;
-    }
+        var windowHeight = $(window).height();
+        if (commentTop + yDelta + commentHeight >
+                windowHeight + $(window).scrollTop()) {
+            $('html,body').animate({
+                scrollTop: commentTop - windowHeight + 
+                    commentHeight + yDelta + SCROLL_THRESHOLD
+            }, { duration: 500, queue: false, easing: 'easeInOutQuad',
+                 complete: cb }); 
+        } else if (commentTop + yDelta < $(window).scrollTop()) {
+            $('html,body').animate({
+                scrollTop: commentTop + yDelta - SCROLL_THRESHOLD
+            }, { duration: 500, queue: false, easing: 'easeInOutQuad', 
+                 complete: cb }); 
+        } else {
+            cb(); cb();
+        }
 
-    var windowHeight = $(window).height();
-    if (commentTop + yDelta + commentHeight >
-            windowHeight + $(window).scrollTop()) {
-        $('html,body').animate({
-            scrollTop: commentTop - windowHeight + 
-                commentHeight + yDelta + SCROLL_THRESHOLD
-        }, { duration: 500, queue: false, easing: 'easeInOutQuad',
-             complete: cb }); 
-    } else if (commentTop + yDelta < $(window).scrollTop()) {
-        $('html,body').animate({
-            scrollTop: commentTop + yDelta - SCROLL_THRESHOLD
-        }, { duration: 500, queue: false, easing: 'easeInOutQuad', 
-             complete: cb }); 
-    } else {
-        cb(); cb();
-    }
-
-    return yDelta;
+        return yDelta;
 };
 
 function resetScroll() {
-    $('#comment-display-inner').animate({
+    $('.files').animate({
         top: 0
     }, { duration: 500, queue: false });
 };
@@ -373,6 +374,7 @@ function attachCommentHandlers(comment) {
                         start: comment.start, 
                         end: comment.end, 
                         chunk: comment.chunk,
+                        file: comment.file,
                         elt: replyElt.get(0) 
                     }, true, function() { 
                         $('textarea').focus();
@@ -495,13 +497,15 @@ if (caesar.state.fullView) {
             var startLine = Number.MAX_VALUE;
             var endLine = Number.MIN_VALUE;
             var chunkId = 0;
+            var fileId = 0;
             $('.line.ui-selected').each(function(i) {
                 var n = parseInt($(this).attr('id').split('-')[2]);
                 endLine = Math.max(endLine, n);
                 startLine = Math.min(startLine, n);
                 chunkId = parseInt($(this).attr('id').split('-')[1]);
+                fileId = parseInt($(this).attr('id').split('-')[3])
             });
-            showCommentForm(startLine, endLine, chunkId);
+            showCommentForm(startLine, endLine, chunkId, fileId);
         }
     });
 }

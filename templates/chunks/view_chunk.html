@@ -118,7 +118,7 @@ Next
 </div>
 <br/>
 <div id="comment-display" class="span-6">
-  <div style="mid-width:30em" id="comment-display-inner">
+  <div style="mid-width:30em" id="comment-display-inner" class="file-{{file.id}} files">
      {% for comment, vote, snippet in comment_data %}
        {% include "review/comment.html" %} 
      {% endfor %}
@@ -130,13 +130,13 @@ Next
   {% for n, line, staff_code in highlighted_lines %}
   {% if not staff_code %}
   <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student">
-    <span id="line-{{chunk.id}}-{{ n }}" class="line">
+    <span id="line-{{chunk.id}}-{{ n }}-{{file.id}}" class="line">
       <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
     </span>
   </span>
   {% else %}
   <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff">
-    <span id="line-{{chunk.id}}-{{ n }}" class="line">
+    <span id="line-{{chunk.id}}-{{ n }}-{{file.id}}" class="line">
       <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
     </span>
   </span>

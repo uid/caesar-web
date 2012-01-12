@@ -76,7 +76,7 @@ $(document).ready(function() {
 
 {% block content %}
 
-{% for chunk, highlighted_lines, comment_data in assignment_data%}
+{% for chunk, highlighted_lines, comment_data, file in assignment_data%}
 <h2 class="file-name-display">
 <A NAME="{{chunk.name}}"></A> {{ chunk.name }}
 </h2>
@@ -85,7 +85,7 @@ $(document).ready(function() {
 <tr>   
 <td id="code-table-display">
 <div id="comment-display" class="span-6">
-    <div id="comment-display-inner">
+    <div id="comment-display-inner" class="file-{{file.id}} files">
         {% for comment, highlight_comment, vote in comment_data %}
             {% include "review/comment.html" %} 
         {% empty %}
@@ -99,13 +99,13 @@ $(document).ready(function() {
         {% for n, line, staff_code in highlighted_lines %}
         {% if not staff_code %}
           <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student">
-            <span id="line-{{chunk.id}}-{{ n }}" class="line">
+            <span id="line-{{chunk.id}}-{{ n }}-{{file.id}}" class="line">
               <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
             </span>
           </span>
           {% else %}
           <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff">
-            <span id="line-{{chunk.id}}-{{ n }}" class="line">
+            <span id="line-{{chunk.id}}-{{ n }}-{{file.id}}" class="line">
               <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
             </span>
           </span>

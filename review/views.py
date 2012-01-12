@@ -172,6 +172,7 @@ def new_comment(request):
                 'chunk': chunk,
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
+                'file': chunk.file
             })
 
 
@@ -359,7 +360,6 @@ def all_activity(request, assign, username):
             else:
                 highlighted_lines.append((number, line, False))
                 
-                
         comments = chunk.comments.select_related('votes', 'author__profile')
         highlighted_comments = []
         highlighted_votes = []
@@ -373,7 +373,7 @@ def all_activity(request, assign, username):
             else:
                 highlighted_comments.append(None)
         comment_data = zip(comments, highlighted_comments, highlighted_votes)
-        assignment_data.append((chunk, highlighted_lines, comment_data))
+        assignment_data.append((chunk, highlighted_lines, comment_data, chunk.file))
 
     return render(request, 'review/all_activity.html', {
         'assignment_data': assignment_data,
