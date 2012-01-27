@@ -237,6 +237,7 @@ def edit_comment(request):
             comment_id = form.cleaned_data['comment_id']
             comment = Comment.objects.get(id=comment_id)
             comment.text = form.cleaned_data['text']
+            comment.edited = datetime.datetime.now()
             comment.save()
             chunk = comment.chunk
             return render(request, 'review/comment.html', {

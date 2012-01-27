@@ -25,6 +25,7 @@ class Comment(models.Model):
     type = models.CharField(max_length=1, choices=TYPE_CHOICES, default='U')
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    edited = models.DateTimeField(null=True, blank=True)
     parent = models.ForeignKey('self', related_name='child_comments', 
         blank=True, null=True)
     # fields added for denormalization purposes
@@ -47,8 +48,9 @@ class Comment(models.Model):
         return map(self.get_comment_vote, self.child_comments)
         
     def is_edited(self):
-        edited = self.modified > self.created
-        return self.modified > self.created
+        if self.edited is not None and self.edited > self.created:
+            return True
+        return False
         
     def get_comment_vote(self):
         try:

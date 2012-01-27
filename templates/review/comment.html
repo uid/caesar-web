@@ -58,7 +58,7 @@
   {% endif %}
   <div class="comment-author">
       {% if comment.is_edited %}
-      * modified {{comment.modified|timesince_human}} ago
+      * modified {{comment.edited|timesince_human}} ago
       {% endif %}
   </div>
   <div class="comment-footer">
