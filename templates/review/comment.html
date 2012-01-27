@@ -56,8 +56,13 @@
     {{ comment.text }}
   </p>
   {% endif %}
-
+  <div class="comment-author">
+      {% if comment.is_edited %}
+      * modified {{comment.modified|timesince_human}} ago
+      {% endif %}
+  </div>
   <div class="comment-footer">
+
     <span class="comment-votes">
       <span class="vote-buttons
         {% if full_view and user.is_authenticated and user != comment.author %}
