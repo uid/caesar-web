@@ -240,6 +240,12 @@
     height: 16px;
 }
 
+.ui-button .ui-icon-edit {
+    background-image: url('../img/pencil-small.png');
+    width: 16px;
+    height: 16px;
+}
+
 .new-comment, .new-reply, .new-comment:hover, .new-reply:hover {
     background-color: #ffff88;
 }

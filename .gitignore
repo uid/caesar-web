@@ -8,3 +8,4 @@ settings_local.py
 /task_sim_output.txt
 /accounts/second-wave-alums.txt
 /accounts/alum-wave-3.txt
+/scripts/*

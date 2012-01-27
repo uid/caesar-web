@@ -2,7 +2,7 @@ from review.models import *
 from accounts.models import UserProfile
 
 from django.forms import ModelForm, Form
-from django.forms import Textarea, HiddenInput, ChoiceField
+from django.forms import Textarea, HiddenInput, ChoiceField, CharField
 
 class CommentForm(ModelForm):
     class Meta:
@@ -23,3 +23,7 @@ class ReplyForm(ModelForm):
             'text': Textarea(attrs={'cols': 10, 'rows': 5}), 
             'parent': HiddenInput(),
         }
+
+class EditCommentForm(Form):
+    text = CharField(widget=Textarea(attrs={'cols': 10, 'rows': 5}))
+    comment_id = CharField(widget=HiddenInput())

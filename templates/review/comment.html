@@ -26,7 +26,7 @@
   <div class="comment-author">
     {% with author=comment.author %}
     {% if comment.type == 'U' %}
-    {{comment.created|timesince_human}} ago 
+    {{comment.created|timesince_human}} ago {% if comment.is_edited %} * {% endif %}
     {% else %}
     automatically generated 
     {% endif %}
@@ -79,6 +79,8 @@
       {% if full_view and comment.author == user %}
       <button id="delete-{{ comment.id }}-button" class="delete-button" 
         type="button">Delete</button>
+     <button id="edit-{{ comment.id }}-button" class="edit-button" 
+        type="button">Edit</button>
       {% endif %}
     </span>
   </div>

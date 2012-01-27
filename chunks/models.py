@@ -217,6 +217,24 @@ class Chunk(models.Model):
     def __unicode__(self):
         return u'%s' % (self.name,)
 
+class ChunkProfile(models.Model):
+    id = models.AutoField(primary_key=True)
+    chunk = models.ForeignKey(Chunk, related_name='profiles')
+    semicolons = models.IntegerField(blank=True, null=True) #total number of semicolons in the chunk
+    nesting_depth = models.IntegerField(blank=True, null=True) #deepest statement
+    total_function_calls = models.IntegerField(blank=True, null=True)
+    total_branches = models.IntegerField(blank=True, null=True)
+    total_loops = models.IntegerField(blank=True, null=True)
+    null_count = models.IntegerField(blank=True, null=True)
+    todo_count = models.IntegerField(blank=True, null=True)
+    instanceof_count = models.IntegerField(blank=True, null=True)
+    synchronized_count = models.IntegerField(blank=True, null=True)
+    valid = models.BooleanField(blank=True, default=False)
+    viable_comments = models.IntegerField(blank=True, null=True)
+    static_comments = models.IntegerField(blank=True, null=True)
+    iterator_count = models.IntegerField(blank=True, null=True)
+    comment_words = models.IntegerField(blank=True, null=True)
+    
 class Fingerprint(models.Model):
     # This ID is basically useless, but Django currently doesn't support
     # composite primary keys

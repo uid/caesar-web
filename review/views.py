@@ -13,7 +13,7 @@ from chunks.models import Chunk, Assignment, Submission, StaffMarker
 from tasks.models import Task
 from tasks.routing import assign_tasks
 from models import Comment, Vote, Star 
-from review.forms import CommentForm, ReplyForm
+from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.models import UserProfile
 
 from pygments import highlight
@@ -48,7 +48,7 @@ def dashboard(request):
     #get all the submissions that the user submitted
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('duedate')\
+        .order_by('name')\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -210,7 +210,42 @@ def reply(request):
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
             })
-
+@login_required
+def edit_comment(request):
+    if request.method == 'GET':
+        comment_id = request.GET['comment_id']
+        comment = Comment.objects.get(pk=comment_id)
+        start = comment.start
+        end = comment.end
+        form = EditCommentForm(initial={
+             'text': comment.text,
+             'comment_id': comment.id,
+        })
+        chunk = Chunk.objects.get(pk=comment.chunk.id)
+        return render(request, 'review/edit_comment_form.html', {
+            'form': form,
+            'start': start,
+            'end': end,
+            'snippet': chunk.generate_snippet(start, end),
+            'chunk': chunk,
+            'comment_id': comment.id,
+            'reply': comment.is_reply(),
+        })
+    else:
+        form = EditCommentForm(request.POST)
+        if form.is_valid():
+            comment_id = form.cleaned_data['comment_id']
+            comment = Comment.objects.get(id=comment_id)
+            comment.text = form.cleaned_data['text']
+            comment.save()
+            chunk = comment.chunk
+            return render(request, 'review/comment.html', {
+                'comment': comment,
+                'chunk': chunk,
+                'snippet': chunk.generate_snippet(comment.start, comment.end),
+                'full_view': True,
+                'file': chunk.file,
+            })
 
 @login_required
 def delete_comment(request):
@@ -255,7 +290,6 @@ def unvote(request):
     # need to make sure to load the comment after deleting the vote to make sure
     # the vote counts are correct
     comment = Comment.objects.get(pk=comment_id)
-    sys.stderr.write("\ncomment: " + comment_id)
     response_json = json.dumps({
         'comment_id': comment_id,
         'upvote_count': comment.upvote_count,

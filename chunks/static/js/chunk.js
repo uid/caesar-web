@@ -141,6 +141,49 @@ function showCommentForm(startLine, endLine, chunkId, fileId) {
     );
 };
 
+function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
+    $.get(caesar.urls.edit_comment, 
+        { comment_id: commentId},
+        function(data) {
+            $(comment.elt).hide(); 
+            $('.reply-form').parent().remove();
+            //if reply
+            var isReply = $(elt).hasClass('comment-reply')
+            var commentElt;
+            if (isReply){
+                commentElt = $(data).insertAfter(comment.elt);
+            } else{
+                // find the appropriate place to insert the form
+                var added = false;
+                var elt = $(data);
+                var index = model.computeIndex(startLine, endLine);
+                $.each(model.comments, function(index, comment) {
+                    if (comment.chunk == chunkId && ((startLine == comment.start && endLine > comment.end)
+                        || startLine < comment.start)) {
+                        $(comment.elt).before(elt);                        
+                        added = true;
+                        return false;
+                    }
+                });
+                if (!added) {
+                    $('.file-'+fileId).append(elt);
+                }
+                // construct a fake "comment" boundary object to pass in
+                commentElt = elt.filter('.comment').get(0);
+            }
+            scrollCodeTo({
+                start: startLine, 
+                end: endLine, 
+                elt: commentElt,
+                chunk: chunkId,
+                file: fileId
+            }, true, function() {
+                $('textarea').focus();
+            }); 
+        }
+    );
+};
+
 function highlightCommentLines(comment) {
     // highlight corresponding code lines
     for (var i = comment.start; i <= comment.end; i++) {
@@ -297,6 +340,10 @@ function drawCommentButtons(comment) {
         icons: { primary: 'ui-icon-delete', secondary: null },
         text: false
     });
+    $('.edit-button', comment.elt).button({
+        icons: { primary: 'ui-icon-edit', secondary: null },
+        text: false
+    });
 }
 
 function checkIfSpecial(comment) {  
@@ -393,7 +440,12 @@ function attachCommentHandlers(comment) {
             });
             return false;
         });
-
+        
+        // edit button
+        $('.edit-button', comment.elt).click(function() {
+                showEditForm(comment.id, comment.start, comment.end, comment.chunk, comment.file, comment);
+        });
+        
         $('.vote-buttons.enabled .vote', comment.elt).click(function(e) {
             var button = this;
             var isUp = $(this).hasClass('up');
@@ -523,6 +575,28 @@ $('#new-comment-form').live('submit', function() {
     return false;
 });
 
+$('#edit-comment-form').live('submit', function() {
+    var dataString = $(this).serialize();
+    $.post(caesar.urls.edit_comment, dataString, function(data) {
+        var newNode = $(data);
+        $('.new-comment').replaceWith(newNode);
+        $('.new-reply').replaceWith(newNode);
+        //remove the one that's hiding
+        var idSplit = newNode.get(0).id.split('-');
+        var comment_id = parseInt(idSplit[1]);
+        $.each(model.comments, function(index, comment) {
+            if (comment != undefined && comment.id == comment_id){
+                model.removeComment(comment);
+            }
+        });
+        model.addCommentFromDOM(newNode.get(0));
+        newNode.effect('highlight', {}, 2000);
+        resetScroll();
+        clearSelection();
+    });
+    return false;
+});
+
 $('#reply-comment-form').live('submit', function() {
     var dataString = $(this).serialize();
     $.post(caesar.urls.reply, dataString, function(data) {
@@ -539,6 +613,9 @@ $('#reply-comment-form').live('submit', function() {
 $('#cancel-button').live('click', function() {
     resetScroll();
     clearSelection();
+    $.each(model.comments, function(index, comment) {
+        $(comment.elt).show();
+    });
 });
 
 $('#cancel-reply-button').live('click', function() {
@@ -618,5 +695,7 @@ $('.dropdown-link').click(function() {
 $('body').click(function() {
     $('.dropdown-menu').slideUp(400); 
 });
+
+$('pre.line-code').each(function(i,e){$(this).prepend($(this).prev());$(this).prev().remove();})
 
 });

@@ -9,6 +9,8 @@ from django.conf import settings
 from accounts.models import UserProfile
 from chunks.models import Chunk
 
+import sys
+
 class Comment(models.Model):
     TYPE_CHOICES = (
         ('U', 'User'),
@@ -43,7 +45,11 @@ class Comment(models.Model):
     #returns child and vote counts for child as a tuple
     def get_child_comment_vote(self):
         return map(self.get_comment_vote, self.child_comments)
-
+        
+    def is_edited(self):
+        edited = self.modified > self.created
+        return self.modified > self.created
+        
     def get_comment_vote(self):
         try:
             vote = self.votes.get(author=request.user.id).value
