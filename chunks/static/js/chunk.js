@@ -187,7 +187,7 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
 function highlightCommentLines(comment) {
     // highlight corresponding code lines
     for (var i = comment.start; i <= comment.end; i++) {
-        $('#line-' + comment.chunk + '-' + i).addClass('highlighted');            
+        $('#line-' + comment.chunk + '-' + i + '-' + comment.file).addClass('highlighted');            
     }
 };
 
@@ -364,7 +364,7 @@ function checkIfSpecial(comment) {
           }
           //highlight comment lines
           for (var i = comment.start; i <= comment.end; i++) {
-              $('#line-' + comment.chunk + '-' + i).addClass('highlight');
+              $('#line-' + comment.chunk + '-' + i + '-' + comment.file).addClass('highlight');
           }
           scrollCodeTo(comment)
        }
@@ -374,7 +374,7 @@ function checkIfSpecial(comment) {
         if ($('#highlight-comment-text-'+ comment.id).hasClass('highlight')){
             //highlight comment lines
             for (var i = comment.start; i <= comment.end; i++) {
-                $('#line-' + comment.chunk + '-' + i).addClass('highlight');
+                $('#line-' + comment.chunk + '-' + i + '-' + comment.file).addClass('highlight');
             }
         }
     }
