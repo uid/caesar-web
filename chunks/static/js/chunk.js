@@ -148,7 +148,7 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
             $(comment.elt).hide(); 
             $('.reply-form').parent().remove();
             //if reply
-            var isReply = $(elt).hasClass('comment-reply')
+            var isReply = $(comment.elt).hasClass('comment-reply')
             var commentElt;
             if (isReply){
                 commentElt = $(data).insertAfter(comment.elt);
@@ -436,7 +436,7 @@ function attachCommentHandlers(comment) {
             $.get(caesar.urls.delete, {
                 comment_id: comment.id
             }, function(data) {
-                model.removeComment(comment);
+                $("#comment-text-"+comment.id).text("[deleted]");
             });
             return false;
         });
@@ -621,6 +621,9 @@ $('#cancel-button').live('click', function() {
 $('#cancel-reply-button').live('click', function() {
     resetScroll();
     $('.reply-form').parent().remove();
+    $.each(model.comments, function(index, comment) {
+        $(comment.elt).show();
+    });
 });
 
 var toggleCommentsText = {

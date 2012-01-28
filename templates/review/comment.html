@@ -30,6 +30,7 @@
     {% else %}
     automatically generated 
     {% endif %}
+    {% if not comment.deleted %}
     {% with is_staff=author.profile.is_staff is_student=author.profile.is_student %}
     by <span class="comment-author-name
       {% if is_staff %}staff{% endif %}
@@ -44,6 +45,7 @@
     {% endif %}
     </span>
     {% endwith %}
+    {% endif %}
     {% endwith %}
   </div>
   
@@ -53,19 +55,22 @@
   </p>
   {% else %}
   <p id="comment-text-{{comment.id}}" class="comment-text">
-    {{ comment.text }}
+    {%if comment.deleted %}[deleted]{% else %}{{ comment.text }}{%endif%}
   </p>
   {% endif %}
   <div class="comment-author">
-      {% if comment.is_edited %}
+      {% if comment.is_edited and not comment.deleted %}
       * modified {{comment.edited|timesince_human}} ago
+      {% endif %}
+      {% if comment.deleted %}
+        * deleted {{comment.modified|timesince_human}} ago
       {% endif %}
   </div>
   <div class="comment-footer">
 
     <span class="comment-votes">
       <span class="vote-buttons
-        {% if full_view and user.is_authenticated and user != comment.author %}
+        {% if full_view and not comment.deleted and user.is_authenticated and user != comment.author %}
           enabled{% endif %}">
           <div id="upvote-{{ comment.id }}"  title="Upvote"
             class="vote up {% if vote == 1 %} selected {% endif %}">
@@ -79,6 +84,7 @@
     </span>
     {% if user.is_authenticated %}
     <span class="comment-actions">
+      {% if not comment.deleted %}
       <button id="reply-{{ comment.id }}-button" class="reply-button"
         type="button">Reply</button>
       {% if full_view and comment.author == user %}
@@ -86,6 +92,7 @@
         type="button">Delete</button>
      <button id="edit-{{ comment.id }}-button" class="edit-button" 
         type="button">Edit</button>
+      {% endif %}
       {% endif %}
     </span>
   </div>

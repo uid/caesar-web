@@ -254,8 +254,16 @@ def delete_comment(request):
     comment = Comment.objects.get(pk=comment_id)
     if comment.author == request.user:
         # This will cascade and delete all replies as well
-        comment.delete()
-    return HttpResponse('deleted')
+        comment.deleted = True
+        comment.save()
+    chunk = comment.chunk
+    return render(request, 'review/comment.html', {
+        'comment': comment,
+        'chunk': chunk,
+        'snippet': chunk.generate_snippet(comment.start, comment.end),
+        'full_view': True,
+        'file': chunk.file,
+    })
 
 @login_required
 def vote(request):

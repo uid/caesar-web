@@ -34,6 +34,7 @@ class Comment(models.Model):
     # Set to either self.id for root comments or parent.id for replies, mostly
     # to allow for retrieving comments in threaded order in one query
     thread_id = models.IntegerField(null=True)
+    deleted = models.BooleanField(default=False)
 
     def __unicode__(self):
         return self.text
