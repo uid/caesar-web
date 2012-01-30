@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+
+{% block css %}
+{{ block.super }}
+
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb" href="{% url review.views.student_stats %}">summary</a>
+  <span class="breadcrumb">adjust reputations</span>
+{% endblock %}
+
+{% block content %}
+
+{% if empty %}
+    <p>
+    <h4>Enter a list of usernames and point adjustment. For example joe@mit.edu 5 or joe 5. </h1>
+    </p>
+{% else %}
+    {% if success %}
+    <p class="success">
+        Success! Reputations have been adjusted.
+    </p> 
+    {% else %}
+    <p class="error">
+        {{err}} Please try again.
+    </p>
+    {% endif %}
+{% endif %}
+<form id="new-comment-form" 
+  action="{% url accounts.views.reputation_adjustment %}" method="post">
+  {% csrf_token %}
+  {{ form.text }}
+  <br/>
+  <div class ="centered">
+  <button type="submit">Save</button>
+  <button id="cancel-button" type="button">Cancel</button>
+  </div>
+</form>
+{% endblock %}

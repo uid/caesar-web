@@ -3,13 +3,18 @@ from accounts.forms import *
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate 
 from django.contrib import auth
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
 from limit_registration import check_name
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Token
+from accounts.models import UserProfile
+from accounts.forms import ReputationForm
 import datetime
 import sys
+import re
 
 def login(request):
     if request.method == 'GET':
@@ -87,4 +92,63 @@ def register(request, code):
         'next': redirect_to,
         'invalid_invitation': invalid_invitation
     })
-
+    
+@login_required
+def reputation_adjustment(request):
+    if request.method == 'GET':
+        form = ReputationForm()
+        return render(request, 'accounts/reputation_form.html', {
+            'form': form,
+            'empty': True,
+            'success': True,
+            'err': ""
+        })  
+    else:
+        form = ReputationForm(request.POST)
+        if form.is_valid():
+            text = form.cleaned_data['text']
+            text.replace('\n', ',')
+            pattern = re.compile(r'[\s,]+')
+            split_text = pattern.split(text)
+            success = True
+            err = ""
+            if len(split_text) % 2 == 1: #uneven number of tokens
+                success = False
+                err = "Uneven number of tokens."
+            else:
+                profiles_to_update = []
+                for i in range(0, len(split_text),2):
+                    value = 0
+                    try:
+                        value = int(split_text[i+1])
+                    except ValueError:
+                        success = False
+                        err = str(split_text[i+1]) + " is not an integer."
+                        break
+                    if re.search('@', split_text[i]): #email
+                        try:
+                            profile = UserProfile.objects.get(user__email = split_text[i])
+                            profiles_to_update.append((profile, value))
+                        except ObjectDoesNotExist:
+                            success = False
+                            err = str(split_text[i]) + " is not a valid email."
+                            break
+                    else: #assume username
+                        try:
+                            profile = UserProfile.objects.get(user__username = split_text[i])
+                            profiles_to_update.append((profile, value))
+                        except ObjectDoesNotExist:
+                            success = False
+                            err = str(split_text[i]) + " is not a valid username."
+                            break
+                if success:
+                    for profile, value in profiles_to_update:
+                        profile.reputation += value
+                        profile.save()
+                        success = True
+            return render(request, 'accounts/reputation_form.html', {
+                'form': form,
+                'empty': False,
+                'success': success,
+                'err': err
+            })
