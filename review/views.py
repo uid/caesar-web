@@ -540,7 +540,6 @@ def student_dashboard(request, username):
         .select_related('chunk__file__submission_assignment') \
         .exclude(status='C') \
         .exclude(status='U') \
-        .filter(chunk__file__submission__assignment__semester='SP12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -554,6 +553,7 @@ def student_dashboard(request, username):
     uncompleted_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='U') \
+        .filter(chunk__file__submission__assignment__semester='SP12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
