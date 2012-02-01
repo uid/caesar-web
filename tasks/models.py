@@ -41,6 +41,7 @@ class Task(models.Model):
         ('O', 'Opened'),
         ('S', 'Started'),
         ('C', 'Completed'),
+        ('U', 'Unfinished'),
     )
     chunk = models.ForeignKey(Chunk, related_name='tasks')
     reviewer = models.ForeignKey(UserProfile, related_name='tasks')

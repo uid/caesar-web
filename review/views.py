@@ -33,22 +33,46 @@ def dashboard(request):
         if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
             new_task_count += assign_tasks(assignment, user)
     
+    old_completed_tasks = user.get_profile().tasks \
+        .select_related('chunk__file__submission__assignment') \
+        .filter(status='C') \
+        .exclude(chunk__file__submission__assignment__semester='SP12') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+
+    old_uncompleted_tasks = user.get_profile().tasks \
+        .select_related('chunk__file__submission__assignment') \
+        .filter(status='U') \
+        .exclude(chunk__file__submission__assignment__semester='SP12') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+    
     active_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission_assignment') \
         .exclude(status='C') \
+        .exclude(status='U') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
+        .filter(chunk__file__submission__assignment__semester='SP12') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+
+    uncompleted_tasks = user.get_profile().tasks \
+        .select_related('chunk__file__submission__assignment') \
+        .filter(status='U') \
+        .filter(chunk__file__submission__assignment__semester='SP12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
    
-    #get all the submissions that the user submitted
+    #get all the submissions that the user submitted, in the current semester
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('name')\
+        .order_by('duedate')\
+        .filter(assignment__semester="SP12")\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -61,14 +85,35 @@ def dashboard(request):
         submission_data.append((submission, reviewer_count, submission.last_modified, 
                                   user_comments, static_comments))
     
+    #get all the submissions that the user submitted, in the current semester
+    old_submissions = Submission.objects.filter(name=user.username) \
+        .filter(duedate__lt=datetime.datetime.now()) \
+        .order_by('duedate')\
+        .exclude(assignment__semester="SP12")\
+        .select_related('chunk__file__assignment') \
+        .annotate(last_modified=Max('files__chunks__comments__modified'))\
+        .reverse()
+    
+    old_submission_data = []
+    for submission in old_submissions:
+        user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
+        static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
+        reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
+        old_submission_data.append((submission, reviewer_count, submission.last_modified, 
+                                  user_comments, static_comments))
+    
     #find the current assignments
     current_submissions = Submission.objects.filter(name=user.username).filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
     
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
+        'old_completed_tasks': old_completed_tasks,
         'new_task_count': new_task_count,
+        'uncompleted_tasks': uncompleted_tasks,
+        'old_uncompleted_tasks': old_uncompleted_tasks,
         'submission_data': submission_data,
+        'old_submission_data': old_submission_data,
         'current_submissions': current_submissions,
     })
     
@@ -468,7 +513,7 @@ def request_extension(request, assignment_id):
 def student_dashboard(request, username):
     participant = User.objects.get(username=username)
     user = request.user
-    if participant.profile.role != 'S' or user.profile.role != 'T':
+    if user.profile.role != 'T':
         raise Http404
     new_task_count = 0
     
@@ -477,24 +522,46 @@ def student_dashboard(request, username):
     #     #do not give tasks to students who got extensions
     #     if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
     #         new_task_count += assign_tasks(assignment, participant)
-    
+    old_completed_tasks = participant.get_profile().tasks \
+        .select_related('chunk__file__submission__assignment') \
+        .filter(status='C') \
+        .exclude(chunk__file__submission__assignment__semester='SP12') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+
+    old_uncompleted_tasks = participant.get_profile().tasks \
+        .select_related('chunk__file__submission__assignment') \
+        .filter(status='U') \
+        .exclude(chunk__file__submission__assignment__semester='SP12') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
     
     active_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission_assignment') \
         .exclude(status='C') \
+        .exclude(status='U') \
+        .filter(chunk__file__submission__assignment__semester='SP12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
     completed_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
+        .filter(chunk__file__submission__assignment__semester='SP12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
-   
+
+    uncompleted_tasks = participant.get_profile().tasks \
+        .select_related('chunk__file__submission__assignment') \
+        .filter(status='U') \
+        .annotate(comment_count=Count('chunk__comments', distinct=True),
+                  reviewer_count=Count('chunk__tasks', distinct=True))
+
     #get all the submissions that the participant submitted
     submissions = Submission.objects.filter(name=participant.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('files__chunks__comments__modified')\
+        .order_by('duedate')\
+        .filter(assignment__semester="SP12")\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -506,6 +573,22 @@ def student_dashboard(request, username):
         reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
         submission_data.append((submission, reviewer_count, submission.last_modified, 
                                   user_comments, static_comments))
+    #get all the submissions that the user submitted, in the current semester
+    old_submissions = Submission.objects.filter(name=participant.username) \
+        .filter(duedate__lt=datetime.datetime.now()) \
+        .order_by('duedate')\
+        .exclude(assignment__semester="SP12")\
+        .select_related('chunk__file__assignment') \
+        .annotate(last_modified=Max('files__chunks__comments__modified'))\
+        .reverse()
+    
+    old_submission_data = []
+    for submission in old_submissions:
+        user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
+        static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
+        reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
+        old_submission_data.append((submission, reviewer_count, submission.last_modified, 
+                                  user_comments, static_comments))
     
     #find the current assignments
     current_submissions = Submission.objects.filter(name=participant.username).filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
@@ -514,7 +597,40 @@ def student_dashboard(request, username):
         'participant': participant,
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
+        'old_completed_tasks': old_completed_tasks,
+        'uncompleted_tasks': uncompleted_tasks,
+        'old_uncompleted_tasks': old_uncompleted_tasks,
         'new_task_count': new_task_count,
         'submission_data': submission_data,
+        'old_submission_data': old_submission_data,
         'current_submissions': current_submissions,
+    })
+
+@staff_member_required
+def manage(request):
+    return render(request, 'review/manage.html', {
+    })
+@staff_member_required
+def cancel_assignment(request):
+    if request.method == 'POST':
+        assignments = request.POST.get('assignment', None)
+        if assignments == "all":
+            sys.stderr.write('all---\n')
+            started_tasks = Task.objects.filter(status='S')
+            started = 0
+            for task in started_tasks:
+                task.mark_as('C')
+                started += 1
+            sys.stderr.write('started: ' + str(started) + '\n')
+            unfinished_tasks = Task.objects.exclude(status='C')
+            total = 0
+            for task in unfinished_tasks:
+                total += 1
+                task.mark_as('U')
+            sys.stderr.write('total: ' + str(total) + '\n')
+            response_json = json.dumps({
+                'total': total,
+            })
+            return HttpResponse(response_json, mimetype='application/javascript')
+    return render(request, 'review/manage.html', {
     })

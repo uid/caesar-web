@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate 
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
@@ -93,7 +94,7 @@ def register(request, code):
         'invalid_invitation': invalid_invitation
     })
     
-@login_required
+@staff_member_required
 def reputation_adjustment(request):
     if request.method == 'GET':
         form = ReputationForm()

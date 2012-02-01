@@ -16,4 +16,6 @@ urlpatterns = patterns('review.views',
     (r'^request_extension/(?P<assignment_id>\d+)', 'request_extension'),
     (r'^dashboard/(?P<username>\w+)', 'student_dashboard'),
     (r'^studentstats', 'student_stats'),
+    (r'^manage', 'manage'),
+    (r'^cancel_assignment', 'cancel_assignment')
 )

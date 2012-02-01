@@ -8,7 +8,7 @@
 
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
-  <a class="breadcrumb" href="{% url review.views.student_stats %}">summary</a>
+  <a class="breadcrumb" href="{% url review.views.manage %}">manage</a>
   <span class="breadcrumb">adjust reputations</span>
 {% endblock %}
 
@@ -16,7 +16,7 @@
 
 {% if empty %}
     <p>
-    <h4>Enter a list of usernames and point adjustment. For example joe@mit.edu 5 or joe 5. </h1>
+    <h4>Enter a list of usernames and point adjustments. For example joe@mit.edu 5 or joe 5. </h1>
     </p>
 {% else %}
     {% if success %}

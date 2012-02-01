@@ -14,12 +14,20 @@ import datetime
 import app_settings
 
 class Assignment(models.Model):
+    SEMESTER_CHOICES = (
+        ('FA11', "Fall 2011"),
+        ('SP12', "Spring 2012"),
+        ('FA12', "Fall 2012"),
+        ('SP13', "Spring 2013"),
+    )
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
     duedate = models.DateTimeField(null=True, blank=True)
     code_review_end_date = models.DateTimeField(null=True, blank=True)
     max_extension = models.IntegerField(default=3)
+    semester = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
+                                      blank=True, null=True)
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):

@@ -114,7 +114,11 @@ table.current-assignment {
     margin-bottom: 2em;
     border-collapse: collapse;
 }
-
+.history{
+    float: right;
+    color: #777;
+    cursor: pointer;
+}
 .grey-text {
     color: #777;
     width: 20em;
