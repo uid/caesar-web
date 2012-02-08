@@ -29,13 +29,17 @@ $(document).ready(function() {
         $(this).text(toggleInstructionsText[textIndex]);
     });
     
-    var toggleHistoryText = [ 'hide history', 'show history' ];
-    var histIndex = 1;
     $('#historic_content').hide();
     $('.history').click(function() {
         $('#historic_content').toggle(400);
-        histIndex = 1 - histIndex;
-        $(this).text(toggleHistoryText[histIndex]);
+        $(this).text("");
+        $(".empty").remove();
+    });
+    
+    $('#historic-submissions').hide();
+    $('.history-submissions').click(function() {
+        $('#historic-submissions').toggle(400);
+        $(this).text("");
     });
 
 });
@@ -79,10 +83,11 @@ $(document).ready(function() {
   {% empty %}
   {% endfor %}
 </table>
+{% endif %}
 
-
+{% if participant.profile.semester_taken %}
 <h2 class="task-header">submitted assignments</h2>
-<div class="task-list">
+<div>
   {% for submission, reviewer_count, last_modified, user_comments, static_comments in submission_data %}
   
   <div id ="submission-{{submission.id}}" class="submission-line">
@@ -107,6 +112,34 @@ $(document).ready(function() {
   {% empty %}
   {% endfor %}
 </div>
+{% if old_submission_data %}
+    <div class="history-submissions"> show previous semesters </div>
+    <div id="historic-submissions" class="task-list">
+      {% for submission, reviewer_count, last_modified, user_comments, static_comments in old_submission_data %}
+  
+      <div id ="submission-{{submission.id}}" class="submission-line">
+        <span class="chunk-name">
+          {{ submission.assignment.name }}
+        </span>
+        <span class="task-stats">
+          <span class="reviewer-count" title="Reviewers">
+              {{ reviewer_count }}
+          </span>
+          <span class="comment-count" title="User Comments">
+            {{ user_comments }}
+          </span>
+          <span class="robot-count" title="Automatic Comments">
+            {{ static_comments }}
+          </span>
+        </span>
+        <span class="task-snippet">
+          {{ last_modified }}
+        </span>
+      </div>
+      {% empty %}
+      {% endfor %}
+    </div>
+    {% endif %}
 {% endif %}
 
 
@@ -124,61 +157,19 @@ $(document).ready(function() {
  No tasks left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>.  {% endfor %}
 </div>
 
-<h2 class="task-header">code recently reviewed</h2>
-<div class="task-list">
+<h2 class="task-header">code already reviewed</h2>
+<div id="task-section">
   {% for task in completed_tasks.all %}
     {% include "review/task.html" %}
   {% empty %}
-  No tasks found.
+  <div class="empty">
+  No recent tasks found.
+  </div>
   {% endfor %}
 </div>
-
-<h2 class="task-header">code not reviewed</h2>
-<div class="task-list">
-  {% for task in uncompleted_tasks.all %}
-    {% include "review/task.html" %}
-  {% empty %}
-  All tasks completed.
-  {% endfor %}
-</div>
-
-</div>
-
-<div class="history"> show history </div>
+<div class="history"> show previous semesters </div>
 <div id="historic_content">
 {% if participant.profile.semester_taken %}
-
-<h2 class="task-header">submitted assignments [previous semesters]</h2>
-<div class="task-list">
-  {% for submission, reviewer_count, last_modified, user_comments, static_comments in old_submission_data %}
-  
-  <div id ="submission-{{submission.id}}" class="submission-line">
-    <span class="chunk-name">
-      {{ submission.assignment.name }}
-    </span>
-    <span class="task-stats">
-      <span class="reviewer-count" title="Reviewers">
-          {{ reviewer_count }}
-      </span>
-      <span class="comment-count" title="User Comments">
-        {{ user_comments }}
-      </span>
-      <span class="robot-count" title="Automatic Comments">
-        {{ static_comments }}
-      </span>
-    </span>
-    <span class="task-snippet">
-      {{ last_modified }}
-    </span>
-  </div>
-  {% empty %}
-  {% endfor %}
-</div>
-{% endif %}
-
-
-<div class="span-24">
-<h2 class="task-header">code reviewed [previous semesters]</h2>
 <div class="task-list">
   {% for task in old_completed_tasks.all %}
     {% include "review/task.html" %}
@@ -186,18 +177,9 @@ $(document).ready(function() {
   No tasks found.
   {% endfor %}
 </div>
-
-<h2 class="task-header">code not reviewed [previous semesters]</h2>
-<div class="task-list">
-  {% for task in old_uncompleted_tasks.all %}
-    {% include "review/task.html" %}
-  {% empty %}
-  All tasks completed.
-  {% endfor %}
+{% endif %}
 </div>
 
 </div>
 
-
-</div>
 {% endblock %}

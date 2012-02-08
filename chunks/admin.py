@@ -6,7 +6,7 @@ class AssignmentAdmin(admin.ModelAdmin):
     pass
 
 class ChunkAdmin(admin.ModelAdmin):
-    readonly_fields = ('name', 'file', 'start', 'end', 'created', 'modified')
+    readonly_fields = ('name', 'file', 'start', 'end', 'created', 'modified', 'staff_portion')
     list_display = ('name', 'file', 'start', 'end')
     search_fields = ('name', 'file__path', 'file__submission__name')
 
@@ -17,7 +17,7 @@ class ChunkProfileAdmin(admin.ModelAdmin):
     list_display = ('chunk', 'semicolons', 'nesting_depth', 
     'total_function_calls', 'total_branches', 'total_loops',
     'todo_count', 'null_count', 'instanceof_count', 'synchronized_count',
-    'valid', 'viable_comments', 'static_comments', 'iterator_count', 'comment_words')
+    'valid', 'viable_comments', 'static_comments', 'iterator_count', 'comment_words', 'student_lines')
 
 admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Submission)

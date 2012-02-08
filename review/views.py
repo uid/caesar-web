@@ -40,12 +40,6 @@ def dashboard(request):
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
-    old_uncompleted_tasks = user.get_profile().tasks \
-        .select_related('chunk__file__submission__assignment') \
-        .filter(status='U') \
-        .exclude(chunk__file__submission__assignment__semester='SP12') \
-        .annotate(comment_count=Count('chunk__comments', distinct=True),
-                  reviewer_count=Count('chunk__tasks', distinct=True))
     
     active_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission_assignment') \
@@ -57,13 +51,6 @@ def dashboard(request):
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester='SP12') \
-        .annotate(comment_count=Count('chunk__comments', distinct=True),
-                  reviewer_count=Count('chunk__tasks', distinct=True))
-
-    uncompleted_tasks = user.get_profile().tasks \
-        .select_related('chunk__file__submission__assignment') \
-        .filter(status='U') \
         .filter(chunk__file__submission__assignment__semester='SP12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
@@ -110,8 +97,6 @@ def dashboard(request):
         'completed_tasks': completed_tasks,
         'old_completed_tasks': old_completed_tasks,
         'new_task_count': new_task_count,
-        'uncompleted_tasks': uncompleted_tasks,
-        'old_uncompleted_tasks': old_uncompleted_tasks,
         'submission_data': submission_data,
         'old_submission_data': old_submission_data,
         'current_submissions': current_submissions,
@@ -528,13 +513,6 @@ def student_dashboard(request, username):
         .exclude(chunk__file__submission__assignment__semester='SP12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
-
-    old_uncompleted_tasks = participant.get_profile().tasks \
-        .select_related('chunk__file__submission__assignment') \
-        .filter(status='U') \
-        .exclude(chunk__file__submission__assignment__semester='SP12') \
-        .annotate(comment_count=Count('chunk__comments', distinct=True),
-                  reviewer_count=Count('chunk__tasks', distinct=True))
     
     active_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission_assignment') \
@@ -546,13 +524,6 @@ def student_dashboard(request, username):
     completed_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester='SP12') \
-        .annotate(comment_count=Count('chunk__comments', distinct=True),
-                  reviewer_count=Count('chunk__tasks', distinct=True))
-
-    uncompleted_tasks = participant.get_profile().tasks \
-        .select_related('chunk__file__submission__assignment') \
-        .filter(status='U') \
         .filter(chunk__file__submission__assignment__semester='SP12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
@@ -598,8 +569,6 @@ def student_dashboard(request, username):
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
         'old_completed_tasks': old_completed_tasks,
-        'uncompleted_tasks': uncompleted_tasks,
-        'old_uncompleted_tasks': old_uncompleted_tasks,
         'new_task_count': new_task_count,
         'submission_data': submission_data,
         'old_submission_data': old_submission_data,

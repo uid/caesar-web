@@ -242,6 +242,7 @@ class ChunkProfile(models.Model):
     static_comments = models.IntegerField(blank=True, null=True)
     iterator_count = models.IntegerField(blank=True, null=True)
     comment_words = models.IntegerField(blank=True, null=True)
+    student_lines = models.IntegerField(blank=True, null=True)
     
 class Fingerprint(models.Model):
     # This ID is basically useless, but Django currently doesn't support

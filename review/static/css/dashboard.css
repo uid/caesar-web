@@ -115,8 +115,11 @@ table.current-assignment {
     border-collapse: collapse;
 }
 .history{
-    float: right;
-    color: #777;
+    color: #0E6996;
+    cursor: pointer;
+}
+.history-submissions{
+    color: #0E6996;
     cursor: pointer;
 }
 .grey-text {
