@@ -39,6 +39,7 @@ class Assignment(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         instance.code_review_end_date = instance.duedate + datetime.timedelta(days=3)
+        instance.semester = 'SP12'
         instance.save()
 
 
