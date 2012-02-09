@@ -168,7 +168,11 @@ $(document).ready(function() {
     <div id="historic_content">
     <div class="task-list">
       {% for task in old_completed_tasks.all %}
-        {% include "review/task.html" %}
+        {% if user.profile.is_student %}
+            {% include "review/non_task.html" %}
+        {% else %}
+            {% include "review/task.html" %}
+        {% endif %}
       {% empty %}
       No tasks found.
       {% endfor %}

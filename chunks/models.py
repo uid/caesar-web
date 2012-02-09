@@ -32,6 +32,9 @@ class Assignment(models.Model):
         db_table = u'assignments'
     def __unicode__(self):
         return self.name
+    def is_current_semester(self):
+        return self.semester == 'SP12'
+        
 @receiver(post_save, sender=Assignment)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

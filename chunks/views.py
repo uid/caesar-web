@@ -19,6 +19,8 @@ import datetime
 def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
+    if user.profile.is_student() and not chunk.file.submission.assignment.is_current_semester() and user != chunk.file.submission.author:
+        raise Http404
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
 
@@ -71,10 +73,15 @@ def view_chunk(request, chunk_id):
 
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
+    user = request.user
     files = File.objects.filter(submission=submission_id).select_related('chunks')
+    submission = Submission.objects.get(id = submission_id)
     if not files:
         raise Http404
-    assignment_name = files[0].submission.assignment.name
+    assignment = files[0].submission.assignment
+    assignment_name = assignment.name
+    if user.profile.is_student() and not assignment.is_current_semester() and user != submission.author:
+        raise Http404
     paths = []
     user_stats = []
     static_stats = []

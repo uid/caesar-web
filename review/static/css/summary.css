@@ -44,6 +44,13 @@ table.assignment-stream {
     background-color: #eee;
     cursor: pointer;
 }
+.non-activity-line {
+    border-bottom: 1px solid #aaa;
+}
+
+.non-activity-line:hover {
+    background-color: #eee;
+}
 
 .new.activity-line {
     font-weight: bold;

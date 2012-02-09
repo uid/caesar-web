@@ -399,6 +399,8 @@ def all_activity(request, assign, username):
     user = request.user
     #get all assignments
     assignment = Assignment.objects.get(id__exact=assign)
+    if user.profile.is_student() and not assignment.is_current_semester():
+        raise Http404
     #get all relevant chunks
     chunks = Chunk.objects \
         .filter(file__submission__assignment = assignment) \
