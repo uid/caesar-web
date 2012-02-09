@@ -4,6 +4,7 @@
 {{ block.super }}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/blue/style.css" type="text/css" />
 {% endblock %}
 
 {% block js %}
@@ -18,9 +19,12 @@ $(document).ready(function() {
       return false;
     });
 
+    $("#allusers").tablesorter({
+        sortList: [[0,0]]
+    });
 });
 </script>
-
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.tablesorter.js"></script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -31,7 +35,14 @@ $(document).ready(function() {
 
 {% block content %}
 <h2 class="task-header">all users</h2>
-<table class="assignment-stream">
+<table id="allusers" class="assignment-stream tablesorter">
+  <thead>
+  <tr>
+      <th> User </th>
+      <th> Reputation </th>
+      <th> Role </th>
+  </tr>
+  </thead>
   {% for participant in participants %}
   <tr id="participant-{{participant.username}}" class="activity-line">
     <td class="black-text"> 
