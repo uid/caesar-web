@@ -386,7 +386,7 @@ def summary(request, username):
 
 @login_required
 def allusers(request):
-    participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile')
+    participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile').order_by('last_name')
     return render(request, 'review/allusers.html', {
         'participants': participants,
     })

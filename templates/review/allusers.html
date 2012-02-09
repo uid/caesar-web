@@ -39,7 +39,7 @@ $(document).ready(function() {
       <span class="grey-text">({{ participant.username }})</span>
     </td>
     <td class="grey-text"> {{ participant.profile.reputation }} </td>
-    <td class="grey-text"> {%if participant.profile.role %}[{{ participant.profile.role }}] {%endif%}</td>
+    <td class="grey-text"> {%if participant.profile.role %}{{ participant.profile.get_role_display }} {%endif%}</td>
   </tr>
   {% empty %}
   {% endfor %}
