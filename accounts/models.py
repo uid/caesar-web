@@ -35,7 +35,7 @@ class UserProfile(models.Model):
     # photo = ImageField(upload_to=get_photo_path)
     assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
         related_name='reviewers')
-    reputation = models.IntegerField(default=100, editable=True)
+    reputation = models.IntegerField(default=0, editable=True)
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
     extension_days = models.IntegerField(default=5)
@@ -57,7 +57,7 @@ class UserProfile(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile, created = UserProfile.objects.get_or_create(user=instance)
-        # if created:
-        #     profile.role = 'S'
-        #     profile.save()
+        if created:
+            profile.role = 'S'
+            profile.save()
     
