@@ -85,7 +85,7 @@ $(document).ready(function() {
 </table>
 {% endif %}
 
-{% if participant.profile.semester_taken %}
+{% if submission_data or old_submission_data %}
 <h2 class="task-header">submitted assignments</h2>
 <div>
   {% for submission, reviewer_count, last_modified, user_comments, static_comments in submission_data %}
