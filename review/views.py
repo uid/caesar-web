@@ -128,17 +128,9 @@ def student_stats(request):
         total_student_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(author__profile__role='S').count()
         total_user_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='U').count()
         total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
-        #first 20 lines
-        first_20_lines = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(start__lte=20).count()
-        #20-40 lines
-        twenty_to_fourty_lines = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(start__lte=40).filter(start__gt=20).count()
-        #40-60 lines
-        fourty_to_sixty_lines = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(start__lte=60).filter(start__gt=40).count()
-        more_than_sixty_lines = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(start__gt=60).count()
         
-        assignment_data.append( (assignment.name, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, 
-                                total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, first_20_lines, twenty_to_fourty_lines, fourty_to_sixty_lines,
-                                more_than_sixty_lines) )
+        assignment_data.append( (assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, 
+                                total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments) )
     return render(request, 'review/studentstats.html', {
         'assignment_data': assignment_data,
         'total_students': total_students,
