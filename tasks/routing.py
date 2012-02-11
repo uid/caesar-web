@@ -209,8 +209,7 @@ def find_chunks(user, chunks, count, total_fewer):
             def chunk_sort_key(chunk):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
-                    review_priority = 0
-                        
+                    review_priority = 0     
                 type_priority = 0
                 if (chunk.class_type == 'TEST'):
                     type_priority = 2
@@ -223,10 +222,9 @@ def find_chunks(user, chunks, count, total_fewer):
                 return (
                     user in chunk.reviewers,
                     user is chunk.submission.author,
-                    review_priority,
                     type_priority,
-                    chunk.staff_portion,
                     -total_affinity(user, chunk.submission.reviewers),
+                    chunk.staff_portion,
                     -total_affinity(user, chunk.reviewers),
                 )
             return chunk_sort_key
