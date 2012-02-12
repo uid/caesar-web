@@ -233,6 +233,8 @@ def find_chunks(user, chunks, count, total_fewer):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = 0
+                if chunk.staff_portion >= 95:
+                    review_priority = 15
                         
                 type_priority = 0
                 if (chunk.class_type == 'TEST'):
@@ -240,8 +242,6 @@ def find_chunks(user, chunks, count, total_fewer):
                 elif (chunk.class_type == 'ENUM'):
                     type_priority = 3
                 elif (chunk.class_type == 'EXCE'):
-                    type_priority = 4
-                if chunk.staff_portion <= 5:
                     type_priority = 4
                 return (
                     user in chunk.reviewers,
