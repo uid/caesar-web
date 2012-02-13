@@ -30,16 +30,22 @@ $(document).ready(function() {
     });
     
     $('#historic_content').hide();
+    var toggleTaskText = [ 'hide previous semesters', 'show previous semesters' ];
+    var taskIndex = 1;
     $('.history').click(function() {
         $('#historic_content').toggle(400);
-        $(this).text("");
+        taskIndex = 1 - taskIndex;
+        $(this).text(toggleTaskText[taskIndex]);
         $(".empty").remove();
     });
     
+    var toggleSemesterText = [ 'hide previous semesters', 'show previous semesters' ];
+    var semesterIndex = 1;
     $('#historic-submissions').hide();
     $('.history-submissions').click(function() {
         $('#historic-submissions').toggle(400);
-        $(this).text("");
+        semesterIndex = 1 - semesterIndex;
+        $(this).text(toggleTaskText[semesterIndex]);
     });
 
 });
@@ -167,19 +173,22 @@ $(document).ready(function() {
   </div>
   {% endfor %}
 </div>
-<div class="history"> show previous semesters </div>
-<div id="historic_content">
-{% if participant.profile.semester_taken %}
-<div class="task-list">
-  {% for task in old_completed_tasks.all %}
-    {% include "review/task.html" %}
-  {% empty %}
-  No tasks found.
-  {% endfor %}
-</div>
+{% if old_completed_tasks.all %}
+    <div class="history"> show previous semesters </div>
+    <div id="historic_content">
+    <div class="task-list">
+      {% for task in old_completed_tasks.all %}
+        {% if user.profile.is_student %}
+            {% include "review/non_task.html" %}
+        {% else %}
+            {% include "review/task.html" %}
+        {% endif %}
+      {% empty %}
+      No tasks found.
+      {% endfor %}
+    </div>
+    </div>
 {% endif %}
-</div>
-
 </div>
 
 {% endblock %}
