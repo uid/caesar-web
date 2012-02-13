@@ -30,7 +30,7 @@ def dashboard(request):
     for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
         #do not give tasks to students who got extensions
-        if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
+        if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
             new_task_count += assign_tasks(assignment, user)
     
     old_completed_tasks = user.get_profile().tasks \
@@ -57,7 +57,7 @@ def dashboard(request):
    
     #get all the submissions that the user submitted, in the current semester
     submissions = Submission.objects.filter(name=user.username) \
-        .filter(duedate__lt=datetime.datetime.now()) \
+        .filter(duedate__lt=datetime.datetime.now()-datetime.timedelta(minutes=30)) \
         .order_by('duedate')\
         .filter(assignment__semester="SP12")\
         .select_related('chunk__file__assignment') \
@@ -90,7 +90,9 @@ def dashboard(request):
                                   user_comments, static_comments))
     
     #find the current assignments
-    current_submissions = Submission.objects.filter(name=user.username).filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
+    current_submissions = Submission.objects.filter(name=user.username)\
+        .filter(duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
+        .order_by('duedate')
     
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
@@ -454,15 +456,29 @@ def request_extension(request, assignment_id):
     if request.method == 'GET':
         current_assignment = Assignment.objects.get(id=assignment_id)
         submission = Submission.objects.get(assignment=current_assignment, author=user)
+        #make sure user got here legally
+        if datetime.datetime.now() >  submission.duedate + datetime.timedelta(minutes=30):
+            return redirect('review.views.dashboard')
         extension = user.profile.extension_days
         extended_days = (submission.duedate - current_assignment.duedate).days
         late_days = 0
-        if datetime.datetime.now() > current_assignment.duedate:
-            late_days = (datetime.datetime.now() - current_assignment.duedate).days + 1
+        if datetime.datetime.now() > current_assignment.duedate + datetime.timedelta(minutes=30):
+            late_days = (datetime.datetime.now() - current_assignment.duedate + datetime.timedelta(minutes=30)).days + 1
         days = range(late_days, min(extension+extended_days+1, current_assignment.max_extension+1))
         written_days = []
         for day in range(days[-1]+1):
             written_days.append(current_assignment.duedate + datetime.timedelta(days=day))
+        if current_assignment.multiplier == 2: #beta submission
+            if (submission.duedate - current_assignment.duedate).seconds/3600 == 12: #has extension
+                extended_days = 1
+            late_days = 0
+            if datetime.datetime.now() > current_assignment.duedate + datetime.timedelta(minutes=30):
+                late_days = 1
+            days = range(late_days, min(extension+extended_days+1, current_assignment.max_extension+1))
+            written_days = []
+            for day in range(days[-1]+1):
+                hours = day * 12
+                written_days.append(current_assignment.duedate + datetime.timedelta(hours=hours))
         return render(request, 'review/extension_form.html', {
             'days': days,
             'current_day': extended_days,
@@ -483,6 +499,9 @@ def request_extension(request, assignment_id):
             user.profile.extension_days = total_days - extension
             user.profile.save()
             submission.duedate = current_assignment.duedate+datetime.timedelta(days=extension)
+            if current_assignment.multiplier == 2: #beta submission
+                hours = extension * 12
+                submission.duedate = current_assignment.duedate + datetime.timedelta(hours=hours)
             submission.save()
             return redirect('review.views.dashboard')
         except ValueError:
@@ -578,19 +597,16 @@ def cancel_assignment(request):
     if request.method == 'POST':
         assignments = request.POST.get('assignment', None)
         if assignments == "all":
-            sys.stderr.write('all---\n')
             started_tasks = Task.objects.filter(status='S')
             started = 0
             for task in started_tasks:
                 task.mark_as('C')
                 started += 1
-            sys.stderr.write('started: ' + str(started) + '\n')
             unfinished_tasks = Task.objects.exclude(status='C')
             total = 0
             for task in unfinished_tasks:
                 total += 1
                 task.mark_as('U')
-            sys.stderr.write('total: ' + str(total) + '\n')
             response_json = json.dumps({
                 'total': total,
             })
