@@ -28,6 +28,7 @@ class Assignment(models.Model):
     max_extension = models.IntegerField(default=3)
     semester = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
                                       blank=True, null=True)
+    multiplier = models.IntegerField(default=1)
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):
