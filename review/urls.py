@@ -17,5 +17,6 @@ urlpatterns = patterns('review.views',
     (r'^dashboard/(?P<username>\w+)', 'student_dashboard'),
     (r'^studentstats', 'student_stats'),
     (r'^manage', 'manage'),
-    (r'^cancel_assignment', 'cancel_assignment')
+    (r'^cancel_assignment', 'cancel_assignment'),
+    (r'^more_work', 'more_work'),
 )

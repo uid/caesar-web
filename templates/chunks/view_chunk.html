@@ -55,18 +55,18 @@
       <li>Upvote or downvote an existing comment.</li>
       <li>Reply to an existing comment to agree, disagree, or discuss.</li>
     </ul>
-    <p>Please do at least one thing on this method, then click the 
+    <p>Please do at least one thing on this code, then click the 
 Next 
-    button to go to the next method to review.</p>
+    button to go to the next methods to review.</p>
   </div>
   {% endif %}
   <div id="chunk-navigation">
     <div id="task-count">
       {% if task %}
-      {{ task_count|default:"No" }} function{{ task_count|pluralize }}
+      {{ task_count|default:"No" }} code section{{ task_count|pluralize }}
       remaining for review
       {% else %}
-      You have not been assigned to review this function
+      You have not been assigned to review this code.
       {% endif %}
     </div>
     {% if task %}

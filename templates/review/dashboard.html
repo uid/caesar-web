@@ -48,6 +48,30 @@ $(document).ready(function() {
         $(this).text(toggleTaskText[semesterIndex]);
     });
 
+    $('#progress').hide();
+    $('#more_work').click(function(e) {
+        $('#progress').show();
+        $.post(caesar.urls.more_work, {
+        }, function(data) {
+            $('#more_work').hide();
+            //$('.result').append('<div class="success">You have '+data.total+' new review tasks</div>');
+            $('.result').append('<div class="success">You have '+data.total +' new review tasks.</div>');
+            $('.task-empty').hide();
+            $('#new-task-list').append('<div id=task-'
+            + data.one.task_id + '-' + data.one.task_chunk_id + ' class="task-line new"> <span class="chunk-name">' 
+            + data.one.task_chunk_name + '</span><span class="task-stats"><span class="comment-count" title="Comments">' + data.one.task_comment_count + '</span><span class="reviewer-count" title="Reviewers">' + data.one.task_reviewer_count + '</span></span><span class="task-snippet">'+ data.one.task_chunk_generate_snippet + '</span></div>');
+            $('#new-task-list').append('<div id=task-'
+            + data.two.task_id + '-' + data.two.task_chunk_id +' class="task-line new"> <span class="chunk-name">' 
+            + data.two.task_chunk_name + '</span><span class="task-stats"><span class="comment-count" title="Comments">' + data.two.task_comment_count + '</span><span class="reviewer-count" title="Reviewers">' + data.two.task_reviewer_count + '</span></span><span class="task-snippet">'+ data.two.task_chunk_generate_snippet + '</span></div>');
+            
+            $('.task-line').click(function(e) {
+              var chunkId = this.id.split('-')[2];
+              window.location = "/chunks/view/" + chunkId;
+              return false;
+            });
+        },"json");
+    });
+
 });
 </script>
 
@@ -145,6 +169,7 @@ $(document).ready(function() {
 {% endif %}
 {% endif %}
 
+<div class="result"></div>
 <div class="span-24">
 {% if new_task_count > 0 %}
 <div class="success">
@@ -152,12 +177,12 @@ $(document).ready(function() {
 </div>
 {% endif %}
 <h2 class="task-header">code to review</h2>
-<div class="task-list">
+<div id="new-task-list" class="task-list">
   {% for task in active_tasks.all %}
     {% include "review/task.html" %}
   {% empty %}
- No tasks left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>.  {% endfor %}
-</div>
+ <div class="task-empty">No tasks left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>. {%if open_assignments %} Or <button id="more_work" type="button">Get more tasks!</button> <span id="progress"><img src="{{ STATIC_URL }}img/progress.gif"/></span>{% endif%}{% endfor %}
+</div></div>
 
 <h2 class="task-header">code already reviewed</h2>
 <div id="task-section">

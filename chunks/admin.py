@@ -6,8 +6,8 @@ class AssignmentAdmin(admin.ModelAdmin):
     pass
 
 class ChunkAdmin(admin.ModelAdmin):
-    readonly_fields = ('name', 'file', 'start', 'end', 'created', 'modified', 'staff_portion')
-    list_display = ('name', 'file', 'start', 'end')
+    readonly_fields = ('name', 'file', 'start', 'end', 'created', 'modified', 'staff_portion', 'class_type')
+    list_display = ('name', 'file', 'start', 'end', 'class_type', 'staff_portion')
     search_fields = ('name', 'file__path', 'file__submission__name')
 
 class StaffMarkerAdmin(admin.ModelAdmin):
