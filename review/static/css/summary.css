@@ -64,3 +64,21 @@ table.assignment-stream {
     display: block;
     margin-bottom: 18px;
 }
+
+.positive-votes {
+	background-color: #B7FFB7;
+	text-align: center;
+	margin-top:1px
+	margin-bottom:1px
+}
+
+.negative-votes {
+	background-color: #FFD1DC;
+	text-align: center;
+	margin-top:1px
+	margin-bottom:1px
+}
+
+.neutral-votes {
+	color: #777;
+}

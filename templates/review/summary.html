@@ -61,11 +61,25 @@ $(document).ready(function() {
                           {% endif %}
           {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
           {% endif %}" class="{%if not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
-    <td><span class="type" id="{{type}}" title="{{type}}">
-    </span></td>
-    <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
+    
+    <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
+    {% if not is_vote %}
+    	<td><span class="
+    	{% if comment.upvote_count > comment.downvote_count %}positive-votes
+    	{% else %}
+    		{% if comment.upvote_count < comment.downvote_count %}negative-votes
+    		{% else %}neutral-votes
+    		{% endif %}
+    	{% endif %}
+    	">+{{comment.upvote_count}}/-{{comment.downvote_count}}</span></td>
+   	    <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
+    {% else %}
+		    <td colspan="2" class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>    	
+    {% endif %}
+
     <td class="grey-text"> {{ comment.chunk.name }} </td>
     <td class="grey-text"> {{ comment.modified }} </td>
+    
   </tr>
   {% empty %}
   {% endfor %}
