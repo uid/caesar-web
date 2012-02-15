@@ -11,7 +11,7 @@ from django.http import HttpResponse, Http404
 
 from chunks.models import Chunk, Assignment, Submission, StaffMarker
 from tasks.models import Task
-from tasks.routing import assign_tasks
+from tasks.routing import assign_tasks, more_tasks
 from models import Comment, Vote, Star 
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.models import UserProfile
@@ -27,10 +27,12 @@ import sys
 def dashboard(request):
     user = request.user
     new_task_count = 0
+    open_assignments = False
     for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
         #do not give tasks to students who got extensions
         if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
+            open_assignments = True
             new_task_count += assign_tasks(assignment, user)
     
     old_completed_tasks = user.get_profile().tasks \
@@ -102,6 +104,7 @@ def dashboard(request):
         'submission_data': submission_data,
         'old_submission_data': old_submission_data,
         'current_submissions': current_submissions,
+        'open_assignments': open_assignments,
     })
     
 @staff_member_required
@@ -337,7 +340,7 @@ def change_task(request):
     task = get_object_or_404(Task, pk=task_id)
     task.mark_as(status)
     try:
-        next_task = request.user.get_profile().tasks.exclude(status='C') \
+        next_task = request.user.get_profile().tasks.exclude(status='C').exclude(status='U') \
                                               .order_by('created')[0:1].get()
         return redirect(next_task.chunk)
     except Task.DoesNotExist:
@@ -602,13 +605,54 @@ def cancel_assignment(request):
             for task in started_tasks:
                 task.mark_as('C')
                 started += 1
-            unfinished_tasks = Task.objects.exclude(status='C')
+            unfinished_tasks = Task.objects.exclude(status='C').exclude(status='U')
             total = 0
             for task in unfinished_tasks:
                 total += 1
                 task.mark_as('U')
             response_json = json.dumps({
                 'total': total,
+            })
+            return HttpResponse(response_json, mimetype='application/javascript')
+    return render(request, 'review/manage.html', {
+    })
+@login_required
+def more_work(request):
+    if request.method == 'POST':
+        user = request.user
+        new_task_count = 0
+        current_tasks = Task.objects.exclude(status='C').exclude(status='U')
+        sys.stderr.write("current tasks: " + str(current_tasks.count()) + "\n")
+        total = 0
+        if not current_tasks.count():
+            for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
+                active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
+                #do not give tasks to students who got extensions
+                if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
+                    sys.stderr.write("active assignments!\n")
+                    total += more_tasks(assignment, user, 2)
+            active_tasks = user.get_profile().tasks \
+                .select_related('chunk__file__submission_assignment') \
+                .exclude(status='C') \
+                .exclude(status='U') \
+                .annotate(comment_count=Count('chunk__comments', distinct=True),
+                          reviewer_count=Count('chunk__tasks', distinct=True))
+            one = active_tasks.all()[0]
+            two = active_tasks.all()[1]
+            response_json = json.dumps({
+                'total': total,
+                'one': {"task_chunk_name": one.chunk.name, \
+                                 "task_comment_count": one.comment_count,\
+                                 "task_reviewer_count": one.reviewer_count, \
+                                 "task_chunk_generate_snippet": one.chunk.generate_snippet(),\
+                                 "task_id": one.id,\
+                                 "task_chunk_id": one.chunk.id},
+                'two': {"task_chunk_name": two.chunk.name, \
+                                 "task_comment_count": two.comment_count,\
+                                 "task_reviewer_count": two.reviewer_count, \
+                                 "task_chunk_generate_snippet": two.chunk.generate_snippet(),\
+                                 "task_id": two.id,\
+                                 "task_chunk_id": two.chunk.id},
             })
             return HttpResponse(response_json, mimetype='application/javascript')
     return render(request, 'review/manage.html', {

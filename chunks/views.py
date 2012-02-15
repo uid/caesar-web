@@ -52,7 +52,7 @@ def view_chunk(request, chunk_id):
             highlighted_lines.append((number, line, False)) 
     
     task_count = Task.objects.filter(reviewer=user.get_profile()) \
-            .exclude(status='C').count()
+            .exclude(status='C').exclude(status='U').count()
     # get the associated task if it exists
     try:
         task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())

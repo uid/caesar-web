@@ -96,6 +96,9 @@ div.assignment-header {
     float: right;
     padding: 0px 5px;
 }
+.progress{
+    display: none;
+}
 
 .comment-count {
     display: inline;
