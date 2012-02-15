@@ -106,6 +106,7 @@ var model = new function() {
 window.isSelecting = false;
 
 function showCommentForm(startLine, endLine, chunkId, fileId) {
+	clearSpecial();
     $.get(caesar.urls.new_comment, 
         { start: startLine, end: endLine, chunk: chunkId},
         function(data) {
@@ -226,6 +227,9 @@ function expandAllAutoComments() {
 };
 
 function scrollCodeTo(comment, doScroll, callback) {
+
+	history.replaceState(history.state, "", "#comment-" + comment.id)
+
     if (doScroll === undefined) {
             doScroll = true;
         }
@@ -288,6 +292,8 @@ function resetScroll() {
     $('.files').animate({
         top: 0
     }, { duration: 500, queue: false });
+    clearSpecial();
+
 };
 
 window.clearSelection = function() {
@@ -305,6 +311,7 @@ function drawCommentMarker(comment) {
           .data('count', 1)
           .click(function(e) { 
               scrollCodeTo(comment);
+              checkIfSpecial(comment);
               $.each(model.comments, function(index, innerComment) {
                   if (innerComment.start == comment.start) {
                       $(innerComment.elt).effect('highlight', {}, 2000);
@@ -346,13 +353,26 @@ function drawCommentButtons(comment) {
     });
 }
 
+function clearSpecial() {
+	$('.comment-text').removeClass('highlight')
+	$('#voteup').removeClass('highlight');
+	$('#votedown').removeClass('highlight');	
+	$('.line').removeClass('highlight')
+}
+
 function checkIfSpecial(comment) {  
     var myFile = document.location.toString();
     if (myFile.match('#')) { // the URL contains an anchor
       var myAnchor = myFile.split('#')[1];
       var highlight_type = myAnchor.split('-')[0];
       var highlight_id = myAnchor.split('-')[1];
-      if (comment.id == highlight_id){        
+      
+
+      
+      // highlight actually special one
+      if (comment.id == highlight_id){     
+            // clear previous special guys
+      		clearSpecial(comment);
           if (highlight_type == "comment"){
               $('#comment-text-'+ highlight_id).addClass('highlight');
           }
@@ -366,7 +386,7 @@ function checkIfSpecial(comment) {
           for (var i = comment.start; i <= comment.end; i++) {
               $('#line-' + comment.chunk + '-' + i + '-' + comment.file).addClass('highlight');
           }
-          scrollCodeTo(comment)
+			return true;
        }
     }
     else{
@@ -378,6 +398,7 @@ function checkIfSpecial(comment) {
             }
         }
     }
+    return false;
 }
 
 function attachCommentHandlers(comment) {
@@ -395,6 +416,7 @@ function attachCommentHandlers(comment) {
             expandComment(comment);
         } else {
             scrollCodeTo(comment);
+            checkIfSpecial(comment)
             return false;
         }
     });
@@ -402,6 +424,7 @@ function attachCommentHandlers(comment) {
     if (caesar.state.fullView) {
         //reply button
         $('.reply-button', comment.elt).click(function() {
+        	clearSpecial();
             $.get(caesar.urls.reply, 
                 { parent: comment.id }	,
                 function(data) {
@@ -433,6 +456,7 @@ function attachCommentHandlers(comment) {
 
         // delete button
         $('.delete-button', comment.elt).click(function() {
+        	clearSpecial();
             $.get(caesar.urls.delete, {
                 comment_id: comment.id
             }, function(data) {
@@ -443,6 +467,7 @@ function attachCommentHandlers(comment) {
         
         // edit button
         $('.edit-button', comment.elt).click(function() {
+        	clearSpecial();
                 showEditForm(comment.id, comment.start, comment.end, comment.chunk, comment.file, comment);
         });
         
@@ -502,7 +527,10 @@ model.addListener('commentAdded', function(comment) {
         drawCommentButtons(comment);
     }
     attachCommentHandlers(comment);
-    checkIfSpecial(comment);
+    if (checkIfSpecial(comment)) {
+    	scrollCodeTo(comment);
+    	checkIfSpecial(comment);
+    }
 });
 
 model.addListener('commentRemoved', function(comment) {
@@ -519,7 +547,7 @@ model.addListener('taskStarted', function() {
 
 $(document).ready(function() {
 
-$('.comment').each(function() {
+$('.comment').each(function() { 
     model.addCommentFromDOM(this);
 });
 
