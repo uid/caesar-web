@@ -496,6 +496,8 @@ def request_extension(request, assignment_id):
             current_assignment = Assignment.objects.get(id=assignment_id)
             submission = Submission.objects.get(assignment=current_assignment, author=user)
             extended_days = (submission.duedate - current_assignment.duedate).days
+            if (submission.duedate - current_assignment.duedate).seconds/3600 == 12:
+                extended_days = 1
             total_days = total_left + extended_days
             if extension > total_days or extension < 0 or extension > current_assignment.max_extension:
                 return redirect('review.views.dashboard')
