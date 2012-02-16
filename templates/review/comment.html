@@ -54,7 +54,7 @@
     {{ comment.text }}
   </p>
   {% else %}
-  <p id="comment-text-{{comment.id}}" class="comment-text">
+  <p id="comment-text-{{comment.id}}" class="comment-text {% if '#important' in comment.text %}hashtag-important{% endif %}">
     {%if comment.deleted %}[deleted]{% else %}{{ comment.text }}{%endif%}
   </p>
   {% endif %}
