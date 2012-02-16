@@ -122,6 +122,8 @@ def student_stats(request):
         alums_participating = all_alums.count()
         total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
         one_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=1)).count()
+        half_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(hours=12)).count()
+        one_day_extension = max(one_day_extension, half_day_extension)
         two_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=2)).count()
         three_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=3)).count()
         total_tasks = Task.objects.filter(chunk__file__submission__assignment=assignment).count()
