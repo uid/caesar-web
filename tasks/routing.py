@@ -210,7 +210,7 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = 0 
-                if chunk.staff_portion >= 70:
+                if chunk.staff_portion >= 80:
                     review_priority = 15
                         
                 type_priority = 0
@@ -234,7 +234,7 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = 0
-                if chunk.staff_portion >= 70:
+                if chunk.staff_portion >= 80:
                     review_priority = 15
                         
                 type_priority = 0
@@ -312,7 +312,6 @@ def more_tasks(assignment, django_user, total):
     if not current_task_count:
         assign_count = total
 
-    sys.stderr.write("to assign: " + str(assign_count) + "\n")
     if not assign_count:
         return assign_count
         
