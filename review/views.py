@@ -625,15 +625,13 @@ def more_work(request):
     if request.method == 'POST':
         user = request.user
         new_task_count = 0
-        current_tasks = Task.objects.exclude(status='C').exclude(status='U')
-        sys.stderr.write("current tasks: " + str(current_tasks.count()) + "\n")
+        current_tasks = user.get_profile().tasks.exclude(status='C').exclude(status='U')
         total = 0
         if not current_tasks.count():
             for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
                 active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
                 #do not give tasks to students who got extensions
                 if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
-                    sys.stderr.write("active assignments!\n")
                     total += more_tasks(assignment, user, 2)
             active_tasks = user.get_profile().tasks \
                 .select_related('chunk__file__submission_assignment') \

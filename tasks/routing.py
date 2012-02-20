@@ -208,10 +208,12 @@ def find_chunks(user, chunks, count):
         if user.role == 'staff':
             def chunk_sort_key(chunk):
                 review_priority = len(chunk.reviewers)
-                if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
-                    review_priority = 0 
-                if chunk.staff_portion >= 70:
+                if len(chunk.reviewers) <= app_settings.REVIEWERS_PER_CHUNK: 
+                    review_priority = -1 * len(chunk.reviewers)
+                if chunk.staff_portion >= 80:
                     review_priority = 15
+                if chunk.name == "Main":
+                    review_priority = 20
                         
                 type_priority = 0
                 if (chunk.class_type == 'TEST'):
@@ -234,8 +236,10 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = 0
-                if chunk.staff_portion >= 70:
+                if chunk.staff_portion >= 80:
                     review_priority = 15
+                if chunk.name == "Main":
+                    review_priority = 20
                         
                 type_priority = 0
                 if (chunk.class_type == 'TEST'):
@@ -301,7 +305,6 @@ def assign_tasks(assignment, django_user):
     return assigned
 
 def more_tasks(assignment, django_user, total):
-    sys.stderr.write("more tasks\n")
     django_profile = django_user.get_profile()
     
     role = _convert_role(django_profile.role)
@@ -312,7 +315,6 @@ def more_tasks(assignment, django_user, total):
     if not current_task_count:
         assign_count = total
 
-    sys.stderr.write("to assign: " + str(assign_count) + "\n")
     if not assign_count:
         return assign_count
         
