@@ -353,11 +353,23 @@ function drawCommentButtons(comment) {
     });
 }
 
+function formatHashtags(text) {
+	// gets text from comment, returns HTML adjusted for hashtags
+	//var output = text.replace(/(#\w+)/g, 
+	//		'<a href="http://www.google.com/" class="hashtag">$1</a>');
+	var output = text.replace(/(#important)/ig, '<span class="hashtag-important">$1</span>')
+	return output;
+}
+
 function clearSpecial() {
-	$('.comment-text').removeClass('highlight')
+	$('.comment-text').removeClass('highlight');
 	$('#voteup').removeClass('highlight');
 	$('#votedown').removeClass('highlight');	
-	$('.line').removeClass('highlight')
+	$('.line').removeClass('highlight');
+	
+	$('.comment-text').each(function(i, l) {
+		l.innerHTML = formatHashtags(l.innerText);
+	});
 }
 
 function checkIfSpecial(comment) {  
