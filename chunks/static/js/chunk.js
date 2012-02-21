@@ -353,7 +353,7 @@ function drawCommentButtons(comment) {
     });
 }
 
-function formatHashtags(text) {
+function getFormattedHashtagText(text) {
 	// gets text from comment, returns HTML adjusted for hashtags
 	//var output = text.replace(/(#\w+)/g, 
 	//		'<a href="http://www.google.com/" class="hashtag">$1</a>');
@@ -361,15 +361,18 @@ function formatHashtags(text) {
 	return output;
 }
 
+function formatHashtags() {
+	$('.comment-text').each(function(i, l) {
+		l.innerHTML =  getFormattedHashtagText(l.innerText);
+	});
+}
+
 function clearSpecial() {
 	$('.comment-text').removeClass('highlight');
 	$('#voteup').removeClass('highlight');
 	$('#votedown').removeClass('highlight');	
-	$('.line').removeClass('highlight');
-	
-	$('.comment-text').each(function(i, l) {
-		l.innerHTML = formatHashtags(l.innerText);
-	});
+	$('.line').removeClass('highlight');	
+	formatHashtags();
 }
 
 function checkIfSpecial(comment) {  
@@ -558,6 +561,8 @@ model.addListener('taskStarted', function() {
 });
 
 $(document).ready(function() {
+
+	formatHashtags();
 
 $('.comment').each(function() { 
     model.addCommentFromDOM(this);
