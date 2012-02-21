@@ -64,15 +64,11 @@ $(document).ready(function() {
     
     <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
     
-    {% if comment.upvote_count > 0 and comment.downvote_count > 0 or is_vote or comment.upvote_count == comment.downvote_count %}
+    {% if comment.upvote_count == 0 and comment.downvote_count == 0 or is_vote %}
 		<td colspan="2" class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
 	{% else %}
-		{% if comment.upvote_count > 0 %}
-			<td class="positive-votes">+{{comment.upvote_count}}</td>
-		{% else %}
-			<td class="negative-votes">-{{comment.downvote_count}}</td>
-		{% endif %}
-		<td class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
+		<td>{% if comment.upvote_count > 0 %}<span class="positive-votes">+{{comment.upvote_count}}</span>{% endif %}{% if comment.upvote_count > 0 and comment.downvote_count > 0 %}/{% endif %}{% if comment.downvote_count > 0 %}<span class="negative-votes">-{{comment.downvote_count}}</span>{% endif %}</td>
+		<td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {{ snippet }} </td>
 	{% endif %}
 
     <td class="grey-text"> {{ comment.chunk.name }} </td>
