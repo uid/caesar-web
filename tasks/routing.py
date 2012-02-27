@@ -61,7 +61,8 @@ class Chunk:
         self.submission = submission
         self.reviewers = set()
         self.class_type = chunk['class_type']
-        self.staff_portion = chunk['staff_portion']
+        self.student_lines = chunk['profile__student_lines']
+        self.return_count = chunk['profile__return_count']
 
     def assign_reviewer(self, user):
         if user in self.reviewers:
@@ -103,7 +104,7 @@ def load_chunks(assignment, user_map, django_user):
     django_chunks = models.Chunk.objects \
             .filter(file__submission__assignment=assignment) \
             .exclude(file__submission__author=django_user) \
-            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'staff_portion')
+            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'profile__student_lines', 'profile__return_count')
     django_tasks = Task.objects.filter(
             chunk__file__submission__assignment=assignment) \
             .exclude(chunk__file__submission__author=django_user) \
@@ -210,7 +211,7 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) <= app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = -1 * len(chunk.reviewers)
-                if chunk.staff_portion >= 80:
+                if chunk.student_lines <= 15:
                     review_priority = 15
                 if chunk.name == "Main":
                     review_priority = 20
@@ -227,6 +228,9 @@ def find_chunks(user, chunks, count):
                     user is chunk.submission.author,
                     review_priority,
                     type_priority,
+                    len(chunk.submission.reviewers),
+                    -chunk.return_count
+                    -chunk.student_lines,
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
                 )
@@ -236,7 +240,7 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = 0
-                if chunk.staff_portion >= 80:
+                if chunk.student_lines <= 15:
                     review_priority = 15
                 if chunk.name == "Main":
                     review_priority = 20
@@ -253,10 +257,9 @@ def find_chunks(user, chunks, count):
                     user is chunk.submission.author,
                     review_priority,
                     type_priority,
-                    chunk.staff_portion,
-                    cluster_score(user, chunk),
-                    -cluster_sizes[chunk.cluster_id],
                     len(chunk.submission.reviewers),
+                    -chunk.return_count
+                    -chunk.student_lines,
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
                 )
@@ -275,6 +278,28 @@ def find_chunks(user, chunks, count):
         else:
             return
 
+def assign_many_tasks(assignment, django_users):
+    user_map = load_users()
+    chunks = load_chunks(assignment, user_map, 0)
+    assigned_list = []
+    for django_user in django_users:
+        print django_user.username
+        django_profile = django_user.get_profile()
+        current_task_count = Task.objects.filter(reviewer=django_profile, 
+                chunk__file__submission__assignment=assignment).count()
+
+        role = _convert_role(django_profile.role)
+        assign_count = app_settings.CHUNKS_PER_ROLE[role] - current_task_count
+        if assign_count <= 0:
+            continue
+        user = user_map[django_user.id]
+        assigned = 0
+        for chunk_id in find_chunks(user, chunks, assign_count):
+            task = Task(reviewer=django_user.get_profile(), chunk_id=chunk_id)
+            task.save()
+            assigned += 1
+        assigned_list.append((django_user.username, assigned))
+    return assigned_list
 
 def assign_tasks(assignment, django_user):
     """

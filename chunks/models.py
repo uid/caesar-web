@@ -232,7 +232,7 @@ class Chunk(models.Model):
 
 class ChunkProfile(models.Model):
     id = models.AutoField(primary_key=True)
-    chunk = models.ForeignKey(Chunk, related_name='profiles')
+    chunk = models.OneToOneField(Chunk, related_name='profile')
     semicolons = models.IntegerField(blank=True, null=True) #total number of semicolons in the chunk
     nesting_depth = models.IntegerField(blank=True, null=True) #deepest statement
     total_function_calls = models.IntegerField(blank=True, null=True)
@@ -248,6 +248,7 @@ class ChunkProfile(models.Model):
     iterator_count = models.IntegerField(blank=True, null=True)
     comment_words = models.IntegerField(blank=True, null=True)
     student_lines = models.IntegerField(blank=True, null=True)
+    return_count = models.IntegerField(blank=True, null=True)
     
 class Fingerprint(models.Model):
     # This ID is basically useless, but Django currently doesn't support
