@@ -145,6 +145,7 @@ INSTALLED_APPS = (
     'chunks',
     'review',
     'tasks',
+    'simplewiki',
 )
 
 LOGIN_REDIRECT_URL = '/'

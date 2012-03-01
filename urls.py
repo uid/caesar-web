@@ -15,6 +15,7 @@ urlpatterns = patterns('',
     (r'^accounts/', include('accounts.urls')),
     (r'^chunks/', include('chunks.urls')),
     (r'^review/', include('review.urls')),
+    (r'^wiki/', include('simplewiki.urls')),
 
     (r'^api/', include('api.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

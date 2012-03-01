@@ -358,6 +358,7 @@ function getFormattedHashtagText(text) {
 	//var output = text.replace(/(#\w+)/g, 
 	//		'<a href="http://www.google.com/" class="hashtag">$1</a>');
 	var output = text.replace(/(#important)/ig, '<span class="hashtag-important">$1</span>')
+	output = output.replace(/(#javaconvention)/ig, '<a href="http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-135099.html#367">$1</span>')
 	return output;
 }
 
