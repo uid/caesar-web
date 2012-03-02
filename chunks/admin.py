@@ -14,10 +14,9 @@ class StaffMarkerAdmin(admin.ModelAdmin):
     list_display = ('chunk', 'start_line', 'end_line')
 
 class ChunkProfileAdmin(admin.ModelAdmin):
-    list_display = ('chunk', 'semicolons', 'nesting_depth', 
-    'total_function_calls', 'total_branches', 'total_loops',
-    'todo_count', 'null_count', 'instanceof_count', 'synchronized_count',
-    'valid', 'viable_comments', 'static_comments', 'iterator_count', 'comment_words', 'student_lines')
+    list_display = ('chunk', 'student_lines', 'return_count', 
+    'for_nesting_depth', 'if_nesting_depth', 'synchronized_count',
+    'valid', 'viable_comments', 'static_comments', 'comment_words')
 
 admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Submission)
