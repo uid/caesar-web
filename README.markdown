@@ -141,7 +141,9 @@ To install Caesar's Python dependencies, just run:
     
 Note: This may not install ldap correctly if you're running OS X. If importing ldap causes errors, run:
 
-    pip-2.7 install python-ldap==2.3.13    
+    pip-2.7 install python-ldap==2.3.13
+    easy_install-2.7 ElementTree
+    easy_install-2.7 Markdown 
 
 
 ### Configuring Caesar

@@ -39,7 +39,6 @@ class Assignment(models.Model):
 @receiver(post_save, sender=Assignment)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        instance.code_review_end_date = instance.duedate + datetime.timedelta(days=3)
         instance.semester = 'SP12'
         instance.save()
 
@@ -233,19 +232,12 @@ class Chunk(models.Model):
 class ChunkProfile(models.Model):
     id = models.AutoField(primary_key=True)
     chunk = models.OneToOneField(Chunk, related_name='profile')
-    semicolons = models.IntegerField(blank=True, null=True) #total number of semicolons in the chunk
-    nesting_depth = models.IntegerField(blank=True, null=True) #deepest statement
-    total_function_calls = models.IntegerField(blank=True, null=True)
-    total_branches = models.IntegerField(blank=True, null=True)
-    total_loops = models.IntegerField(blank=True, null=True)
-    null_count = models.IntegerField(blank=True, null=True)
-    todo_count = models.IntegerField(blank=True, null=True)
-    instanceof_count = models.IntegerField(blank=True, null=True)
+    for_nesting_depth = models.IntegerField(blank=True, null=True) #deepest for loop count
+    if_nesting_depth = models.IntegerField(blank=True, null=True) #deepest if count
     synchronized_count = models.IntegerField(blank=True, null=True)
     valid = models.BooleanField(blank=True, default=False)
     viable_comments = models.IntegerField(blank=True, null=True)
     static_comments = models.IntegerField(blank=True, null=True)
-    iterator_count = models.IntegerField(blank=True, null=True)
     comment_words = models.IntegerField(blank=True, null=True)
     student_lines = models.IntegerField(blank=True, null=True)
     return_count = models.IntegerField(blank=True, null=True)
