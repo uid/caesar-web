@@ -211,7 +211,7 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) <= app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = -1 * len(chunk.reviewers)
-                if chunk.student_lines <= 15:
+                if chunk.student_lines <= 30:
                     review_priority = 15
                 if chunk.name == "Main":
                     review_priority = 20
@@ -229,7 +229,7 @@ def find_chunks(user, chunks, count):
                     review_priority,
                     type_priority,
                     len(chunk.submission.reviewers),
-                    -chunk.return_count
+                    -chunk.return_count,
                     -chunk.student_lines,
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
@@ -240,7 +240,7 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = 0
-                if chunk.student_lines <= 15:
+                if chunk.student_lines <= 30:
                     review_priority = 15
                 if chunk.name == "Main":
                     review_priority = 20
@@ -258,7 +258,7 @@ def find_chunks(user, chunks, count):
                     review_priority,
                     type_priority,
                     len(chunk.submission.reviewers),
-                    -chunk.return_count
+                    -chunk.return_count,
                     -chunk.student_lines,
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
