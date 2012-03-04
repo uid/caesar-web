@@ -229,7 +229,7 @@ def find_chunks(user, chunks, count):
                     review_priority,
                     type_priority,
                     len(chunk.submission.reviewers),
-                    -chunk.return_count
+                    -chunk.return_count,
                     -chunk.student_lines,
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
@@ -258,7 +258,7 @@ def find_chunks(user, chunks, count):
                     review_priority,
                     type_priority,
                     len(chunk.submission.reviewers),
-                    -chunk.return_count
+                    -chunk.return_count,
                     -chunk.student_lines,
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
