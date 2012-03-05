@@ -12,7 +12,10 @@ urlpatterns = patterns('',
 
     (r'^$', RedirectView.as_view(url='review/')),
 
-    (r'^accounts/', include('accounts.urls')),
+    (r'^accounts/*', include('accounts.urls')),
+    (r'accounts/$', 'django.contrib.auth.views.login', {
+        'template_name': 'accounts/login.html',    
+    }),
     (r'^chunks/', include('chunks.urls')),
     (r'^review/', include('review.urls')),
     (r'^wiki/', include('simplewiki.urls')),
