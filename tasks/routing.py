@@ -63,6 +63,8 @@ class Chunk:
         self.class_type = chunk['class_type']
         self.student_lines = chunk['profile__student_lines']
         self.return_count = chunk['profile__return_count']
+        self.for_nesting_depth = chunk['profile__for_nesting_depth']
+        self.if_nesting_depth = chunk['profile__if_nesting_depth']
 
     def assign_reviewer(self, user):
         if user in self.reviewers:
@@ -104,7 +106,7 @@ def load_chunks(assignment, user_map, django_user):
     django_chunks = models.Chunk.objects \
             .filter(file__submission__assignment=assignment) \
             .exclude(file__submission__author=django_user) \
-            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'profile__student_lines', 'profile__return_count')
+            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'profile__student_lines', 'profile__return_count', 'profile__for_nesting_depth', 'profile__if_nesting_depth')
     django_tasks = Task.objects.filter(
             chunk__file__submission__assignment=assignment) \
             .exclude(chunk__file__submission__author=django_user) \
@@ -211,7 +213,7 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) <= app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = -1 * len(chunk.reviewers)
-                if chunk.student_lines <= 30:
+                if chunk.student_lines <= 40:
                     review_priority = 15
                 if chunk.name == "Main":
                     review_priority = 20
@@ -229,8 +231,7 @@ def find_chunks(user, chunks, count):
                     review_priority,
                     type_priority,
                     len(chunk.submission.reviewers),
-                    -chunk.return_count,
-                    -chunk.student_lines,
+                    -1*(chunk.return_count + chunk.for_nesting_depth + chunk.if_nesting_depth),
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
                 )
@@ -240,7 +241,7 @@ def find_chunks(user, chunks, count):
                 review_priority = len(chunk.reviewers)
                 if len(chunk.reviewers) < app_settings.REVIEWERS_PER_CHUNK: 
                     review_priority = 0
-                if chunk.student_lines <= 30:
+                if chunk.student_lines <= 40:
                     review_priority = 15
                 if chunk.name == "Main":
                     review_priority = 20
@@ -258,7 +259,7 @@ def find_chunks(user, chunks, count):
                     review_priority,
                     type_priority,
                     len(chunk.submission.reviewers),
-                    -chunk.return_count,
+                    -1*(chunk.return_count + chunk.for_nesting_depth + chunk.if_nesting_depth),
                     -chunk.student_lines,
                     -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
