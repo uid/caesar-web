@@ -374,7 +374,9 @@ function getFormattedHashtagText(text) {
 
 function formatHashtags() {
 	$('.comment-text').each(function(i, l) {
-		l.innerHTML =  getFormattedHashtagText(l.innerText);
+	    if (typeof l.innerText != 'undefined'){
+		    l.innerHTML =  getFormattedHashtagText(l.innerText);
+	    }
 	});
 }
 
@@ -383,7 +385,7 @@ function clearSpecial() {
 	$('#voteup').removeClass('highlight');
 	$('#votedown').removeClass('highlight');	
 	$('.line').removeClass('highlight');	
-	formatHashtags();
+	//formatHashtags();
 }
 
 function checkIfSpecial(comment) {  
