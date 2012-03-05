@@ -374,7 +374,7 @@ function getFormattedHashtagText(text) {
 
 function formatHashtags() {
 	$('.comment-text').each(function(i, l) {
-		l.innerHTML =  getFormattedHashtagText(l.innerText);
+		l.innerHTML =  getFormattedHashtagText(l.textContent);
 	});
 }
 
