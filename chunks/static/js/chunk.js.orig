@@ -359,24 +359,28 @@ function hashtagRedirect(text) {
 }
 
 function getFormattedHashtagText(text) {
-	var output = text.replace(/(#important[^\w])/ig, '<span class="hashtag-important">$1</span>');
-	output = output.replace(/(#magicnumber[^\w])/ig, '<a onclick=hashtagRedirect("http://c2.com/cgi/wiki?MagicNumber")>$1</span>');
-	output = output.replace(/(#namingconvention[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-135099.html#367")>$1</a>');
-	output = output.replace(/(#javadoc[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html")>$1</a>');
-	output = output.replace(/(#import[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_imports.html")>$1</a>');
-	output = output.replace(/(#braces[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-142311.html#430")>$1</a>');
-	output = output.replace(/(#modifierorder[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_modifier.html")>$1</a>');
-	output = output.replace(/(#size[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_sizes.html")>$1</a>');
-	output = output.replace(/(#innerassignment[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_coding.html")>$1</a>');
-	output = output.replace(/(#hashcode[^\w])/ig, '<a onclick=hashtagRedirect("http://www.technofundo.com/tech/java/equalhash.html")>$1</a>');
-	output = output.replace(/(#tab[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Files")>$1</a>');
-	output = output.replace(/(#scope[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Variables")>$1</a>');
+	var output = text.replace(/(#important)/ig, '<span class="hashtag-important">$1</span>');
+	output = output.replace(/(#magicnumber)/ig, '<a onclick=hashtagRedirect("http://c2.com/cgi/wiki?MagicNumber")>$1</span>');
+	output = output.replace(/(#namingconvention)/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-135099.html#367")>$1</a>');
+	output = output.replace(/(#javadoc)/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html")>$1</a>');
+	output = output.replace(/(#importissues)/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_imports.html")>$1</a>');
+	output = output.replace(/(#bracketissues)/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-142311.html#430")>$1</a>');
+	output = output.replace(/(#modifierorder)/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_modifier.html")>$1</a>');
+	output = output.replace(/(#sizeissues)/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_sizes.html")>$1</a>');
+	output = output.replace(/(#innerassignment)/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_coding.html")>$1</a>');
+	output = output.replace(/(#hashcode)/ig, '<a onclick=hashtagRedirect("http://www.technofundo.com/tech/java/equalhash.html")>$1</a>');
 	return output;
 }
 
 function formatHashtags() {
 	$('.comment-text').each(function(i, l) {
+<<<<<<< HEAD
 		l.innerHTML =  getFormattedHashtagText(l.textContent);
+=======
+	    if (typeof l.innerText != 'undefined'){
+		    l.innerHTML =  getFormattedHashtagText(l.innerText);
+	    }
+>>>>>>> 19c6c934b0638c5296504ef21a7cffcc225c494b
 	});
 }
 
@@ -385,6 +389,7 @@ function clearSpecial() {
 	$('#voteup').removeClass('highlight');
 	$('#votedown').removeClass('highlight');	
 	$('.line').removeClass('highlight');	
+	//formatHashtags();
 }
 
 function checkIfSpecial(comment) {  
@@ -573,6 +578,8 @@ model.addListener('taskStarted', function() {
 });
 
 $(document).ready(function() {
+
+	formatHashtags();
 
 $('.comment').each(function() { 
     model.addCommentFromDOM(this);
