@@ -1,0 +1,148 @@
+<html>
+<head>
+<style type="text/css">
+
+	a.hashtag-1 {
+		color:green;
+		onclick:return false;
+	}
+	
+	a.hashtag-2 {
+		color:red;
+		onclick:return false;
+	}
+	
+</style>
+
+<link rel="stylesheet" href="/static/css/comments.css" type="text/css" />
+<link rel="stylesheet" href="/static/css/blueprint/screen.css" type="text/css" />
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<script type="text/javascript">	
+
+hashtags = {}
+{% for k, v in hashtags.items %}
+    hashtags["{{k}}"] = "{{v}}";
+{% endfor %}
+
+updatePreview = function(text) {
+	$('#comment-text-165956')[0].innerHTML = genCommentPreview(text);
+};
+
+genCommentPreview = function(text) {
+	output = text;
+	
+	// link all recognized hashtags
+	for (k in hashtags) {
+		var r = new RegExp('(\#' + k + ')([^a-zA-Z]|$)', 'gi');
+		output = output.replace(r, '<a class="hashtag-1" href="' + hashtags[k] +'">$1</a>$2');
+	}
+	
+	output = output.replace(/\#important(\W|$)/gi, '<span class="hashtag-important">#important</span>$1');
+	
+	// mark unlinked hashtags as red
+	output = output.replace(/(^|[^\>])(\#\w+)/gi, '$1<a class="hashtag-2">$2</a>');
+	
+	return output;
+};
+// do it onload
+//$(function() {
+//    updatePreview($('#comment_input')[0].value);
+//});
+</script>
+</head>
+<body>
+    Testing live preview
+    <hr>
+	<div class='span-6'>
+        <div class="comment comment-reply new-reply">
+          <div class="reply-form">
+            <form id="edit-comment-form" action="/review/edit_comment/" method="post">
+              <div style="display:none"><input type="hidden" name="csrfmiddlewaretoken" value="75cbce1c1ee9d13af1b8a1d6f5c5fcc6"></div>
+              <textarea id="id_text" rows="5" cols="10" name="text" onkeyup="updatePreview(this.value)"></textarea>
+              <input type="hidden" name="comment_id" value="165952" id="id_comment_id">
+              <button type="submit">Save</button>
+              <button id="cancel-reply-button" type="button">Cancel</button>
+            </form>
+          </div>
+        </div>
+        
+        <div id="comment-165956-48-48-29386-18245" class="comment 
+         
+         
+         expanded" style="">
+
+  
+  <div class="comment-header">
+    <span class="comment-line-numbers">
+    48
+    
+    </span>
+    <span class="comment-visibility">
+    </span>
+    <span class="comment-snippet">
+          private void checkRep() {         // height= width         // all the rows must be the same length         // dim ^ 2 = size
+    </span>
+  </div>
+  
+
+  <div class="comment-author">
+    
+    
+    just a few seconds ago 
+    
+    
+    
+    by <span class="comment-author-name
+      
+      student">
+      
+        <a href="/review/user/jdhenke">
+        Joseph Henke
+        (100)
+        </a>
+    
+    </span>
+
+    
+    
+    
+  </div>
+      <i>Preview</i>
+  
+  <p id="comment-text-165956" class="comment-text">
+  </p>
+  
+  <div class="comment-author">
+      
+      
+  </div>
+  <div class="comment-footer">
+
+    <span class="comment-votes">
+      <span class="vote-buttons
+        ">
+          <div id="upvote-165956" title="Upvote" class="vote up ">
+            0
+          </div>
+          <div id="downvote-165956" title="Downvote" class="vote down ">
+            0
+          </div>
+        </span>
+    </span>
+    
+    <span class="comment-actions">
+      
+      <button id="reply-165956-button" class="reply-button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary" type="button" role="button" aria-disabled="false"><span class="ui-button-icon-primary ui-icon ui-icon-reply"></span><span class="ui-button-text">Reply</span></button>
+      
+      <button id="delete-165956-button" class="delete-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" type="button" role="button" aria-disabled="false" title="Delete"><span class="ui-button-icon-primary ui-icon ui-icon-delete"></span><span class="ui-button-text">Delete</span></button>
+     <button id="edit-165956-button" class="edit-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" type="button" role="button" aria-disabled="false" title="Edit"><span class="ui-button-icon-primary ui-icon ui-icon-edit"></span><span class="ui-button-text">Edit</span></button>
+      
+      
+    </span>
+  </div>
+  
+</div>
+</div>
+</body>
+</html>

@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.conf import settings
+from django.template import RequestContext
 
 from models import *
 from settings import *
@@ -28,6 +29,21 @@ def view(request, wiki_url):
                                  'wiki_attachments_write': article.can_attach(request.user),
                                  } ) 
     return render_to_response('simplewiki_view.html', c)
+    
+def list_all(request):
+    articles = None
+    try:
+        articles = Article.objects.all()
+    except:
+        pass
+    return render_to_response('simplewiki/simplewiki_all.html', 
+                              {'articles': articles})
+    
+def comment_test(request):
+    hashtags = {'repexposure': 'http://www.google.com/',
+                'import': 'http://www.yahoo.com/'};
+                
+    return render_to_response('test_comment.html', {'hashtags': hashtags})
 
 def root_redirect(request):
     """

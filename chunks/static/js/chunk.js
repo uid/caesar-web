@@ -106,7 +106,7 @@ var model = new function() {
 window.isSelecting = false;
 
 function showCommentForm(startLine, endLine, chunkId, fileId) {
-	clearSpecial();
+    clearSpecial();
     $.get(caesar.urls.new_comment, 
         { start: startLine, end: endLine, chunk: chunkId},
         function(data) {
@@ -228,7 +228,7 @@ function expandAllAutoComments() {
 
 function scrollCodeTo(comment, doScroll, callback) {
 
-	history.replaceState(history.state, "", "#comment-" + comment.id)
+    history.replaceState(history.state, "", "#comment-" + comment.id)
 
     if (doScroll === undefined) {
             doScroll = true;
@@ -355,36 +355,36 @@ function drawCommentButtons(comment) {
 
 // overrides onclick functionality of scrolling comments
 function hashtagRedirect(text) {
-	window.open(text, '_newtab');
+    window.open(text, '_newtab');
 }
 
 function getFormattedHashtagText(text) {
-	var output = text.replace(/(#important[^\w])/ig, '<span class="hashtag-important">$1</span>');
-	output = output.replace(/(#magicnumber[^\w])/ig, '<a onclick=hashtagRedirect("http://c2.com/cgi/wiki?MagicNumber")>$1</span>');
-	output = output.replace(/(#namingconvention[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-135099.html#367")>$1</a>');
-	output = output.replace(/(#javadoc[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html")>$1</a>');
-	output = output.replace(/(#import[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_imports.html")>$1</a>');
-	output = output.replace(/(#braces[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-142311.html#430")>$1</a>');
-	output = output.replace(/(#modifierorder[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_modifier.html")>$1</a>');
-	output = output.replace(/(#size[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_sizes.html")>$1</a>');
-	output = output.replace(/(#innerassignment[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_coding.html")>$1</a>');
-	output = output.replace(/(#hashcode[^\w])/ig, '<a onclick=hashtagRedirect("http://www.technofundo.com/tech/java/equalhash.html")>$1</a>');
-	output = output.replace(/(#tab[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Files")>$1</a>');
-	output = output.replace(/(#scope[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Variables")>$1</a>');
-	return output;
+    var output = text.replace(/(#important[^\w])/ig, '<span class="hashtag-important">$1</span>');
+    output = output.replace(/(#magicnumber[^\w])/ig, '<a onclick=hashtagRedirect("http://c2.com/cgi/wiki?MagicNumber")>$1</span>');
+    output = output.replace(/(#namingconvention[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-135099.html#367")>$1</a>');
+    output = output.replace(/(#javadoc[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html")>$1</a>');
+    output = output.replace(/(#import[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_imports.html")>$1</a>');
+    output = output.replace(/(#braces[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-142311.html#430")>$1</a>');
+    output = output.replace(/(#modifierorder[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_modifier.html")>$1</a>');
+    output = output.replace(/(#size[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_sizes.html")>$1</a>');
+    output = output.replace(/(#innerassignment[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_coding.html")>$1</a>');
+    output = output.replace(/(#hashcode[^\w])/ig, '<a onclick=hashtagRedirect("http://www.technofundo.com/tech/java/equalhash.html")>$1</a>');
+    output = output.replace(/(#tab[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Files")>$1</a>');
+    output = output.replace(/(#scope[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Variables")>$1</a>');
+    return output;
 }
 
 function formatHashtags() {
-	$('.comment-text').each(function(i, l) {
-		l.innerHTML =  getFormattedHashtagText(l.textContent);
-	});
+    $('.comment-text').each(function(i, l) {
+        l.innerHTML =  getFormattedHashtagText(l.textContent);
+    });
 }
 
 function clearSpecial() {
-	$('.comment-text').removeClass('highlight');
-	$('#voteup').removeClass('highlight');
-	$('#votedown').removeClass('highlight');	
-	$('.line').removeClass('highlight');	
+    $('.comment-text').removeClass('highlight');
+    $('#voteup').removeClass('highlight');
+    $('#votedown').removeClass('highlight');    
+    $('.line').removeClass('highlight');    
 }
 
 function checkIfSpecial(comment) {  
@@ -399,7 +399,7 @@ function checkIfSpecial(comment) {
       // highlight actually special one
       if (comment.id == highlight_id){     
             // clear previous special guys
-      		clearSpecial(comment);
+              clearSpecial(comment);
           if (highlight_type == "comment"){
               $('#comment-text-'+ highlight_id).addClass('highlight');
           }
@@ -413,7 +413,7 @@ function checkIfSpecial(comment) {
           for (var i = comment.start; i <= comment.end; i++) {
               $('#line-' + comment.chunk + '-' + i + '-' + comment.file).addClass('highlight');
           }
-			return true;
+            return true;
        }
     }
     else{
@@ -451,9 +451,9 @@ function attachCommentHandlers(comment) {
     if (caesar.state.fullView) {
         //reply button
         $('.reply-button', comment.elt).click(function() {
-        	clearSpecial();
+            clearSpecial();
             $.get(caesar.urls.reply, 
-                { parent: comment.id }	,
+                { parent: comment.id }    ,
                 function(data) {
                     $('.reply-form').parent().remove();
                     clearSelection();
@@ -483,7 +483,7 @@ function attachCommentHandlers(comment) {
 
         // delete button
         $('.delete-button', comment.elt).click(function() {
-        	clearSpecial();
+            clearSpecial();
             $.get(caesar.urls.delete, {
                 comment_id: comment.id
             }, function(data) {
@@ -494,7 +494,7 @@ function attachCommentHandlers(comment) {
         
         // edit button
         $('.edit-button', comment.elt).click(function() {
-        	clearSpecial();
+            clearSpecial();
                 showEditForm(comment.id, comment.start, comment.end, comment.chunk, comment.file, comment);
         });
         
@@ -555,8 +555,8 @@ model.addListener('commentAdded', function(comment) {
     }
     attachCommentHandlers(comment);
     if (checkIfSpecial(comment)) {
-    	scrollCodeTo(comment);
-    	checkIfSpecial(comment);
+        scrollCodeTo(comment);
+        checkIfSpecial(comment);
     }
 });
 
