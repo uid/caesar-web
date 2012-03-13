@@ -37,10 +37,18 @@ class Assignment(models.Model):
         return self.semester == 'SP12'
         
 @receiver(post_save, sender=Assignment)
-def create_user_profile(sender, instance, created, **kwargs):
+def create_current_assignment(sender, instance, created, **kwargs):
     if created:
         instance.semester = 'SP12'
         instance.save()
+
+@receiver(post_save, sender=Assignment)
+def update_deadline(sender, instance, created, **kwargs):
+    if not created:
+        subs = Submission.objects.filter(assignment=instance)
+        for sub in subs:
+            sub.duedate = instance.duedate
+            sub.save()
 
 
 class Submission(models.Model):
