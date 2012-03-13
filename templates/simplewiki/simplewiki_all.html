@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+{% endblock %}
+
+{% block content %}
+<h1>All Articles</h1>
+<h3>This is a list of all articles in the database.</h3>
+{% for article in articles %}
+    <p><a href="{{article.slug}}">{{article.title}}</a></p>
+{% endfor %}
+{% endblock %}
