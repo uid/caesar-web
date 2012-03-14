@@ -3,7 +3,7 @@ import types
 from django.core.urlresolvers import get_callable
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponseForbidden, HttpResponseNotAllowed
 from django.utils import simplejson
-from django.shortcuts import get_object_or_404, render_to_response 
+from django.shortcuts import render, get_object_or_404, render_to_response 
 from django.template import RequestContext, Context, loader
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
@@ -36,8 +36,9 @@ def list_all(request):
         articles = Article.objects.all()
     except:
         pass
-    return render_to_response('simplewiki/simplewiki_all.html', 
-                              {'articles': articles})
+    return render(request, 'simplewiki/simplewiki_all.html', {
+            'articles': articles
+    })
     
 def comment_test(request):
     hashtags = {'repexposure': 'http://www.google.com/',
