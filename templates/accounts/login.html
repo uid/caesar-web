@@ -36,7 +36,10 @@
     <button type="submit">Login</button>
   </form>
 
-    Forgotten password? Email elena_11 at mit.edu.
+  <a id="forgotten-link" 
+     href="{% url django.contrib.auth.views.password_reset %}">
+    Forgotten password?
+  </a>
 
 
   {% comment %}
