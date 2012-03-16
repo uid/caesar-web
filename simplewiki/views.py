@@ -12,9 +12,12 @@ from django.db.models import Q
 from django.conf import settings
 from django.template import RequestContext
 
+from django.contrib.auth.decorators import login_required
+
 from models import *
 from settings import *
 
+@login_required
 def view(request, wiki_url):
     
     (article, path, err) = fetch_from_url(request, wiki_url)
@@ -28,24 +31,38 @@ def view(request, wiki_url):
                                  'wiki_write': article.can_write_l(request.user),
                                  'wiki_attachments_write': article.can_attach(request.user),
                                  } ) 
-    return render_to_response('simplewiki_view.html', c)
+    return render(request, "simplewiki/simplewiki_view.html", {
+                           'wiki_article': article,
+                           'wiki_write': True,
+                           # 'wiki_write': article.can_write_l(request.user),
+                           'wiki_attachments_write': article.can_attach(request.user),
+    })
+    # return render_to_response('simplewiki_view.html', c)
     
+# WORKS!!!!
+@login_required
 def list_all(request):
     articles = None
     try:
-        articles = Article.objects.all()
+        # get all articles besides root
+        articles = Article.objects.exclude(id=Article.get_root().id)
     except:
         pass
     return render(request, 'simplewiki/simplewiki_all.html', {
             'articles': articles
     })
     
+@login_required
 def comment_test(request):
     hashtags = {'repexposure': 'http://www.google.com/',
                 'import': 'http://www.yahoo.com/'};
                 
-    return render_to_response('test_comment.html', {'hashtags': hashtags})
+    return render(request, 'simplewiki/test_comment.html', {
+                           'hashtags': hashtags,
+    })
+    return render_to_response('simplewiki/test_comment.html', {'hashtags': hashtags})
 
+@login_required
 def root_redirect(request):
     """
     Reason for redirecting:
@@ -62,8 +79,9 @@ def root_redirect(request):
         err = not_found(request, 'mainpage')
         return err
 
-    return HttpResponseRedirect(reverse('wiki_view', args=(root.slug,)))
+    return HttpResponseRedirect(reverse('simplewiki/wiki_view', args=(root.slug,)))
 
+@login_required
 def create(request, wiki_url):
     
     url_path = get_url_path(wiki_url)
@@ -71,7 +89,7 @@ def create(request, wiki_url):
     if url_path != [] and url_path[0].startswith('_'):
             c = RequestContext(request, {'wiki_err_keyword': True,
                                          'wiki_url': '/'.join(url_path) })
-            return render_to_response('simplewiki_error.html', c)        
+            return render_to_response('simplewiki/simplewiki_error.html', c)        
 
     # Lookup path
     try:
@@ -85,7 +103,7 @@ def create(request, wiki_url):
         if not path:
             c = RequestContext(request, {'wiki_err_noparent': True,
                                          'wiki_url_parent': '/'.join(url_path[:-1]) })
-            return render_to_response('simplewiki_error.html', c)
+            return render_to_response('simplewiki/simplewiki_error.html', c)
         
         perm_err = check_permissions(request, path[-1], check_locked=False, check_write=True)
         if perm_err:
@@ -130,8 +148,9 @@ def create(request, wiki_url):
                                  'wiki_write': True,
                                  })
 
-    return render_to_response('simplewiki_create.html', c)
+    return render_to_response('simplewiki/simplewiki_create.html', c)
 
+@login_required
 def edit(request, wiki_url):
 
     (article, path, err) = fetch_from_url(request, wiki_url)
@@ -171,8 +190,9 @@ def edit(request, wiki_url):
                                  'wiki_attachments_write': article.can_attach(request.user),
                                  })
 
-    return render_to_response('simplewiki_edit.html', c)
+    return render_to_response('simplewiki/simplewiki_edit.html', c)
 
+@login_required
 def history(request, wiki_url, page=1):
 
     (article, path, err) = fetch_from_url(request, wiki_url)
@@ -222,8 +242,9 @@ def history(request, wiki_url, page=1):
                                  'wiki_article': article,
                                  'wiki_history': history[beginItem:beginItem+page_size],})
 
-    return render_to_response('simplewiki_history.html', c)
+    return render_to_response('simplewiki/simplewiki_history.html', c)
 
+@login_required
 def search_articles(request, wiki_url):
     # blampe: We should check for the presence of other popular django search
     # apps and use those if possible. Only fall back on this as a last resort.
@@ -254,10 +275,11 @@ def search_articles(request, wiki_url):
         else:        
             c = RequestContext(request, {'wiki_search_results': results,
                                          'wiki_search_query': querystring})
-            return render_to_response('simplewiki_searchresults.html', c)
+            return render_to_response('simplewiki/simplewiki_searchresults.html', c)
     
     return view(request, wiki_url)
 
+@login_required
 def search_add_related(request, wiki_url):
 
     (article, path, err) = fetch_from_url(request, wiki_url)
@@ -289,6 +311,7 @@ def search_add_related(request, wiki_url):
     json = simplejson.dumps({'results': results})
     return HttpResponse(json, mimetype='application/json')
 
+@login_required
 def add_related(request, wiki_url):
 
     (article, path, err) = fetch_from_url(request, wiki_url)
@@ -331,19 +354,22 @@ def remove_related(request, wiki_url, related_id):
     finally:
         return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
+@login_required
 def random_article(request, wiki_url):
     from random import randint
     num_arts = Article.objects.count()
     article = Article.objects.all()[randint(0, num_arts-1)]
     return HttpResponseRedirect(reverse('wiki_view', args=(article.get_url(),)))
 
+@login_required
 def encode_err(request, url):
-    return render_to_response('simplewiki_error.html',
+    return render_to_response('simplewiki/simplewiki_error.html',
                               RequestContext(request, {'wiki_err_encode': True}))
-    
+
+@login_required   
 def not_found(request, wiki_url):
     """Generate a NOT FOUND message for some URL"""
-    return render_to_response('simplewiki_error.html',
+    return render_to_response('simplewiki/simplewiki_error.html',
                               RequestContext(request, {'wiki_err_notfound': True,
                                                        'wiki_url': wiki_url}))
 
@@ -393,7 +419,7 @@ def check_permissions(request, article, check_read=False, check_write=False, che
         #       on the current page? (no such redirect happens for an anon upload yet)
         # benjaoming: I think this is the nicest way of displaying an error, but
         # these errors shouldn't occur, but rather be prevented on the other pages.
-        return render_to_response('simplewiki_error.html', c)
+        return render_to_response('simplewiki/simplewiki_error.html', c)
     else:
         return None
 
