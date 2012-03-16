@@ -1,5 +1,11 @@
-<html>
-<head>
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+{% endblock %}
+
+{% block content %}
 <style type="text/css">
 
 	a.hashtag-1 {
@@ -145,4 +151,4 @@ genCommentPreview = function(text) {
 </div>
 </div>
 </body>
-</html>
+{% endblock %}

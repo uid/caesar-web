@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "simplewiki/simplewiki_base.html" %}
 
 {% block css %}
 {{ block.super }}
@@ -11,6 +11,7 @@
 
 {% block content %}
 <h1>All Articles</h1>
+<hr />
 <h3>This is a list of all articles in the database.</h3>
 {% for article in articles %}
     <p><a href="{{article.slug}}">{{article.title}}</a></p>

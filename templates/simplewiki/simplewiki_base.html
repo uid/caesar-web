@@ -1,3 +1,9 @@
+{% extends "base.html" %}
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+{% endblock %}
+
+{% block content %}
 {% load i18n simplewiki_utils %}
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html lang="{{ LANGUAGE_CODE }}">
@@ -135,7 +141,7 @@
         {% if wiki_write %}
         <form method="POST" action="{% url add_related wiki_article.get_url %}">{% csrf_token %}
         	<input type="text" name="value" id="wiki_related_input" style="width: 72%" />
-        	<input type="submit" id="wiki_related_input_submit" disabled="true" value="Add" style="width: 20%" />
+        	<input type="submit" id="wiki_related_input_submit" enabled="true" value="Add" style="width: 20%" />
         	<input type="hidden" name="id" value="" id="wiki_related_input_id" />
         </form>
         {% endif %}
@@ -195,3 +201,4 @@
 
 </body>
 </html>
+{% endblock %}
