@@ -146,6 +146,7 @@ INSTALLED_APPS = (
     'review',
     'tasks',
     'simplewiki',
+    'notifications',
 )
 
 LOGIN_REDIRECT_URL = '/'
