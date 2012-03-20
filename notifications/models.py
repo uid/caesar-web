@@ -14,6 +14,8 @@ from email_templates import send_templated_mail
 
 from review.models import Comment, Vote
 from chunks.models import Submission
+import datetime
+import sys
 
 # class Event(models.Model):
 #     CREATED = 'C'
@@ -79,13 +81,14 @@ NEW_REPLY_SUBJECT_TEMPLATE = Template(
 @receiver(post_save, sender=Comment)
 def send_comment_notification(sender, instance, created=False, **kwargs):
     if created:
+        sys.stderr.write("in created\n")
         site = Site.objects.get_current()
         context = Context({
             'site': site,
             'comment': instance,
             'chunk': instance.chunk
         })
-        
+        sys.stderr.write("in context\n")
         #comment gets a reply, the reply is not by the original author
         if instance.parent and instance.parent.author.email \
                 and instance.parent.author != instance.author:
@@ -94,11 +97,30 @@ def send_comment_notification(sender, instance, created=False, **kwargs):
             notification = Notification(recipient = instance.parent.author, reason='R')
             notification.submission = instance.chunk.file.submission
             notification.comment = instance
-            notificaiton.save()
+            notification.save()
             
             sent = send_templated_mail(
                 subject, None, (to,), 'new_reply', 
                 context, template_prefix='notifications/')
+            notification.email_sent = sent
+            notification.save()
+        
+        submission_author = instance.chunk.file.submission.author
+        submission = instance.chunk.file.submission
+        #comment gets made on a submission after code review deadline has passed
+        if submission_author and submission_author.email \
+                and instance.author != submission_author\
+                and datetime.datetime.now() > submission.assignment.code_review_end_date:
+            to = submission_author.email
+            subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
+            notification = Notification(recipient = submission_author, reason='C')
+            notification.submission = instance.chunk.file.submission
+            notification.comment = instance
+            notification.save()
+            
+            sent = send_templated_mail(
+                    subject, None, (to,), 'new_submission_comment', 
+                    context, template_prefix='notifications/')
             notification.email_sent = sent
             notification.save()
     pass
