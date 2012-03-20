@@ -79,6 +79,13 @@ NEW_REPLY_SUBJECT_TEMPLATE = Template(
 @receiver(post_save, sender=Comment)
 def send_comment_notification(sender, instance, created=False, **kwargs):
     if created:
+        site = Site.objects.get_current()
+        context = Context({
+            'site': site,
+            'comment': instance,
+            'chunk': instance.chunk
+        })
+        
         #comment gets a reply, the reply is not by the original author
         if instance.parent and instance.parent.author.email \
                 and instance.parent.author != instance.author:
