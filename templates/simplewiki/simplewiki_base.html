@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb" href="/wiki/">Wiki</a>
+  <span class="breadcrumb">{{wiki_article.slug}}</span>
 {% endblock %}
 
 {% block content %}
@@ -37,9 +39,29 @@
 {% endblock %}
 </head>
 <body>
-
+<hr />
+<a href="javascript:location.href='{% url wiki_view wiki_article.get_url %}'">VIEW</a> 
+<a href="javascript:location.href='{% url wiki_edit wiki_article.get_url %}'">EDIT</a> 
+<a href="javascript:location.href='{% url wiki_history wiki_article.get_url 1 %}'">HISTORY</a>
+<div style="float:right">
+    <form method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
+        <b>Search:</b>
+        <input type="text" name="value" id="wiki_search_input" value="{{wiki_search_query|escape}}"/>
+        <input type="submit" id="wiki_search_input_submit" value={% trans "Go!" %} />
+    </form>
+</div>
+<hr />
 <h1>{% block wiki_page_title %}{% endblock %}</h1>
 <hr />
+
+<h3>{% block slug %}{% endblock %}</h3>
+<hr />
+
+{% block wiki_body %}
+
+{% endblock %}
+
+<hr>
 
 {% block wiki_panel %}
 
@@ -50,13 +72,13 @@
     		<div class="wiki_box_corner"></div>
     		<div class="wiki_box_bar"></div>
     	</div>
-    	<div class="wiki_box_contents">
+    	<!--<div class="wiki_box_contents">
         	<div class="wiki_box_title">{% trans "Search" %}</div>
             <form method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
             	<input type="text" name="value" id="wiki_search_input" style="width: 72%" value="{{wiki_search_query|escape}}"/>
             	<input type="submit" id="wiki_search_input_submit" value={% trans "Go!" %} style="width: 20%" />
             </form>
-        </div>
+        </div>-->
         <div class="wiki_box_footer">
         	<div class="wiki_box_corner"></div>
         	<div class="wiki_box_bar"></div>
@@ -90,12 +112,12 @@
     	<p>
     	
 	    {% if wiki_article %} 
-    	    <input type="button" onclick="javascript:location.href='{% url wiki_view wiki_article.get_url %}'" value="View" style="width: 100%;" /><br />
-    	    <input type="button" onclick="javascript:location.href='{% url wiki_edit wiki_article.get_url %}'" value="Edit" style="width: 100%;"{% if not wiki_write %} disabled="true"{%endif%} /><br />
-    	    <input type="button" onclick="javascript:location.href='{% url wiki_history wiki_article.get_url 1 %}'" value="History" style="width: 100%;" />
+    	    <!-- <input type="button" onclick="javascript:location.href='{% url wiki_view wiki_article.get_url %}'" value="View" style="width: 100%;" /><br /> -->
+    	    <!-- <input type="button" onclick="javascript:location.href='{% url wiki_edit wiki_article.get_url %}'" value="Edit" style="width: 100%;"{% if not wiki_write %} disabled="true"{%endif%} /><br /> -->
+    	    <!-- <input type="button" onclick="javascript:location.href='{% url wiki_history wiki_article.get_url 1 %}'" value="History" style="width: 100%;" /> -->
     	{% endif %}
-    	<input type="button" onclick="document.getElementById('wiki_create_form').style.display='block';" value="{% trans "Create article" %}" style="width: 100%; margin-bottom: 2px;" class="button" />
-    	<input type="button" onclick="javascript:location.href='{% url wiki_random wiki_article.get_url %}'" value="{% trans "Random article" %}" style="width: 100%; margin-bottom: 2px;" class="button" />
+    	<!--<input type="button" onclick="document.getElementById('wiki_create_form').style.display='block';" value="{% trans "Create article" %}" style="width: 100%; margin-bottom: 2px;" class="button" /> -->
+    	<!-- <input type="button" onclick="javascript:location.href='{% url wiki_random wiki_article.get_url %}'" value="{% trans "Random article" %}" style="width: 100%; margin-bottom: 2px;" class="button" /> -->
     	</p>
 	    {% if wiki_article %} 
     	    {% if wiki_article.locked %}
@@ -160,7 +182,7 @@
         	</div>
         	<div class="wiki_box_contents">
 
-        	<div class="wiki_box_title">{% trans "Attachments" %}</div>
+<!--        	<div class="wiki_box_title">{% trans "Attachments" %}</div>
         	{% if wiki_article.attachments %}
         	<ul>
         		{% for a in wiki_article.attachments %}
@@ -189,15 +211,12 @@
         		<div class="wiki_box_bar"></div>
         	</div>
         </div>
-    {% endif %}
+    {% endif %} -->
 
 </div>
 
 {% endblock %}
 
-{% block wiki_body %}
-
-{% endblock %}
 
 </body>
 </html>
