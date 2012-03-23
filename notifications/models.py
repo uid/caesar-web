@@ -13,51 +13,23 @@ from django.dispatch import receiver
 from email_templates import send_templated_mail
 
 from review.models import Comment, Vote
-
-
-class Event(models.Model):
-    CREATED = 'C'
-    DELETED = 'D'
-    MODIFIED = 'M'
-    TYPE_CHOICES = (
-            (CREATED, 'Created'),
-            (DELETED, 'Deleted'),
-            (MODIFIED, 'Modified'),
-    )
-
-    type = models.CharField(max_length=1, choices=TYPE_CHOICES)
-    user = models.ForeignKey(User, blank=True, null=True, related_name='events')
-    target_type = models.ForeignKey(ContentType, blank=True, null=True)
-    target_id = models.PositiveIntegerField(blank=True, null=True)
-    target = generic.GenericForeignKey('target_type', 'target_id')
-    created = models.DateTimeField(auto_now_add=True)
-
-
-@receiver(post_save, sender=Comment)
-def log_comment_save(sender, instance, created=False, **kwargs):
-    event_type = Event.CREATED if created else Event.MODIFIED
-    event = Event(type=event_type, user=instance.author, target=instance)
-    event.save()
-
-
-@receiver(post_save, sender=Vote)
-def log_vote_save(sender, instance, created=False, **kwargs):
-    event_type = Event.CREATED if created else Event.MODIFIED
-    event = Event(type=event_type, user=instance.author, target=instance)
-    event.save()
+from chunks.models import Submission
+import datetime
+import sys
 
 
 class Notification(models.Model):
-    AUTHORED = 'A'
-    ASSIGNED = 'S'
-    PARTICIPATED = 'P'
+    SUMMARY = 'S'
+    RECEIVED_REPLY = 'R'
+    COMMENT_ON_SUBMISSION = 'C'
     REASON_CHOICES = (
-            (AUTHORED, 'Authored'),
-            (ASSIGNED, 'Assigned'),
-            (PARTICIPATED, 'Participated'),
+            (SUMMARY, 'Summary'),
+            (RECEIVED_REPLY, 'Received reply'),
+            (COMMENT_ON_SUBMISSION, 'Received comment on submission'),
     )
 
-    event = models.ForeignKey(Event)
+    submission = models.ForeignKey(Submission, blank=True, null=True, related_name='notifications')
+    comment = models.ForeignKey(Comment, blank=True, null=True, related_name='notifications')
     recipient = models.ForeignKey(User, related_name='notifications')
     reason = models.CharField(max_length=1, blank=True, choices=REASON_CHOICES)
     created = models.DateTimeField(auto_now_add=True)
@@ -76,26 +48,49 @@ NEW_REPLY_SUBJECT_TEMPLATE = Template(
 
 @receiver(post_save, sender=Comment)
 def send_comment_notification(sender, instance, created=False, **kwargs):
+    if created:
+        sys.stderr.write("in created\n")
+        site = Site.objects.get_current()
+        context = Context({
+            'site': site,
+            'comment': instance,
+            'chunk': instance.chunk
+        })
+        sys.stderr.write("in context\n")
+        #comment gets a reply, the reply is not by the original author
+        if instance.parent and instance.parent.author.email \
+                and instance.parent.author != instance.author:
+            to = instance.parent.author.email
+            subject = NEW_REPLY_SUBJECT_TEMPLATE.render(context)
+            notification = Notification(recipient = instance.parent.author, reason='R')
+            notification.submission = instance.chunk.file.submission
+            notification.comment = instance
+            notification.save()
+            
+            sent = send_templated_mail(
+                subject, None, (to,), 'new_reply', 
+                context, template_prefix='notifications/')
+            notification.email_sent = sent
+            notification.save()
+            return
+        
+        submission_author = instance.chunk.file.submission.author
+        submission = instance.chunk.file.submission
+        #comment gets made on a submission after code review deadline has passed
+        if submission_author and submission_author.email \
+                and instance.author != submission_author\
+                and datetime.datetime.now() > submission.assignment.code_review_end_date:
+            to = submission_author.email
+            subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
+            notification = Notification(recipient = submission_author, reason='C')
+            notification.submission = instance.chunk.file.submission
+            notification.comment = instance
+            notification.save()
+            
+            sent = send_templated_mail(
+                    subject, None, (to,), 'new_submission_comment', 
+                    context, template_prefix='notifications/')
+            notification.email_sent = sent
+            notification.save()
     pass
-    # if created:
-    #     submission_author = instance.chunk.file.submission.author
-    #     site = Site.objects.get_current()
-    #     context = Context({
-    #         'site': site,
-    #         'comment': instance,
-    #         'chunk': instance.chunk
-    #     })
-    #     if submission_author and submission_author.email:
-    #         to = submission_author.email
-    #         subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
-    #         send_templated_mail(
-    #                 subject, None, (to,), 'new_submission_comment', 
-    #                 context, template_prefix='notifications/')
-    #     if instance.parent and instance.parent.author.email \
-    #             and instance.parent.author != instance.author:
-    #         to = instance.parent.author.email
-    #         subject = NEW_REPLY_SUBJECT_TEMPLATE.render(context)
-    #         send_templated_mail(
-    #                 subject, None, (to,), 'new_reply', 
-    #                 context, template_prefix='notifications/')
 
