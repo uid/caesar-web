@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <span class="breadcrumb">Assignment Info</span>
+{% endblock %}
+
+{% block content %}
+<form id="simluate-form" 
+  action="/chunks/simulate/{{assignment.id}}" method="post">
+  {% csrf_token %}
+
+<p> <h1 class="task-header"> Statistics for {{ assignment.name }}. </h1> </p>
+<p><h2 class="task-header">For the reviewing process we can expect: <input type="text" name="students" value="{{ students.count }}" size=3/> students, <input type="text" name="alums" value="{{ alums.count }}" size=3/> alums, <input type="text" name="staff" value="{{ staff.count }}" size=3/> staff</h2></p>
+
+<p> <h4 class="task-header"> There are {{ chunks_worth_reviewing.count }} classes that would benefit from reviewing, spread over {{ active_students }} active students (students that at least pulled the assignment). This means that each student contributed {{ classes_per_student }} classes to the review process. In order to review all of them, each student would have to be assigned {{ tasks_per_student }} tasks to review. </h4> </p>
+
+<p> <h4 class="task-header"> The following are the names and number of classes to be reviewed: </br>
+
+
+      {% for name, num in chunks_data %}
+      <input type="checkbox" name="chunk" value="{{name}}">
+          {{ name }}, {{ num }} </br>
+      {% endfor %}
+      
+</h4></p>
+  
+  <br/>
+  <div class ="centered">
+  <button type="submit">Save</button>
+  <button id="cancel-button" type="button">Cancel</button>
+  </div>
+</form>
+{% endblock %}
