@@ -11,10 +11,10 @@
 {% endblock %}
 
 {% block content %}
+<hr />
 <h1>All Articles</h1>
 <hr />
-<h3>This is a list of all articles in the database.</h3>
 {% for article in articles %}
-    <p><a href="{{article.slug}}">{{article.title}}</a></p>
+    <h4><a href="{{article.slug}}">{{article.title}}</a></h4>
 {% endfor %}
 {% endblock %}

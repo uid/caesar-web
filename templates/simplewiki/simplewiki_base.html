@@ -43,20 +43,21 @@
 <a href="javascript:location.href='{% url wiki_view wiki_article.get_url %}'">VIEW</a> 
 <a href="javascript:location.href='{% url wiki_edit wiki_article.get_url %}'">EDIT</a> 
 <a href="javascript:location.href='{% url wiki_history wiki_article.get_url 1 %}'">HISTORY</a>
-<div style="float:right">
+<span style="float:right; padding: 0px 0px 10px 0px">
     <form method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
         <b>Search:</b>
         <input type="text" name="value" id="wiki_search_input" value="{{wiki_search_query|escape}}"/>
         <input type="submit" id="wiki_search_input_submit" value={% trans "Go!" %} />
     </form>
-</div>
+</span>
 <hr />
+
 <h1>{% block wiki_page_title %}{% endblock %}</h1>
+<h3><i>#{{ wiki_article.slug }}</i></h3>
 <hr />
-
-<h3>{% block slug %}{% endblock %}</h3>
-<hr />
-
+<table>
+<tr>
+<td width="70%">
 {% block wiki_body %}
 
 {% endblock %}
@@ -119,14 +120,7 @@
     	<!--<input type="button" onclick="document.getElementById('wiki_create_form').style.display='block';" value="{% trans "Create article" %}" style="width: 100%; margin-bottom: 2px;" class="button" /> -->
     	<!-- <input type="button" onclick="javascript:location.href='{% url wiki_random wiki_article.get_url %}'" value="{% trans "Random article" %}" style="width: 100%; margin-bottom: 2px;" class="button" /> -->
     	</p>
-	    {% if wiki_article %} 
-    	    {% if wiki_article.locked %}
-    	    <p><strong>{% trans "This article has been locked" %}</strong></p>
-    	    {% endif %}
-    	    <p>
-    	        <i>{% trans "Last modified" %}: {{ wiki_article.modified_on|date }}, {{ wiki_article.modified_on|time }}</i>
-    	    </p>
-        {% endif %}
+	    
     	</div>
     	<div class="wiki_box_footer">
     		<div class="wiki_box_corner"></div>
@@ -143,7 +137,7 @@
         	</div>
         	<div class="wiki_box_contents">
 
-        	<div class="wiki_box_title">{% trans "Related articles" %}</div>
+        	<!-- <div class="wiki_box_title">{% trans "Related articles" %}</div>
         {% if wiki_article.related.all %}
         	<p>
         		{% for rel in wiki_article.related.all %}
@@ -159,14 +153,14 @@
         	</p>
         {% else %}
         	<p><i>({% trans "none" %})</i></p>
-        {% endif %}
-        {% if wiki_write %}
+        {% endif %} -->
+        <!-- {% if wiki_write %}
         <form method="POST" action="{% url add_related wiki_article.get_url %}">{% csrf_token %}
         	<input type="text" name="value" id="wiki_related_input" style="width: 72%" />
         	<input type="submit" id="wiki_related_input_submit" enabled="true" value="Add" style="width: 20%" />
         	<input type="hidden" name="id" value="" id="wiki_related_input_id" />
         </form>
-        {% endif %}
+        {% endif %} -->
 
         	</div>
         	<div class="wiki_box_footer">
@@ -212,12 +206,36 @@
         	</div>
         </div>
     {% endif %} -->
+    {% if wiki_article %} 
+    	    {% if wiki_article.locked %}
+    	    <p><strong>{% trans "This article has been locked" %}</strong></p>
+    	    {% endif %}
+    	    <p>
+    	        <i>{% trans "Last modified" %}: {{ wiki_article.modified_on|date }}, {{ wiki_article.modified_on|time }}</i>
+    	    </p>
+        {% endif %}
 
 </div>
 
 {% endblock %}
 
 
+</td>
+<td style="vertical-align:top">
+<h2>Examples from Caesar </h2>
+<ul>
+<li>Example #1</li>
+<li>Example #2</li>
+</ul>
+<br>
+<h2>Related Articles</h2>
+<ul>
+<li>Bad Code</li>
+</ul>
+
+</td>
+</tr>
+</table>
 </body>
 </html>
 {% endblock %}
