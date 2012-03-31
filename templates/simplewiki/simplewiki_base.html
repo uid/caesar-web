@@ -44,92 +44,25 @@
     <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
     <a class="breadcrumb" href="/wiki/">Wiki</a>
     {% if wiki_article.slug %}
-        <span class="breadcrumb">{{wiki_article.slug}}</span>
+        <a class="breadcrumb" href="/wiki/{{wiki_article.slug}}/">{{wiki_article.title}}</a>
     {% endif %}
 {% endblock %}
 
 {% block content %}
-    
-    <br> <!-- for spacing against caesar bar across the top -->
-    
-    <!-- View/Edit/History/Search Bar. Need to put functionality somewhere else. -->
-    <!--
-    <a href="javascript:location.href='{% url wiki_view wiki_article.get_url %}'">VIEW</a> 
-    <a href="javascript:location.href='{% url wiki_edit wiki_article.get_url %}'">EDIT</a> 
-    <a href="javascript:location.href='{% url wiki_history wiki_article.get_url 1 %}'">HISTORY</a>
-    <span style="float:right; padding: 0px 0px 10px 0px">
-        <form method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
-            <b>Search:</b>
-            <input type="text" name="value" id="wiki_search_input" value="{{wiki_search_query|escape}}"/>
-            <input type="submit" id="wiki_search_input_submit" value={% trans "Go!" %} />
-        </form>
-    </span>
-    -->
-    
-    <!-- TITLE AND SLUG -->
-    <h1>{% block wiki_page_title %}{% endblock %}</h1>
-    {% if wiki_article.slug %}
-    <h3><i>#{{ wiki_article.slug }}</i></h3>
-    {% endif %}
-    <hr />
-
-    <table>
-    
-    <!-- CONTENTS -->
-    <tr>
-    <td width="70%" style="vertical-align:top">
+  
+    <!-- Title -->
+    <br>
+    {% if wiki_article %}
+        <h1> {{ wiki_article.title }} </h1>
+        <h3><i>#{{ wiki_article.slug }} </i> </h3>
+        <hr />
+    {% else %}
+        {% if wiki_form %}
+        <h1> New Article for #{{wiki_form.title.value}}</h1>
+        <hr />
+        {% endif %}
+    {% endif %}  
     {% block wiki_body %}
     {% endblock %}
-    </td>
-
-    <!-- In Progress Attempt at Buttons
-    <button onclick="location.href='{% url wiki_edit wiki_article.get_url %}'" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" type="button" role="button" aria-disabled="false" title="Edit"><span class="ui-button-icon-primary ui-icon ui-icon-edit"></span><span class="ui-button-text">Edit</span></button>
-    <button onclick="location.href='{% url wiki_history wiki_article.get_url 1 %}'" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only" type="button" role="button" aria-disabled="false" title="Edit"><span class="ui-button-icon-primary ui-icon ui-icon-edit"></span><span class="ui-button-text">Edit</span></button>
-    -->
-
-    <!-- SIDEBAR -->
-    <td style="vertical-align:top" border="1">
-        <table style="border:2px solid #555; border-radius: 10px"><tr><td>
-        <!-- TODO: Use Buttons. These images are just place holders or now -->
-        <div align="center">
-            <!-- <image title="Edit" onclick="location.href='{% url wiki_edit wiki_article.get_url %}'"src="/static/img/pencil-small.png">
-            <image title="History" onclick="location.href='{% url wiki_history wiki_article.get_url 1 %}'" src="/static/img/history-small.png">
-            -->
-            <br>
-            <h3>
-            <a onclick="location.href='{% url wiki_edit wiki_article.get_url %}'">EDIT</a><span>  </span>
-            <a onclick="location.href='{% url wiki_history wiki_article.get_url 1 %}'">HISTORY</a>
-            </h3>
-        </div>
-        </td></tr></table>
-        <br>
-        <table style="border:2px solid #555; border-radius: 10px"><tr><td>
-            <h2>Examples from Caesar </h2>
-            <ul>
-            <li><image src="/static/img/balloon.png" style="vertical-align:middle"/><a>  Example #1</a></li>
-            <li><image src="/static/img/balloon.png" style="vertical-align:middle"/><a>  Example #2</a></li>
-            </ul>
-            
-            <!-- TODO: Implement related articles -->
-            <!--
-            <br>
-            <h2>Related Articles</h2>
-            <ul>
-            <li>Bad Code</li>
-            </ul>   -->
-        </td></tr></table>
-        
-    </td>
-    </tr>
-    </table>
-    
-    <!-- FOOTER -->
-    <hr />
-    {% if wiki_article %} 
-        {% if wiki_article.locked %}
-            <p><strong>{% trans "This article has been locked" %}</strong></p>
-        {% endif %}
-        <p><i>{% trans "Last modified" %}: {{ wiki_article.modified_on|date }}, {{ wiki_article.modified_on|time }}</i></p>
-    {% endif %}
  
 {% endblock %}
