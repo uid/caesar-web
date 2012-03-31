@@ -11,10 +11,22 @@
 {% endblock %}
 
 {% block content %}
-<hr />
-<h1>All Articles</h1>
-<hr />
-{% for article in articles %}
-    <h4><a href="{{article.slug}}">{{article.title}}</a></h4>
-{% endfor %}
+    <br>
+    <h1>All Articles</h1>
+    <hr />
+    <table>
+    <tr><td width="70%">
+        
+        {% for article in articles %}
+            <h4><a href="{{article.slug}}">{{article.title}}</a></h4>
+        {% endfor %}
+    </td>
+    <td style="vertical-align:top">
+        <table style="border:2px solid #000; border-radius: 10px"><tr><td style="vertical-align:top">
+            <br>
+            <h3 style="text-align:center">Create New Article<br><br><i>"#<input type="text" onkeydown="if (event.keyCode == 13) {location.href='/wiki/' + this.value + '/_create/';}" style="font-weight:bold; font-size:12pt"/>"<i></h3>
+        </td></tr></table>
+    </td>
+    </tr>
+    </table>
 {% endblock %}

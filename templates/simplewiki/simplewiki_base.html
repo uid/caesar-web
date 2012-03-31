@@ -43,7 +43,9 @@
 {% block breadcrumbs %}
     <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
     <a class="breadcrumb" href="/wiki/">Wiki</a>
-    <span class="breadcrumb">{{wiki_article.slug}}</span>
+    {% if wiki_article.slug %}
+        <span class="breadcrumb">{{wiki_article.slug}}</span>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -66,7 +68,9 @@
     
     <!-- TITLE AND SLUG -->
     <h1>{% block wiki_page_title %}{% endblock %}</h1>
+    {% if wiki_article.slug %}
     <h3><i>#{{ wiki_article.slug }}</i></h3>
+    {% endif %}
     <hr />
 
     <table>
@@ -76,12 +80,6 @@
     <td width="70%" style="vertical-align:top">
     {% block wiki_body %}
     {% endblock %}
-        <!-- TODO: Use Buttons. These images are just place holders or now -->
-        <div align="center">
-            <image title="Edit" onclick="location.href='{% url wiki_edit wiki_article.get_url %}'"src="/static/img/pencil-small.png">
-            <image title="History" onclick="location.href='{% url wiki_history wiki_article.get_url 1 %}'" src="/static/img/history-small.png">
-        </div>
-        
     </td>
 
     <!-- In Progress Attempt at Buttons
@@ -91,17 +89,34 @@
 
     <!-- SIDEBAR -->
     <td style="vertical-align:top" border="1">
-        <table border="1"><tr><td>
+        <table style="border:2px solid #555; border-radius: 10px"><tr><td>
+        <!-- TODO: Use Buttons. These images are just place holders or now -->
+        <div align="center">
+            <!-- <image title="Edit" onclick="location.href='{% url wiki_edit wiki_article.get_url %}'"src="/static/img/pencil-small.png">
+            <image title="History" onclick="location.href='{% url wiki_history wiki_article.get_url 1 %}'" src="/static/img/history-small.png">
+            -->
+            <br>
+            <h3>
+            <a onclick="location.href='{% url wiki_edit wiki_article.get_url %}'">EDIT</a><span>  </span>
+            <a onclick="location.href='{% url wiki_history wiki_article.get_url 1 %}'">HISTORY</a>
+            </h3>
+        </div>
+        </td></tr></table>
+        <br>
+        <table style="border:2px solid #555; border-radius: 10px"><tr><td>
             <h2>Examples from Caesar </h2>
             <ul>
-            <li>Example #1</li>
-            <li>Example #2</li>
+            <li><image src="/static/img/balloon.png" style="vertical-align:middle"/><a>  Example #1</a></li>
+            <li><image src="/static/img/balloon.png" style="vertical-align:middle"/><a>  Example #2</a></li>
             </ul>
+            
+            <!-- TODO: Implement related articles -->
+            <!--
             <br>
             <h2>Related Articles</h2>
             <ul>
             <li>Bad Code</li>
-            </ul>   
+            </ul>   -->
         </td></tr></table>
         
     </td>
