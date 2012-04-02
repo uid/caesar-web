@@ -10,8 +10,12 @@
 	{{ wiki_form }}
 	<tr>
 		<td colspan="2" align="right">
-			<input type="submit" value="{% trans "Edit article" %}" /></td>
+			<input type="submit" value="{% trans "Submit Changes" %}" /></td>
 	</tr>
 	</table>
 </form>
+<br>
+<div style="text-align:right">
+    <image title="History" onclick="location.href='{% url wiki_history wiki_article.get_url 1 %}'" src="/static/img/history-small.png">
+</div>
 {% endblock %}

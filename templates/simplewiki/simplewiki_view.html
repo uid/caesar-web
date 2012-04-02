@@ -1,14 +1,63 @@
 {% extends "simplewiki/simplewiki_base.html" %}
 
 {% load i18n simplewiki_utils %}
-{% block wiki_page_title %}
-{{ wiki_article.title }}
-{% endblock %}
 {% block wiki_body %}
-<div id="wiki_article">
-	{{ wiki_article.current_revision.contents_parsed|safe }}
-</div>
-{% endblock %}
-{%block slug %}
-#{{ wiki_article.slug }}
+    
+    <!-- View/Edit/History/Search Bar. Need to put functionality somewhere else. -->
+    <!--
+    <a href="javascript:location.href='{% url wiki_view wiki_article.get_url %}'">VIEW</a> 
+    <a href="javascript:location.href='{% url wiki_edit wiki_article.get_url %}'">EDIT</a> 
+    <a href="javascript:location.href='{% url wiki_history wiki_article.get_url 1 %}'">HISTORY</a>
+    <span style="float:right; padding: 0px 0px 10px 0px">
+        <form method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
+            <b>Search:</b>
+            <input type="text" name="value" id="wiki_search_input" value="{{wiki_search_query|escape}}"/>
+            <input type="submit" id="wiki_search_input_submit" value={% trans "Go!" %} />
+        </form>
+    </span>
+    -->
+    <table>
+    
+    <!-- CONTENTS -->
+    <tr>
+    <td width="70%" style="vertical-align:top">
+    <div id="wiki_article">
+        {{ wiki_article.current_revision.contents_parsed|safe }}
+    </div>
+    <div style="text-align:right">
+        <image title="Edit" onclick="location.href='{% url wiki_edit wiki_article.get_url %}'"src="/static/img/pencil-small.png">
+    </div>
+    </td>
+
+    <!-- SIDEBAR -->
+    <td style="vertical-align:top" border="1">
+        <table style="border:2px solid #555; border-radius: 10px"><tr><td>
+            <h2>Examples from Caesar</h2>
+            <ul>
+            <li><image src="/static/img/balloon.png" style="vertical-align:middle"/><a>  Example #1</a></li>
+            <li><image src="/static/img/balloon.png" style="vertical-align:middle"/><a>  Example #2</a></li>
+            </ul>  
+        </td></tr></table>
+        <br>
+        <table style="border:2px solid #555; border-radius: 10px"><tr><td>
+            <h2>Related Articles</h2>
+            <ul>
+            <li><a>Other Article About This One Thing</a></li>
+            <li><a>Some Article About Another Thing</a></li>
+            </ul>  
+        </td></tr></table>
+        
+        
+    </td>
+    </tr>
+    </table>
+    
+    <!-- FOOTER -->
+    <hr />
+    {% if wiki_article %} 
+        {% if wiki_article.locked %}
+            <p><strong>{% trans "This article has been locked" %}</strong></p>
+        {% endif %}
+        <p><i>{% trans "Last modified" %}: {{ wiki_article.modified_on|date }}, {{ wiki_article.modified_on|time }}</i></p>
+    {% endif %}
 {% endblock %}
