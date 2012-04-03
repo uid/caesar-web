@@ -6,12 +6,19 @@ Create article
 {% block wiki_body %}
 <form method="POST" id="wiki_revision">{% csrf_token %}
 
+    {{ wiki_form.contents }}
+    <input style="visibility:hidden" type="text" name="title" value="not supported" id="id_title">
+    <br>
+    <input type="submit" value="Create Hashtag" />
+	
+	<!-- DEFAULT
 	<table id="wiki_revision_table">
 	{{ wiki_form }}
 	<tr>
 		<td colspan="2" align="right">
 			<input type="submit" value="{% trans "Create Article" %}" /></td>
 	</tr>
-	</table>
+	</table> 
+	-->
 </form>
 {% endblock %}

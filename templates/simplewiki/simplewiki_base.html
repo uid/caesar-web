@@ -2,6 +2,25 @@
 {% block css %}
 {{ block.super}}
 
+<style type="text/css">
+    .current {
+        border:2px solid #000;
+        padding: 2px 3px 2px 3px; 
+        border-radius: 4px;
+        color: #000;
+        text-decoration: none;
+    }
+    
+    .notcurrent {
+        border:2px solid #aaa;
+        padding: 2px 3px 2px 3px; 
+        border-radius: 4px;
+        color: #aaa;
+        text-decoration: none;
+    }
+
+</style>
+
 {% load i18n simplewiki_utils %}
 
     <!-- SIMPLEWIKI DEFAULT STYLING. CLASHES WITH CAESAR STYLING SO COMMENTED OUT -->
@@ -44,7 +63,7 @@
     <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
     <a class="breadcrumb" href="/wiki/">Wiki</a>
     {% if wiki_article.slug %}
-        <a class="breadcrumb" href="/wiki/{{wiki_article.slug}}/">{{wiki_article.title}}</a>
+        <a class="breadcrumb" href="/wiki/{{wiki_article.slug}}/">{{wiki_article.slug}}</a>
     {% endif %}
 {% endblock %}
 
@@ -53,15 +72,19 @@
     <!-- Title -->
     <br>
     {% if wiki_article %}
-        <h1> {{ wiki_article.title }} </h1>
-        <h3><i>#{{ wiki_article.slug }} </i> </h3>
-        <hr />
-    {% else %}
-        {% if wiki_form %}
-        <h1> New Article for #{{wiki_form.title.value}}</h1>
-        <hr />
-        {% endif %}
+        <table><tr>
+        <td width="70%" style="vertical-align:bottom"><h1 style="display:inline">#{{ wiki_article.slug }} </h1></td>
+        <td style="font-size:16pt; text-align:right; vertical-align:middle">
+            <a class="{% if view == 'read' %}current{% else %}notcurrent{% endif %}" href="{% url wiki_view wiki_article.get_url %}">Read</a> 
+            <a class="{% if view == 'edit' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_edit wiki_article.get_url %}'>Edit</a> 
+            <a class="{% if view == 'history' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_history wiki_article.get_url 1 %}'>View History</a>
+        </td></tr></table>
     {% endif %}  
+
+    {% if wiki_form and not wiki_article %}
+        <h1> New Hashtag: #{{slug}}</h1>
+    {% endif %}
+    <hr />
     {% block wiki_body %}
     {% endblock %}
  

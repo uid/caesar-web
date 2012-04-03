@@ -17,6 +17,8 @@ from django.contrib.auth.decorators import login_required
 from models import *
 from settings import *
 
+from review.models import Comment, Vote
+
 @login_required
 def view(request, wiki_url):
     
@@ -30,16 +32,31 @@ def view(request, wiki_url):
     c = RequestContext(request, {'wiki_article': article,
                                  'wiki_write': article.can_write_l(request.user),
                                  'wiki_attachments_write': article.can_attach(request.user),
-                                 } ) 
+                                 } )
+    # get related articles
+    review_data = view_helper(Comment.objects.filter(text__icontains='#' + article.slug,
+                                                     upvote_count=1).order_by('created')[0:5])
     return render(request, "simplewiki/simplewiki_view.html", {
                            'wiki_article': article,
                            'wiki_write': True,
                            # 'wiki_write': article.can_write_l(request.user),
                            'wiki_attachments_write': article.can_attach(request.user),
+                           'view': 'read',
+                           'review_data': review_data,
     })
     # return render_to_response('simplewiki_view.html', c)
     
-# WORKS!!!!
+def view_helper(comments):
+    review_data = []
+    for comment in comments:
+        if comment.is_reply():
+            #false means not a vote activity
+            review_data.append(("reply-comment", comment, comment.generate_snippet(), False, None))
+        else:
+            review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
+    review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
+    return review_data
+
 @login_required
 def list_all(request):
     articles = None
@@ -146,6 +163,8 @@ def create(request, wiki_url):
         
     c = RequestContext(request, {'wiki_form': f,
                                  'wiki_write': True,
+                                 'slug': request.GET.get('wiki_article_name', url_path[-1]),
+                                 'view': 'create',
                                  })
 
     return render_to_response('simplewiki/simplewiki_create.html', c)
@@ -188,6 +207,7 @@ def edit(request, wiki_url):
                                  'wiki_write': True,
                                  'wiki_article': article,
                                  'wiki_attachments_write': article.can_attach(request.user),
+                                 'view': 'edit',
                                  })
 
     return render_to_response('simplewiki/simplewiki_edit.html', c)
@@ -240,7 +260,10 @@ def history(request, wiki_url, page=1):
                                  'wiki_write': article.can_write_l(request.user),
                                  'wiki_attachments_write': article.can_attach(request.user),
                                  'wiki_article': article,
-                                 'wiki_history': history[beginItem:beginItem+page_size],})
+                                 'wiki_history': history[beginItem:beginItem+page_size],
+                                 'view': 'history',
+                                 })
+                                 
 
     return render_to_response('simplewiki/simplewiki_history.html', c)
 

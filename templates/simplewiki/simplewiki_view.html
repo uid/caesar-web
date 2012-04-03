@@ -1,4 +1,27 @@
+
 {% extends "simplewiki/simplewiki_base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $('.activity-line').click(function(e) {
+          var activityType = this.id.split('-')[0];
+          var comment_Id = this.id.split('-')[1];
+          var chunk_Id = this.id.split('-')[2];
+          window.location = "/chunks/view/" + chunk_Id + "#" + activityType + "-" + comment_Id;
+          return false;
+        });
+
+    });
+    </script>
+{% endblock %}
 
 {% load i18n simplewiki_utils %}
 {% block wiki_body %}
@@ -19,29 +42,16 @@
     <table>
     
     <!-- CONTENTS -->
-    <tr>
     <td width="70%" style="vertical-align:top">
     <div id="wiki_article">
         {{ wiki_article.current_revision.contents_parsed|safe }}
-    </div>
-    <div style="text-align:right">
-        <image title="Edit" onclick="location.href='{% url wiki_edit wiki_article.get_url %}'"src="/static/img/pencil-small.png">
     </div>
     </td>
 
     <!-- SIDEBAR -->
     <td style="vertical-align:top" border="1">
         <table style="border:2px solid #555; border-radius: 10px"><tr><td>
-            <h2>Examples from Caesar</h2>
-            <ul>
-            <li><image src="/static/img/balloon.png" style="vertical-align:middle"/><a>  Example #1</a></li>
-            <li><image src="/static/img/balloon.png" style="vertical-align:middle"/><a>  Example #2</a></li>
-            </ul>  
-        </td></tr></table>
-        <br>
-        <table style="border:2px solid #555; border-radius: 10px"><tr><td>
             <h2>Related Articles</h2>
-            <ul>
             <li><a>Other Article About This One Thing</a></li>
             <li><a>Some Article About Another Thing</a></li>
             </ul>  
@@ -51,13 +61,46 @@
     </td>
     </tr>
     </table>
+    <!-- EXAMPLES -->
+    <hr />
+    <h2>Examples</h2>
+    
+    <table class="assignment-stream">
+    {% for type, comment, snippet, is_vote, vote in review_data %}
+        <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}
+                              {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
+                              {% endif %}
+              {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
+              {% endif %}" class="{%if not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
+        
+        <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
+        
+        {% if comment.upvote_count == 0 and comment.downvote_count == 0 or is_vote %}
+            <td colspan="2" class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
+        {% else %}
+            <td>{% if comment.upvote_count > 0 %}<span class="positive-votes">+{{comment.upvote_count}}</span>{% endif %}{% if comment.upvote_count > 0 and comment.downvote_count > 0 %}/{% endif %}{% if comment.downvote_count > 0 %}<span class="negative-votes">-{{comment.downvote_count}}</span>{% endif %}</td>
+            <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {{ snippet }} </td>
+        {% endif %}
+        
+        <td class="grey-text"> {{ comment.chunk.name }} </td>
+        <td class="grey-text"> {{ comment.modified }} </td>
+        
+        </tr>
+        {% empty %}
+    {% endfor %}
+    {% if review_data|length == 0 %}
+        <h4><i>No examples found.</i></h4>
+    {% endif %}
+    </table>
+    
     
     <!-- FOOTER -->
-    <hr />
     {% if wiki_article %} 
         {% if wiki_article.locked %}
             <p><strong>{% trans "This article has been locked" %}</strong></p>
         {% endif %}
         <p><i>{% trans "Last modified" %}: {{ wiki_article.modified_on|date }}, {{ wiki_article.modified_on|time }}</i></p>
     {% endif %}
+    
+    
 {% endblock %}
