@@ -49,7 +49,7 @@ $(document).ready(function() {
 <h3 class="assignment-display">
   <a name="assignment-display"></a> {{ assignment.name }} {%if not assignment.is_current_semester %} - {{ assignment.get_semester_display }} {% endif %}
   <div class="view-all-activity">
-    {%if not user.profile.is_student %}
+    {%if assignment.is_current_semester or not user.profile.is_student %}
     <a href="{% url review.views.all_activity assignment.id participant.username %}"> view with code</a>
     {% endif %}
   </div>
@@ -60,7 +60,7 @@ $(document).ready(function() {
                           {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
                           {% endif %}
           {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
-          {% endif %}" class="{%if not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
+          {% endif %}" class="{%if assignment.is_current_semester or not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
     
     <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
     

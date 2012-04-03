@@ -3,7 +3,8 @@ from django.contrib import admin
 from chunks.models import Assignment, Submission, File, Chunk, StaffMarker, ChunkProfile
 
 class AssignmentAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'duedate', 'code_review_end_date', 'semester', 'student_count', 'alum_count', 'staff_count')
+    search_fields = ('name', 'semester')
 
 class ChunkAdmin(admin.ModelAdmin):
     readonly_fields = ('name', 'file', 'start', 'end', 'created', 'modified', 'staff_portion', 'class_type')

@@ -29,6 +29,12 @@ class Assignment(models.Model):
     semester = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
                                       blank=True, null=True)
     multiplier = models.IntegerField(default=1)
+    student_count = models.IntegerField(default=5)
+    alum_count = models.IntegerField(default=3)
+    staff_count = models.IntegerField(default=10)
+    
+    chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names
+    
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):
