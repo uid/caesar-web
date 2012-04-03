@@ -84,6 +84,8 @@ class Chunk:
 
 def _convert_role(role):
     return {'T': 'staff', 'S': 'student'}.get(role, 'other')
+def _convert_role_to_count(assignment, role):
+    return {'staff': assignment.staff_count, 'student': assignment.student_count, 'other':assignment.alum_count}.get(role)
 
 def load_users():
     # load all existing users 
@@ -290,7 +292,7 @@ def assign_many_tasks(assignment, django_users):
                 chunk__file__submission__assignment=assignment).count()
 
         role = _convert_role(django_profile.role)
-        assign_count = app_settings.CHUNKS_PER_ROLE[role] - current_task_count
+        assign_count = _convert_role_to_count(assignment, role) - current_task_count
         if assign_count <= 0:
             continue
         user = user_map[django_user.id]
@@ -313,7 +315,9 @@ def assign_tasks(assignment, django_user):
             chunk__file__submission__assignment=assignment).count()
     
     role = _convert_role(django_profile.role)
-    assign_count = app_settings.CHUNKS_PER_ROLE[role] - current_task_count
+    
+    #get the assignment count from Assignment
+    assign_count = _convert_role_to_count(assignment, role) - current_task_count
     if assign_count <= 0:
         return 0
 

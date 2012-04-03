@@ -6,6 +6,12 @@
 
 {% block wiki_body %}
 <form method="POST" id="wiki_revision">{% csrf_token %}
+	
+	{{wiki_form.contents}}
+	<input style="visibility:hidden" id="id_revision_text" type="text" name="revision_text">
+	<br>
+	<input type="submit" value="Save" /></td>
+	<!-- DEFAULT
 	<table id="wiki_revision_table">
 	{{ wiki_form }}
 	<tr>
@@ -13,9 +19,6 @@
 			<input type="submit" value="{% trans "Submit Changes" %}" /></td>
 	</tr>
 	</table>
+	-->
 </form>
-<br>
-<div style="text-align:right">
-    <image title="History" onclick="location.href='{% url wiki_history wiki_article.get_url 1 %}'" src="/static/img/history-small.png">
-</div>
 {% endblock %}

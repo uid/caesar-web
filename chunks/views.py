@@ -6,6 +6,7 @@ from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
 from pygments import highlight
 from pygments.lexers import JavaLexer
@@ -14,6 +15,7 @@ from pygments.formatters import HtmlFormatter
 import os
 import subprocess
 import datetime
+import sys
 
 @login_required
 def view_chunk(request, chunk_id):
@@ -216,3 +218,102 @@ def submit_assignment(request, assignment_id):
     author = afile[authorindex + len(changeauthor): revindex]
     submission.save()
     return redirect('review.views.dashboard')
+@login_required
+def simualte(request, assignment_id):
+    if request.method == 'GET':
+        user = request.user
+        assignment = Assignment.objects.get(id=assignment_id)
+        assignment_chunks = Chunk.objects.filter(file__submission__assignment__id = assignment_id)
+        #TODO: change how ps is found
+        ps = "ps1-beta"
+        par = User.objects.filter(comments__chunk__file__submission__assignment__name = ps).distinct()
+        par.exclude(username = 'checkstyle')
+        students = par.filter(profile__role = 'S')
+        alums = par.filter(profile__role = None)
+        staff = par.filter(profile__role = 'T')
+    
+        #find all active students, students that have at least pulled the assignment
+        all_students = User.objects.filter(submissions__assignment = assignment)
+        active_students = []
+        for student in all_students:
+            chunks = Chunk.objects.filter(file__submission__assignment = assignment).filter(file__submission__author=student)
+            if chunks.count() > 0:
+                active_students.append(student)
+    
+        #find all classes that are worth reviewing, not tests and code more than 40 lines
+        classes = assignment_chunks.filter(class_type = "NONE").filter(profile__student_lines__gt = 30).exclude(name="Main")
+        classes_per_student = str(classes.count() / float(len(active_students)))[0:3]
+        tasks_per_student = str(2*classes.count() / float(students.count()))[0:3]
+    
+        dist = dict()
+        for chunk in classes:
+            name = chunk.name
+            if name in dist:
+                dist[name] += 1
+            else:
+                dist[name] = 1
+    
+        chunks_data = []
+        for w in sorted(dist, key=dist.get, reverse=True):
+            chunks_data.append((w, dist[w]))
+    
+        return render(request, 'chunks/simulate.html', {
+            'assignment': assignment,
+            'students': students,
+            'alums': alums,
+            'staff': staff,
+            'chunks_worth_reviewing': classes,
+            'active_students': len(active_students),
+            'classes_per_student': classes_per_student,
+            'tasks_per_student': tasks_per_student,
+            'chunks_data': chunks_data,
+        })
+    else:
+        sys.stderr.write(str(request.POST['chunk']))
+        user = request.user
+        assignment = Assignment.objects.get(id=assignment_id)
+        assignment_chunks = Chunk.objects.filter(file__submission__assignment__id = assignment_id)
+        ps = "ps1-beta"
+        par = User.objects.filter(comments__chunk__file__submission__assignment__name = ps).distinct()
+        par.exclude(username = 'checkstyle')
+        students = par.filter(profile__role = 'S')
+        alums = par.filter(profile__role = None)
+        staff = par.filter(profile__role = 'T')
+    
+        #find all active students, students that have at least pulled the assignment
+        all_students = User.objects.filter(submissions__assignment = assignment)
+        active_students = []
+        for student in all_students:
+            chunks = Chunk.objects.filter(file__submission__assignment = assignment).filter(file__submission__author=student)
+            if chunks.count() > 0:
+                active_students.append(student)
+    
+        #find all classes that are worth reviewing, not tests and code more than 40 lines
+        classes = assignment_chunks.filter(class_type = "NONE").filter(profile__student_lines__gt = 30).exclude(name="Main")
+        classes_per_student = str(classes.count() / float(len(active_students)))[0:3]
+        tasks_per_student = str(2*classes.count() / float(students.count()))[0:3]
+    
+        dist = dict()
+        for chunk in classes:
+            name = chunk.name
+            if name in dist:
+                dist[name] += 1
+            else:
+                dist[name] = 1
+    
+        chunks_data = []
+        for w in sorted(dist, key=dist.get, reverse=True):
+            chunks_data.append((w, dist[w]))
+    
+        return render(request, 'chunks/simulate.html', {
+            'assignment': assignment,
+            'students': students,
+            'alums': alums,
+            'staff': staff,
+            'chunks_worth_reviewing': classes,
+            'active_students': len(active_students),
+            'classes_per_student': classes_per_student,
+            'tasks_per_student': tasks_per_student,
+            'chunks_data': chunks_data,
+        })
+    

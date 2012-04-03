@@ -5,19 +5,19 @@
 {% endblock %}
 {% block wiki_body %}
 <form method="POST">{% csrf_token %}
-<table id="wiki_history_table">
+<table id="wiki_history_table" border="1px">
     <thead>
         <tr>
             <th id="revision">Revision</th>
-            <th id="comment">Comment</th>
-            <th id="diff">Diff</th>
             <th id="modified">Modified</th>
+            <th id="diff">Diff</th>
+            <!--<th id="comment">Comment</th>-->
         </tr>
     </thead>
     <tbody>
         {% for revision in wiki_history %}
             <tr style="border-top: 1px" {%cycle '' 'class="dark"'%}>
-                <td width="15px">
+                <td width="15px" style="vertical-align:top">
                     <input  type="radio" name="revision" id="{{ revision.id }}" value="{{ revision.id }}"{%ifequal wiki_article.current_revision.id revision.id%} checked{%endifequal%} />
                     <label for="{{ revision.id }}">
                         {{ revision }}
@@ -27,13 +27,12 @@
                             {% endifnotequal %}
                         {% endif %}
                     </label>
+                <td style="vertical-align:top">{{ revision.get_user}}
+                <br/>
+                {{ revision.revision_date|date}} {{ revision.revision_date|time}}
                 </td>
-                <td>{% if revision.revision_text %}{{ revision.revision_text}}{% else %}<i>None</i>{% endif %}</td>
-                <td class="diff">{% for x in revision.get_diff %}{{x|escape}}<br />{% endfor %}</td>
-                <td>{{ revision.get_user}}
-                    <br/>
-                    {{ revision.revision_date|date}} {{ revision.revision_date|time}}
-                </td>
+                <!--<td>{% if revision.revision_text %}{{ revision.revision_text}}{% else %}<i>None</i>{% endif %}</td>-->
+                <td class="diff" style="vertical-align:top">{% for x in revision.get_diff %}{{x|escape}}<br />{% endfor %}</td>
             </tr>
         {% endfor %}
     </tbody>
@@ -52,6 +51,6 @@
         </tfoot>
     {% endif %}
 </table>
-<input type="submit" value="Change To Selected Revision"{% if not wiki_write %} disabled="true"{% endif %} />
+<input type="submit" value="Revert To Selected Revision"{% if not wiki_write %} disabled="true"{% endif %} />
 </form>
 {% endblock %}
