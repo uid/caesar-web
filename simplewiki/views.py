@@ -34,8 +34,7 @@ def view(request, wiki_url):
                                  'wiki_attachments_write': article.can_attach(request.user),
                                  } )
     # get related articles
-    review_data = view_helper(Comment.objects.filter(text__icontains='#' + article.slug,
-                                                     upvote_count=1).order_by('created')[0:5])
+    review_data = view_helper(Comment.objects.filter(text__icontains='#' + article.slug).order_by('created')[0:5])
     return render(request, "simplewiki/simplewiki_view.html", {
                            'wiki_article': article,
                            'wiki_write': True,
