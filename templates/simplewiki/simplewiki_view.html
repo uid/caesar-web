@@ -5,12 +5,14 @@
 {{ block.super }}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" />
 {% endblock %}
 
 {% block js %}
     {{ block.super }}
     <script type="text/javascript">
-    $(document).ready(function() {
+    $(function() {
+        // link comments
         $('.activity-line').click(function(e) {
           var activityType = this.id.split('-')[0];
           var comment_Id = this.id.split('-')[1];
@@ -18,7 +20,8 @@
           window.location = "/chunks/view/" + chunk_Id + "#" + activityType + "-" + comment_Id;
           return false;
         });
-
+        // link hashtags
+        $("#wiki_article")[0].innerHTML = link_hashtags($("#wiki_article")[0].innerHTML);
     });
     </script>
 {% endblock %}
@@ -50,10 +53,10 @@
 
     <!-- SIDEBAR -->
     <td style="vertical-align:top" border="1">
-        <table style="border:2px solid #555; border-radius: 10px"><tr><td>
-            <h2>Related Articles</h2>
-            <li><a>Other Article About This One Thing</a></li>
-            <li><a>Some Article About Another Thing</a></li>
+        <table style="border:2px solid #555; border-radius: 10px; padding: 5px 5px 5px 5px; font-size:12pt"><tr><td>
+            <h2>See Also</h2>
+            <li>#important</li>
+            <li>#repexposure</li>
             </ul>  
         </td></tr></table>
         
@@ -61,9 +64,16 @@
     </td>
     </tr>
     </table>
+    <!-- LAST MODIFIED -->
+    {% if wiki_article %} 
+        {% if wiki_article.locked %}
+            <p><strong>{% trans "This article has been locked" %}</strong></p>
+        {% endif %}
+        <p><i>{% trans "Last modified" %}: {{ wiki_article.modified_on|date }}, {{ wiki_article.modified_on|time }}</i></p>
+    {% endif %}
     <!-- EXAMPLES -->
     <hr />
-    <h2>Examples</h2>
+    <h1>Examples</h1>
     
     <table class="assignment-stream">
     {% for type, comment, snippet, is_vote, vote in review_data %}
@@ -92,15 +102,5 @@
         <h4><i>No examples found.</i></h4>
     {% endif %}
     </table>
-    
-    
-    <!-- FOOTER -->
-    {% if wiki_article %} 
-        {% if wiki_article.locked %}
-            <p><strong>{% trans "This article has been locked" %}</strong></p>
-        {% endif %}
-        <p><i>{% trans "Last modified" %}: {{ wiki_article.modified_on|date }}, {{ wiki_article.modified_on|time }}</i></p>
-    {% endif %}
-    
     
 {% endblock %}
