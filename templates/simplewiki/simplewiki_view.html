@@ -45,22 +45,42 @@
     <table>
     
     <!-- CONTENTS -->
-    <td width="70%" style="vertical-align:top">
+    <td width="70%" style="vertical-align:top; padding:0 1em 0 0;">
     <div id="wiki_article">
         {{ wiki_article.current_revision.contents_parsed|safe }}
     </div>
     </td>
 
     <!-- SIDEBAR -->
-    <td style="vertical-align:top" border="1">
-        <table style="border:2px solid #555; border-radius: 10px; padding: 5px 5px 5px 5px; font-size:12pt"><tr><td>
-            <h2>See Also</h2>
+    <td style="vertical-align:top">
+        <table id="sidebar"><tr><td>
+            <h2 style="display:inline">See Also</h2>
             <li>#important</li>
-            <li>#repexposure</li>
-            </ul>  
+            <li>#repexposure</li> 
+        </td></tr></table>
+        <br>
+        <table id="sidebar"><tr><td>
+            <h2 style="display:inline">Examples</h2>
+            <table>
+            {% for type, comment, snippet, is_vote, vote in review_data %}
+                <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}
+                              {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
+                              {% endif %}
+                          {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
+                          {% endif %}" class="{%if not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
+                <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
+                <td> {{ comment.chunk.name }} </td>
+                </tr>
+                {% empty %}
+            {% endfor %}
+            </table>
+    {% if review_data|length == 0 %}
+        <h4><i>No examples found.</i></h4>
+    {% endif %}
         </td></tr></table>
         
-        
+    
+    
     </td>
     </tr>
     </table>
@@ -71,7 +91,9 @@
         {% endif %}
         <p><i>{% trans "Last modified" %}: {{ wiki_article.modified_on|date }}, {{ wiki_article.modified_on|time }}</i></p>
     {% endif %}
+    
     <!-- EXAMPLES -->
+    <!--
     <hr />
     <h1>Examples</h1>
     
@@ -102,5 +124,6 @@
         <h4><i>No examples found.</i></h4>
     {% endif %}
     </table>
+    -->
     
 {% endblock %}

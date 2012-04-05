@@ -4,6 +4,16 @@
 	{{wiki_article.title}}
 {% endblock %}
 
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(function() {
+            $("#id_contents").attr("rows", "100");
+        });
+    </script>
+
+{% endblock %}
+
 {% block wiki_body %}
 <form method="POST" id="wiki_revision">{% csrf_token %}
 	

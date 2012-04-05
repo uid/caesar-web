@@ -3,6 +3,11 @@
     {{ block.super}}
     
     <style type="text/css">
+        .current, .notcurrent, .search {
+            font-size: 14pt;
+            display:inline;
+        }
+        
         .current {
             border:2px solid #000;
             padding: 2px 3px 2px 3px; 
@@ -18,26 +23,47 @@
             color: #aaa;
             text-decoration: none;
         }
+        
+                
+        .search {
+            
+        }
+        
+        #wiki_article {
+            font-size: 11pt;
+            padding: 1em 2em 1em 1em;
+            background: #eee;
+            border-radius: 10px;
+        }
+        
+        #id_contents {
+            font-size: 11pt;
+            box-sizing: border-box;
+            width:100%;
+            height:40em;
+        }
+        
+        #sidebar {
+            border:2px solid #555;
+            border-radius: 10px;
+            padding: 0px 5px 5px 5px; 
+            font-size:12pt
+        }
+
+        
+        .active-search {
+            color:#000;
+        }
+        
+        .inactive-search {
+            color:#aaa;
+        }
     
     </style>
     
     <!-- SIMPLEWIKI DEFAULT STYLING. CLASHES WITH CAESAR STYLING SO COMMENTED OUT -->
     <!-- <link rel="stylesheet" media="screen,print" href="/static/simplewiki/css/base.css" /> -->
     <!-- <link rel="stylesheet" media="print" href="/static/simplewiki/css/base_print.css" /> -->
-    
-    <style type="text/css">
-        .ui-button .ui-icon-edit {
-            background-image: url('/static/img/pencil-small.png');
-            width: 16px;
-            height: 16px;
-        }
-        
-        #wiki_article {
-            font-size: 11pt;
-            padding: 0 2em 0 0
-        }
-    </style>
-    
     <link rel="stylesheet" href="/static/simplewiki/css/autosuggest_inquisitor.css" />
     {% load i18n simplewiki_utils %}
 {% endblock %}
@@ -81,13 +107,12 @@
     <br>
     {% if wiki_article %}
         <table><tr>
-        <td width="70%" style="vertical-align:bottom"><h1 style="display:inline">#{{ wiki_article.slug }} </h1></td>
+        <td style="vertical-align:bottom"><h1 style="display:inline">#{{ wiki_article.slug }} </h1></td>
         <td style="text-align:right; vertical-align:middle">
-            <h2 style="display:inline">
             <a class="{% if view == 'read' %}current{% else %}notcurrent{% endif %}" href="{% url wiki_view wiki_article.get_url %}">Read</a> 
             <a class="{% if view == 'edit' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_edit wiki_article.get_url %}'>Edit</a> 
             <a class="{% if view == 'history' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_history wiki_article.get_url 1 %}'>View History</a>
-            </h2>
+            <input id="search" class="search inactive-search" value="Search..." onblur="if(this.value=='') {this.value='Search...';$('#search').addClass('inactive-search');$('#search').removeClass('active-search');}" onfocus="if(this.value=='Search...') { this.value=''; $('#search').removeClass('inactive-search');$('#search').addClass('active-search')}"></input>
         </td></tr></table>
     {% endif %}  
 
