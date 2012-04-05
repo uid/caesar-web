@@ -1,41 +1,49 @@
 {% extends "base.html" %}
 {% block css %}
-{{ block.super}}
-
-<style type="text/css">
-    .current {
-        border:2px solid #000;
-        padding: 2px 3px 2px 3px; 
-        border-radius: 4px;
-        color: #000;
-        text-decoration: none;
-    }
+    {{ block.super}}
     
-    .notcurrent {
-        border:2px solid #aaa;
-        padding: 2px 3px 2px 3px; 
-        border-radius: 4px;
-        color: #aaa;
-        text-decoration: none;
-    }
-
-</style>
-
-{% load i18n simplewiki_utils %}
-
+    <style type="text/css">
+        .current {
+            border:2px solid #000;
+            padding: 2px 3px 2px 3px; 
+            border-radius: 4px;
+            color: #000;
+            text-decoration: none;
+        }
+        
+        .notcurrent {
+            border:2px solid #aaa;
+            padding: 2px 3px 2px 3px; 
+            border-radius: 4px;
+            color: #aaa;
+            text-decoration: none;
+        }
+    
+    </style>
+    
     <!-- SIMPLEWIKI DEFAULT STYLING. CLASHES WITH CAESAR STYLING SO COMMENTED OUT -->
     <!-- <link rel="stylesheet" media="screen,print" href="/static/simplewiki/css/base.css" /> -->
     <!-- <link rel="stylesheet" media="print" href="/static/simplewiki/css/base_print.css" /> -->
+    
     <style type="text/css">
         .ui-button .ui-icon-edit {
             background-image: url('/static/img/pencil-small.png');
             width: 16px;
             height: 16px;
         }
-
+        
+        #wiki_article {
+            font-size: 11pt;
+            padding: 0 2em 0 0
+        }
     </style>
+    
     <link rel="stylesheet" href="/static/simplewiki/css/autosuggest_inquisitor.css" />
+    {% load i18n simplewiki_utils %}
+{% endblock %}
 
+{% block js %}
+    {{ block.super }}
     <script type="text/javascript" src="/static/simplewiki/js/bsn.AutoSuggest_c_2.0.js"></script>
     <script type="text/javascript">
         function set_related_article_id(s) {
@@ -74,10 +82,12 @@
     {% if wiki_article %}
         <table><tr>
         <td width="70%" style="vertical-align:bottom"><h1 style="display:inline">#{{ wiki_article.slug }} </h1></td>
-        <td style="font-size:16pt; text-align:right; vertical-align:middle">
+        <td style="text-align:right; vertical-align:middle">
+            <h2 style="display:inline">
             <a class="{% if view == 'read' %}current{% else %}notcurrent{% endif %}" href="{% url wiki_view wiki_article.get_url %}">Read</a> 
             <a class="{% if view == 'edit' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_edit wiki_article.get_url %}'>Edit</a> 
             <a class="{% if view == 'history' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_history wiki_article.get_url 1 %}'>View History</a>
+            </h2>
         </td></tr></table>
     {% endif %}  
 

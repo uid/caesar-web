@@ -27,7 +27,7 @@
                             {% endifnotequal %}
                         {% endif %}
                     </label>
-                <td style="vertical-align:top">{{ revision.get_user}}
+                <td style="vertical-align:top"><a href="/review/user/{{revision.get_user}}/">{{ revision.get_user}}</a>
                 <br/>
                 {{ revision.revision_date|date}} {{ revision.revision_date|time}}
                 </td>
