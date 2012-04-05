@@ -12,9 +12,9 @@ link_hashtags = function(html, newtab) {
     for (k in hashtags) {
         var r = new RegExp('(\#' + k + ')', 'gi');
         if (k == 'important') {
-            output = output.replace(r, "<a class='hashtag-important' onclick=hashtag_redirect(hashtags[k]," + newtab + ")>$1</a>");
+            output = output.replace(r, "<a class='hashtag-important' onclick=hashtag_redirect('" + hashtags[k]+ "'," + newtab + ")>$1</a>");
         } else {
-            output = output.replace(r, "<a style='cursor:pointer' onclick=hashtag_redirect(hashtags[k]," + newtab + ")>$1</a>");
+            output = output.replace(r, "<a style='cursor:pointer' onclick=hashtag_redirect('" + hashtags[k] + "'," + newtab + ")>$1</a>");
         }
     }
     
