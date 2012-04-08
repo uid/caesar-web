@@ -68,13 +68,31 @@ table.assignment-stream {
 .positive-votes {
 	background-color: #B7FFB7;
 	text-align: center;
-	margin-top:1px
+	margin-top:1px;
 	margin-bottom:1px
 }
 
 .negative-votes {
 	background-color: #FFD1DC;
 	text-align: center;
-	margin-top:1px
+	margin-top:1px;
 	margin-bottom:1px
+}
+.result{
+    text-align: right;
+}
+.green{
+    color: #009900;
+}
+.last-left{
+    border-left: 1px solid #aaa;
+}
+.list-chunks{
+    border: 1px solid #555;
+    border-radius: 10px;
+    margin-bottom: 1px;
+    list-style: none;
+    font-size: 1.2em;
+    width: 150px;
+    padding: 10px 10px;
 }

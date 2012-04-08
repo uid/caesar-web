@@ -8,6 +8,284 @@
 
 {% block js %}
 {{ block.super }}
+<script src="http://api.jquery.com/scripts/events.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script>
+$(document).ready(function(){
+    $( "#sortable" ).sortable();
+    $( "#sortable" ).disableSelection();
+    $(".count").keyup(function(event){
+        countReviewers();
+      });
+    function countReviewers() {
+        var student_contr = parseInt($("#total-students").val()) * parseInt($("#per-student").val());
+        var alum_contr = parseInt($("#total-alums").val()) * parseInt($("#per-alum").val());
+        var per_chunk = parseInt($("#per-chunk").val());
+        var total = (student_contr + alum_contr)/per_chunk;
+        $("#power-number").text(total);
+        $("#student-tasks").text($("#total-students").val() + " x " + $("#per-student").val() + " = " + student_contr + " tasks total.");
+        $("#alum-tasks").text($("#total-alums").val() + " x " + $("#per-alum").val() + " = " + alum_contr + " tasks total.");
+        $("#task-class").text("/ (" + per_chunk + " tasks/class ) = " + total + " classes");
+    }
+    $(".chunks").change(function(event){
+        countChunks();
+    });
+    function countChunks() {
+        var total = 0;
+        $(".chunks").each(function(){
+            if($(this).is(":checked")){
+                var valSplit = $(this).val().split('-');
+                total += parseInt(valSplit[1]);
+            }
+        $("#chunk-number").text(total);
+        });
+    }
+    countChunks();
+    countReviewers();
+});
+
+$(function () {
+    var important;
+    var test;
+    var unimportant;
+    $(document).ready(function() {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'important-graph',
+                zoomType: 'xy'
+            },
+            title: {
+                text: 'Lines of Student Code for Classes'
+            },
+            xAxis: {
+                title: {
+                    enabled: true,
+                    text: 'lines of code'
+                },
+                startOnTick: true,
+                endOnTick: true,
+                showLastLabel: true,
+                max: 200,
+                min: 0
+            },
+            yAxis: {
+                title: {
+                    text: '# copies'
+                },
+                max: 210,
+                min: 0
+            },
+            tooltip: {
+                formatter: function() {
+                        return ''+
+                        this.x +' lines of code, '+ this.y +' copies';
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 700,
+                y: 20,
+                floating: true,
+                backgroundColor: '#FFFFFF',
+                borderWidth: 1
+            },
+            plotOptions: {
+                scatter: {
+                    marker: {
+                        radius: 3,
+                        states: {
+                            hover: {
+                                enabled: true,
+                                lineColor: 'rgb(100,100,100)'
+                            }
+                        }
+                    },
+                    states: {
+                        hover: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    }
+                }
+            },
+            series: [
+            {% for name, graph in important_graph %}
+            {
+                name: "{{name}}",
+                type: "scatter",
+                data: {{graph}}
+            },
+            {% endfor %}
+            {
+                name: "student lines",
+                type: "line",
+                data: [[30, -1], [30, 300]]
+            },
+            ]
+        });
+        
+        test = new Highcharts.Chart({
+            chart: {
+                renderTo: 'test-graph',
+                type: 'scatter',
+                zoomType: 'xy'
+            },
+            title: {
+                text: 'Lines of Student Code for Test Classes'
+            },
+            xAxis: {
+                title: {
+                    enabled: true,
+                    text: 'lines of code'
+                },
+                startOnTick: true,
+                endOnTick: true,
+                showLastLabel: true,
+                max: 200,
+                min: 0
+            },
+            yAxis: {
+                title: {
+                    text: '# copies'
+                },
+                max: 210,
+                min: 0
+            },
+            tooltip: {
+                formatter: function() {
+                        return ''+
+                        this.x +' lines of code, '+ this.y +' copies';
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 700,
+                y: 20,
+                floating: true,
+                backgroundColor: '#FFFFFF',
+                borderWidth: 1
+            },
+            plotOptions: {
+                scatter: {
+                    marker: {
+                        radius: 3,
+                        states: {
+                            hover: {
+                                enabled: true,
+                                lineColor: 'rgb(100,100,100)'
+                            }
+                        }
+                    },
+                    states: {
+                        hover: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    }
+                }
+            },
+            series: [
+            {% for name, graph in test_graph %}
+            {
+                name: "{{name}}",
+                data: {{graph}}
+            },
+            {% endfor %}
+            {
+                name: "student lines",
+                type: "line",
+                data: [[30, -1], [30, 300]]
+            },
+            ]
+        });
+
+        unimportant = new Highcharts.Chart({
+            chart: {
+                renderTo: 'unimportant-graph',
+                type: 'scatter',
+                zoomType: 'xy'
+            },
+            title: {
+                text: 'Lines of Student Code for (mostly) Staff-Provided Classes'
+            },
+            xAxis: {
+                title: {
+                    enabled: true,
+                    text: 'lines of code'
+                },
+                startOnTick: true,
+                endOnTick: true,
+                showLastLabel: true,
+                max: 200,
+                min: 0
+            },
+            yAxis: {
+                title: {
+                    text: '# copies'
+                },
+                max: 210,
+                min: 0
+            },
+            tooltip: {
+                formatter: function() {
+                        return ''+
+                        this.x +' lines of code, '+ this.y +' copies';
+                }
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'left',
+                verticalAlign: 'top',
+                x: 700,
+                y: 20,
+                floating: true,
+                backgroundColor: '#FFFFFF',
+                borderWidth: 1
+            },
+            plotOptions: {
+                scatter: {
+                    marker: {
+                        radius: 3,
+                        states: {
+                            hover: {
+                                enabled: true,
+                                lineColor: 'rgb(100,100,100)'
+                            }
+                        }
+                    },
+                    states: {
+                        hover: {
+                            marker: {
+                                enabled: false
+                            }
+                        }
+                    }
+                }
+            },
+            series: [
+            {% for name, graph in unimportant_graph %}
+            {
+                name: "{{name}}",
+                data: {{graph}}
+            },
+            {% endfor %}
+            {
+                name: "student lines",
+                type: "line",
+                data: [[30, -1], [30, 300]]
+            },
+            ]
+        });
+    });
+});   
+</script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -20,25 +298,73 @@
   action="/chunks/simulate/{{assignment.id}}" method="post">
   {% csrf_token %}
 
-<p> <h1 class="task-header"> Statistics for {{ assignment.name }}. </h1> </p>
-<p><h2 class="task-header">For the reviewing process we can expect: <input type="text" name="students" value="{{ students.count }}" size=3/> students, <input type="text" name="alums" value="{{ alums.count }}" size=3/> alums, <input type="text" name="staff" value="{{ staff.count }}" size=3/> staff</h2></p>
+<p> <h1 class="task-header"> Settings for {{ assignment.name }}. </h1> </p>
 
-<p> <h4 class="task-header"> There are {{ chunks_worth_reviewing.count }} classes that would benefit from reviewing, spread over {{ active_students }} active students (students that at least pulled the assignment). This means that each student contributed {{ classes_per_student }} classes to the review process. In order to review all of them, each student would have to be assigned {{ tasks_per_student }} tasks to review. </h4> </p>
+<p> Assign <input type="text" id="per-chunk" class="count" name="per_chunk" value="2" size=3/> non staff users (students and alums) to each class for review. Staff will serve as quality control and be assigned as a 3rd reviewer whenever possible. </p>
 
-<p> <h4 class="task-header"> The following are the names and number of classes to be reviewed: </br>
+<p><h2 class="task-header">For the reviewing process we can expect: </h2>
+<table class="assignment-stream">
+  <tr class="non-activity-line">
+    <td> 
+       <input type="text" id="total-students" class="count" name="students" value="{{ assignment.students }}" size=3/>
+    </td>
+    <td > students </td>
+    <td > reviewing </td>
+    <td>  <input type="text" id="per-student" class="count" name="student_tasks" value="{{ assignment.student_count }}" size=3/> </td>
+    <td > tasks each. </td>
+    <td class="last-left"><h4><span id="student-tasks">0 tasks total.</span></h4></td>
+  </tr>
+  <tr class="non-activity-line">
+      <td> 
+         <input type="text" id="total-alums" class="count" name="alums" value="{{ assignment.alums }}" size=3/>
+      </td>
+      <td > alums </td>
+      <td > reviewing </td>
+      <td>  <input type="text" id="per-alum" class="count" name="alum_tasks" value="{{ assignment.alum_count }}" size=3/> </td>
+      <td > tasks each. </td>
+      <td class="last-left"><h4><span id="alum-tasks"> 0  tasks total.</span></h4></td>
+  </tr>
+  <tr class="non-activity-line">
+      <td> 
+         <input type="text" name="staff" value="{{ assignment.staff }}" size=3/>
+      </td>
+      <td > staff </td>
+      <td > reviewing </td>
+      <td>  <input type="text" name="staff_tasks" value="{{ assignment.staff_count }}" size=3/> </td>
+      <td > tasks each. </td>
+      <td class="last-left"> </td>
+  </tr>
+  <tr class="non-activity-line">
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td class="last-left"><h4><span id='task-class'>/ (2 tasks/class).</span></h4></td>
+  </tr>
+</table>
+<h2 class="task-header result" id="power"> At most <span id="power-number" class="green"> 0 </span> classes will reviewed.</h2></p>
 
+<div id="important-graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+<div id="test-graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+<div id="unimportant-graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
 
-      {% for name, num in chunks_data %}
-      <input type="checkbox" name="chunk" value="{{name}}">
-          {{ name }}, {{ num }} </br>
+<p> <h4 class="task-header"> Check which classes should be reviewed and drag to order them by priority. </br>
+
+<ul id="sortable">
+      {% for name, num, checked in chunks_data %}
+      <li class="list-chunks"><input class="chunks" type="checkbox" name="chunk" value="{{name}}-{{num}}" {%if checked %}checked="checked"{%endif%}>
+          {{ name }}, {{ num }}</li>
       {% endfor %}
-      
+</ul>
 </h4></p>
-  
+<p><h2 class="task-header result" id="power">  <span id="chunk-number" class="green"> 0 </span> classes scheduled for review. </h2></p>
   <br/>
   <div class ="centered">
   <button type="submit">Save</button>
   <button id="cancel-button" type="button">Cancel</button>
   </div>
 </form>
+
+<!-- <p> <h4 class="task-header">  {{ chunks_worth_reviewing.count }} classes that would benefit from reviewing, spread over {{ active_students }} active students (students that at least pulled the assignment). This means that each student contributed {{ classes_per_student }} classes to the review process. In order to review all of them, each student would have to be assigned {{ tasks_per_student }} tasks to review. </h4> </p> -->
 {% endblock %}

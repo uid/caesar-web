@@ -33,7 +33,11 @@ class Assignment(models.Model):
     alum_count = models.IntegerField(default=3)
     staff_count = models.IntegerField(default=10)
     
-    chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names
+    students = models.IntegerField(default=199)
+    alums = models.IntegerField(default=1)
+    staff = models.IntegerField(default=15)
+    
+    chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
     
     class Meta:
         db_table = u'assignments'
