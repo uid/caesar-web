@@ -220,17 +220,51 @@ def submit_assignment(request, assignment_id):
     return redirect('review.views.dashboard')
 @login_required
 def simualte(request, assignment_id):
+    user = request.user
+    assignment = Assignment.objects.get(id=assignment_id)
+    assignment_chunks = Chunk.objects.filter(file__submission__assignment__id = assignment_id).select_related('file__submission__assignment', 'profile')
+    
+    chunks_graph = dict()
+    important = set()
+    test = set()
+    for chunk in assignment_chunks:
+        name = chunk.name
+        lines_dict = dict()
+        if name in chunks_graph:
+            lines_dict = chunks_graph[name]
+        lines = min(chunk.profile.student_lines, 200)
+        if lines in lines_dict:
+            lines_dict[lines] += 1
+        else:
+            lines_dict[lines] = 1
+        if lines > 30:
+            important.add(name)
+            if chunk.class_type == "TEST":
+                test.add(name)
+        chunks_graph[name] = lines_dict
+    
+    #list of lists ["sudoku", [[1,20], [3,50]]]
+    #list of important and unimportant 
+    important_graphs = []
+    test_graphs = []
+    unimportant_graphs = []
+    for name in chunks_graph.keys():
+        lines_dict = chunks_graph[name]
+        lines_list = []
+        for key in lines_dict.keys():
+            lines_list.append([int(key), lines_dict[key]])
+        if name in test:
+            test_graphs.append([name, lines_list])
+        elif name in important:
+            important_graphs.append([name, lines_list])
+        else:
+            unimportant_graphs.append([name, lines_list])
+    
+    
     if request.method == 'GET':
-        user = request.user
-        assignment = Assignment.objects.get(id=assignment_id)
-        assignment_chunks = Chunk.objects.filter(file__submission__assignment__id = assignment_id)
-        #TODO: change how ps is found
-        ps = "ps1-beta"
-        par = User.objects.filter(comments__chunk__file__submission__assignment__name = ps).distinct()
-        par.exclude(username = 'checkstyle')
-        students = par.filter(profile__role = 'S')
-        alums = par.filter(profile__role = None)
-        staff = par.filter(profile__role = 'T')
+        students = assignment.students
+        alums = assignment.alums
+        staff = assignment.staff
     
         #find all active students, students that have at least pulled the assignment
         all_students = User.objects.filter(submissions__assignment = assignment)
@@ -239,12 +273,13 @@ def simualte(request, assignment_id):
             chunks = Chunk.objects.filter(file__submission__assignment = assignment).filter(file__submission__author=student)
             if chunks.count() > 0:
                 active_students.append(student)
-    
+        
+        chunks_data = []
+        to_assign = assignment.chunks_to_assign
+
         #find all classes that are worth reviewing, not tests and code more than 40 lines
         classes = assignment_chunks.filter(class_type = "NONE").filter(profile__student_lines__gt = 30).exclude(name="Main")
-        classes_per_student = str(classes.count() / float(len(active_students)))[0:3]
-        tasks_per_student = str(2*classes.count() / float(students.count()))[0:3]
-    
+
         dist = dict()
         for chunk in classes:
             name = chunk.name
@@ -252,34 +287,41 @@ def simualte(request, assignment_id):
                 dist[name] += 1
             else:
                 dist[name] = 1
-    
-        chunks_data = []
+
         for w in sorted(dist, key=dist.get, reverse=True):
-            chunks_data.append((w, dist[w]))
-    
+            to_assign += w + " " + str(dist[w]) + " 1 1,"
+            chunks_data.append((w, dist[w], 1))
+
+        
+        assignment.chunks_to_assign = to_assign
+        assignment.save()
+            # chunks_info = to_assign.split(",")
+            # for chunk_info in chunks_info:
+            #     info = chunk_info.split(" ")
+            #     if len(info) == 4:
+            #         if int(info[2]):
+            #             chunks_data.append((info[0], info[1], int(info[3])))
+
+        
         return render(request, 'chunks/simulate.html', {
             'assignment': assignment,
-            'students': students,
-            'alums': alums,
-            'staff': staff,
-            'chunks_worth_reviewing': classes,
-            'active_students': len(active_students),
-            'classes_per_student': classes_per_student,
-            'tasks_per_student': tasks_per_student,
             'chunks_data': chunks_data,
+            'important_graph': important_graphs,
+            'unimportant_graph': unimportant_graphs,
+            'test_graph': test_graphs,
         })
     else:
-        sys.stderr.write(str(request.POST['chunk']))
-        user = request.user
-        assignment = Assignment.objects.get(id=assignment_id)
-        assignment_chunks = Chunk.objects.filter(file__submission__assignment__id = assignment_id)
-        ps = "ps1-beta"
-        par = User.objects.filter(comments__chunk__file__submission__assignment__name = ps).distinct()
-        par.exclude(username = 'checkstyle')
-        students = par.filter(profile__role = 'S')
-        alums = par.filter(profile__role = None)
-        staff = par.filter(profile__role = 'T')
-    
+        students = request.POST['students']
+        alums = request.POST['alums']
+        staff = request.POST['staff']
+        assignment.students = students
+        assignment.alums = alums
+        assignment.staff = staff
+        
+        assignment.student_count = request.POST['student_tasks']
+        assignment.alum_count = request.POST['alum_tasks']
+        assignment.staff_count = request.POST['staff_tasks']
+        assignment.save()
         #find all active students, students that have at least pulled the assignment
         all_students = User.objects.filter(submissions__assignment = assignment)
         active_students = []
@@ -287,33 +329,52 @@ def simualte(request, assignment_id):
             chunks = Chunk.objects.filter(file__submission__assignment = assignment).filter(file__submission__author=student)
             if chunks.count() > 0:
                 active_students.append(student)
-    
-        #find all classes that are worth reviewing, not tests and code more than 40 lines
+        
+        #find all classes that are worth reviewing, not tests and code more than 30 lines
         classes = assignment_chunks.filter(class_type = "NONE").filter(profile__student_lines__gt = 30).exclude(name="Main")
-        classes_per_student = str(classes.count() / float(len(active_students)))[0:3]
-        tasks_per_student = str(2*classes.count() / float(students.count()))[0:3]
-    
-        dist = dict()
-        for chunk in classes:
-            name = chunk.name
-            if name in dist:
-                dist[name] += 1
-            else:
-                dist[name] = 1
-    
+        
         chunks_data = []
-        for w in sorted(dist, key=dist.get, reverse=True):
-            chunks_data.append((w, dist[w]))
-    
+        test_data = []
+        to_assign = assignment.chunks_to_assign
+        chunks_info = to_assign.split(",")
+        for chunk_info in chunks_info:
+            info = chunk_info.split(" ")
+            if len(info) == 4:
+                if int(info[2]):
+                    chunks_data.append((info[0], info[1], int(info[3])))
+                else:
+                    test_data.append((info[0], info[1], int(info[3])))
+        
+        chunks_raw = request.POST.getlist('chunk')
+        checked = set()
+        for raw in chunks_raw:
+            chunk_name = raw.split("-")[0]
+            checked.add(chunk_name)
+        
+        to_assign = ""
+        for name, num, old in chunks_data:
+            if name in checked:
+                to_assign += name + " " + str(num) + " 1 1,"
+            else:
+                to_assign += name + " " + str(num) + " 1 0,"
+           
+        
+        assignment.chunks_to_assign = to_assign
+        assignment.save()
+        
+        chunks_data = []
+        test_data = []
+        chunks_info = to_assign.split(",")
+        for chunk_info in chunks_info:
+            info = chunk_info.split(" ")
+            if len(info) == 4:
+                if int(info[2]):
+                    chunks_data.append((info[0], info[1], int(info[3])))
+                else:
+                    test_data.append((info[0], info[1], int(info[3])))
+        
         return render(request, 'chunks/simulate.html', {
             'assignment': assignment,
-            'students': students,
-            'alums': alums,
-            'staff': staff,
-            'chunks_worth_reviewing': classes,
-            'active_students': len(active_students),
-            'classes_per_student': classes_per_student,
-            'tasks_per_student': tasks_per_student,
             'chunks_data': chunks_data,
         })
     
