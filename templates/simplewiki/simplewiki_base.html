@@ -56,7 +56,7 @@
         }
         
         .inactive-search {
-            color:#aaa;
+            /*color:#aaa;*/
         }
     
     </style>
@@ -110,12 +110,19 @@
         <td style="vertical-align:bottom"><h1 style="display:inline">#{{ wiki_article.slug }} </h1></td>
         <td style="text-align:right; vertical-align:middle">
             <a class="{% if view == 'read' %}current{% else %}notcurrent{% endif %}" href="{% url wiki_view wiki_article.get_url %}">Read</a> 
-            <a class="{% if view == 'edit' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_edit wiki_article.get_url %}'>Edit</a> 
-            <a class="{% if view == 'history' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_history wiki_article.get_url 1 %}'>View History</a>
-            <input id="search" class="search inactive-search" value="Search..." onblur="if(this.value=='') {this.value='Search...';$('#search').addClass('inactive-search');$('#search').removeClass('active-search');}" onfocus="if(this.value=='Search...') { this.value=''; $('#search').removeClass('inactive-search');$('#search').addClass('active-search')}"></input>
+            <a class="{% if view == 'edit' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_edit wiki_article.get_url %}'><img src="/static/img/pencil.png" /> Edit</a> 
+            <a class="{% if view == 'history' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_history wiki_article.get_url 1 %}'><img src="/static/img/history-small.png" /> View History</a>
+            <form style="display:inline" method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
+                <input name="value" id="search" class="search inactive-search" value="Search..." onblur="if(this.value=='') {this.value='Search...';$('#search').addClass('inactive-search');$('#search').removeClass('active-search');}" onfocus="if(this.value=='Search...') { this.value=''; $('#search').removeClass('inactive-search');$('#search').addClass('active-search')}" value="{{wiki_search_query|escape}}"></input>
+            </form>
+            <!--
+                <b>Search:</b>
+                <input type="text" name="value" id="wiki_search_input" value="{{wiki_search_query|escape}}"/>
+                <input type="submit" id="wiki_search_input_submit" value={% trans "Go!" %} />
+            </form>-->
         </td></tr></table>
-    {% endif %}  
-
+    {% endif %}
+    
     {% if wiki_form and not wiki_article %}
         <h1> New Hashtag: #{{slug}}</h1>
     {% endif %}
