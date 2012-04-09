@@ -9,12 +9,10 @@
 {% endblock %}
 
 {% block wiki_body %}
+    <h1>Search results for "{{ wiki_search_query }}"</h1>
+    <hr />
     {% for article in wiki_search_results %}
-        {% if article.get_url %}
-            <a href="{% url wiki_view article.get_url %}">{{ article.get_url }}</a><br/>
-        {% else %}
-            <a href="{% url wiki_view '' %}">/</a><br/>
-        {% endif %}
+            <h4><a href="{% url wiki_view article.get_url %}">#{{ article.slug }}</a></h4>
     {% empty %}
         {% trans "No articles were found!" %}
     {% endfor %}

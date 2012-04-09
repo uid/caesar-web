@@ -5,6 +5,11 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
 {% endblock %}
 
+{% block js %}
+    <script type="text/javascript">
+    </script>
+{% endblock %}
+
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
   <span class="breadcrumb">Wiki</span>
@@ -24,7 +29,7 @@
     <td style="vertical-align:top">
         <table style="border:2px solid #000; border-radius: 10px"><tr><td style="vertical-align:top">
             <br>
-            <h3 style="text-align:center">Create New Hashtag<br><br><i>"#<input type="text" onkeydown="if (event.keyCode == 13) {location.href='/wiki/' + this.value + '/_create/';}" style="font-weight:bold; font-size:12pt"/>"<i></h3>
+            <h3 style="text-align:center">Create New Hashtag<br><br><i>"#<input type="text" onkeyup="this.value = this.value.replace(/[^a-zA-Z]/g, '')" onkeydown="this.value = this.value.replace(/[^a-zA-Z]/g, ''); if (event.keyCode == 13) {location.href='/wiki/' + this.value + '/_create/';}" style="font-weight:bold; font-size:12pt"/>"<i></h3>
         </td></tr></table>
     </td>
     </tr>

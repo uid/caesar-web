@@ -22,6 +22,7 @@
         });
         // link hashtags
         $("#wiki_article")[0].innerHTML = link_hashtags($("#wiki_article")[0].innerHTML, false);
+        $("#see_also")[0].innerHTML = link_hashtags($("#see_also")[0].innerHTML, false);
     });
     </script>
 {% endblock %}
@@ -54,11 +55,13 @@
     <!-- SIDEBAR -->
     <td style="vertical-align:top">
         <table id="sidebar"><tr><td>
+        <div id="see_also">
             <h2 style="display:inline">See Also</h2>
             <li>#important</li>
             <li>#repexposure</li> 
+            <li>#nonexistanthashtag</li>
+        </div>
         </td></tr></table>
-        <br>
         <table id="sidebar"><tr><td>
             <h2 style="display:inline">Examples</h2>
             <table>
@@ -93,7 +96,7 @@
     {% endif %}
     
     <!-- EXAMPLES -->
-    <!--
+    
     <hr />
     <h1>Examples</h1>
     
@@ -124,6 +127,6 @@
         <h4><i>No examples found.</i></h4>
     {% endif %}
     </table>
-    -->
+    
     
 {% endblock %}

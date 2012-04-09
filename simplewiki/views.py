@@ -270,37 +270,17 @@ def history(request, wiki_url, page=1):
 
 @login_required
 def search_articles(request, wiki_url):
-    # blampe: We should check for the presence of other popular django search
-    # apps and use those if possible. Only fall back on this as a last resort.
-    # Adding some context to results (eg where matches were) would also be nice.
-    
-    # todo: maybe do some perm checking here
-    
     if request.method == 'POST':
         querystring = request.POST['value'].strip()
-        if querystring:
-            results = Article.objects.all()
-            for queryword in querystring.split():
-                # Basic negation is as fancy as we get right now
-                if queryword[0] == '-' and len(queryword) > 1:
-                    results._search = lambda x: results.exclude(x)
-                    queryword = queryword[1:]
-                else:
-                    results._search = lambda x: results.filter(x)
-                    
-                results = results._search(Q(current_revision__contents__icontains = queryword) | \
-                                          Q(title = queryword))
-        else:
-            # Need to throttle results by splitting them into pages...
-            results = Article.objects.all()
-
-        if results.count() == 1:
-            return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
-        else:        
-            c = RequestContext(request, {'wiki_search_results': results,
-                                         'wiki_search_query': querystring})
-            return render_to_response('simplewiki/simplewiki_searchresults.html', c)
-    
+        results = [x for x in Article.objects.filter(slug__icontains=querystring)];
+        results += [x for x in Article.objects.filter(current_revision__contents__icontains=querystring) if x not in results];
+        results = [x for x in results if not x == Article.get_root()]
+        #if len(results) == 1:
+        #    return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
+        #else:        
+        c = RequestContext(request, {'wiki_search_results': results,
+                                     'wiki_search_query': querystring})
+        return render_to_response('simplewiki/simplewiki_searchresults.html', c)
     return view(request, wiki_url)
 
 @login_required
