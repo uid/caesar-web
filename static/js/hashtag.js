@@ -39,7 +39,7 @@ function hashtagRedirect(text) {
 
 function getFormattedHashtagText(text) {
     var output = text.replace(/(#important[^\w])/ig, '<span class="hashtag-important">$1</span>');
-    output = output.replace(/(#magicnumber[^\w])/ig, '<a onclick=hashtagRedirect("http://c2.com/cgi/wiki?MagicNumber")>$1</span>');
+    output = output.replace(/(#magicnumber[^\w])/ig, '<a onclick=hashtagRedirect("http://c2.com/cgi/wiki?MagicNumber")>$1</a>');
     output = output.replace(/(#namingconvention[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-135099.html#367")>$1</a>');
     output = output.replace(/(#javadoc[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/index-137868.html")>$1</a>');
     output = output.replace(/(#import[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_imports.html")>$1</a>');
