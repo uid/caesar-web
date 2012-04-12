@@ -22,7 +22,6 @@
         });
         // link hashtags
         $("#wiki_article")[0].innerHTML = link_hashtags($("#wiki_article")[0].innerHTML, false);
-        $("#see_also")[0].innerHTML = link_hashtags($("#see_also")[0].innerHTML, false);
     });
     </script>
 {% endblock %}
@@ -43,10 +42,11 @@
         </form>
     </span>
     -->
-    <table>
+
     
     <!-- CONTENTS -->
-    <td width="70%" style="vertical-align:top; padding:0 1em 0 0;">
+    <table>
+    <td width="72%" style="vertical-align:top; padding:0 1em 0 0;">
     <div id="wiki_article">
         {{ wiki_article.current_revision.contents_parsed|safe }}
     </div>
@@ -54,36 +54,20 @@
 
     <!-- SIDEBAR -->
     <td style="vertical-align:top">
-        <table id="sidebar"><tr><td>
-        <div id="see_also">
-            <h2 style="display:inline">See Also</h2>
-            <li>#important</li>
-            <li>#repexposure</li> 
-            <li>#nonexistanthashtag</li>
-        </div>
-        </td></tr></table>
-        <table id="sidebar"><tr><td>
-            <h2 style="display:inline">Examples</h2>
-            <table>
-            {% for type, comment, snippet, is_vote, vote in review_data %}
-                <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}
-                              {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
-                              {% endif %}
-                          {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
-                          {% endif %}" class="{%if not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
-                <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
-                <td> {{ comment.chunk.name }} </td>
-                </tr>
-                {% empty %}
-            {% endfor %}
-            </table>
-    {% if review_data|length == 0 %}
-        <h4><i>No examples found.</i></h4>
-    {% endif %}
-        </td></tr></table>
+        <table class="sidebar">
+        <td>
+        Wiki page by <a>AAA</a>, <a>BBB</a> and <a>CCC</a>.
+        <br>
+        Used X times this semester (y all time).
+        <br>
+        by <a>DDD</a>, <a>EEE</a> and <a>YYY</a>.
+        <br>
+        <a href='#examples'>See Examples</a>
+        </td>
+        </table>
         
-    
-    
+        </td>
+        </table>
     </td>
     </tr>
     </table>
@@ -98,7 +82,7 @@
     <!-- EXAMPLES -->
     
     <hr />
-    <h1>Examples</h1>
+    <h1 id="examples">Examples</h1>
     
     <table class="assignment-stream">
     {% for type, comment, snippet, is_vote, vote in review_data %}

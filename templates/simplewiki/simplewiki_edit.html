@@ -8,8 +8,33 @@
     {{ block.super }}
     <script type="text/javascript">
         $(function() {
-            $("#id_contents").attr("rows", "100");
+            $("#id_contents")
+                .attr("rows", "100")
+                .change(function(e) {
+                    window.onbeforeunload = function() {
+                        return "JDH!";
+                    }
+                })
+                .val(function(index, value) {
+                   return value.replace(/\\#/gi, "#");
+                });
+            $("#save")
+                .button()
+                .click(function(e) {
+                    window.onbeforeunload = null;
+                    $("#id_contents")
+                        .val(function(index, value) {
+                            return value.replace(/#/ig, "\\#");
+                        });
+                });
+            $("#cancel")
+                .button()
+                .click(function() {
+                    window.location='{% url wiki_view wiki_article.get_url %}';
+                });
         });
+        
+        
     </script>
 
 {% endblock %}
@@ -20,7 +45,8 @@
 	{{wiki_form.contents}}
 	<input style="visibility:hidden" id="id_revision_text" type="text" name="revision_text">
 	<br>
-	<input type="submit" value="Save" /></td>
+	<input type="submit" id="save" value="Save" />
+	<input type="button" id="cancel" value="Cancel" />
 	<!-- DEFAULT
 	<table id="wiki_revision_table">
 	{{ wiki_form }}

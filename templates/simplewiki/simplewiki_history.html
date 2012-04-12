@@ -3,6 +3,14 @@
 {% block wiki_page_title %}
     {{ wiki_article.title }}
 {% endblock %}
+{% block js %}
+    {{ block.super }}
+    <script>
+        $(function() {
+            $("#revert").button();
+        });
+    </script>
+{% endblock %}
 {% block wiki_body %}
 <form method="POST">{% csrf_token %}
 <table id="wiki_history_table" border="1px">
@@ -51,6 +59,6 @@
         </tfoot>
     {% endif %}
 </table>
-<input type="submit" value="Revert To Selected Revision"{% if not wiki_write %} disabled="true"{% endif %} />
+<input id="revert" type="submit" value="Revert To Selected Revision"{% if not wiki_write %} disabled="true"{% endif %} />
 </form>
 {% endblock %}

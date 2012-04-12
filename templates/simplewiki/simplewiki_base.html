@@ -1,19 +1,13 @@
 {% extends "base.html" %}
 {% block css %}
-    {{ block.super}}
-    
+
+
     <style type="text/css">
-        .current, .notcurrent, .search {
-            font-size: 14pt;
-            display:inline;
-        }
         
-        .current {
-            border:2px solid #000;
-            padding: 2px 3px 2px 3px; 
-            border-radius: 4px;
-            color: #000;
+        .header {
+            padding: 0px;
             text-decoration: none;
+            font-size: 14pt;
         }
         
         .notcurrent {
@@ -24,9 +18,16 @@
             text-decoration: none;
         }
         
+        .ui-button-text-only, .ui-button-text {
+            padding:1px !important;
+            width:100px !important;
+            font-size:14pt !important;
+            text-align:center;
+        }
                 
-        .search {
-            
+        #search {
+            padding: 4px;
+            border-radius:5px;
         }
         
         #wiki_article {
@@ -43,7 +44,7 @@
             height:40em;
         }
         
-        #sidebar {
+        .sidebar {
             border:2px solid #555;
             border-radius: 10px;
             padding: 0px 5px 5px 5px; 
@@ -56,7 +57,11 @@
         }
         
         .inactive-search {
-            /*color:#aaa;*/
+            color:#aaa;
+        }
+        
+        #radio {
+            display:inline;
         }
     
     </style>
@@ -66,6 +71,7 @@
     <!-- <link rel="stylesheet" media="print" href="/static/simplewiki/css/base_print.css" /> -->
     <link rel="stylesheet" href="/static/simplewiki/css/autosuggest_inquisitor.css" />
     {% load i18n simplewiki_utils %}
+    {{ block.super}}
 {% endblock %}
 
 {% block js %}
@@ -91,6 +97,13 @@
                 x();
         }
     </script>
+    
+   <script>
+	$(function() {
+		$( "#radio" ).buttonset();
+		$("#search")[0].value = "Search Wiki...";
+	});
+	</script>
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -102,18 +115,24 @@
 {% endblock %}
 
 {% block content %}
+
+
   
     <!-- Title -->
     <br>
     {% if wiki_article %}
         <table><tr>
-        <td style="vertical-align:bottom"><h1 style="display:inline">#{{ wiki_article.slug }} </h1></td>
+        <td style="vertical-align:middle"><h1 style="display:inline">#{{ wiki_article.slug }} </h1></td>
         <td style="text-align:right; vertical-align:middle">
-            <a class="{% if view == 'read' %}current{% else %}notcurrent{% endif %}" href="{% url wiki_view wiki_article.get_url %}">Read</a> 
-            <a class="{% if view == 'edit' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_edit wiki_article.get_url %}'><img src="/static/img/pencil.png" /> Edit</a> 
-            <a class="{% if view == 'history' %}current{% else %}notcurrent{% endif %}" href='{% url wiki_history wiki_article.get_url 1 %}'><img src="/static/img/history-small.png" /> View History</a>
+            <div id="radio" class="ui-buttonset">
+                <input onclick="window.location='{% url wiki_view wiki_article.get_url %}'" type="radio" {% if view == 'read' %}checked="checked"{% endif %}id="radio1" name="radio" class="header ui-helper-hidden-accessible"><label for="radio1" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left"  role="button"><span class="ui-button-text">Read</span></label>
+                <input onclick="window.location='{% url wiki_edit wiki_article.get_url %}'" type="radio" {% if view == 'edit' %}checked="checked"{% endif %} id="radio2" name="radio" class="header ui-helper-hidden-accessible"><label for="radio2" class="header ui-button ui-widget ui-state-default ui-button-text-only"                 role="button" aria-disabled="false"><span class="ui-button-text">Edit</span></label>
+                <input onclick="window.location='{% url wiki_history wiki_article.get_url 1 %}'" type="radio" {% if view == 'history' %}checked="checked"{% endif %} id="radio3" name="radio" class="header ui-helper-hidden-accessible"><label for="radio3" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false"><span class="ui-button-text">History</span></label>
+            </div>
+            </td>
+            <td width="10%">
             <form style="display:inline" method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
-                <input name="value" id="search" class="search inactive-search" value="Search..." onblur="if(this.value=='') {this.value='Search...';$('#search').addClass('inactive-search');$('#search').removeClass('active-search');}" onfocus="if(this.value=='Search...') { this.value=''; $('#search').removeClass('inactive-search');$('#search').addClass('active-search')}" value="{{wiki_search_query|escape}}"></input>
+                <input name="value" id="search" class="header inactive-search" value="Search Wiki..." onblur="if(this.value=='') {this.value='Search Wiki...';$('#search').addClass('inactive-search');$('#search').removeClass('active-search');}" onfocus="if(this.value=='Search Wiki...') { this.value=''; $('#search').removeClass('inactive-search');$('#search').addClass('active-search')}" value="{{wiki_search_query|escape}}"></input>
             </form>
             <!--
                 <b>Search:</b>
