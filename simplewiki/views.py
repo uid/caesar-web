@@ -45,7 +45,7 @@ def view(request, wiki_url):
     num_uses_total = len(Comment.objects.filter(text__icontains='#' + article.slug))
     current_semester_comments = [x for x in 
                                 Comment.objects.filter(text__icontains='#' + article.slug).order_by('created')
-                                if not x.chunk.file.submission.assignment.is_current_semester()]
+                                if x.chunk.file.submission.assignment.is_current_semester()]
     review_data = view_helper(current_semester_comments[0:15])
     commenters = []
     for c in current_semester_comments:
