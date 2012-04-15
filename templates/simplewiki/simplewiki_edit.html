@@ -39,6 +39,18 @@
 
 {% endblock %}
 
+{% block title %}
+    #{{ wiki_article.slug }} 
+{% endblock %}
+
+{% block navigate %}
+<div id="radio" class="ui-buttonset">
+    <input onclick="window.location='{% url wiki_view wiki_article.get_url %}'" type="radio" id="radio1" name="radio" class="header ui-helper-hidden-accessible"><label for="radio1" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left"  role="button"><span class="ui-button-text">Read</span></label>
+    <input onclick="window.location='{% url wiki_edit wiki_article.get_url %}'" type="radio" checked="checked" id="radio2" name="radio" class="header ui-helper-hidden-accessible"><label for="radio2" class="header ui-button ui-widget ui-state-default ui-button-text-only"                 role="button" aria-disabled="false"><span class="ui-button-text">Edit</span></label>
+    <input onclick="window.location='{% url wiki_history wiki_article.get_url 1 %}'" type="radio" id="radio3" name="radio" class="header ui-helper-hidden-accessible"><label for="radio3" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false"><span class="ui-button-text">History</span></label>
+</div>
+{% endblock %}
+
 {% block wiki_body %}
 <form method="POST" id="wiki_revision">{% csrf_token %}
 	

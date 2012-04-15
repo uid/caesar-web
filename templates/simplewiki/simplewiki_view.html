@@ -26,23 +26,20 @@
     </script>
 {% endblock %}
 
+{% block title %}
+    #{{ wiki_article.slug }} 
+{% endblock %}
+
+{% block navigate %}
+<div id="radio" class="ui-buttonset">
+                <input onclick="window.location='{% url wiki_view wiki_article.get_url %}'" type="radio" {% if view == 'read' %}checked="checked"{% endif %}id="radio1" name="radio" class="header ui-helper-hidden-accessible"><label for="radio1" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left"  role="button"><span class="ui-button-text">Read</span></label>
+                <input onclick="window.location='{% url wiki_edit wiki_article.get_url %}'" type="radio" {% if view == 'edit' %}checked="checked"{% endif %} id="radio2" name="radio" class="header ui-helper-hidden-accessible"><label for="radio2" class="header ui-button ui-widget ui-state-default ui-button-text-only"                 role="button" aria-disabled="false"><span class="ui-button-text">Edit</span></label>
+                <input onclick="window.location='{% url wiki_history wiki_article.get_url 1 %}'" type="radio" {% if view == 'history' %}checked="checked"{% endif %} id="radio3" name="radio" class="header ui-helper-hidden-accessible"><label for="radio3" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false"><span class="ui-button-text">History</span></label>
+            </div>
+{% endblock %}
+
 {% load i18n simplewiki_utils %}
 {% block wiki_body %}
-    
-    <!-- View/Edit/History/Search Bar. Need to put functionality somewhere else. -->
-    <!--
-    <a href="javascript:location.href='{% url wiki_view wiki_article.get_url %}'">VIEW</a> 
-    <a href="javascript:location.href='{% url wiki_edit wiki_article.get_url %}'">EDIT</a> 
-    <a href="javascript:location.href='{% url wiki_history wiki_article.get_url 1 %}'">HISTORY</a>
-    <span style="float:right; padding: 0px 0px 10px 0px">
-        <form method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
-            <b>Search:</b>
-            <input type="text" name="value" id="wiki_search_input" value="{{wiki_search_query|escape}}"/>
-            <input type="submit" id="wiki_search_input_submit" value={% trans "Go!" %} />
-        </form>
-    </span>
-    -->
-
     
     <!-- CONTENTS -->
     <table>
@@ -56,12 +53,25 @@
     <td style="vertical-align:top">
         <table class="sidebar">
         <td>
-        Wiki page by <a>AAA</a>, <a>BBB</a> and <a>CCC</a>.
-        <br>
-        Used X times this semester (y all time).
-        <br>
-        by <a>DDD</a>, <a>EEE</a> and <a>YYY</a>.
-        <br>
+        Wiki page content by
+        {% for contributor in contributors %}
+            <a href="/review/user/{{ contributor.username }}">{{ contributor.username }}</a>, 
+        {% endfor %}
+        <hr>
+        {% if num_uses_semester == 0 %}
+            <!-- Has not been used this semester -->
+            #{{ wiki_article.slug }} has not been used yet this semester.
+        {% else %}
+            <!-- Has been used this semester. -->
+            Used {{num_uses_semester}} times this semester by 
+            {% for commenter in commenters %}
+                <a href="/review/user/{{ commenter.username }}">{{ commenter.username }}</a>, 
+            {% endfor %}
+        {% endif%}
+        <hr>
+        Used {{num_uses_total}} times ever.
+        
+        <hr>
         <a href='#examples'>See Examples</a>
         </td>
         </table>
@@ -111,6 +121,5 @@
         <h4><i>No examples found.</i></h4>
     {% endif %}
     </table>
-    
     
 {% endblock %}

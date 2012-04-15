@@ -34,8 +34,23 @@ def view(request, wiki_url):
                                  'wiki_attachments_write': article.can_attach(request.user),
                                  } )
     # get related articles
-    review_data = view_helper(Comment.objects.filter(text__icontains='#' + article.slug).order_by('created')[0:5])
+    
     articles = [x for x in Article.objects.all() if not x == Article.get_root()]
+    contributors = []
+    history = Revision.objects.filter(article__exact = article).order_by('counter')
+    for r in history:
+        if r.revision_user not in contributors:
+            contributors.append(r.revision_user)
+
+    num_uses_total = len(Comment.objects.filter(text__icontains='#' + article.slug))
+    current_semester_comments = [x for x in 
+                                Comment.objects.filter(text__icontains='#' + article.slug).order_by('created')
+                                if not x.chunk.file.submission.assignment.is_current_semester()]
+    review_data = view_helper(current_semester_comments[0:15])
+    commenters = []
+    for c in current_semester_comments:
+        if c.author not in commenters:
+            commenters.append(c.author)
     return render(request, "simplewiki/simplewiki_view.html", {
                            'wiki_article': article,
                            'wiki_write': True,
@@ -44,6 +59,10 @@ def view(request, wiki_url):
                            'view': 'read',
                            'review_data': review_data,
                            'articles': articles,
+                           'contributors': contributors,
+                           'num_uses_semester': len(current_semester_comments),
+                           'num_uses_total': num_uses_total,
+                           'commenters': commenters,
     })
     # return render_to_response('simplewiki_view.html', c)
     
@@ -275,11 +294,24 @@ def search_articles(request, wiki_url):
         results = [x for x in Article.objects.filter(slug__icontains=querystring)];
         results += [x for x in Article.objects.filter(current_revision__contents__icontains=querystring) if x not in results];
         results = [x for x in results if not x == Article.get_root()]
-        #if len(results) == 1:
-        #    return HttpResponseRedirect(reverse('wiki_view', args=(results[0].get_url(),)))
-        #else:        
+        
+        results_data = []
+        text_radius = 50
+        for result in results:
+            if querystring.lower() in result.slug.lower():
+                results_data.append((result, '', ''))
+            elif querystring.lower() in result.current_revision.contents.lower():
+                contents = result.current_revision.contents.lower().replace("\#", "#")
+                index = contents.index(querystring.lower())
+                lowIndex = max(0, index - text_radius)
+                highIndex = min(len(contents), index + len(querystring) + text_radius)
+                before = contents[lowIndex: index]
+                after = contents[index + len(querystring): highIndex]
+                results_data.append((result, before, after))
         c = RequestContext(request, {'wiki_search_results': results,
-                                     'wiki_search_query': querystring})
+                                     'wiki_search_query': querystring,
+                                     'results_data': results_data,
+                                     })
         return render_to_response('simplewiki/simplewiki_searchresults.html', c)
     return view(request, wiki_url)
 
