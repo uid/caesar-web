@@ -8,12 +8,16 @@
     {% endif %}
 {% endblock %}
 
+{% block title %}
+    Search results for "{{ wiki_search_query }}"
+{% endblock %}
+
 {% block wiki_body %}
-    <h1>Search results for "{{ wiki_search_query }}"</h1>
-    <hr />
-    {% for article in wiki_search_results %}
-            <h4><a href="{% url wiki_view article.get_url %}">#{{ article.slug }}</a></h4>
+    {% for article, before, after in results_data %}
+            <h4>
+            <a href="{% url wiki_view article.get_url %}">#{{ article.slug }}</a>
+            : ...{{ before }}<b>{{ wiki_search_query }}</b>{{ after }}...</h4>
     {% empty %}
-        {% trans "No articles were found!" %}
+        No articles were found matching "{{wiki_search_query}}".
     {% endfor %}
 {% endblock %}
