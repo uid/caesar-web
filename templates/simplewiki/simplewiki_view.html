@@ -58,19 +58,26 @@
             <a href="/review/user/{{ contributor.username }}">{{ contributor.username }}</a>, 
         {% endfor %}
         <hr>
-        {% if num_uses_semester == 0 %}
+        {% if num_student_uses_semester == 0 %}
             <!-- Has not been used this semester -->
-            #{{ wiki_article.slug }} has not been used yet this semester.
+            No students have used #{{ wiki_article.slug }} in a comment this semester.
         {% else %}
             <!-- Has been used this semester. -->
-            Used {{num_uses_semester}} times this semester by 
+            Used {{num_student_uses_semester}} times this semester in comments from   
             {% for commenter in commenters %}
                 <a href="/review/user/{{ commenter.username }}">{{ commenter.username }}</a>, 
             {% endfor %}
         {% endif%}
+        {% if num_checkstyle_uses_semester != 0 %}
+            <hr>
+            Used {{num_checkstyle_uses_semester}} times by checkstyle this semester.
+        {% endif %}
         <hr>
-        Used {{num_uses_total}} times ever.
-        
+        {% if num_uses_total == 0 %}
+            {{ article.slug }} has never been used.
+        {% else %}
+            Used {{num_uses_total}} times including all semesters.
+        {% endif %}        
         <hr>
         <a href='#examples'>See Examples</a>
         </td>
