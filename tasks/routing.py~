@@ -356,7 +356,7 @@ def more_tasks(assignment, django_user, total):
     role = _convert_role(django_profile.role)
     current_task_count = Task.objects.filter(reviewer=django_profile, 
             chunk__file__submission__assignment=assignment).exclude(status='C').exclude(status='U').count()
-    
+    priority_dict = _convert_assignment_to_priority(assignment)
     assign_count = 0
     if not current_task_count:
         assign_count = total
