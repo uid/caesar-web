@@ -299,41 +299,26 @@ def simualte(request, assignment_id):
         for key in lines_dict.keys():
             lines_list.append([int(key), lines_dict[key]])
     unimportant_graphs.append(["StudentDefinedClasses", lines_list])
+
+    chunks_data = []
+
+    for name, lines_list in important_graphs:
+        chunks_data.append((name, 1))
+    for name, lines_list in unimportant_graphs:
+        chunks_data.append((name, 1))
+    for name, lines_list in test_graphs:
+	    chunks_data.append((name, 0))    
     
     if request.method == 'GET':
-        students = assignment.students
-        alums = assignment.alums
-        staff = assignment.staff
-    
-        #find all active students, students that have at least pulled the assignment
-        all_students = User.objects.filter(submissions__assignment = assignment)
-        active_students = []
-        for student in all_students:
-            chunks = Chunk.objects.filter(file__submission__assignment = assignment).filter(file__submission__author=student)
-            if chunks.count() > 0:
-                active_students.append(student)
-        
-        chunks_data = []
+        to_assign = assignment.chunks_to_assign
+        if len(to_assign) > 1:
+            count = 0
+            for chunk_info in to_assign.split(",")[0:-1]:
+                split_info = chunk_info.split(" ")
+                chunks_data[count] = (split_info[0], int(split_info[1]))
+                count += 1
+            
 
-
-
-        for name, lines_list in important_graphs:
-            chunks_data.append((name, 1))
-        for name, lines_list in unimportant_graphs:
-            chunks_data.append((name, 1))
-        for name, lines_list in test_graphs:
-	        chunks_data.append((name, 0))
-
-
-        
-            # chunks_info = to_assign.split(",")
-            # for chunk_info in chunks_info:
-            #     info = chunk_info.split(" ")
-            #     if len(info) == 4:
-            #         if int(info[2]):
-            #             chunks_data.append((info[0], info[1], int(info[3])))
-
-        
         return render(request, 'chunks/simulate.html', {
             'assignment': assignment,
             'chunks_data': chunks_data,
@@ -355,60 +340,44 @@ def simualte(request, assignment_id):
         assignment.student_count = request.POST['student_tasks']
         assignment.alum_count = request.POST['alum_tasks']
         assignment.staff_count = request.POST['staff_tasks']
+
+        assignment.reviewers_per_chunk = request.POST['per_chunk']
+        assignment.min_student_lines = request.POST['min_lines']
         assignment.save()
-        #find all active students, students that have at least pulled the assignment
-        all_students = User.objects.filter(submissions__assignment = assignment)
-        active_students = []
-        for student in all_students:
-            chunks = Chunk.objects.filter(file__submission__assignment = assignment).filter(file__submission__author=student)
-            if chunks.count() > 0:
-                active_students.append(student)
         
-        #find all classes that are worth reviewing, not tests and code more than 30 lines
-        classes = assignment_chunks.filter(class_type = "NONE").filter(profile__student_lines__gt = 30).exclude(name="Main")
-        
-        chunks_data = []
-        test_data = []
-        to_assign = assignment.chunks_to_assign
-        chunks_info = to_assign.split(",")
-        for chunk_info in chunks_info:
-            info = chunk_info.split(" ")
-            if len(info) == 4:
-                if int(info[2]):
-                    chunks_data.append((info[0], info[1], int(info[3])))
-                else:
-                    test_data.append((info[0], info[1], int(info[3])))
         
         chunks_raw = request.POST.getlist('chunk')
         checked = set()
         for raw in chunks_raw:
-            chunk_name = raw.split("-")[0]
-            checked.add(chunk_name)
+            checked.add(raw)
         
         to_assign = ""
-        for name, num, old in chunks_data:
+        for name, check in chunks_data:
             if name in checked:
-                to_assign += name + " " + str(num) + " 1 1,"
+                to_assign += name + " 1,"
             else:
-                to_assign += name + " " + str(num) + " 1 0,"
+                to_assign += name + " 0,"
            
         
+        if len(to_assign) > 1:
+            count = 0
+            for chunk_info in to_assign.split(",")[0:-1]:
+                split_info = chunk_info.split(" ")
+                chunks_data[count] = (split_info[0], int(split_info[1]))
+                count += 1
+
         assignment.chunks_to_assign = to_assign
         assignment.save()
         
-        chunks_data = []
-        test_data = []
-        chunks_info = to_assign.split(",")
-        for chunk_info in chunks_info:
-            info = chunk_info.split(" ")
-            if len(info) == 4:
-                if int(info[2]):
-                    chunks_data.append((info[0], info[1], int(info[3])))
-                else:
-                    test_data.append((info[0], info[1], int(info[3])))
         
         return render(request, 'chunks/simulate.html', {
             'assignment': assignment,
             'chunks_data': chunks_data,
+            'important_graph': important_graphs,
+            'unimportant_graph': unimportant_graphs,
+            'test_graph': test_graphs,
+            'max_important': max_important+1,
+            'max_unimportant': max_unimportant+1,
+            'max_test': max_test +1,
         })
     

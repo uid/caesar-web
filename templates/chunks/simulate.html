@@ -354,6 +354,7 @@ $(document).ready(function(){
     }
     countChunks();
     countReviewers();
+    move_lines();
 });   
 </script>
 {% endblock %}
@@ -370,7 +371,7 @@ $(document).ready(function(){
 
 <p> <h1 class="task-header"> Settings for {{ assignment.name }}. </h1> </p>
 
-<p> Assign <input type="text" id="per-chunk" class="count" name="per_chunk" value="2" size=3/> non staff users (students and alums) to each class for review. Staff will serve as quality control and be assigned as a <span id="next-reviewer"> 3rd</span> reviewer to as many classes as possible. </p>
+<p> Assign <input type="text" id="per-chunk" class="count" name="per_chunk" value="{{ assignment.reviewers_per_chunk }}" size=3/> non staff users (students and alums) to each class for review. Staff will serve as quality control and be assigned as a <span id="next-reviewer"> 3rd</span> reviewer to as many classes as possible. </p>
 
 <p><h2 class="task-header">For the reviewing process we can expect: </h2>
 Baseline values for {{assignment.name}} in <span class="purple"> purple. </span> <br/>
@@ -411,31 +412,34 @@ Baseline values for {{assignment.name}} in <span class="purple"> purple. </span>
       <td> </td>
       <td> </td>
       <td> </td>
-      <td class="last-left"><span id='task-class'>/ (2 tasks/class).</span> <br/></td>
+      <td class="last-left"><span id='task-class'>/ ({{ assignment.reviewers_per_chunk }} tasks/class).</span> <br/></td>
   </tr>
 </table>
 <h2 class="task-header result" id="power"> At most <span id="power-number" class="green"> 0 </span> classes will reviewed.</h2></p>
 
-<p> Only classes with at least <input type="text" id="min-lines" class="lines" name="min-lines" value="30" size=3/> student lines will be considered for review. </p>
+<p> Only classes with at least <input type="text" id="min-lines" class="lines" name="min_lines" value="{{ assignment.min_student_lines }}" size=3/> student lines will be considered for review. </p>
 Click and drag in the plot area to zoom in. 
 <div id="important-graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
 <div id="test-graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
 <div id="unimportant-graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
 
 <p>
-<div class="column-left"><ul id="sortable">
-<h4 class="task-header"> Check which classes should be reviewed: </br>
+<div class="column-left">
+<h4 class="task-header"> Check which classes should be reviewed<br/> Drag to prioritize reviewing order. <br/>
+<ul id="sortable">
 
       {% for name, checked in chunks_data %}
       <li class="list-chunks"><input class="chunks" type="checkbox" name="chunk" value="{{name}}" {%if checked %}checked="checked"{%endif%}><span id="span-{{name}}"></span></li>
       {% endfor %}
-</h4></ul></div>
-<div class="column-right"><ul>
-<h4 class="task-header"> The following classes will not be reviewed: </br>
+</ul></h4></div>
+<div class="column-right">
+<h4 class="task-header"> The following classes are too short<br/>
+(in terms of student lines): <br/>
+<ul>
       {% for name, checked in chunks_data %}
       <li class="non-list-chunks"><span id="non-span-{{name}}"></span></li>
       {% endfor %}
-</h4></ul></div>
+</ul></h4></div>
 </p>
 <div class="clear-both">
 <p><h2 class="task-header result" id="power">  <span id="chunk-number" class="green"> 0 </span> classes scheduled for review. </h2></p>
