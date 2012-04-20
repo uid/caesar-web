@@ -77,10 +77,12 @@ caption {background:#eee;}
 .top {margin-top:0;padding-top:0;}
 .bottom {margin-bottom:0;padding-bottom:0;}
 .hashtag-important {color:white; background:#B20000; padding: 1px 2px 1px 2px; border-radius:3px; text-decoration: none}
+/*
 .hashtag-important:hover {
     background:none;
     cursor:pointer;
 }
+*/
 
 /* forms.css */
 label {font-weight:bold;}
