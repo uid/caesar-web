@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block js %}
+    {{ block.super }}
     <script type="text/javascript">
     </script>
 {% endblock %}
@@ -21,7 +22,7 @@
 
 {% block wiki_body %}
     <table>
-    <tr><td width="70%">
+    <tr><td width="70%" style="vertical-align: top">
         
         {% for article in articles %}
             <h4><a href="{{article.slug}}">#{{article.slug}}</a></h4>
