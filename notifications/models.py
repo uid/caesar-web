@@ -79,7 +79,8 @@ def send_comment_notification(sender, instance, created=False, **kwargs):
         #comment gets made on a submission after code review deadline has passed
         if submission_author and submission_author.email \
                 and instance.author != submission_author\
-                and datetime.datetime.now() > submission.assignment.code_review_end_date:
+                and datetime.datetime.now() > submission.assignment.code_review_end_date\
+                and instance.author.username != "checkstyle":
             to = submission_author.email
             subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
             notification = Notification(recipient = submission_author, reason='C')
