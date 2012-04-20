@@ -433,7 +433,7 @@ Click and drag in the plot area to zoom in.
 <div class="column-right"><ul>
 <h4 class="task-header"> The following classes will not be reviewed: </br>
       {% for name, checked in chunks_data %}
-      <li class="non-list-chunks"><span id="non-span-{{name}}"></span></li>
+      <li class="list-chunks"><span id="non-span-{{name}}"></span></li>
       {% endfor %}
 </h4></ul></div>
 </p>

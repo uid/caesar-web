@@ -99,7 +99,7 @@ table.assignment-stream {
     cursor: move;
 }
 .non-list-chunks{
-    border: 1px solid #555;
+    border: 1px solid #808080;
     border-radius: 10px;
     margin-bottom: 1px;
     list-style: none;
