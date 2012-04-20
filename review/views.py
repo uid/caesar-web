@@ -15,6 +15,7 @@ from tasks.routing import assign_tasks, more_tasks
 from models import Comment, Vote, Star 
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.models import UserProfile
+from simplewiki.models import Article
 
 from pygments import highlight
 from pygments.lexers import JavaLexer
@@ -454,6 +455,7 @@ def all_activity(request, assign, username):
         'participant': participant,
         'activity_view': True,
         'full_view': True,
+        'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
 @login_required
 def request_extension(request, assignment_id):

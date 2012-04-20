@@ -1,6 +1,6 @@
 
 /* links all hashtags in all comments in the page */
-format_hashtags = function(newtab) {   
+format_hashtags = function(newtab) {
     $('.comment-text').each(function(i, l) {
         l.innerHTML =  link_hashtags(l.textContent, newtab);
     });

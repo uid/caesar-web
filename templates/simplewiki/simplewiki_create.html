@@ -1,7 +1,42 @@
 {% extends "simplewiki/simplewiki_base.html" %}
 {% load i18n simplewiki_utils %}
-{% block wiki_page_title %}
-Create article
+
+{% block js %}
+    {{block.super}}
+    <script type="text/javascript">
+        $(function() {
+            $("#id_contents")
+                .attr("rows", "100")
+                .change(function(e) {
+                    window.onbeforeunload = function() {
+                        return "You have made changes!";
+                    }
+                })
+                .val(function(index, value) {
+                   return value.replace(/\\#/gi, "#");
+                });
+            $("#save")
+                .button()
+                .click(function(e) {
+                    window.onbeforeunload = null;
+                    $("#id_contents")
+                        .val(function(index, value) {
+                            return value.replace(/#/ig, "\\#");
+                        });
+                });
+            $("#cancel")
+                .button()
+                .click(function() {
+                    window.location='{% url wiki_view wiki_article.get_url %}';
+                });
+        });
+        
+        
+    </script>
+{% endblock %}
+
+{% block title %}
+    Create #{{slug}}
 {% endblock %}
 {% block wiki_body %}
 <form method="POST" id="wiki_revision">{% csrf_token %}
@@ -9,7 +44,8 @@ Create article
     {{ wiki_form.contents }}
     <input style="visibility:hidden" type="text" name="title" value="not supported" id="id_title">
     <br>
-    <input type="submit" value="Create Hashtag" />
+    <input type="submit" id="save" value="Create Hashtag" />
+	<input type="button" id="cancel" value="Cancel" />
 	
 	<!-- DEFAULT
 	<table id="wiki_revision_table">

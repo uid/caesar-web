@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block css %}
 
+{{ block.super }}
 
     <style type="text/css">
         
@@ -48,7 +49,7 @@
             border:2px solid #555;
             border-radius: 10px;
             padding: 0px 5px 5px 5px; 
-            font-size:12pt
+            font-size:12pt;
         }
 
         
@@ -71,7 +72,6 @@
     <!-- <link rel="stylesheet" media="print" href="/static/simplewiki/css/base_print.css" /> -->
     <link rel="stylesheet" href="/static/simplewiki/css/autosuggest_inquisitor.css" />
     {% load i18n simplewiki_utils %}
-    {{ block.super}}
 {% endblock %}
 
 {% block js %}
@@ -101,7 +101,23 @@
    <script>
 	$(function() {
 		$( "#radio" ).buttonset();
-		$("#search")[0].value = "Search Wiki...";
+		default_text = "Search Wiki..."
+		$("#search")
+		    .val(default_text)
+		    .focus(function(e) {
+		        if ($(this).val() == default_text) {
+		            $(this).val("");
+		        }
+		        $(this).removeClass("inactive-search");
+		        $(this).addClass("active-search");
+		    })
+		    .blur(function(e) {
+		        if ($(this).val() == "") {
+		            $(this).val(default_text);
+		            $(this).addClass("inactive-search");
+		            $(this).removeClass("active-search");
+		        }
+		    })
 	});
 	</script>
 {% endblock %}
@@ -128,7 +144,7 @@
     </td>
     <td width="10%">
     <form style="display:inline" method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
-        <input name="value" id="search" class="header inactive-search" value="Search Wiki..." onblur="if(this.value=='') {this.value='Search Wiki...';$('#search').addClass('inactive-search');$('#search').removeClass('active-search');}" onfocus="if(this.value=='Search Wiki...') { this.value=''; $('#search').removeClass('inactive-search');$('#search').addClass('active-search')}" value="{{wiki_search_query|escape}}"></input>
+        <input name="value" id="search" class="header inactive-search"></input>
     </form>
     </td></tr></table>
     <hr />

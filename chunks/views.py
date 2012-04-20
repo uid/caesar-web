@@ -12,6 +12,8 @@ from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
+from simplewiki.models import Article
+
 import os
 import subprocess
 import datetime
@@ -70,7 +72,8 @@ def view_chunk(request, chunk_id):
         'task': task,
         'task_count': task_count,
         'full_view': True,
-        'file': chunk.file
+        'file': chunk.file,
+        'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     }) 
 
 @login_required
@@ -177,6 +180,7 @@ def view_all_chunks(request, viewtype, submission_id):
         'read_only': False,
         'comment_view': comment_view,
         'full_view': True,
+        'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
 @login_required
 def submit_assignment(request, assignment_id):
