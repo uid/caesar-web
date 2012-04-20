@@ -1,8 +1,5 @@
 {% extends "simplewiki/simplewiki_base.html" %}
 {% load i18n simplewiki_utils %}
-{% block wiki_page_title %}
-	{{wiki_article.title}}
-{% endblock %}
 
 {% block js %}
     {{ block.super }}
@@ -12,7 +9,7 @@
                 .attr("rows", "100")
                 .change(function(e) {
                     window.onbeforeunload = function() {
-                        return "JDH!";
+                        return "You have made changes!";
                     }
                 })
                 .val(function(index, value) {
@@ -33,8 +30,6 @@
                     window.location='{% url wiki_view wiki_article.get_url %}';
                 });
         });
-        
-        
     </script>
 
 {% endblock %}
