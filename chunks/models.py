@@ -97,14 +97,6 @@ def create_current_assignment(sender, instance, created, **kwargs):
         instance.staff_count = instance.staff_count_default            
         instance.save()
 
-@receiver(post_save, sender=Assignment)
-def update_deadline(sender, instance, created, **kwargs):
-    if not created:
-        subs = Submission.objects.filter(assignment=instance)
-        for sub in subs:
-            sub.duedate = instance.duedate
-            sub.save()
-
 
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
