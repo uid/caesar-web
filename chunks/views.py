@@ -237,6 +237,8 @@ def simualte(request, assignment_id):
     max_unimportant = 0
     for chunk in assignment_chunks:
         name = chunk.name
+        if name is None:
+            continue
         lines_dict = dict()
         num = 0
         if name in chunks_graph:
@@ -292,13 +294,15 @@ def simualte(request, assignment_id):
         lines_dict, num = chunks_graph[name]
         for key in lines_dict.keys():
             lines_list.append([int(key), lines_dict[key]])
-    test_graphs.append(["StudentDefinedTests", lines_list])
+    if len(lines_list) > 0:
+        test_graphs.append(["StudentDefinedTests", lines_list])
     lines_list = []
     for name in other:
         lines_dict, num = chunks_graph[name]
         for key in lines_dict.keys():
             lines_list.append([int(key), lines_dict[key]])
-    unimportant_graphs.append(["StudentDefinedClasses", lines_list])
+    if len(lines_list) > 0:
+        unimportant_graphs.append(["StudentDefinedClasses", lines_list])
 
     chunks_data = []
 
@@ -311,7 +315,7 @@ def simualte(request, assignment_id):
     
     if request.method == 'GET':
         to_assign = assignment.chunks_to_assign
-        if len(to_assign) > 1:
+        if to_assign is not None:
             count = 0
             for chunk_info in to_assign.split(",")[0:-1]:
                 split_info = chunk_info.split(" ")
