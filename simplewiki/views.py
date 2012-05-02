@@ -36,25 +36,16 @@ def view(request, wiki_url):
     # get related articles
     
     articles = [x for x in Article.objects.all() if not x == Article.get_root()]
-    # contributors = []
-    # history = Revision.objects.filter(article__exact = article).order_by('counter')
-    # for r in history:
-    #     if r.revision_user not in contributors:
-    #        contributors.append(r.revision_user)
-    contributors = User.objects.filter(wiki_revision_user__article__exact = article).distinct()
-    # contributors = contributors.order_by("wiki_revision_user__revision_date")
+    revisions = Revision.objects.filter(article__exact = article).order_by("revision_date")
+    contributors = []
+    for revision in revisions:
+        if revision.revision_user not in contributors:
+            contributors.append(revision.revision_user)
     num_uses_total = Comment.objects.filter(text__icontains='#' + article.slug).count()
-    #current_semester_comments = [x for x in 
-    #                            Comment.objects.filter(text__icontains='#' + article.slug).order_by('created')
-    #                            if not x.chunk.file.submission.assignment.is_current_semester()]
     current_semester_comments = Comment.objects.filter(chunk__file__submission__assignment__semester="SP12",
                                                        text__icontains = "#" + article.slug).distinct().exclude(author__username = "checkstyle")
     
     review_data = view_helper(current_semester_comments[0:15])
-    # commenters = []
-    # for c in current_semester_comments:
-    #    if c.author not in commenters:
-    #        commenters.append(c.author)
     commenters = User.objects.filter(comments__chunk__file__submission__assignment__semester="SP12",
                                      comments__text__icontains = "#" + article.slug).exclude(username="checkstyle").distinct()
     num_checkstyle_uses_semester = Comment.objects.filter(chunk__file__submission__assignment__semester="SP12",
