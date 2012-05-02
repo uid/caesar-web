@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<style>
+    .entry {
+        border: 2px solid #000;
+        padding: 5px;
+        font-size: 20pt;
+        width: 500px;
+    }
+    
+    #prompt {
+        position: absolute;
+        font-size: 20pt;
+        padding: 2px;
+    }
+    
+    #current-hashtag {
+        color: #00F;
+    }
+    
+    #comment-text {
+        font-size: 20pt;
+    }
+    
+}​
+
+</style>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript">
+    text = "";
+    f = function() {
+        $("#comment-text").each(function(i, el) {
+            temp = get_normalized_text();
+            i = get_first_diff(text, temp);
+            if (i >= 0 && temp.substring(i, i+1) == "#" || (temp == '#')) {
+                if (temp == '#') {
+                    i = 0;
+                }
+                display_popup(temp, i);
+            }
+        });
+        text = get_normalized_text();
+    }
+    
+    $(function() {
+        $("#comment-text").keydown(function(e){ return e.which != 13; });
+        $("#comment-text").keyup(function(e) {
+            $("#text").val($("#comment-text")[0].textContent);
+            f();
+        });
+
+    });
+    
+    display_popup = function(temp, i) {
+        leftText = temp.substring(0, i);
+        rightText = temp.substring(i+1, temp.length);               
+        setText(leftText + "<span id='current-hashtag'>#</span>", rightText)
+        
+        x = $("#current-hashtag")[0].getBoundingClientRect().right;
+        y = $("#current-hashtag")[0].getBoundingClientRect().top - 10;
+        var $popup = $('<input/>', {
+            'html': 'popup'
+        })
+            .attr("id","prompt")
+            .appendTo('body')
+            .autocomplete({ 
+                source: ['repexposure', 'fail', 'badcode', 'important' ]})
+            .css({
+                'left': x,
+                'top': y,
+            })
+            .blur(function() {
+                update_form();
+                $(this).remove();
+            })
+            .keyup( function(e) {
+                if (e.keyCode == 13 || e.keyCode == 32 || e.keyCode == 27) {
+                    $hashtag = $.trim($(this).val()) + "&nbsp;"
+                    if (e.keyCode == 27) {
+                        $hashtag = "";
+                    }
+                    leftText  = leftText + "#" + $hashtag;
+                    setText(leftText, rightText);
+                }
+            })
+            .hide()
+            .fadeIn()
+            .focus();
+    }
+    
+    setText = function(leftText, rightText) {
+        $("#comment-text")
+            .focus()
+            .wrapInner("<div id='placeholder'/>")
+            .prepend(leftText)
+            .append(rightText);
+        $("#placeholder").remove();
+        text = get_normalized_text();
+    }
+    
+    get_first_diff = function(oldText, newText) {
+        if (newText.length - oldText.length != 1) {
+            return -1;
+        }
+        
+        for (i = 0; i < oldText.length-1; ++i) {
+            if (oldText.substring(i, i + 1) != newText.substring(i, i+1)) {
+                return i;
+            }
+        }
+        return oldText.length;
+    };
+    
+    get_normalized_text = function() {
+        return $("#comment-text")[0].textContent.replace(/\&nbsp;/gi," ");
+    }
+    
+    update_form = function() {
+        $("#text").val($("#comment-text")[0].textContent);
+    }
+    
+</script>
+{% endblock %}
+
+{% block content %}
+    <div id="comment-text" class="entry" contenteditable="true"></div>
+    <div id="debug"></div>
+    <textarea id="text"></textarea>
+{% endblock %}

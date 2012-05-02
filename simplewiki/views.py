@@ -42,6 +42,7 @@ def view(request, wiki_url):
     #     if r.revision_user not in contributors:
     #        contributors.append(r.revision_user)
     contributors = User.objects.filter(wiki_revision_user__article__exact = article).distinct()
+    # contributors = contributors.order_by("wiki_revision_user__revision_date")
     num_uses_total = Comment.objects.filter(text__icontains='#' + article.slug).count()
     #current_semester_comments = [x for x in 
     #                            Comment.objects.filter(text__icontains='#' + article.slug).order_by('created')
@@ -104,10 +105,9 @@ def comment_test(request):
     hashtags = {'repexposure': 'http://www.google.com/',
                 'import': 'http://www.yahoo.com/'};
                 
-    return render(request, 'simplewiki/test_comment.html', {
+    return render(request, 'simplewiki/auto.html', {
                            'hashtags': hashtags,
     })
-    return render_to_response('simplewiki/test_comment.html', {'hashtags': hashtags})
 
 @login_required
 def root_redirect(request):

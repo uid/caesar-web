@@ -1,0 +1,28 @@
+<!-- EXAMPLES -->
+<table class="assignment-stream">
+{% for type, comment, snippet, is_vote, vote in review_data %}
+    <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}
+                          {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
+                          {% endif %}
+          {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
+          {% endif %}" class="{%if not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
+    
+    <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
+    
+    {% if comment.upvote_count == 0 and comment.downvote_count == 0 or is_vote %}
+        <td colspan="2" class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
+    {% else %}
+        <td>{% if comment.upvote_count > 0 %}<span class="positive-votes">+{{comment.upvote_count}}</span>{% endif %}{% if comment.upvote_count > 0 and comment.downvote_count > 0 %}/{% endif %}{% if comment.downvote_count > 0 %}<span class="negative-votes">-{{comment.downvote_count}}</span>{% endif %}</td>
+        <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {{ snippet }} </td>
+    {% endif %}
+    
+    <td class="grey-text"> {{ comment.chunk.name }} </td>
+    <td class="grey-text"> {{ comment.modified }} </td>
+    
+    </tr>
+    {% empty %}
+{% endfor %}
+{% if review_data|length == 0 %}
+    <h4><i>No examples found.</i></h4>
+{% endif %}
+</table>
