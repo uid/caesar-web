@@ -14,7 +14,7 @@ link_hashtags = function(html, newtab) {
         if (k == 'important') {
             output = output.replace(r, "<a class='hashtag-important' onclick=hashtag_redirect('" + hashtags[k]+ "'," + newtab + ")>$1</a>");
         } else {
-            output = output.replace(r, "<a style='cursor:pointer' onclick=hashtag_redirect('" + hashtags[k] + "'," + newtab + ")>$1</a>");
+            output = output.replace(r, "<a style='cursor:pointer' onclick=hashtag_redirect('" + hashtags[k] + "'," + newtab + ") contenteditable='false'>$1</a>");
         }
     }
     

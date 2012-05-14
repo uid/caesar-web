@@ -94,10 +94,11 @@ def list_all(request):
 @login_required
 def comment_test(request):
     hashtags = {'repexposure': 'http://www.google.com/',
-                'import': 'http://www.yahoo.com/'};
-                
+                'import': 'http://www.yahoo.com/'}
+    articles = Article.objects.exclude(id=Article.get_root().id)
     return render(request, 'simplewiki/auto.html', {
                            'hashtags': hashtags,
+                           'articles': articles,
     })
 
 @login_required

@@ -14,14 +14,16 @@
         position: absolute;
         font-size: 20pt;
         padding: 2px;
+        border: 2px solid #000;
     }
     
     #current-hashtag {
-        color: #00F;
+        /* color: #00F; */
     }
     
     #comment-text {
         font-size: 20pt;
+        min-height: 20px;
     }
     
 }​
@@ -32,34 +34,33 @@
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+
     text = "";
-    f = function() {
-        $("#comment-text").each(function(i, el) {
-            temp = get_normalized_text();
-            i = get_first_diff(text, temp);
-            if (i >= 0 && temp.substring(i, i+1) == "#" || (temp == '#')) {
-                if (temp == '#') {
-                    i = 0;
-                }
-                display_popup(temp, i);
-            }
-        });
-        text = get_normalized_text();
-    }
-    
     $(function() {
         $("#comment-text").keydown(function(e){ return e.which != 13; });
         $("#comment-text").keyup(function(e) {
-            $("#text").val($("#comment-text")[0].textContent);
-            f();
+            if (e.keyCode == 51 && e.shiftKey) {
+                temp = get_normalized_text();
+                // get cursor position
+                
+                i = get_cursor_index();
+                $("#debug").text(i);
+                // call popup
+                display_popup(temp, i);
+            }
         });
 
     });
     
+    get_cursor_index = function() {
+        selection = window.getSelection();
+        selection.focusNode;
+    }
+    
     display_popup = function(temp, i) {
         leftText = temp.substring(0, i);
-        rightText = temp.substring(i+1, temp.length);               
-        setText(leftText + "<span id='current-hashtag'>#</span>", rightText)
+        rightText = temp.substring(i, temp.length);               
+        setText(leftText + "<span id='current-hashtag'></span>", rightText)
         
         x = $("#current-hashtag")[0].getBoundingClientRect().right;
         y = $("#current-hashtag")[0].getBoundingClientRect().top - 10;
@@ -69,7 +70,10 @@
             .attr("id","prompt")
             .appendTo('body')
             .autocomplete({ 
-                source: ['repexposure', 'fail', 'badcode', 'important' ]})
+                source: [
+                {% for article in articles %}
+                    "{{article.slug}}",
+                {% endfor %}]})
             .css({
                 'left': x,
                 'top': y,
@@ -80,12 +84,16 @@
             })
             .keyup( function(e) {
                 if (e.keyCode == 13 || e.keyCode == 32 || e.keyCode == 27) {
-                    $hashtag = $.trim($(this).val()) + "&nbsp;"
+                    var popup_text = $(this).val();
+                    $hashtag = $.trim(popup_text) + "&nbsp;"
                     if (e.keyCode == 27) {
                         $hashtag = "";
                     }
-                    leftText  = leftText + "#" + $hashtag;
-                    setText(leftText, rightText);
+                    leftText  = leftText + $hashtag;
+                    offset = leftText.replace(/\&nbsp;/gi," ").length
+                    setText(leftText, rightText);                            
+                    set_cursor(offset);
+                    text = get_normalized_text();
                 }
             })
             .hide()
@@ -96,11 +104,23 @@
     setText = function(leftText, rightText) {
         $("#comment-text")
             .focus()
-            .wrapInner("<div id='placeholder'/>")
+            .wrapInner("<span id='placeholder'/>")
             .prepend(leftText)
             .append(rightText);
         $("#placeholder").remove();
         text = get_normalized_text();
+        update_form();
+    }
+    
+    set_cursor = function(offset) {
+        var el = document.getElementById("cursor");
+        var range = document.createRange();
+        var sel = window.getSelection();
+        range.setStart(el, 0);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        $("#cursor").remove();
     }
     
     get_first_diff = function(oldText, newText) {
@@ -129,6 +149,6 @@
 
 {% block content %}
     <div id="comment-text" class="entry" contenteditable="true"></div>
-    <div id="debug"></div>
+    <div id="debug">joe</div>
     <textarea id="text"></textarea>
 {% endblock %}
