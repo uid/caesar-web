@@ -67,11 +67,11 @@ def send_comment_notification(sender, instance, created=False, **kwargs):
             notification.comment = instance
             notification.save()
             
-            sent = send_templated_mail(
-                subject, None, (to,), 'new_reply', 
-                context, template_prefix='notifications/')
-            notification.email_sent = sent
-            notification.save()
+            #sent = send_templated_mail(
+            #    subject, None, (to,), 'new_reply', 
+            #    context, template_prefix='notifications/')
+            #notification.email_sent = sent
+            #notification.save()
             return
         
         submission_author = instance.chunk.file.submission.author
@@ -87,10 +87,10 @@ def send_comment_notification(sender, instance, created=False, **kwargs):
             notification.comment = instance
             notification.save()
             
-            sent = send_templated_mail(
-                    subject, None, (to,), 'new_submission_comment', 
-                    context, template_prefix='notifications/')
-            notification.email_sent = sent
-            notification.save()
+            #sent = send_templated_mail(
+             #       subject, None, (to,), 'new_submission_comment', 
+              #      context, template_prefix='notifications/')
+           # notification.email_sent = sent
+            #notification.save()
     pass
 
