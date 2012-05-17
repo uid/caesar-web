@@ -108,11 +108,11 @@
     <script type="text/javascript">
     /* create dictionary of hashtags */
     // TODO: Dynamically generate this
-    // hashtags = { 
-    // {% for article in articles %} 
-    //     '{{article.slug}}':'{% url wiki_view article.get_url %}',
-    // {% endfor %} }
-        hashtags = { 
+    hashtags = { 
+    {% for article in articles %} 
+        '{{article.slug}}':'{% url wiki_view article.get_url %}',
+    {% endfor %} }
+    /*   hashtags = { 
          
             'repexposure':'/wiki//repexposure',
          
@@ -124,6 +124,7 @@
          
             'important':'/wiki//important',
          }
+    */
      </script>
      <script type="text/javascript" src = "{{STATIC_URL}}/js/hashtag.js" ></script>    
     {% endblock %}
@@ -155,6 +156,7 @@
                 {% if user.is_staff %}
                 <a href="{% url admin:index %}">Admin</a>|
                 <a href="{% url review.views.student_stats %}">Summary </a>|
+                <a href="{% url review.views.search %}">Search </a>|
                 <a href="{% url review.views.manage %}">Manage </a>|
                 {% endif %}
                 <a href="{% url django.contrib.auth.views.logout %}">Logout</a>

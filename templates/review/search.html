@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" />
+
+<style type="text/css">
+    #search {
+        font-size: 18pt;
+        border-radius: 5px;
+        padding: 2px;
+    }
+</style>
+
+
+{% endblock %}
+
+{% block breadcrumbs %}
+    <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+    <span class="breadcrumb">Search</span>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+    $(function() {
+        // link comments
+        $('.activity-line').click(function(e) {
+          var activityType = this.id.split('-')[0];
+          var comment_Id = this.id.split('-')[1];
+          var chunk_Id = this.id.split('-')[2];
+          window.location = "/chunks/view/" + chunk_Id + "#" + activityType + "-" + comment_Id;
+          return false;
+        });
+        $("#search")
+            .focus(function (e) {
+                if ($("#search").val() == "Search Comments...") {
+                    $("#search")
+                        .val("")
+                        .css('color', "#000")
+                }
+            })
+            .blur(function(e) {
+                if ($("#search").val() == "") {
+                    $("#search")
+                        .val("Search Comments...")
+                        .css('color', "#AAA")
+                }
+            })
+            .blur();
+            
+    });
+    </script>
+{% endblock %}
+
+{% block content %}
+    <br>
+    <table><tr><td width="70%">
+        {% if query %}
+            <h1>Comments containing "{{query}}"</h1>
+            <h3>Displaying {{ review_data|length }} of {{ num_results }} comments.</h3>
+        {% else %}
+            <h1>No Search Specified</h1>
+        {% endif %}
+    </td><td>
+        <form method="POST" action='{% url review.views.search %}'>{% csrf_token %}
+            <input name="value" id="search" ></input>
+        </form>
+    </td></tr></table>
+    <hr>
+    
+    {% include "simplewiki/examples.html" %}
+{% endblock %}
