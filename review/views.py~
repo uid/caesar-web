@@ -110,7 +110,7 @@ def dashboard(request):
     
 @staff_member_required
 def student_stats(request):
-    assignments = Assignment.objects.all().order_by('duedate').reverse()[0:5]
+    assignments = Assignment.objects.all().order_by('duedate').reverse()
     total_students = User.objects.filter(profile__role='S').count()
     total_alum = User.objects.exclude(profile__role='S').exclude(profile__role='T').count()
     all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T')
