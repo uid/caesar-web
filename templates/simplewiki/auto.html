@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<style>
+    .entry {
+        border: 2px solid #000;
+        padding: 5px;
+        font-size: 20pt;
+        width: 500px;
+    }
+    
+    #prompt {
+        position: absolute;
+        font-size: 20pt;
+        padding: 2px;
+        border: 2px solid #000;
+    }
+    
+    #current-hashtag {
+        /* color: #00F; */
+    }
+    
+    #comment-text {
+        font-size: 20pt;
+        min-height: 20px;
+    }
+    
+}​
+
+</style>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript">
+
+    text = "";
+    $(function() {
+        $("#comment-text").keydown(function(e){ return e.which != 13; });
+        $("#comment-text").keyup(function(e) {
+            if (e.keyCode == 51 && e.shiftKey) {
+                temp = get_normalized_text();
+                // get cursor position
+                
+                i = get_cursor_index();
+                $("#debug").text(i);
+                // call popup
+                display_popup(temp, i);
+            }
+        });
+
+    });
+    
+    get_cursor_index = function() {
+        selection = window.getSelection();
+        selection.focusNode;
+    }
+    
+    display_popup = function(temp, i) {
+        leftText = temp.substring(0, i);
+        rightText = temp.substring(i, temp.length);               
+        setText(leftText + "<span id='current-hashtag'></span>", rightText)
+        
+        x = $("#current-hashtag")[0].getBoundingClientRect().right;
+        y = $("#current-hashtag")[0].getBoundingClientRect().top - 10;
+        var $popup = $('<input/>', {
+            'html': 'popup'
+        })
+            .attr("id","prompt")
+            .appendTo('body')
+            .autocomplete({ 
+                source: [
+                {% for article in articles %}
+                    "{{article.slug}}",
+                {% endfor %}]})
+            .css({
+                'left': x,
+                'top': y,
+            })
+            .blur(function() {
+                update_form();
+                $(this).remove();
+            })
+            .keyup( function(e) {
+                if (e.keyCode == 13 || e.keyCode == 32 || e.keyCode == 27) {
+                    var popup_text = $(this).val();
+                    $hashtag = $.trim(popup_text) + "&nbsp;"
+                    if (e.keyCode == 27) {
+                        $hashtag = "";
+                    }
+                    leftText  = leftText + $hashtag;
+                    offset = leftText.replace(/\&nbsp;/gi," ").length
+                    setText(leftText, rightText);                            
+                    set_cursor(offset);
+                    text = get_normalized_text();
+                }
+            })
+            .hide()
+            .fadeIn()
+            .focus();
+    }
+    
+    setText = function(leftText, rightText) {
+        $("#comment-text")
+            .focus()
+            .wrapInner("<span id='placeholder'/>")
+            .prepend(leftText)
+            .append(rightText);
+        $("#placeholder").remove();
+        text = get_normalized_text();
+        update_form();
+    }
+    
+    set_cursor = function(offset) {
+        var el = document.getElementById("cursor");
+        var range = document.createRange();
+        var sel = window.getSelection();
+        range.setStart(el, 0);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        $("#cursor").remove();
+    }
+    
+    get_first_diff = function(oldText, newText) {
+        if (newText.length - oldText.length != 1) {
+            return -1;
+        }
+        
+        for (i = 0; i < oldText.length-1; ++i) {
+            if (oldText.substring(i, i + 1) != newText.substring(i, i+1)) {
+                return i;
+            }
+        }
+        return oldText.length;
+    };
+    
+    get_normalized_text = function() {
+        return $("#comment-text")[0].textContent.replace(/\&nbsp;/gi," ");
+    }
+    
+    update_form = function() {
+        $("#text").val($("#comment-text")[0].textContent);
+    }
+    
+</script>
+{% endblock %}
+
+{% block content %}
+    <div id="comment-text" class="entry" contenteditable="true"></div>
+    <div id="debug">joe</div>
+    <textarea id="text"></textarea>
+{% endblock %}

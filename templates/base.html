@@ -156,6 +156,7 @@
                 {% if user.is_staff %}
                 <a href="{% url admin:index %}">Admin</a>|
                 <a href="{% url review.views.student_stats %}">Summary </a>|
+                <a href="{% url review.views.search %}">Search </a>|
                 <a href="{% url review.views.manage %}">Manage </a>|
                 {% endif %}
                 <a href="{% url django.contrib.auth.views.logout %}">Logout</a>

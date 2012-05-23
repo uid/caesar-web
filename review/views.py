@@ -661,3 +661,31 @@ def more_work(request):
             return HttpResponse(response_json, mimetype='application/javascript')
     return render(request, 'review/manage.html', {
     })
+
+def view_helper(comments):
+    review_data = []
+    for comment in comments:
+        if comment.is_reply():
+            #false means not a vote activity
+            review_data.append(("reply-comment", comment, comment.generate_snippet(), False, None))
+        else:
+            review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
+    review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
+    return review_data
+
+@login_required
+def search(request):
+    if request.method == 'POST':
+        querystring = request.POST['value'].strip()
+        if querystring:
+            comments = Comment.objects.filter(chunk__file__submission__assignment__semester="SP12",
+                                              text__icontains = querystring)
+            review_data = view_helper(comments[:15])
+            return render(request, 'review/search.html', {
+                                   'review_data': review_data,
+                                   'query': querystring,
+                                   'num_results': len(comments),
+            })
+    return render(request, 'review/search.html', {
+                               'review_data': [],
+                           })

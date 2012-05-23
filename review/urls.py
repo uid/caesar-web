@@ -19,4 +19,5 @@ urlpatterns = patterns('review.views',
     (r'^manage', 'manage'),
     (r'^cancel_assignment', 'cancel_assignment'),
     (r'^more_work', 'more_work'),
+    (r'^search', 'search'),
 )

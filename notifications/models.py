@@ -89,9 +89,9 @@ def send_comment_notification(sender, instance, created=False, **kwargs):
             notification.save()
             
             #sent = send_templated_mail(
-            #        subject, None, (to,), 'new_submission_comment', 
-            #        context, template_prefix='notifications/')
-            #notification.email_sent = sent
+             #       subject, None, (to,), 'new_submission_comment', 
+              #      context, template_prefix='notifications/')
+           # notification.email_sent = sent
             #notification.save()
     pass
 

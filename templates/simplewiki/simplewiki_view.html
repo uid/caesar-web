@@ -53,33 +53,27 @@
     <td style="vertical-align:top">
         <table class="sidebar">
         <td>
-        Wiki page content by
+        Wiki page edited by 
         {% for contributor in contributors %}
-            <a href="/review/user/{{ contributor.username }}">{{ contributor.username }}</a>, 
+            <a href="/review/user/{{ contributor.username }}">{{ contributor.username }}</a>{% if not forloop.last %},{% endif %} 
         {% endfor %}
         <hr>
         {% if num_student_uses_semester == 0 %}
             <!-- Has not been used this semester -->
-            No students have used #{{ wiki_article.slug }} in a comment this semester.
+            No students have used #{{ wiki_article.slug }} in a comment this semester
         {% else %}
             <!-- Has been used this semester. -->
-            Used {{num_student_uses_semester}} times this semester in comments from   
-            {% for commenter in commenters %}
-                <a href="/review/user/{{ commenter.username }}">{{ commenter.username }}</a>, 
-            {% endfor %}
+            This hashtag has been <a href='#examples'>used {{num_student_uses_semester}} times</a> this semester
         {% endif%}
+        {% if num_uses_total == 0 %}
+            (This hashtag has never been used before this semester either).
+        {% else %}
+            ({{num_uses_total}} times over all semesters).
+        {% endif %}  
         {% if num_checkstyle_uses_semester != 0 %}
             <hr>
             Used {{num_checkstyle_uses_semester}} times by checkstyle this semester.
         {% endif %}
-        <hr>
-        {% if num_uses_total == 0 %}
-            {{ article.slug }} has never been used.
-        {% else %}
-            Used {{num_uses_total}} times including all semesters.
-        {% endif %}        
-        <hr>
-        <a href='#examples'>See Examples</a>
         </td>
         </table>
         
@@ -99,7 +93,7 @@
     <!-- EXAMPLES -->
     
     <hr />
-    <h1 id="examples">Examples</h1>
+    <h1 id="examples">Examples This Semester</h1>
     
     <table class="assignment-stream">
     {% for type, comment, snippet, is_vote, vote in review_data %}
@@ -117,7 +111,7 @@
             <td>{% if comment.upvote_count > 0 %}<span class="positive-votes">+{{comment.upvote_count}}</span>{% endif %}{% if comment.upvote_count > 0 and comment.downvote_count > 0 %}/{% endif %}{% if comment.downvote_count > 0 %}<span class="negative-votes">-{{comment.downvote_count}}</span>{% endif %}</td>
             <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {{ snippet }} </td>
         {% endif %}
-        
+        <td class="grey-text" style="width: 10em !important;"> {{ comment.author }} </td>
         <td class="grey-text"> {{ comment.chunk.name }} </td>
         <td class="grey-text"> {{ comment.modified }} </td>
         
