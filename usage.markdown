@@ -23,6 +23,7 @@ Brief explanation of form fields:
 
 * [Name:] this is what all users of the system will see in reference to the assignment
 * [Duedate:] Students will see when the problem set is due, if they are allowed extensions, extensions will count from the duedate. WARNING: Duedate is tricky to change later, if possible set it correctly the first time.
+* [Semester:] You don't need to pick this. Caesar will ignore whatever you pick and just use the current semester. 
 * [Code review end date:] This field controls if reviewing is allowed to be happening to this problem set. If current time < code review end date, the system will start assigning code if there is code loaded into the system. When creating the assignment set this date to before the duedate and when you want reviewing to open change this to something sensible. 
 * [max extensions] and [multiplier] are only relevant if a slack day policy is used. See section Extensions. Set max extensions to 0 if slack days are not allowed for that problem set.
 
