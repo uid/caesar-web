@@ -84,7 +84,7 @@ click - 'configure routing' to configure how chunks should be allocated to revie
 Go back to the admin page for the assignment, http://caesar.csail.mit.edu/admin/chunks/assignment, pick your assignment and change the [Code review end date:] to something in the future. This will make the system start assignment users with chunks to review when they go to the dashboard.
 
 ### Notify users
-Send an email to relevant users that reviewing has opened.
+Send an email to relevant users that reviewing has opened.  At the moment, the best way to do this is to run /var/django/scripts/loadusers.py.  You may have to edit this script to produce the list of emails that you want.
 
 Caesar dashboard displays basic information about the assignment. The only way to edit this is directly in the code. The file is called 'dashboard_toolbar.html'. 
 
