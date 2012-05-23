@@ -24,7 +24,7 @@ The only fields you need to enter are these:
 
 * [Name:] this is what all users of the system will see in reference to the assignment
 * [Duedate:] Students will see when the problem set is due, if they are allowed extensions, extensions will count from the duedate. WARNING: Duedate is tricky to change later, if possible set it correctly the first time.
-* [Code review end date:] This field controls if reviewing is allowed to be happening to this problem set. If current time < code review end date, the system will start assigning code if there is code loaded into the system. When creating the assignment set this date to before the duedate and when you want reviewing to open change this to something sensible. 
+* [Code review end date:] *Set this field in the past while you're loading an assignment, so that visitors won't get code assigned to them until you're ready.*  This field controls if reviewing is allowed to be happening to this problem set. If current time < code review end date, the system will start assigning code if there is code loaded into the system. When creating the assignment set this date to before the duedate and when you want reviewing to open change this to something sensible. 
 * [max extensions] and [multiplier] are only relevant if a slack day policy is used. See section Extensions. Set max extensions to 0 if slack days are not allowed for that problem set.
 
 Ignore the rest of the fields.  There is a routing interface that will set these numbers, so anything you enter in them now will be overwritten anyway.
