@@ -44,8 +44,7 @@ Students may not request extensions if it is past the duedate of the problem set
 
 ### Load code
 
-This will involve the preprocessor, which is found in /home/caesar/caesar-preprocessor on the caesar production VM (caesar.csail.mit.edu) 
-and the caesar development VM (caesar-dev.csail.mit.edu).
+This will involve the preprocessor, which you'll need to check out from GitHub (https://github.com/uid/caesar-preprocessor) and compile with Eclipse.
 
 Check to see that you are loading to the right database (Production vs Developer). 
 
