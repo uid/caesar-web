@@ -1,15 +1,15 @@
 New Semester
 ============
 
-Go to 'http://caesar.csail.mit.edu/review/manage' and click 'close all assignments'. This remove any unfinished tasks from 'code to review' section on the dashboard. 
+1. Close all open reviewing assignments.  Go to 'http://caesar.csail.mit.edu/review/manage' and click 'close all assignments'. This remove any unfinished tasks from 'code to review' section on the dashboard. 
 
-Changes relevant users to alums and others to inactive (they will no longer be able to log on, but their content will remain). Add/change staff. 
+2. Update the user roster.  There is a helpful script 'loadusers.py' located in /var/django/caesar/scripts to do most of this, 
+though you may need to do manual fixups by going to Admin / Users in the Caesar web interface.  Specifically, you need to:
 
-When you have the full roster of students, load them into the system. 
+  (a) Change students who passed the class to alums, and students who dropped or failed to inactive (they will no longer be able to log on, but their content will remain). Add/change staff. 
+  (b) When you have the full roster of students for the new semester, load them into the system. 
 
-There is a helpful script 'loadusers.py' located in /var/django/caesar/scripts to do most of this. 
-
-In chunks.models change any references to 'current semester' to be the new semester.
+3. In chunks.models change any references to 'current semester' to be the new semester.
 
 New Assignment
 ============
