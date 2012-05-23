@@ -52,20 +52,23 @@ Check to see that you are loading to the right database (Production vs Developer
 
 Update to the relevant code in svn, or whatever code you want to load. 
 
-Set the crawler path to something like
+Edit edu.mit.csail.caesar.Main to configure the load. Set the crawler path to the root directory of your student code tree:
 
     Crawler crawler = new BasicInvertedFileSystemCrawler("/Users/elena/Documents/sp12/sp12/users");
 
-Set 'Assignment' to the assignment you're trying to load. 
+The preprocessor assumes that this path contains username folders (e.g. "bitdiddle"), and each username folder contains 
+assignment folders (e.g. "ps4").
+
+Set 'Assignment' to the assignment you're trying to load  
 
     Assignment assignment = new Assignment("ps4", "ps4-beta"); 
 
-The first name is the name found in the directory, the second is the name found in Caesar. 
+The first name is the folder name found in the student code tree, the second is the name that you gave to the assignment in Caesar. 
 
 Similarly we need to point the preprocessor to the staff starter code. 
 
     Crawler staffCrawler = new BasicInvertedFileSystemCrawler("/Users/elena/Documents/6.005/chunks_staff");
-    Assignment staffAssignment = new Assignment("ps2-starting", "ps4-final"); 
+    Assignment staffAssignment = new Assignment("ps4-starting", "ps4-final"); 
 
 First name is what is in the directory, second name is irrelevant. 
 
