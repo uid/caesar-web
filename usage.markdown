@@ -46,6 +46,8 @@ Students may not request extensions if it is past the duedate of the problem set
 
 This will involve the preprocessor, which you'll need to check out from GitHub (https://github.com/uid/caesar-preprocessor) and compile with Eclipse.
 
+The GitHub checkout is missing a Java class, Database, which contains configuration settings.  You'll need to obtain this from a previous TA.
+
 Check to see that you are loading to the right database (Production vs Developer). 
 
 Update to the relevant code in svn, or whatever code you want to load. 
