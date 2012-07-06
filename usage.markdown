@@ -96,7 +96,7 @@ Send an email to relevant users that reviewing has opened.  At the moment, the b
 If a user is complaining something is broken on their dashboard, you can go to http://caesar.csail.mit.edu/review/dashboard/_username_ to see what they see. 
 
 
-Backups
+Backup & Restore
 ===================
 After every problem set, make a backup of the Caesar database as follows:
 
@@ -109,5 +109,14 @@ After every problem set, make a backup of the Caesar database as follows:
 4. Go to Export, make sure Select All, SQL, and Save as File with template __DB__-%Y-%m-%d, and gzipped.
 
 5. Push Go.  Put the resulting file in /afs/csail/proj/courses/6.005/caesar_backups/.
+
+
+If you need to restore the database from a backup, you can't just use phpMyAdmin import, because it's limited to 2MB 
+as configured on CSAIL, and our backups are hundreds of MB.  So do it directly with the mysql client:
+
+1. (optional) Make a fresh database on http://mysql.csail.mit.edu, and give caesar_stage permissions to admin it.
+2. mysql --host=mysql.csail.mit.edu --user=caesar_stage --password=PASSWORDHERE --database=caesar_DATABASEHERE
+3. source caesar_production-XXXX.sql
+4. Point /var/django/caesar/settings_local.py to the new database.
 
 
