@@ -96,3 +96,18 @@ Send an email to relevant users that reviewing has opened.  At the moment, the b
 If a user is complaining something is broken on their dashboard, you can go to http://caesar.csail.mit.edu/review/dashboard/_username_ to see what they see. 
 
 
+Backups
+===================
+After every problem set, make a backup of the Caesar database as follows:
+
+1. Go to phpMyAdmin (http://mysql.csail.mit.edu/phpmyadmin)
+
+2. Log in as caesar_stage with the Caesar database password (see /var/django/caesar/settings_local.py for the passwd)
+
+3. Choose the caesar_production database.
+
+4. Go to Export, make sure Select All, SQL, and Save as File with template __DB__-%y-%m-%d, and gzipped.
+
+5. Push Go.  Put the resulting file in /afs/csail/proj/courses/6.005/caesar_backups/.
+
+
