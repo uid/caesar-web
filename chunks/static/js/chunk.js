@@ -576,8 +576,8 @@ if (caesar.state.fullView) {
         stop: function(event, ui) {
             var startLine = Number.MAX_VALUE;
             var endLine = Number.MIN_VALUE;
-            var chunkId = 0;
-            var fileId = 0;
+            var chunkId = null;
+            var fileId = null;
             $('.line.ui-selected').each(function(i) {
                 var n = parseInt($(this).attr('id').split('-')[2]);
                 endLine = Math.max(endLine, n);
@@ -585,6 +585,9 @@ if (caesar.state.fullView) {
                 chunkId = parseInt($(this).attr('id').split('-')[1]);
                 fileId = parseInt($(this).attr('id').split('-')[3])
             });
+            if (chunkId == null) {
+                return; // no lines selected, don't show the form
+	    }
             showCommentForm(startLine, endLine, chunkId, fileId);
         }
     });

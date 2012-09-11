@@ -39,7 +39,7 @@ def dashboard(request):
     old_completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__assignment__semester='SP12') \
+        .exclude(chunk__file__submission__assignment__semester='FA12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -54,7 +54,7 @@ def dashboard(request):
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester='SP12') \
+        .filter(chunk__file__submission__assignment__semester='FA12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
    
@@ -62,7 +62,7 @@ def dashboard(request):
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()-datetime.timedelta(minutes=30)) \
         .order_by('duedate')\
-        .filter(assignment__semester="SP12")\
+        .filter(assignment__semester="FA12")\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -79,7 +79,7 @@ def dashboard(request):
     old_submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
         .order_by('duedate')\
-        .exclude(assignment__semester="SP12")\
+        .exclude(assignment__semester="FA12")\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -532,7 +532,7 @@ def student_dashboard(request, username):
     old_completed_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__assignment__semester='SP12') \
+        .exclude(chunk__file__submission__assignment__semester='FA12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
     
@@ -546,7 +546,7 @@ def student_dashboard(request, username):
     completed_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester='SP12') \
+        .filter(chunk__file__submission__assignment__semester='FA12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -554,7 +554,7 @@ def student_dashboard(request, username):
     submissions = Submission.objects.filter(name=participant.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
         .order_by('duedate')\
-        .filter(assignment__semester="SP12")\
+        .filter(assignment__semester="FA12")\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -570,7 +570,7 @@ def student_dashboard(request, username):
     old_submissions = Submission.objects.filter(name=participant.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
         .order_by('duedate')\
-        .exclude(assignment__semester="SP12")\
+        .exclude(assignment__semester="FA12")\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -678,7 +678,7 @@ def search(request):
     if request.method == 'POST':
         querystring = request.POST['value'].strip()
         if querystring:
-            comments = Comment.objects.filter(chunk__file__submission__assignment__semester="SP12",
+            comments = Comment.objects.filter(chunk__file__submission__assignment__semester="FA12",
                                               text__icontains = querystring)
             review_data = view_helper(comments[:15])
             return render(request, 'review/search.html', {

@@ -25,7 +25,7 @@ class Assignment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     duedate = models.DateTimeField(null=True, blank=True)
     code_review_end_date = models.DateTimeField(null=True, blank=True)
-    max_extension = models.IntegerField(default=3)
+    max_extension = models.IntegerField(default=2)
     semester = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
                                       blank=True, null=True)
     multiplier = models.IntegerField(default=1)
@@ -53,12 +53,12 @@ class Assignment(models.Model):
     def __unicode__(self):
         return self.name
     def is_current_semester(self):
-        return self.semester == 'SP12'
+        return self.semester == 'FA12'
         
 @receiver(post_save, sender=Assignment)
 def create_current_assignment(sender, instance, created, **kwargs):
     if created:
-        current_semester = 'SP12'
+        current_semester = 'FA12'
         instance.semester = current_semester
         past = Assignment.objects.filter(semester = current_semester).order_by('duedate').exclude(id = instance.id).reverse()
         if past.count() > 0:

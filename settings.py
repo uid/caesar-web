@@ -8,11 +8,7 @@ def project_path(s):
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    ('Mason Tang', 'masont@mit.edu'),
-    ('Elena Tatarchenko', 'elena_11@mit.edu'),
-)
-
+ADMINS = ()
 MANAGERS = ADMINS
 
 DATABASES = {
