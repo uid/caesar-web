@@ -5,14 +5,14 @@ from django.db.models import Q, Count, Max
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
-from django.contrib.auth.decorators import login_required 
+from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404
 
 from chunks.models import Chunk, Assignment, Submission, StaffMarker
 from tasks.models import Task
 from tasks.routing import assign_tasks, more_tasks
-from models import Comment, Vote, Star 
+from models import Comment, Vote, Star
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.models import UserProfile
 from simplewiki.models import Article
@@ -29,13 +29,13 @@ def dashboard(request):
     user = request.user
     new_task_count = 0
     open_assignments = False
-    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
+    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now(), is_live=True):
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
         #do not give tasks to students who got extensions
         if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
             open_assignments = True
             new_task_count += assign_tasks(assignment, user)
-    
+
     old_completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
@@ -43,7 +43,7 @@ def dashboard(request):
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
-    
+
     active_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission_assignment') \
         .exclude(status='C') \
@@ -57,7 +57,7 @@ def dashboard(request):
         .filter(chunk__file__submission__assignment__semester='FA12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
-   
+
     #get all the submissions that the user submitted, in the current semester
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()-datetime.timedelta(minutes=30)) \
@@ -66,15 +66,15 @@ def dashboard(request):
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
-    
+
     submission_data = []
     for submission in submissions:
         user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
         static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
         reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
-        submission_data.append((submission, reviewer_count, submission.last_modified, 
+        submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
-    
+
     #get all the submissions that the user submitted, in the current semester
     old_submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
@@ -83,20 +83,20 @@ def dashboard(request):
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
-    
+
     old_submission_data = []
     for submission in old_submissions:
         user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
         static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
         reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
-        old_submission_data.append((submission, reviewer_count, submission.last_modified, 
+        old_submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
-    
+
     #find the current assignments
     current_submissions = Submission.objects.filter(name=user.username)\
         .filter(duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
         .order_by('duedate')
-    
+
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
@@ -107,7 +107,7 @@ def dashboard(request):
         'current_submissions': current_submissions,
         'open_assignments': open_assignments,
     })
-    
+
 @staff_member_required
 def student_stats(request):
     assignments = Assignment.objects.all().order_by('duedate').reverse()[0:5]
@@ -115,7 +115,7 @@ def student_stats(request):
     total_alum = User.objects.exclude(profile__role='S').exclude(profile__role='T').count()
     all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T')
     total_staff = User.objects.filter(profile__role='T').count()
-    
+
     assignment_data = []
     for assignment in assignments:
         total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
@@ -136,8 +136,8 @@ def student_stats(request):
         total_student_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(author__profile__role='S').count()
         total_user_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='U').count()
         total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
-        
-        assignment_data.append( (assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, 
+
+        assignment_data.append( (assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human,
                                 total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments) )
     return render(request, 'review/studentstats.html', {
         'assignment_data': assignment_data,
@@ -181,7 +181,7 @@ def new_comment(request):
             'end': end,
             'snippet': chunk.generate_snippet(start, end),
             'chunk': chunk,
-        })  
+        })
     else:
         form = CommentForm(request.POST)
         if form.is_valid():
@@ -222,7 +222,7 @@ def reply(request):
             chunk = parent.chunk
             comment.chunk = chunk
             comment.end = parent.end
-            comment.start = parent.start 
+            comment.start = parent.start
             if parent.is_reply():
                 # strictly single threads for discussion
                 comment.parent = parent.parent
@@ -357,7 +357,7 @@ def summary(request, username):
     assignment_data = []
     #get all assignments
     assignments = Assignment.objects.all().order_by('created').reverse()
-    for assignment in assignments: 
+    for assignment in assignments:
         #get all comments that the user wrote
         comments = Comment.objects.filter(author=participant).filter(chunk__file__submission__assignment = assignment).select_related('chunk')
         review_data = []
@@ -367,7 +367,7 @@ def summary(request, username):
                 review_data.append(("reply-comment", comment, comment.generate_snippet(), False, None))
             else:
                 review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
-    
+
         votes = Vote.objects.filter(author=participant) \
                     .filter(comment__chunk__file__submission__assignment = assignment) \
                     .select_related('comment__chunk')
@@ -410,7 +410,7 @@ def all_activity(request, assign, username):
     assignment_data = []
 
     lexer = JavaLexer()
-    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)   
+    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     for chunk in chunks:
         if chunk in chunk_set:
             continue
@@ -419,12 +419,12 @@ def all_activity(request, assign, username):
         participant_votes = dict((vote.comment.id, vote.value) \
                 for vote in participant.votes.filter(comment__chunk=chunk.id))
         numbers, lines = zip(*chunk.lines)
-        
+
         staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
-        
-        highlighted = zip(numbers, 
+
+        highlighted = zip(numbers,
                 highlight(chunk.data, lexer, formatter).splitlines())
-                
+
         highlighted_lines = []
         staff_line_index = 0
         for number, line in highlighted:
@@ -434,14 +434,14 @@ def all_activity(request, assign, username):
                 highlighted_lines.append((number, line, True))
             else:
                 highlighted_lines.append((number, line, False))
-                
+
         comments = chunk.comments.select_related('votes', 'author__profile')
         highlighted_comments = []
         highlighted_votes = []
         for comment in comments:
             if comment.id in participant_votes:
                 highlighted_votes.append(participant_votes[comment.id])
-            else: 
+            else:
                 highlighted_votes.append(None)
             if comment.author == participant:
                 highlighted_comments.append(comment)
@@ -491,7 +491,7 @@ def request_extension(request, assignment_id):
             'current_day': extended_days,
             'written_days': written_days,
             'total_days': user.profile.extension_days + extended_days
-        })  
+        })
     else:
         days = request.POST.get('dayselect', None)
         try:
@@ -523,7 +523,7 @@ def student_dashboard(request, username):
     if user.profile.role != 'T':
         raise Http404
     new_task_count = 0
-    
+
     # for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
     #     active_sub = Submission.objects.filter(name=participant.username).filter(assignment=assignment)
     #     #do not give tasks to students who got extensions
@@ -535,7 +535,7 @@ def student_dashboard(request, username):
         .exclude(chunk__file__submission__assignment__semester='FA12') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
-    
+
     active_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission_assignment') \
         .exclude(status='C') \
@@ -558,13 +558,13 @@ def student_dashboard(request, username):
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
-    
+
     submission_data = []
     for submission in submissions:
         user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
         static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
         reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
-        submission_data.append((submission, reviewer_count, submission.last_modified, 
+        submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
     #get all the submissions that the user submitted, in the current semester
     old_submissions = Submission.objects.filter(name=participant.username) \
@@ -574,18 +574,18 @@ def student_dashboard(request, username):
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
-    
+
     old_submission_data = []
     for submission in old_submissions:
         user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
         static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
         reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
-        old_submission_data.append((submission, reviewer_count, submission.last_modified, 
+        old_submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
-    
+
     #find the current assignments
     current_submissions = Submission.objects.filter(name=participant.username).filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
-    
+
     return render(request, 'review/student_dashboard.html', {
         'participant': participant,
         'active_tasks': active_tasks,
@@ -630,7 +630,7 @@ def more_work(request):
         current_tasks = user.get_profile().tasks.exclude(status='C').exclude(status='U')
         total = 0
         if not current_tasks.count():
-            for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
+            for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now(), is_live=True):
                 active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
                 #do not give tasks to students who got extensions
                 if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():

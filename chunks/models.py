@@ -25,8 +25,9 @@ class Assignment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     duedate = models.DateTimeField(null=True, blank=True)
     code_review_end_date = models.DateTimeField(null=True, blank=True)
+    is_live = models.BooleanField(default=False)
     max_extension = models.IntegerField(default=2)
-    semester = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
+    semester = models.CharField(max_length=4, choices=SEMESTER_CHOICES,
                                       blank=True, null=True)
     multiplier = models.IntegerField(default=1)
     student_count = models.IntegerField(default=5)
@@ -35,7 +36,7 @@ class Assignment(models.Model):
     alum_count_default = models.IntegerField(default=3)
     staff_count = models.IntegerField(default=10)
     staff_count_default = models.IntegerField(default=10)
-    
+
     students = models.IntegerField(default=199)
     students_default = models.IntegerField(default=199)
     alums = models.IntegerField(default=1)
@@ -45,16 +46,18 @@ class Assignment(models.Model):
 
     reviewers_per_chunk = models.IntegerField(default=2)
     min_student_lines = models.IntegerField(default=30)
-    
+
     chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
-    
+
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):
         return self.name
     def is_current_semester(self):
         return self.semester == 'FA12'
-        
+    def is_life_assignment(self):
+        return datetime.datetime.now() < submission.assignment.code_review_end_date and self.is_live
+
 @receiver(post_save, sender=Assignment)
 def create_current_assignment(sender, instance, created, **kwargs):
     if created:
@@ -94,7 +97,7 @@ def create_current_assignment(sender, instance, created, **kwargs):
         instance.staff = instance.staff_default
         instance.student_count = instance.student_count_default
         instance.alum_count = instance.alum_count_default
-        instance.staff_count = instance.staff_count_default            
+        instance.staff_count = instance.staff_count_default
         instance.save()
 
 
@@ -102,7 +105,7 @@ class Submission(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     assignment = models.ForeignKey(Assignment, related_name='submissions')
-    author = models.ForeignKey(User, 
+    author = models.ForeignKey(User,
             blank=True, null=True, related_name='submissions')
     created = models.DateTimeField(auto_now_add=True)
     revision = models.IntegerField(null=True, blank=True)
@@ -112,11 +115,11 @@ class Submission(models.Model):
         db_table = u'submissions'
     def __unicode__(self):
         return self.name
-    
+
     @models.permalink
     def get_absolute_url(self):
         return ('chunks.views.view_all_chunks', [str(self.assignment.name), str(self.name), "code"])
- 
+
 
 @receiver(post_save, sender=Assignment)
 def create_user_submission(sender, instance, created, **kwargs):
@@ -142,7 +145,7 @@ class File(models.Model):
             first_line_offset += 1
         offset +=1
         self.lines = list(enumerate(self.data.splitlines(), start = offset))
-        
+
     def __init__(self, *args, **kwargs):
         super(File, self).__init__(*args, **kwargs)
         self.__split_lines()
@@ -175,25 +178,25 @@ class Chunk(models.Model):
     modified = models.DateTimeField(auto_now=True)
     class_type = models.CharField(max_length=4, choices=CLASS_TYPE_CHOICES,
                             blank=True, null=True)
-                            
+
     staff_portion = models.IntegerField(default = 0)
-    
+
     objects = ChunkManager()
     class Meta:
         db_table = u'chunks'
 
     @property
     def data(self):
-        if not hasattr(self, '_data'): 
+        if not hasattr(self, '_data'):
             self._split_lines()
         return self._data
 
     @property
     def lines(self):
-        if not hasattr(self, '_lines'): 
+        if not hasattr(self, '_lines'):
             self._split_lines()
         return self._lines
-    
+
     def _split_lines(self):
         file_data = self.file.data
         # Rewind backwards from the offset to the beginning of the line
@@ -210,7 +213,7 @@ class Chunk(models.Model):
         data = file_data[first_line_offset:self.end].expandtabs(4)
         self._data = textwrap.dedent(data)
         self._lines = list(enumerate(self.data.splitlines(), start=first_line))
-    
+
     def staff_percentage(self):
         markers = self.staffmarkers.all()
         total_lines = 0
@@ -226,11 +229,11 @@ class Chunk(models.Model):
     #   vote = user_votes.get(comment.id, None)
     #   snippet = self.generate_snippet(comment.start, comment.end)
     #   return (comment, vote, snippet)
-    # 
+    #
     # def get_comment_data(self):
     #   return map(self.get_comment_vote_snippet,
     #           Comment.get_comments_for_chunk(self))
-        
+
     def generate_snippet(self, start=None, end=None):
         if start is None:
             start = self.lines[0][0]
@@ -242,7 +245,7 @@ class Chunk(models.Model):
         start_line = start - line_offset
         end_line = start - line_offset
         last_line = len(self.lines) - 1
-        
+
         # first, search forward and gather text
         while snippet_length < settings.MINIMUM_SNIPPET_LENGTH and \
                 end_line < last_line:
@@ -257,7 +260,7 @@ class Chunk(models.Model):
         self.start_line = start_line
         self.end_line = end_line+1
         return ' '.join(zip(*snippet_lines)[1])
-    
+
     def get_highlighted_lines(self):
         lexer = JavaLexer()
         formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
@@ -265,7 +268,7 @@ class Chunk(models.Model):
         # highlight the code this way to correctly identify multi-line
         # constructs
         # TODO implement a custom formatter to do this instead
-        highlighted_lines = zip(numbers, 
+        highlighted_lines = zip(numbers,
                 highlight(self.data, lexer, formatter).splitlines())
         return highlighted_lines
 
@@ -296,12 +299,12 @@ class ChunkProfile(models.Model):
     comment_words = models.IntegerField(blank=True, null=True)
     student_lines = models.IntegerField(blank=True, null=True)
     return_count = models.IntegerField(blank=True, null=True)
-    
+
 class Fingerprint(models.Model):
     # This ID is basically useless, but Django currently doesn't support
     # composite primary keys
     id = models.AutoField(primary_key=True)
-    chunk = models.ForeignKey(Chunk, related_name='fingerprints', 
+    chunk = models.ForeignKey(Chunk, related_name='fingerprints',
                               db_index=True, editable=False)
     value = models.IntegerField(db_index=True, editable=False)
     position = models.IntegerField(editable=False)
