@@ -158,11 +158,13 @@ Then edit settings_local.py and change the settings appropriately.
 ### Initializing the application
 
 Finally, Caesar itself needs some setup:
+Note: when running ./manage.py syncdb, Django may ask if you want to create a new superuser for it's auth system. Select 'no' - the users table doesn't exist until migrate, so this will cause an error.
 
     cd /var/django/caesar
     mkdir media && chmod g+w media
     ./manage.py syncdb
     ./manage.py migrate
+    ./manage.py createsuperuser --username=admin --email=example@mit.edu
     ./manage.py collectstatic
     sudo ln -sf /var/django/caesar/apache/caesar /etc/apache2/sites-available
     sudo a2ensite caesar
