@@ -1,5 +1,5 @@
 from chunks.models import Chunk, File, Assignment, Submission, StaffMarker
-from review.models import Comment, Vote, Star 
+from review.models import Comment, Vote, Star
 from tasks.models import Task
 
 from django.http import Http404
@@ -35,7 +35,7 @@ def view_chunk(request, chunk_id):
         snippet = chunk.generate_snippet(comment.start, comment.end)
         return (comment, vote, snippet)
 
-    comment_data = map(get_comment_data, 
+    comment_data = map(get_comment_data,
                        chunk.comments.select_related('author__profile'))
 
     lexer = JavaLexer()
@@ -43,7 +43,7 @@ def view_chunk(request, chunk_id):
     numbers, lines = zip(*chunk.lines)
     # highlight the code this way to correctly identify multi-line constructs
     # TODO implement a custom formatter to do this instead
-    highlighted = zip(numbers, 
+    highlighted = zip(numbers,
             highlight(chunk.data, lexer, formatter).splitlines())
     highlighted_lines = []
     staff_line_index = 0
@@ -53,8 +53,8 @@ def view_chunk(request, chunk_id):
                 staff_line_index += 1
             highlighted_lines.append((number, line, True))
         else:
-            highlighted_lines.append((number, line, False)) 
-    
+            highlighted_lines.append((number, line, False))
+
     task_count = Task.objects.filter(reviewer=user.get_profile()) \
             .exclude(status='C').exclude(status='U').count()
     # get the associated task if it exists
@@ -64,7 +64,7 @@ def view_chunk(request, chunk_id):
             task.mark_as('O')
     except Task.DoesNotExist:
         task = None
-    return render(request, 'chunks/view_chunk.html', { 
+    return render(request, 'chunks/view_chunk.html', {
         'chunk': chunk,
         'similar_chunks': chunk.get_similar_chunks(),
         'highlighted_lines': highlighted_lines,
@@ -74,7 +74,7 @@ def view_chunk(request, chunk_id):
         'full_view': True,
         'file': chunk.file,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
-    }) 
+    })
 
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
@@ -96,7 +96,7 @@ def view_all_chunks(request, viewtype, submission_id):
     common_prefix = ""
     if len(paths) > 1:
         common_prefix = os.path.commonprefix(paths)
-    
+
     #get a list of only the relative paths
     paths = []
     for afile in files:
@@ -106,13 +106,13 @@ def view_all_chunks(request, viewtype, submission_id):
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     for afile in files:
         staff_lines = StaffMarker.objects.filter(chunk__file=afile).order_by('start_line', 'end_line')
-        
+
         #prepare the file - get the lines that are part of chunk and the ones that aren't
         highlighted_lines_for_file = []
         numbers, lines = zip(*afile.lines)
-        highlighted = zip(numbers, 
+        highlighted = zip(numbers,
                 highlight(afile.data, lexer, formatter).splitlines())
-                
+
         highlighted_lines = []
         staff_line_index = 0
         for number, line in highlighted:
@@ -121,8 +121,8 @@ def view_all_chunks(request, viewtype, submission_id):
                     staff_line_index += 1
                 highlighted_lines.append((number, line, True))
             else:
-                highlighted_lines.append((number, line, False))        
-        
+                highlighted_lines.append((number, line, False))
+
         chunks = afile.chunks.order_by('start')
         total_lines = len(afile.lines)
         offset = numbers[0]
@@ -145,33 +145,33 @@ def view_all_chunks(request, viewtype, submission_id):
                 def get_comment_data(comment):
                     snippet = chunk.generate_snippet(comment.start, comment.end)
                     return (comment, snippet)
-                
+
                 comments = chunk.comments.select_related('chunk', 'author__profile')
                 comment_data = map(get_comment_data, comments)
-                
+
                 user_comments += comments.filter(type='U').count()
                 static_comments += comments.filter(type='S').count()
-                
+
                 #now for the chunk part
                 start = chunk_start
                 end = chunk_end
                 #True means it's a chunk, False it's not a chunk
                 highlighted_lines_for_file.append((highlighted_lines[start-offset:end-offset], True, chunk, comment_data))
-        #see if there is anything else to grab 
+        #see if there is anything else to grab
         highlighted_lines_for_file.append((highlighted_lines[end-offset:], False, None, None))
         user_stats.append(user_comments)
         static_stats.append(static_comments)
         all_highlighted_lines.append(highlighted_lines_for_file)
     file_data = zip(paths, all_highlighted_lines, files)
-    
+
     code_only = False
     comment_view = True
     if viewtype == "code":
         code_only = True
         comment_view = False
-    
+
     path_and_stats = zip(paths, user_stats, static_stats)
-    
+
     return render(request, 'chunks/view_all_chunks.html', {
         'assignment_name': assignment_name,
         'path_and_stats': path_and_stats,
@@ -193,7 +193,7 @@ def submit_assignment(request, assignment_id):
             'new_submission': False,
             'late': True
         })
-    #check if there is an existing submission 
+    #check if there is an existing submission
     submission = Submission.objects.get(author=user, assignment=current_assignment)
     p = subprocess.Popen(['/Users/elena/Documents/Praetor/praetor/codeTester', '/Users/elena/Documents/Praetor/server_files/trunk'], stdout=subprocess.PIPE)
     afile, err = p.communicate()
@@ -227,7 +227,7 @@ def simualte(request, assignment_id):
     user = request.user
     assignment = Assignment.objects.get(id=assignment_id)
     assignment_chunks = Chunk.objects.filter(file__submission__assignment__id = assignment_id).select_related('file__submission__assignment', 'profile')
-    
+
     chunks_graph = dict()
     edited = set()
     test = set()
@@ -257,9 +257,9 @@ def simualte(request, assignment_id):
         if chunk.class_type == "TEST":
             test.add(name)
         chunks_graph[name] = (lines_dict, num+1)
-    
+
     #list of lists ["sudoku", [[1,20], [3,50]]]
-    #list of important and unimportant 
+    #list of important and unimportant
     important_graphs = []
     test_graphs = []
     unimportant_graphs = []
@@ -287,9 +287,9 @@ def simualte(request, assignment_id):
                 unimportant_graphs.append([name, lines_list])
             else:
                 other.add(name)
-    
-    #call everything student created as "other"    
-    lines_list = []    
+
+    #call everything student created as "other"
+    lines_list = []
     for name in other_test:
         lines_dict, num = chunks_graph[name]
         for key in lines_dict.keys():
@@ -311,8 +311,8 @@ def simualte(request, assignment_id):
     for name, lines_list in unimportant_graphs:
         chunks_data.append((name, 1))
     for name, lines_list in test_graphs:
-	    chunks_data.append((name, 0))    
-    
+	    chunks_data.append((name, 0))
+
     if request.method == 'GET':
         to_assign = assignment.chunks_to_assign
         if to_assign is not None:
@@ -321,7 +321,7 @@ def simualte(request, assignment_id):
                 split_info = chunk_info.split(" ")
                 chunks_data[count] = (split_info[0], int(split_info[1]))
                 count += 1
-            
+
 
         return render(request, 'chunks/simulate.html', {
             'assignment': assignment,
@@ -340,7 +340,7 @@ def simualte(request, assignment_id):
         assignment.students = students
         assignment.alums = alums
         assignment.staff = staff
-        
+
         assignment.student_count = request.POST['student_tasks']
         assignment.alum_count = request.POST['alum_tasks']
         assignment.staff_count = request.POST['staff_tasks']
@@ -348,21 +348,21 @@ def simualte(request, assignment_id):
         assignment.reviewers_per_chunk = request.POST['per_chunk']
         assignment.min_student_lines = request.POST['min_lines']
         assignment.save()
-        
-        
+
+
         chunks_raw = request.POST.getlist('chunk')
         checked = set()
         for raw in chunks_raw:
             checked.add(raw)
-        
+
         to_assign = ""
         for name, check in chunks_data:
             if name in checked:
                 to_assign += name + " 1,"
             else:
                 to_assign += name + " 0,"
-           
-        
+
+
         if len(to_assign) > 1:
             count = 0
             for chunk_info in to_assign.split(",")[0:-1]:
@@ -372,8 +372,8 @@ def simualte(request, assignment_id):
 
         assignment.chunks_to_assign = to_assign
         assignment.save()
-        
-        
+
+
         return render(request, 'chunks/simulate.html', {
             'assignment': assignment,
             'chunks_data': chunks_data,
@@ -384,4 +384,36 @@ def simualte(request, assignment_id):
             'max_unimportant': max_unimportant+1,
             'max_test': max_test +1,
         })
-    
+
+@login_required
+def list_users(request, assignment_id):
+  def cmp_users(user1, user2):
+    if user1.profile.role == user2.profile.role:
+      return cmp(user1.first_name, user2.first_name)
+    if user1.profile.is_student():
+      return -1
+    if user1.profile.is_staff():
+      return 1
+    if user2.profile.is_student():
+      return 1
+    return -1
+
+  assignment = Assignment.objects.get(id=assignment_id)
+  submissions = Submission.objects.filter(assignment=assignment_id)
+
+  users = []
+  data = {}
+  for submission in submissions:
+    if submission.author.id not in data:
+      users.append(submission.author)
+      data[submission.author.id] = {'tasks': []}
+    data[submission.author.id]['submission'] = submission
+
+    for chunk in submission.chunks():
+      for task in chunk.tasks.filter():
+        if task.reviewer.user.id not in data:
+          users.append(task.reviewer.user)
+          data[task.reviewer.user.id] = {'tasks': []}
+        data[task.reviewer.user.id]['tasks'].append(task)
+
+  return render(request, 'chunks/list_users.html', {'users': sorted(users, cmp=cmp_users), 'data': data})

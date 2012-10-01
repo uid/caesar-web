@@ -120,6 +120,14 @@ class Submission(models.Model):
     def get_absolute_url(self):
         return ('chunks.views.view_all_chunks', [str(self.assignment.name), str(self.name), "code"])
 
+    def chunk_count(self):
+        return len(self.chunks())
+
+    def chunks(self):
+        chunks = []
+        for f in self.files.filter():
+            chunks.extend(f.chunks.filter())
+        return chunks
 
 @receiver(post_save, sender=Assignment)
 def create_user_submission(sender, instance, created, **kwargs):
@@ -286,6 +294,37 @@ class Chunk(models.Model):
 
     def __unicode__(self):
         return u'%s' % (self.name,)
+
+    def list_reviewers(self):
+        return [t.reviewer for t in self.tasks.filter()]
+
+    # returns a tuple of (student_reviewers, alum_reviewers, staff_reviewers)
+    def reviewer_types(self):
+        students = 0; alum = 0; staff = 0
+        for reviewer in self.reviewers.filter():
+            if reviewer.is_student():
+                students += 1
+            elif reviewer.is_staff():
+                staff += 1
+            else:
+                alum += 1
+        return (students, alum, staff)
+
+    def student_reviewers(self):
+      return self.reviewer_types()[0]
+
+    def alum_reviewers(self):
+      return self.reviewer_types()[1]
+
+    def staff_reviewers(self):
+      return self.reviewer_types()[2]
+
+    def reviewer_count(self):
+      return len(self.list_reviewers())
+
+    def comment_count(self):
+      return len(self.comments.filter())
+
 
 class ChunkProfile(models.Model):
     id = models.AutoField(primary_key=True)

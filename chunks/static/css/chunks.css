@@ -159,3 +159,60 @@
     height: 16px;
     padding-left: 18px;
 }
+
+/* list chunks css */
+.chunk {
+  margin-left: 25px;
+  padding: 0 5px;
+}
+
+.zero-reviewer-chunk {
+  background: #def;
+}
+
+.multi-reviewer-chunk {
+}
+
+.chunk-info {
+  float: right;
+}
+
+.chunk-info {
+  display: inline;
+}
+
+.user-chunk {
+  font-size: 14px;
+  margin-top: 3px;
+  padding: 0 5px;
+}
+
+.zero-chunk {
+  background: #f0f0f0;
+  padding: 0 5px;
+}
+
+.multi-chunk {
+  padding: 0 5px;
+}
+
+.chunk-link {
+  color:#333;
+}
+
+.chunk-link:hover {
+  color:#111;
+}
+
+#user-chunk-list {
+  padding-top: 10px;
+}
+
+.author-role {
+  float: right;
+}
+
+.task {
+  background: #fff;
+  margin-left:25px;
+}

@@ -15,13 +15,13 @@ class TaskManager(models.Manager):
         Returns the number of chunks assigned.
         """
         reviewer = user.get_profile()
-        current_task_count = Task.objects.filter(reviewer=reviewer, 
+        current_task_count = Task.objects.filter(reviewer=reviewer,
                 chunk__file__submission__assignment=assignment).count()
-        
+
         assign_count = app_settings.CHUNKS_PER_REVIEWER - current_task_count
         if assign_count <= 0:
             return assign_count
-        
+
         # FIXME this query will probably need to be optimized
         chunks = Chunk.objects.exclude(file__submission__name=user.username) \
             .filter(file__submission__assignment=assignment) \
@@ -32,7 +32,7 @@ class TaskManager(models.Manager):
         for chunk in chunks:
             task = Task(reviewer=user.get_profile(), chunk=chunk)
             task.save()
-            
+
         return assign_count
 
 class Task(models.Model):
@@ -55,14 +55,14 @@ class Task(models.Model):
     objects = TaskManager()
     class Meta:
         unique_together = ('chunk', 'reviewer',)
-    
+
     def __unicode__(self):
         return "Task: %s - %s" % (self.reviewer.user, self.chunk)
 
     def mark_as(self, status):
         if status not in zip(*Task.STATUS_CHOICES)[0]:
             raise Exception('Invalid task status')
-        
+
         self.status = status
         if status == 'N':
             self.opened = None
@@ -76,3 +76,6 @@ class Task(models.Model):
             self.completed = datetime.now()
 
         self.save()
+
+    def author(self):
+      return self.chunk.file.submission.author

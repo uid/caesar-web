@@ -15,10 +15,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'caesar.db',
-        'USER': '',        
-        'PASSWORD': '',   
-        'HOST': '',      
-        'PORT': '',     
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 

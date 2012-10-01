@@ -17,8 +17,8 @@ class Token(models.Model):
 class UserProfile(models.Model):
     # def get_photo_path(instance, filename):
     #     return os.path.join(
-    #             settings.PROFILE_PHOTO_DIR, 
-    #             instance.user.username, 
+    #             settings.PROFILE_PHOTO_DIR,
+    #             instance.user.username,
     #             filename)
 
     ROLE_CHOICES = (
@@ -39,9 +39,9 @@ class UserProfile(models.Model):
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
     extension_days = models.IntegerField(default=5)
-    semester_taken = models.CharField(max_length=4, choices=SEMESTER_CHOICES, 
+    semester_taken = models.CharField(max_length=4, choices=SEMESTER_CHOICES,
                                       blank=True, null=True)
-    
+
     token = models.ForeignKey(Token, related_name='invited', default=None, null=True)
     def __unicode__(self):
         return self.user.__unicode__()
@@ -52,6 +52,13 @@ class UserProfile(models.Model):
     def is_student(self):
         return self.role == 'S'
 
+    def role_str(self):
+      if self.is_student():
+        return 'Student'
+      elif self.is_staff():
+        return 'Staff'
+      return 'Other'
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -60,4 +67,4 @@ def create_user_profile(sender, instance, created, **kwargs):
         if created:
             profile.role = 'S'
             profile.save()
-    
+

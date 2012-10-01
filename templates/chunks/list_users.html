@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+{% load chunk_extras %}
+<div id=user-chunk-list>
+  {% for user in users %}
+    {% with user_data=data|get_item:user.id %}
+    <div class='user-chunk'>
+
+      <div class = '{% if user_data.submission.chunk_count > 0 %}multi-chunks{% else %} zero-chunk {% endif %}'>
+        <span class='author'>{{user.first_name}} {{user.last_name}}</span>
+        <span class='author-role'>{{user.profile.role_str}}</span>
+      </div>
+
+      {% for task in user_data.tasks %}
+      <div class='task'>
+        {{task.chunk.name}}, by {{task.author.first_name}} {{task.author.last_name}}
+      </div>
+      {% endfor %}
+
+      {% for chunk in user_data.submission.chunks %}
+      <div class='chunk {% if chunk.reviewer_count > 0 %}multi-reviewer-chunk{% else %}zero-reviewer-chunk{% endif %}'>
+        <a class='chunk-link' href='/chunks/view/{{chunk.id}}'>{{chunk.name}}</a>
+        <div class='chunk-info'>
+          <span class='reviewer-count'>
+            ({{chunk.student_reviewers}}/{{chunk.alum_reviewers}}/{{chunk.staff_reviewers}})
+          </span>
+          <span class='comment-count'>{{chunk.comment_count}}</span>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+    {% endwith %}
+  {% endfor %}
+</div>
+
+{% endblock %}
