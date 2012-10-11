@@ -53,7 +53,7 @@ class UserProfile(models.Model):
         return self.role == 'S'
 
     def is_alum(self):
-        return not is_staff() and not is_student() and not is_checkstle()
+        return not is_staff() and not is_student() and not is_checkstyle()
 
     def role_str(self):
       if self.is_student():
