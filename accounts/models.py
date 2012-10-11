@@ -52,6 +52,9 @@ class UserProfile(models.Model):
     def is_student(self):
         return self.role == 'S'
 
+    def is_alum(self):
+        return not is_staff() and not is_student() and not is_checkstle()
+
     def role_str(self):
       if self.is_student():
         return 'Student'
@@ -59,6 +62,13 @@ class UserProfile(models.Model):
         return 'Staff'
       return 'Other'
 
+    def is_checkstyle(self):
+      return self.user.username == 'checkstyle'
+
+    def name(self):
+      if self.user.first_name and self.user.last_name:
+        return self.user.first_name + ' ' + self.user.last_name
+      return self.user.username
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

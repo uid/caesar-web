@@ -26,7 +26,7 @@ class Comment(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
     edited = models.DateTimeField(null=True, blank=True)
-    parent = models.ForeignKey('self', related_name='child_comments', 
+    parent = models.ForeignKey('self', related_name='child_comments',
         blank=True, null=True)
     # fields added for denormalization purposes
     upvote_count = models.IntegerField(default=0)
@@ -47,12 +47,12 @@ class Comment(models.Model):
     #returns child and vote counts for child as a tuple
     def get_child_comment_vote(self):
         return map(self.get_comment_vote, self.child_comments)
-        
+
     def is_edited(self):
         if self.edited is not None and self.edited > self.created:
             return True
         return False
-        
+
     def get_comment_vote(self):
         try:
             vote = self.votes.get(author=request.user.id).value
@@ -68,7 +68,10 @@ class Comment(models.Model):
         if len(self.text) < snippet_length:
             return self.text
         return self.text[0:snippet_length] + "..."
-        
+
+    def is_checkstyle(self):
+      return self.author.username is 'checkstyle'
+
     class Meta:
         ordering = [ 'start', '-end', 'thread_id', 'created' ]
 
@@ -82,7 +85,7 @@ class Vote(models.Model):
     author = models.ForeignKey(User, related_name='votes')
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
-    
+
     REPUTATION_WEIGHT = 1
 
     def __unicode__(self):

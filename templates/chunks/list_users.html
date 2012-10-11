@@ -8,6 +8,12 @@
 
 {% block content %}
 {% load chunk_extras %}
+
+<div id='toggle-buttons'>
+  <button id='toggle-chunks' onclick="$('.chunk').fadeToggle()">Toggle Chunks</button>
+  <button id='toggle-tasks' onclick="$('.task').toggleToggle()">Toggle Tasks</button>
+</div>
+
 <div id=user-chunk-list>
   {% for user in users %}
     {% with user_data=data|get_item:user.id %}
@@ -19,8 +25,13 @@
       </div>
 
       {% for task in user_data.tasks %}
-      <div class='task'>
+      <div class='task {% if not task.completed %}uncompleted-task{% endif %}'>
         {{task.chunk.name}}, by {{task.author.first_name}} {{task.author.last_name}}
+
+        <div class='chunk-info'>
+          {{task.chunk.reviewers_comment_str}}
+        </div>
+
       </div>
       {% endfor %}
 
@@ -28,10 +39,7 @@
       <div class='chunk {% if chunk.reviewer_count > 0 %}multi-reviewer-chunk{% else %}zero-reviewer-chunk{% endif %}'>
         <a class='chunk-link' href='/chunks/view/{{chunk.id}}'>{{chunk.name}}</a>
         <div class='chunk-info'>
-          <span class='reviewer-count'>
-            ({{chunk.student_reviewers}}/{{chunk.alum_reviewers}}/{{chunk.staff_reviewers}})
-          </span>
-          <span class='comment-count'>{{chunk.comment_count}}</span>
+          {{chunk.reviewers_comment_str}}
         </div>
       </div>
       {% endfor %}

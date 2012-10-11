@@ -24,7 +24,7 @@ class User:
         self.submissions = []
         self.chunks = []
         self.other_reviewers = set()
-        self.clusters = defaultdict(lambda : 0) 
+        self.clusters = defaultdict(lambda : 0)
 
     def __unicode__(self):
         return u"User(id=%d, role=%s, reputation=%d)" % \
@@ -47,7 +47,7 @@ class Submission:
         self.id = id
         self.author = author
         self.reviewers = set()
-        self.chunks = [Chunk(chunk=chunk, submission=self) 
+        self.chunks = [Chunk(chunk=chunk, submission=self)
                 for chunk in chunks]
 
     def __str__(self):
@@ -96,12 +96,12 @@ def _convert_assignment_to_priority(assignment):
             priority_dict[split_info[0]] = -1
         else:
             priority_dict[split_info[0]] = 0
-    
+
     return priority_dict
 
 def load_users():
-    # load all existing users 
-    user_map = defaultdict(lambda : None) 
+    # load all existing users
+    user_map = defaultdict(lambda : None)
     django_users = auth.models.User.objects.select_related('profile').all()
     for u in django_users:
         user_map[u.id] = User(
@@ -142,7 +142,7 @@ def load_chunks(assignment, user_map, django_user):
         submissions[submission.id] = submission
         chunks.extend(submission.chunks)
 
-    
+
     # load existing reviewing assignments
     for chunk in chunks:
         chunk_map[chunk.id] = chunk
@@ -169,7 +169,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             cluster_sizes[chunk.cluster_id] += 1
 
     # Sort the chunks according to these criteria:
-    # 
+    #
     # For students and other:
     #  1. Remove chunks already assigned to the user
     #  2. Remove chunks with maximum number of reviewers
@@ -181,7 +181,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
     #  6. Maximize affinity between user and reviewers on the chunk, which
     #     increases diversity of other reviewers for reviewer.
     #
-    # For staff, we simply try to spread them out to maximize number of 
+    # For staff, we simply try to spread them out to maximize number of
     # submissions with at least one staff member, and then maximize the number
     # of students that get to review a chunk along with staff.
 
@@ -189,7 +189,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         distance_affinity = 0
         if user2 in user1.other_reviewers:
             distance_affinity -= 50
-        
+
         reputation_affinity = abs(user1.reputation - user2.reputation)
 
         role_affinity = 0
@@ -219,17 +219,17 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             return 2
         else:
             return -cluster_count
-        
-        
+
+
     def make_chunk_sort_key(user):
         if user.role == 'staff':
             def chunk_sort_key(chunk):
                 review_priority = len(chunk.reviewers)
-                if len(chunk.reviewers) <= reviewers_per_chunk: 
+                if len(chunk.reviewers) <= reviewers_per_chunk:
                     review_priority = -1 * len(chunk.reviewers)
                 if chunk.student_lines <= min_student_lines:
                     review_priority = 15
-                        
+
                 type_priority = 0
                 if chunk.name in priority_dict:
                     type_priority = priority_dict[chunk.name]
@@ -254,11 +254,11 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         else:
             def chunk_sort_key(chunk):
                 review_priority = len(chunk.reviewers)
-                if len(chunk.reviewers) < reviewers_per_chunk: 
+                if len(chunk.reviewers) < reviewers_per_chunk:
                     review_priority = 0
                 if chunk.student_lines <= min_student_lines:
                     review_priority = 15
-                
+
                 type_priority = 0
                 if chunk.name in priority_dict:
                     type_priority = priority_dict[chunk.name]
@@ -280,9 +280,9 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
                     -(chunk.student_lines if chunk.student_lines != None else 0),
                 )
             return chunk_sort_key
-        
+
     key = make_chunk_sort_key(user)
-    
+
     if not chunks:
         return
     for _ in itertools.repeat(None, count):
@@ -302,7 +302,7 @@ def assign_many_tasks(assignment, django_users):
     for django_user in django_users:
         print django_user.username
         django_profile = django_user.get_profile()
-        current_task_count = Task.objects.filter(reviewer=django_profile, 
+        current_task_count = Task.objects.filter(reviewer=django_profile,
                 chunk__file__submission__assignment=assignment).count()
 
         role = _convert_role(django_profile.role)
@@ -325,9 +325,9 @@ def assign_tasks(assignment, django_user):
     Returns the number of chunks assigned.
     """
     django_profile = django_user.get_profile()
-    current_task_count = Task.objects.filter(reviewer=django_profile, 
+    current_task_count = Task.objects.filter(reviewer=django_profile,
             chunk__file__submission__assignment=assignment).count()
-    
+
     role = _convert_role(django_profile.role)
     priority_dict = _convert_assignment_to_priority(assignment)
     #get the assignment count from Assignment
@@ -338,21 +338,21 @@ def assign_tasks(assignment, django_user):
     user_map = load_users()
     user = user_map[django_user.id]
     chunks = load_chunks(assignment, user_map, django_user)
-    
+
     assigned = 0
     for chunk_id in find_chunks(user, chunks, assign_count, assignment.reviewers_per_chunk, assignment.min_student_lines, priority_dict):
         task = Task(reviewer=django_user.get_profile(), chunk_id=chunk_id)
         task.save()
         assigned += 1
-        
-    
+
+
     return assigned
 
 def more_tasks(assignment, django_user, total):
     django_profile = django_user.get_profile()
-    
+
     role = _convert_role(django_profile.role)
-    current_task_count = Task.objects.filter(reviewer=django_profile, 
+    current_task_count = Task.objects.filter(reviewer=django_profile,
             chunk__file__submission__assignment=assignment).exclude(status='C').exclude(status='U').count()
     priority_dict = _convert_assignment_to_priority(assignment)
     assign_count = 0
@@ -361,11 +361,11 @@ def more_tasks(assignment, django_user, total):
 
     if not assign_count:
         return assign_count
-        
+
     user_map = load_users()
     user = user_map[django_user.id]
     chunks = load_chunks(assignment, user_map, django_user)
-    
+
     assigned = 0
     for chunk_id in find_chunks(user, chunks, assign_count, assignment.reviewers_per_chunk, assignment.min_student_lines, priority_dict):
         task = Task(reviewer=django_user.get_profile(), chunk_id=chunk_id)

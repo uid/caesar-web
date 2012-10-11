@@ -192,7 +192,7 @@
   padding: 0 5px;
 }
 
-.multi-chunk {
+.multi-chunks {
   padding: 0 5px;
 }
 
@@ -215,4 +215,13 @@
 .task {
   background: #fff;
   margin-left:25px;
+  padding: 0 5px;
+}
+
+.uncompleted-task {
+  background:#DEF;
+}
+
+#toggle-buttons {
+  margin: 15px 0 0 3px;
 }

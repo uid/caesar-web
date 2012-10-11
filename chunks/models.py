@@ -12,6 +12,7 @@ from django.dispatch import receiver
 
 import datetime
 import app_settings
+from collections import defaultdict
 
 class Assignment(models.Model):
     SEMESTER_CHOICES = (
@@ -295,32 +296,48 @@ class Chunk(models.Model):
     def __unicode__(self):
         return u'%s' % (self.name,)
 
-    def list_reviewers(self):
-        return [t.reviewer for t in self.tasks.filter()]
-
-    # returns a tuple of (student_reviewers, alum_reviewers, staff_reviewers)
-    def reviewer_types(self):
-        students = 0; alum = 0; staff = 0
+    def sorted_reviewers(self):
+        students = []; alum = []; staff = []
         for reviewer in self.reviewers.filter():
             if reviewer.is_student():
-                students += 1
+                students.append(reviewer)
             elif reviewer.is_staff():
-                staff += 1
+                staff.append(reviewer)
             else:
-                alum += 1
-        return (students, alum, staff)
+                alum.append(reviewer)
+        return students + alum + staff
 
-    def student_reviewers(self):
-      return self.reviewer_types()[0]
+    def reviewers_comment_str(self, ignore_user=None):
+      comment_count = defaultdict(int)
+      for reviewer in self.reviewers.filter():
+        comment_count[reviewer] = 0
 
-    def alum_reviewers(self):
-      return self.reviewer_types()[1]
+      for comment in self.comments.filter():
+        comment_count[comment.author.profile] += 1
 
-    def staff_reviewers(self):
-      return self.reviewer_types()[2]
+      reviewers_str = ''
+      students = []; alum = []; staff = []
+      for (author, count) in comment_count.items():
+        if ignore_user and author == ignore_user.profile:
+          pass
+
+        if author.is_checkstyle():
+          reviewers_str = 'Checkstyle (%s)' % count
+        elif author.is_student():
+          students.append('%s (%s)' % (author.name(), count))
+        elif author.is_staff():
+          staff.append('%s [T] (%s)' % (author.name(), count))
+        else:
+          alum.append('%s [A] (%s)' % (author.name(), count))
+
+      # if checkstyle made comments and others have commented as well
+      if reviewers_str and len(comment_count) > 1:
+        reviewers_str += ', '
+
+      return reviewers_str + ', '.join(students+alum+staff)
 
     def reviewer_count(self):
-      return len(self.list_reviewers())
+      return len(self.sorted_reviewers())
 
     def comment_count(self):
       return len(self.comments.filter())
