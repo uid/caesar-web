@@ -20,16 +20,18 @@
     <div class='user-chunk'>
 
       <div class = '{% if user_data.submission.chunk_count > 0 %}multi-chunks{% else %} zero-chunk {% endif %}'>
-        <span class='author'>{{user.first_name}} {{user.last_name}}</span>
+        <span class='author'>{{user.first_name}} {{user.last_name}}, {{user.username}}</span>
         <span class='author-role'>{{user.profile.role_str}}</span>
       </div>
 
       {% for task in user_data.tasks %}
-      <div class='task {% if not task.completed %}uncompleted-task{% endif %}'>
+      <div class='task {% if task.completed %}completed-task{% endif %}'>
         {{task.chunk.name}}, by {{task.author.first_name}} {{task.author.last_name}}
 
         <div class='chunk-info'>
-          {{task.chunk.reviewers_comment_str}}
+          {% for reviewers in task.chunk.reviewers_comment_strs %}
+            <span class='info-col {{reviewers.class}} {% if not reviewers.completed %}un{% endif %}completed'>{{reviewers.str}}</span>
+          {% endfor %}
         </div>
 
       </div>
@@ -39,7 +41,9 @@
       <div class='chunk {% if chunk.reviewer_count > 0 %}multi-reviewer-chunk{% else %}zero-reviewer-chunk{% endif %}'>
         <a class='chunk-link' href='/chunks/view/{{chunk.id}}'>{{chunk.name}}</a>
         <div class='chunk-info'>
-          {{chunk.reviewers_comment_str}}
+          {% for reviewers in chunk.reviewers_comment_strs %}
+            <span class='info-col {{reviewers.class}} {% if not reviewers.completed %}un{% endif %}completed'>{{reviewers.str}}</span>
+          {% endfor %}
         </div>
       </div>
       {% endfor %}

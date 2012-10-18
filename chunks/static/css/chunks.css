@@ -164,13 +164,14 @@
 .chunk {
   margin-left: 25px;
   padding: 0 5px;
+  position: relative;
 }
 
 .zero-reviewer-chunk {
-  background: #def;
 }
 
 .multi-reviewer-chunk {
+  background: #def;
 }
 
 .chunk-info {
@@ -216,12 +217,42 @@
   background: #fff;
   margin-left:25px;
   padding: 0 5px;
+  position: relative;
 }
 
-.uncompleted-task {
+.completed-task {
   background:#DEF;
 }
 
 #toggle-buttons {
   margin: 15px 0 0 3px;
+}
+
+.reviewers-col {
+  background: yellow;
+}
+
+.info-col {
+  position: absolute;
+}
+
+.checkstyle-col {
+  left: 30%;
+}
+
+.students-col {
+  left: 42%;
+  padding: 0 10px;
+}
+
+.alumn-col {
+  left: 70%;
+}
+
+.staff-col {
+  left: 83%;
+}
+
+.uncompleted {
+  background-color: white;
 }

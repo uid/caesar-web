@@ -1,5 +1,7 @@
 import textwrap
 
+import tasks
+
 from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
@@ -307,7 +309,7 @@ class Chunk(models.Model):
                 alum.append(reviewer)
         return students + alum + staff
 
-    def reviewers_comment_str(self, ignore_user=None):
+    def reviewers_comment_strs(self, ignore_user=None):
       comment_count = defaultdict(int)
       for reviewer in self.reviewers.filter():
         comment_count[reviewer] = 0
@@ -315,26 +317,26 @@ class Chunk(models.Model):
       for comment in self.comments.filter():
         comment_count[comment.author.profile] += 1
 
-      reviewers_str = ''
+      checkstyle_str = ''
       students = []; alum = []; staff = []
+      students_completed = alum_completed = staff_completed = False
       for (author, count) in comment_count.items():
         if ignore_user and author == ignore_user.profile:
           pass
 
         if author.is_checkstyle():
-          reviewers_str = 'Checkstyle (%s)' % count
+          checkstyle_str = 'Checkstyle (%s)' % count
         elif author.is_student():
-          students.append('%s (%s)' % (author.name(), count))
+          students.append('%s (%s)' % (author.user.username, count))
+          students_completed = students_completed or tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)[0].completed
         elif author.is_staff():
-          staff.append('%s [T] (%s)' % (author.name(), count))
+          staff.append('%s [T] (%s)' % (author.user.username, count))
+          staff_completed = staff_completed or tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)[0].completed
         else:
-          alum.append('%s [A] (%s)' % (author.name(), count))
+          alum.append('%s [A] (%s)' % (author.user.username, count))
+          alum_completed = alum_completed or tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)[0].completed
 
-      # if checkstyle made comments and others have commented as well
-      if reviewers_str and len(comment_count) > 1:
-        reviewers_str += ', '
-
-      return reviewers_str + ', '.join(students+alum+staff)
+      return ({'class': 'checkstyle-col', 'str': checkstyle_str, 'completed': True}, {'class': 'students-col', 'str':', '.join(students), 'completed': students_completed}, {'class': 'alum-col', 'str': ', '.join(alum), 'completed': alum_completed}, {'class': 'staff-col', 'str': ', '.join(staff), 'completed': staff_completed})
 
     def reviewer_count(self):
       return len(self.sorted_reviewers())
