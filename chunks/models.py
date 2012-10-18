@@ -323,6 +323,9 @@ class Chunk(models.Model):
       for (author, count) in comment_count.items():
         if ignore_user and author == ignore_user.profile:
           pass
+
+        if author.is_student():
+          students.append('%s [S] (%s)' % (author.user.username, count))
           if not students_completed:
             curr_tasks = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
             students_completed = curr_tasks and curr_tasks[0].completed
