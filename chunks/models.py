@@ -323,18 +323,19 @@ class Chunk(models.Model):
       for (author, count) in comment_count.items():
         if ignore_user and author == ignore_user.profile:
           pass
-
-        if author.is_checkstyle():
-          checkstyle_str = 'Checkstyle (%s)' % count
-        elif author.is_student():
-          students.append('%s (%s)' % (author.user.username, count))
-          students_completed = students_completed or tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)[0].completed
+          if not students_completed:
+            curr_tasks = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
+            students_completed = curr_tasks and curr_tasks[0].completed
         elif author.is_staff():
           staff.append('%s [T] (%s)' % (author.user.username, count))
-          staff_completed = staff_completed or tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)[0].completed
+          if not staff_completed:
+            curr_tasks = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
+            staff_completed = curr_tasks and curr_tasks[0].completed
         else:
           alum.append('%s [A] (%s)' % (author.user.username, count))
-          alum_completed = alum_completed or tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)[0].completed
+          if not alum_completed:
+            curr_tasks = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
+            alum_completed = curr_tasks and curr_tasks[0].completed
 
       return ({'class': 'checkstyle-col', 'str': checkstyle_str, 'completed': True}, {'class': 'students-col', 'str':', '.join(students), 'completed': students_completed}, {'class': 'alum-col', 'str': ', '.join(alum), 'completed': alum_completed}, {'class': 'staff-col', 'str': ', '.join(staff), 'completed': staff_completed})
 
