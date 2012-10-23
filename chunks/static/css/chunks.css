@@ -165,21 +165,18 @@
   margin-left: 25px;
   padding: 0 5px;
   position: relative;
+  overflow: auto;
 }
 
 .zero-reviewer-chunk {
 }
 
 .multi-reviewer-chunk {
-  background: #def;
-}
-
-.chunk-info {
-  float: right;
 }
 
 .chunk-info {
   display: inline;
+  float: right;
 }
 
 .user-chunk {
@@ -189,12 +186,22 @@
 }
 
 .zero-chunk {
-  background: #f0f0f0;
-  padding: 0 5px;
+  background: #ffc;
 }
 
 .multi-chunks {
+}
+
+.chunks {
   padding: 0 5px;
+}
+
+.last-task {
+  margin-bottom: 12px;
+}
+
+.last-chunk{
+  margin-bottom: 12px;
 }
 
 .chunk-link {
@@ -210,14 +217,15 @@
 }
 
 .author-role {
-  float: right;
+  left: 35%;
+  position: absolute;
 }
 
 .task {
   background: #fff;
   margin-left:25px;
   padding: 0 5px;
-  position: relative;
+  overflow: auto;
 }
 
 .completed-task {
@@ -229,30 +237,18 @@
 }
 
 .reviewers-col {
-  background: yellow;
-}
-
-.info-col {
-  position: absolute;
-}
-
-.checkstyle-col {
-  left: 30%;
-}
-
-.students-col {
-  left: 42%;
-  padding: 0 10px;
-}
-
-.alum-col {
-  left: 70%;
-}
-
-.staff-col {
-  left: 83%;
+  float: left;
+  width: 150px;
 }
 
 .uncompleted {
   background-color: white;
+}
+
+.uncompleted {
+  background-color: white;
+}
+
+.completed {
+  background-color: #def;
 }

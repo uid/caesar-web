@@ -19,18 +19,22 @@
     {% with user_data=data|get_item:user.id %}
     <div class='user-chunk'>
 
-      <div class = '{% if user_data.submission.chunk_count > 0 %}multi-chunks{% else %} zero-chunk {% endif %}'>
+      <div class = 'chunks {% if user_data.submission.chunk_count > 0 %}multi-chunks{% else %} zero-chunk {% endif %}'>
         <span class='author'>{{user.first_name}} {{user.last_name}}, {{user.username}}</span>
         <span class='author-role'>{{user.profile.role_str}}</span>
       </div>
 
       {% for task in user_data.tasks %}
-      <div class='task {% if task.completed %}completed-task{% endif %}'>
-        {{task.chunk.name}}, by {{task.author.first_name}} {{task.author.last_name}}
+      <div class='task {% if task.completed %}completed-task{% endif %} {% if forloop.last %}last-task{% endif %}'>
+        <span><a class='chunk-link' href='/chunks/view/{{task.chunk.id}}'>{{task.chunk.name}}</a>, by {{task.author.first_name}} {{task.author.last_name}}</span>
 
         <div class='chunk-info'>
-          {% for reviewers in task.chunk.reviewers_comment_strs %}
-            <span class='info-col {{reviewers.class}} {% if not reviewers.completed %}un{% endif %}completed'>{{reviewers.str}}</span>
+          {% for reviewer_group in task.chunk.reviewers_comment_strs %}
+            <div class='reviewers-col'>
+              {% for reviewer in reviewer_group %}
+                <div class='{% if not reviewer.completed %}un{% endif %}completed'>{{reviewer.username}} [{{reviewer.count}}]</div>
+              {% endfor %}
+            </div>
           {% endfor %}
         </div>
 
@@ -38,11 +42,15 @@
       {% endfor %}
 
       {% for chunk in user_data.submission.chunks %}
-      <div class='chunk {% if chunk.reviewer_count > 0 %}multi-reviewer-chunk{% else %}zero-reviewer-chunk{% endif %}'>
-        <a class='chunk-link' href='/chunks/view/{{chunk.id}}'>{{chunk.name}}</a>
+      <div class='chunk {% if chunk.reviewer_count > 0 %}multi-reviewer-chunk{% else %}zero-reviewer-chunk{% endif %} {% if forloop.last %}last-chunk{% endif %}'>
+        <span><a class='chunk-link' href='/chunks/view/{{chunk.id}}'>{{chunk.name}}</a>, by this student</span>
         <div class='chunk-info'>
-          {% for reviewers in chunk.reviewers_comment_strs %}
-            <span class='info-col {{reviewers.class}} {% if not reviewers.completed %}un{% endif %}completed'>{{reviewers.str}}</span>
+          {% for reviewer_group in chunk.reviewers_comment_strs %}
+            <div class='reviewers-col'>
+              {% for reviewer in reviewers %}
+                <div class='{% if not reviewer.completed %}un{% endif %}completed'>{{reviewer.username}} [{{reviewer.count}}]</div>
+              {% endfor %}
+            </div>
           {% endfor %}
         </div>
       </div>

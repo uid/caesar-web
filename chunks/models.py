@@ -317,30 +317,28 @@ class Chunk(models.Model):
       for comment in self.comments.filter():
         comment_count[comment.author.profile] += 1
 
-      checkstyle_str = ''
-      students = []; alum = []; staff = []
-      students_completed = alum_completed = staff_completed = False
+      checkstyle = []; students = []; alum = []; staff = []
       for (author, count) in comment_count.items():
         if ignore_user and author == ignore_user.profile:
           pass
 
-        if author.is_student():
-          students.append('%s [S] (%s)' % (author.user.username, count))
-          if not students_completed:
-            curr_tasks = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
-            students_completed = curr_tasks and curr_tasks[0].completed
-        elif author.is_staff():
-          staff.append('%s [T] (%s)' % (author.user.username, count))
-          if not staff_completed:
-            curr_tasks = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
-            staff_completed = curr_tasks and curr_tasks[0].completed
-        else:
-          alum.append('%s [A] (%s)' % (author.user.username, count))
-          if not alum_completed:
-            curr_tasks = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
-            alum_completed = curr_tasks and curr_tasks[0].completed
+        author_task = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
+        author_dict = {
+          'username': author.user.username,
+          'count': count,
+          'completed': (not author_task) or author_task[0].completed,
+          }
 
-      return ({'class': 'checkstyle-col', 'str': checkstyle_str, 'completed': True}, {'class': 'students-col', 'str':', '.join(students), 'completed': students_completed}, {'class': 'alum-col', 'str': ', '.join(alum), 'completed': alum_completed}, {'class': 'staff-col', 'str': ', '.join(staff), 'completed': staff_completed})
+        if author.is_student():
+          students.append(author_dict)
+        elif author.is_staff():
+          staff.append(author_dict)
+        elif author.is_checkstyle():
+          checkstyle.append(author_dict)
+        else:
+          alum.append(author_dict)
+
+      return [checkstyle, students, alum, staff]
 
     def reviewer_count(self):
       return len(self.sorted_reviewers())
