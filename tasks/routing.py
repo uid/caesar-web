@@ -294,59 +294,57 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         else:
             return
 
-def assign_tasks(assignment, django_user):
+def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map={}, max_tasks=None):
     """
-    Assigns chunks to the user for review, if the user does not have enough.
-
-    Returns the number of chunks assigned.
+    Returns a list of tasks that should be assigned to the given reviewer.
+    assignment: assignment that tasks should be generated for
+    reviewer: user object to create more tasks for
+    chunk_map: map of chunk ids to chunk object returned by load_chunks. If simulating routing, use the same chunk_map object each time.
+    chunk_id_task_map: map of chunk ids to lists of the assigned tasks. If simulating routing, use the same chunk_id_task_map each time.
     """
-    django_profile = django_user.get_profile()
-    current_task_count = Task.objects.filter(reviewer=django_profile,
-            chunk__file__submission__assignment=assignment).count()
 
-    role = _convert_role(django_profile.role)
-    priority_dict = _convert_assignment_to_priority(assignment)
-    #get the assignment count from Assignment
-    assign_count = _convert_role_to_count(assignment, role) - current_task_count
-    if assign_count <= 0:
-        return 0
+    unfinished_task_count = Task.objects.filter(reviewer=reviewer, chunk__file__submission__assignment=assignment).exclude(status='C').count()
+    num_tasks_to_assign = unfinished_task_count - assignment.num_tasks_for_user(reviewer)
+    if num_tasks_to_assign <= 0:
+      return []
 
-    user_map = load_users()
-    user = user_map[django_user.id]
-    chunks = load_chunks(assignment, user_map, django_user)
+    num_tasks_to_assign = min(num_tasks_to_assign, max_tasks)
 
-    assigned = 0
-    for chunk_id in find_chunks(user, chunks, assign_count, assignment.reviewers_per_chunk, assignment.min_student_lines, priority_dict):
-        task = Task(reviewer=django_user.get_profile(), chunk_id=chunk_id)
-        task.save()
-        assigned += 1
+    chunk_type_priorities = _convert_assignment_to_priority(assignment)
 
+    tasks = []
+    for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, assignment.reviewers_per_chunk, assignment.min_student_lines, chunk_type_priorities):
+      task = Task(reviewer=reviewer.profile(), chunk_id=chunk_id)
 
-    return assigned
+      chunk_id_task_map.get(chunk_id, []).append(task)
+      chunk_map[chunk_id].reviewers.append(reviewer)
+      chunk_map[chunk_id].submission.reviewers.append(reviewer)
+      tasks.append(task)
 
-def more_tasks(assignment, django_user, total):
-    django_profile = django_user.get_profile()
+    return tasks
 
-    role = _convert_role(django_profile.role)
-    current_task_count = Task.objects.filter(reviewer=django_profile,
-            chunk__file__submission__assignment=assignment).exclude(status='C').exclude(status='U').count()
-    priority_dict = _convert_assignment_to_priority(assignment)
-    assign_count = 0
-    if not current_task_count:
-        assign_count = total
+def assign_tasks(assignment, reviewer, max_tasks=None):
+  user_map = load_users()
+  chunks = load_chunks(assignment, user_map, reviewer)
+  chunk_map = {}
+  for chunk in chunks:
+    chunk_map[chunk.id] = chunk
 
-    if not assign_count:
-        return assign_count
+  tasks = _generate_tasks(assignment, reviewer, chunk_map, max_tasks=max_tasks)
 
-    user_map = load_users()
-    user = user_map[django_user.id]
-    chunks = load_chunks(assignment, user_map, django_user)
+  [task.save() for task in tasks]
 
-    assigned = 0
-    for chunk_id in find_chunks(user, chunks, assign_count, assignment.reviewers_per_chunk, assignment.min_student_lines, priority_dict):
-        task = Task(reviewer=django_user.get_profile(), chunk_id=chunk_id)
-        task.save()
-        assigned += 1
+  return len(tasks)
 
+def simulate_tasks(assignment):
+  user_map = load_users()
+  chunks = load_chunks(assignment, user_map, reviewer)
+  chunk_map = {}
+  for chunk in chunks:
+    chunk_map[chunk.id] = chunk
+  chunk_id_task_map = {}
 
-    return assigned
+  for reviewer in user_map.values():
+    _generate_tasks(assignment, user_map[reviewer.id], chunk_map, chunk_id_task_map=chunk_id_task_map)
+
+  return chunk_id_task_map

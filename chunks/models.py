@@ -61,6 +61,14 @@ class Assignment(models.Model):
     def is_life_assignment(self):
         return datetime.datetime.now() < submission.assignment.code_review_end_date and self.is_live
 
+    def num_tasks_for_user(self, user):
+      if user.profile.is_student():
+        return self.student_count
+      elif user.profile.is_staff():
+        return self.staff_count
+      else:
+        return self.alum_count
+
 @receiver(post_save, sender=Assignment)
 def create_current_assignment(sender, instance, created, **kwargs):
     if created:

@@ -11,7 +11,7 @@ from django.http import HttpResponse, Http404
 
 from chunks.models import Chunk, Assignment, Submission, StaffMarker
 from tasks.models import Task
-from tasks.routing import assign_tasks, more_tasks
+from tasks.routing import assign_tasks
 from models import Comment, Vote, Star
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.models import UserProfile
@@ -31,6 +31,7 @@ def dashboard(request):
     open_assignments = False
     for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now(), is_live=True):
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
+        new_task_count += assign_tasks(assignment, user)
         #do not give tasks to students who got extensions
         if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
             open_assignments = True
@@ -634,7 +635,7 @@ def more_work(request):
                 active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
                 #do not give tasks to students who got extensions
                 if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
-                    total += more_tasks(assignment, user, 2)
+                    total += assign_tasks(assignment, user, max_tasks=2)
             active_tasks = user.get_profile().tasks \
                 .select_related('chunk__file__submission_assignment') \
                 .exclude(status='C') \
