@@ -294,30 +294,6 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         else:
             return
 
-def assign_many_tasks(assignment, django_users):
-    user_map = load_users()
-    chunks = load_chunks(assignment, user_map, 0)
-    assigned_list = []
-    priority_dict = _convert_assignment_to_priority(assignment)
-    for django_user in django_users:
-        print django_user.username
-        django_profile = django_user.get_profile()
-        current_task_count = Task.objects.filter(reviewer=django_profile,
-                chunk__file__submission__assignment=assignment).count()
-
-        role = _convert_role(django_profile.role)
-        assign_count = _convert_role_to_count(assignment, role) - current_task_count
-        if assign_count <= 0:
-            continue
-        user = user_map[django_user.id]
-        assigned = 0
-        for chunk_id in find_chunks(user, chunks, assign_count, assignment.reviewers_per_chunk, assignment.min_student_lines, priority_dict):
-            task = Task(reviewer=django_user.get_profile(), chunk_id=chunk_id)
-            task.save()
-            assigned += 1
-        assigned_list.append((django_user.username, assigned))
-    return assigned_list
-
 def assign_tasks(assignment, django_user):
     """
     Assigns chunks to the user for review, if the user does not have enough.
