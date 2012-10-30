@@ -62,9 +62,9 @@ class Assignment(models.Model):
         return datetime.datetime.now() < submission.assignment.code_review_end_date and self.is_live
 
     def num_tasks_for_user(self, user):
-      if user.profile.is_student():
+      if user.role == 'student':
         return self.student_count
-      elif user.profile.is_staff():
+      elif user.role == 'staff':
         return self.staff_count
       else:
         return self.alum_count
@@ -200,6 +200,8 @@ class Chunk(models.Model):
 
     staff_portion = models.IntegerField(default = 0)
 
+    simulated_tasks = None
+
     objects = ChunkManager()
     class Meta:
         db_table = u'chunks'
@@ -317,34 +319,30 @@ class Chunk(models.Model):
                 alum.append(reviewer)
         return students + alum + staff
 
-    def reviewers_comment_strs(self, ignore_user=None):
+    def reviewers_comment_strs(self, tasks=None):
       comment_count = defaultdict(int)
-      for reviewer in self.reviewers.filter():
-        comment_count[reviewer] = 0
-
-      for comment in self.comments.filter():
+      for comment in self.comments.all():
         comment_count[comment.author.profile] += 1
 
-      checkstyle = []; students = []; alum = []; staff = []
-      for (author, count) in comment_count.items():
-        if ignore_user and author == ignore_user.profile:
-          pass
+      if not tasks:
+        tasks = self.tasks.all()
 
-        author_task = tasks.models.Task.objects.filter(chunk=self.id, reviewer=author.id)
-        author_dict = {
-          'username': author.user.username,
-          'count': count,
-          'completed': (not author_task) or author_task[0].completed,
+      checkstyle = []; students = []; alum = []; staff = []
+      for task in tasks:
+        user_task_dict = {
+          'username': task.reviewer.user.username,
+          'count': comment_count[task.reviewer],
+          'completed': task.completed,
           }
 
-        if author.is_student():
-          students.append(author_dict)
-        elif author.is_staff():
-          staff.append(author_dict)
-        elif author.is_checkstyle():
-          checkstyle.append(author_dict)
+        if task.reviewer.is_student():
+          students.append(user_task_dict)
+        elif task.reviewer.is_staff():
+          staff.append(user_task_dict)
+        elif task.reviewer.is_checkstyle():
+          checkstyle.append(user_task_dict)
         else:
-          alum.append(author_dict)
+          alum.append(user_task_dict)
 
       return [checkstyle, students, alum, staff]
 

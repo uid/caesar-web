@@ -14,6 +14,10 @@ import app_settings
 
 __all__ = ['assign_tasks']
 
+#todo: remove
+import logging
+logger = logging.getLogger(__name__)
+
 # WARNING: These classes shadow the names of the actual model objects
 # that they represent. This is deliberate. I am sorry.
 class User:
@@ -294,7 +298,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         else:
             return
 
-def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map={}, max_tasks=None):
+def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map={}, max_tasks=sys.maxint):
     """
     Returns a list of tasks that should be assigned to the given reviewer.
     assignment: assignment that tasks should be generated for
@@ -303,9 +307,11 @@ def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map={}, max_
     chunk_id_task_map: map of chunk ids to lists of the assigned tasks. If simulating routing, use the same chunk_id_task_map each time.
     """
 
-    unfinished_task_count = Task.objects.filter(reviewer=reviewer, chunk__file__submission__assignment=assignment).exclude(status='C').count()
-    num_tasks_to_assign = unfinished_task_count - assignment.num_tasks_for_user(reviewer)
+    unfinished_task_count = Task.objects.filter(reviewer=reviewer.id, chunk__file__submission__assignment=assignment).exclude(status='C').count()
+    num_tasks_to_assign = assignment.num_tasks_for_user(reviewer) - unfinished_task_count
+    logger.info(num_tasks_to_assign)
     if num_tasks_to_assign <= 0:
+      logger.info("returning, no tasks to assign")
       return []
 
     num_tasks_to_assign = min(num_tasks_to_assign, max_tasks)
@@ -314,11 +320,12 @@ def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map={}, max_
 
     tasks = []
     for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, assignment.reviewers_per_chunk, assignment.min_student_lines, chunk_type_priorities):
-      task = Task(reviewer=reviewer.profile(), chunk_id=chunk_id)
+      logger.info('chunk: ' + str(chunk_id))
+      task = Task(reviewer_id=reviewer.id, chunk_id=chunk_id)
 
-      chunk_id_task_map.get(chunk_id, []).append(task)
-      chunk_map[chunk_id].reviewers.append(reviewer)
-      chunk_map[chunk_id].submission.reviewers.append(reviewer)
+      chunk_id_task_map[chunk_id].append(task)
+      chunk_map[chunk_id].reviewers.add(reviewer)
+      chunk_map[chunk_id].submission.reviewers.add(reviewer)
       tasks.append(task)
 
     return tasks
@@ -336,15 +343,23 @@ def assign_tasks(assignment, reviewer, max_tasks=None):
 
   return len(tasks)
 
-def simulate_tasks(assignment):
+def simulate_tasks(assignment, num_students, num_staff, num_alum):
   user_map = load_users()
-  chunks = load_chunks(assignment, user_map, reviewer)
+  chunks = load_chunks(assignment, user_map, None)
   chunk_map = {}
   for chunk in chunks:
     chunk_map[chunk.id] = chunk
-  chunk_id_task_map = {}
+  chunk_id_task_map = defaultdict(list)
 
-  for reviewer in user_map.values():
+  #for i in range(0, num_students + num_staff + num_alum):
+  #  if i < num_students:
+  #    reviewer =
+  #  elif i < num_students + num_staff:
+  #    reviewer =
+  #  else:
+  #    reviewer =
+  for reviewer in user_map.values()[0:4]:
+    logger.info('reviewer: ' + str(reviewer))
     _generate_tasks(assignment, user_map[reviewer.id], chunk_map, chunk_id_task_map=chunk_id_task_map)
 
   return chunk_id_task_map

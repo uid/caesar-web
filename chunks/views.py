@@ -1,6 +1,8 @@
 from chunks.models import Chunk, File, Assignment, Submission, StaffMarker
+from chunks.forms import SimulateRoutingForm
 from review.models import Comment, Vote, Star
 from tasks.models import Task
+from tasks.routing import simulate_tasks
 
 from django.http import Http404
 from django.shortcuts import render, get_object_or_404, redirect
@@ -18,6 +20,11 @@ import os
 import subprocess
 import datetime
 import sys
+from collections import defaultdict
+
+#todo: remove
+import logging
+logger = logging.getLogger(__name__)
 
 @login_required
 def view_chunk(request, chunk_id):
@@ -387,7 +394,9 @@ def simualte(request, assignment_id):
 
 @login_required
 def list_users(request, assignment_id):
-  def cmp_users(user1, user2):
+  def cmp_user_data(user_data1, user_data2):
+    user1 = user_data1['user']
+    user2 = user_data2['user']
     if user1.profile.role == user2.profile.role:
       return cmp(user1.first_name, user2.first_name)
     if user1.profile.is_student():
@@ -398,22 +407,96 @@ def list_users(request, assignment_id):
       return 1
     return -1
 
+  def task_dict(task):
+    return {
+        'completed': task.completed,
+        'chunk': task.chunk,
+        'author': task.author(),
+        'reviewer': task.reviewer,
+        'reviewers_dicts': None,
+        }
+  def chunk_dict(chunk):
+    return {
+        'reviewer-count': chunk.reviewer_count,
+        'id': chunk.id,
+        'name': chunk.name,
+        'reviewers_dicts': None,
+        'tasks': chunk.tasks.all(),
+        }
+
+  def reviewers_comment_strs(chunk=None, tasks=None):
+    comment_count = defaultdict(int)
+    if chunk and (not tasks or len(tasks) == 0):
+      for comment in chunk.comments.all():
+        comment_count[comment.author.profile] += 1
+
+    if chunk and (not tasks or len(tasks) == 0):
+      tasks = chunk.tasks.all()
+
+    checkstyle = []; students = []; alum = []; staff = []
+    for task in tasks:
+      user_task_dict = {
+        'username': task.reviewer.user.username,
+        'count': comment_count[task.reviewer],
+        'completed': task.completed,
+        }
+
+      if task.reviewer.is_student():
+        students.append(user_task_dict)
+      elif task.reviewer.is_staff():
+        staff.append(user_task_dict)
+      elif task.reviewer.is_checkstyle():
+        checkstyle.append(user_task_dict)
+      else:
+        alum.append(user_task_dict)
+
+    return [checkstyle, students, alum, staff]
+
   assignment = Assignment.objects.get(id=assignment_id)
   submissions = Submission.objects.filter(assignment=assignment_id)
-
-  users = []
   data = {}
+  chunk_task_map = defaultdict(list)
+  chunk_map = {}
+  form = None
+
   for submission in submissions:
-    if submission.author.id not in data:
-      users.append(submission.author)
-      data[submission.author.id] = {'tasks': []}
-    data[submission.author.id]['submission'] = submission
-
+    data[submission.author.id] = {'tasks': [], 'user': submission.author, 'chunks': [chunk_dict(chunk) for chunk in submission.chunks()], 'submission': submission}
     for chunk in submission.chunks():
-      for task in chunk.tasks.filter():
-        if task.reviewer.user.id not in data:
-          users.append(task.reviewer.user)
-          data[task.reviewer.user.id] = {'tasks': []}
-        data[task.reviewer.user.id]['tasks'].append(task)
+      chunk_map[chunk.id] = chunk
 
-  return render(request, 'chunks/list_users.html', {'users': sorted(users, cmp=cmp_users), 'data': data})
+  if request.method == 'POST':
+    form = SimulateRoutingForm(request.POST)
+
+  if form: #and form.is_valid():
+    #chunk_task_map = simulate_tasks(assignment, form.cleaned_data['num_students'], form.cleaned_data['num_staff'], form.cleaned_data['num_alum'])
+    chunk_task_map = simulate_tasks(assignment, 0, 0, 0)
+
+    for (chunk_id, tasks) in chunk_task_map.iteritems():
+      for task in tasks:
+        if task.reviewer.user.id not in data:
+          data[task.reviewer.user.id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
+        else:
+          data[task.reviewer.user.id]['tasks'].append(task_dict(task))
+
+  else:
+    for user_id in data.keys():
+      for chunk in data[user_id]['chunks']:
+        chunk_task_map[chunk['id']] = chunk['tasks']
+        for task in chunk['tasks']:
+          user_id = task.reviewer.user.id
+          if user_id not in data:
+            data[user_id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
+          else:
+            data[user_id]['tasks'].append(task_dict(task))
+
+  chunk_reviewers_map = defaultdict(list)
+  for (chunk_id, tasks) in chunk_task_map.iteritems():
+    chunk_reviewers_map[chunk_id] = reviewers_comment_strs(chunk=chunk_map.get(chunk_id), tasks=tasks)
+
+  for user_data in data.values():
+    for chunk in user_data['chunks']:
+      chunk['reviewers_dicts'] = chunk_reviewers_map[chunk['id']]
+    for task in user_data['tasks']:
+      task['reviewers_dicts'] = chunk_reviewers_map[task['chunk'].id]
+
+  return render(request, 'chunks/list_users.html', {'users_data': sorted(data.values(), cmp=cmp_user_data), 'form': SimulateRoutingForm()})
