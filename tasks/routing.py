@@ -226,11 +226,16 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
 
 
     def make_chunk_sort_key(user):
-        if user.role == 'staff':
-            def chunk_sort_key(chunk):
+        def chunk_sort_key(chunk):
                 review_priority = len(chunk.reviewers)
-                if len(chunk.reviewers) <= reviewers_per_chunk:
-                    review_priority = -1 * len(chunk.reviewers)
+
+		if user.role == 'staff':
+			if len(chunk.reviewers) <= reviewers_per_chunk:
+				review_priority = -1 * len(chunk.reviewers)
+		else:
+			if len(chunk.reviewers) < reviewers_per_chunk:
+				review_priority = 0
+
                 if chunk.student_lines <= min_student_lines:
                     review_priority = 15
 
@@ -248,42 +253,13 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
                     user is chunk.submission.author,
                     review_priority,
                     type_priority,
-                    -total_affinity(user, chunk.submission.reviewers),
-                    -total_affinity(user, chunk.reviewers),
-                    len(chunk.submission.reviewers),
-#                    -1*(chunk.return_count + chunk.for_nesting_depth + chunk.if_nesting_depth),
-
-                )
-            return chunk_sort_key
-        else:
-            def chunk_sort_key(chunk):
-                review_priority = len(chunk.reviewers)
-                if len(chunk.reviewers) < reviewers_per_chunk:
-                    review_priority = 0
-                if chunk.student_lines <= min_student_lines:
-                    review_priority = 15
-
-                type_priority = 0
-                if chunk.name in priority_dict:
-                    type_priority = priority_dict[chunk.name]
-                elif chunk.class_type == 'TEST' and "StudentDefinedTests" in priority_dict:
-                    type_priority = priority_dict["StudentDefinedTests"]
-                elif chunk.class_type == 'NONE' and "StudentDefinedClasses" in priority_dict:
-                    type_priority = priority_dict["StudentDefinedClasses"]
-                else:
-                    type_priority = 20
-                return (
-                    user in chunk.reviewers,
-                    user is chunk.submission.author,
-                    review_priority,
-                    type_priority,
-		            -total_affinity(user, chunk.submission.reviewers),
+		    -total_affinity(user, chunk.submission.reviewers),
                     -total_affinity(user, chunk.reviewers),
                     len(chunk.submission.reviewers),
 #                    -1*(chunk.return_count + chunk.for_nesting_depth + chunk.if_nesting_depth),
                     -(chunk.student_lines if chunk.student_lines != None else 0),
                 )
-            return chunk_sort_key
+	return chunk_sort_key
 
     key = make_chunk_sort_key(user)
 
@@ -358,7 +334,7 @@ def simulate_tasks(assignment, num_students, num_staff, num_alum):
   #    reviewer =
   #  else:
   #    reviewer =
-  for reviewer in user_map.values()[0:4]:
+  for reviewer in user_map.values():
     logger.info('reviewer: ' + str(reviewer))
     _generate_tasks(assignment, user_map[reviewer.id], chunk_map, chunk_id_task_map=chunk_id_task_map)
 
