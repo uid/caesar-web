@@ -7,34 +7,6 @@ from accounts.models import UserProfile
 from chunks.models import Chunk
 import app_settings
 
-class TaskManager(models.Manager):
-    def assign_tasks(self, assignment, user):
-        """
-        Assigns chunks to the user for review, if the user does not have enough.
-
-        Returns the number of chunks assigned.
-        """
-        reviewer = user.get_profile()
-        current_task_count = Task.objects.filter(reviewer=reviewer,
-                chunk__file__submission__assignment=assignment).count()
-
-        assign_count = app_settings.CHUNKS_PER_REVIEWER - current_task_count
-        if assign_count <= 0:
-            return assign_count
-
-        # FIXME this query will probably need to be optimized
-        chunks = Chunk.objects.exclude(file__submission__name=user.username) \
-            .filter(file__submission__assignment=assignment) \
-            .exclude(tasks__reviewer=reviewer) \
-            .annotate(reviewer_count=Count('tasks')) \
-            .filter(reviewer_count__lt=app_settings.REVIEWERS_PER_CHUNK) \
-            .order_by('-reviewer_count')[0:assign_count]
-        for chunk in chunks:
-            task = Task(reviewer=user.get_profile(), chunk=chunk)
-            task.save()
-
-        return assign_count
-
 class Task(models.Model):
     STATUS_CHOICES=(
         ('N', 'New'),
@@ -52,7 +24,6 @@ class Task(models.Model):
     opened = models.DateTimeField(blank=True, null=True)
     started = models.DateTimeField(blank=True, null=True)
     completed = models.DateTimeField(blank=True, null=True)
-    objects = TaskManager()
     class Meta:
         unique_together = ('chunk', 'reviewer',)
 
