@@ -634,7 +634,7 @@ def more_work(request):
                 active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
                 #do not give tasks to students who got extensions
                 if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
-                    total += assign_tasks(assignment, user, max_tasks=2)
+                    total += assign_tasks(assignment, user, max_tasks=2, assign_more=True)
             active_tasks = user.get_profile().tasks \
                 .select_related('chunk__file__submission_assignment') \
                 .exclude(status='C') \

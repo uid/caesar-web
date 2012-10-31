@@ -22,10 +22,6 @@ import datetime
 import sys
 from collections import defaultdict
 
-#todo: remove
-import logging
-logger = logging.getLogger(__name__)
-
 @login_required
 def view_chunk(request, chunk_id):
     user = request.user
