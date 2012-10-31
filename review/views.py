@@ -136,9 +136,9 @@ def student_stats(request):
         total_student_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(author__profile__role='S').count()
         total_user_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='U').count()
         total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
+        zero_chunk_users = len(filter(lambda count: count == 0, [len(submission.chunks()) for submission in assignment.submissions.all()]))
 
-        assignment_data.append( (assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human,
-                                total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments) )
+        assignment_data.append( (assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, zero_chunk_users) )
     return render(request, 'review/studentstats.html', {
         'assignment_data': assignment_data,
         'total_students': total_students,

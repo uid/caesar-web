@@ -21,8 +21,7 @@
 <h2 class="task-header">Total Alums: {{ total_alums }}</h2>
 <h2 class="task-header">Total Staff: {{ total_staff }}</h2>
 
-
-{% for assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments  in assignment_data %}
+{% for assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, zero_chunk_users  in assignment_data %}
     <h2 class="task-header">{{ assignment.name }} - {{ assignment.get_semester_display }} 
       <a href="/chunks/simulate/{{assignment.id}}"> configure routing</a>
       <a href="/chunks/list_users/{{assignment.id}}"> list users</a>
@@ -34,6 +33,7 @@
     <h4 class="task header"> assigned_chunks: {{ assigned_chunks }} </h4>
     <h4 class="task header"> total chunks with human comment: {{ total_chunks_with_human }} </h4>
     <h4 class="task header"> total comments: {{total_comments}}  --> checkstyle: {{total_checkstyle}} | user: {{total_user_comments}} | alum: {{total_alum_comments}} | student: {{total_student_comments}} | staff: {{total_staff_comments}}</h4>
+    <h4 class="task header"> number of students with a submission but no chunks: {{ zero_chunk_users }} </h4>
     
 {%endfor %}
 {% endblock %}
