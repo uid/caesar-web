@@ -114,6 +114,7 @@ def create_current_assignment(sender, instance, created, **kwargs):
 
 class Batch(models.Model):
     assignment = models.ForeignKey(Assignment, related_name='batches')
+    is_live = models.BooleanField(default=False)
 
     class Meta:
       verbose_name_plural = 'batches'
