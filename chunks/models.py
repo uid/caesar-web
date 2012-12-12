@@ -112,6 +112,13 @@ def create_current_assignment(sender, instance, created, **kwargs):
         instance.save()
 
 
+class Batch(models.Model):
+    assignment = models.ForeignKey(Assignment, related_name='batches')
+
+    class Meta:
+      verbose_name_plural = 'batches'
+
+
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
@@ -122,6 +129,8 @@ class Submission(models.Model):
     revision = models.IntegerField(null=True, blank=True)
     revision_date = models.DateTimeField(null=True, blank=True)
     duedate = models.DateTimeField(null=True, blank=True)
+    batch = models.ForeignKey(Batch, blank=True, null=True, related_name='submissions')
+
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
