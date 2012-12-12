@@ -197,8 +197,9 @@ class Chunk(models.Model):
     modified = models.DateTimeField(auto_now=True)
     class_type = models.CharField(max_length=4, choices=CLASS_TYPE_CHOICES,
                             blank=True, null=True)
-
-    staff_portion = models.IntegerField(default = 0)
+    staff_portion = models.IntegerField(default=0)
+    student_lines = models.IntegerField(default=0)
+    chunk_info = models.TextField(blank=True, null=True)
 
     simulated_tasks = None
 
@@ -352,35 +353,6 @@ class Chunk(models.Model):
     def comment_count(self):
       return len(self.comments.filter())
 
-
-class ChunkProfile(models.Model):
-    id = models.AutoField(primary_key=True)
-    chunk = models.OneToOneField(Chunk, related_name='profile')
-    for_nesting_depth = models.IntegerField(blank=True, null=True) #deepest for loop count
-    if_nesting_depth = models.IntegerField(blank=True, null=True) #deepest if count
-    synchronized_count = models.IntegerField(blank=True, null=True)
-    valid = models.BooleanField(blank=True, default=False)
-    viable_comments = models.IntegerField(blank=True, null=True)
-    static_comments = models.IntegerField(blank=True, null=True)
-    comment_words = models.IntegerField(blank=True, null=True)
-    student_lines = models.IntegerField(blank=True, null=True)
-    return_count = models.IntegerField(blank=True, null=True)
-
-class Fingerprint(models.Model):
-    # This ID is basically useless, but Django currently doesn't support
-    # composite primary keys
-    id = models.AutoField(primary_key=True)
-    chunk = models.ForeignKey(Chunk, related_name='fingerprints',
-                              db_index=True, editable=False)
-    value = models.IntegerField(db_index=True, editable=False)
-    position = models.IntegerField(editable=False)
-
-    class Meta:
-        unique_together = ('chunk', 'position',)
-        db_table = u'fingerprints'
-
-    def __unicode__(self):
-        return u'%d: [%d, %d]' % (self.chunk_id, self.position, self.value)
 class StaffMarker(models.Model):
     chunk = models.ForeignKey(Chunk, related_name='staffmarkers')
     start_line = models.IntegerField(blank=True, null=True)
