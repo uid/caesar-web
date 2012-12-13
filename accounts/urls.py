@@ -17,4 +17,5 @@ urlpatterns = patterns('',
             {'template_name': 'accounts/reset_confirm.html'}),
     (r'^reset/complete/$', 'django.contrib.auth.views.password_reset_complete',
                            {'template_name': 'accounts/reset_complete.html'}), 
+    (r'registration/', 'accounts.views.registration_request'),
 )

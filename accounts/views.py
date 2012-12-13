@@ -8,7 +8,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
-from limit_registration import check_name
+from limit_registration import check_name, check_email
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Token
 from accounts.models import UserProfile
@@ -16,6 +16,7 @@ from accounts.forms import ReputationForm
 import datetime
 import sys
 import re
+from hashlib import sha224
 
 def login(request):
     if request.method == 'GET':
@@ -47,24 +48,45 @@ def invalid_registration(request):
     return render(request, 'accounts/invalidreg.html', {
         'invalid_invitation': invalid_invitation,
     })
+
+def registration_request (request):
+    if request.method == 'GET':
+        return render(request, 'accounts/registration_request.html', {
+            'form': ''
+        })
+    else:
+        redirect_to = request.POST.get('next', '/')
+        #check if the email is a valid alum email
+        valid_email = check_email(request.POST['email'])
+        if valid_email:
+            # should send out an email with SHA hash as token
+            token = sha224("Nobody inspects the spammish repetition").hexdigest()
+            return HttpResponseRedirect('accounts/register/'+token)
+        else:
+            invalid_invitation = "You need a valid @alum.mit.edu account to request an invitation."
+    return render(request, 'accounts/invalidreg.html', {
+        'next': redirect_to,
+        'invalid_invitation': invalid_invitation
+    })
     
 def register(request, code):
     sys.stderr.write('In register. \n')
     invalid_invitation = ""
     token = None
-    try:
-        token = Token.objects.get(code=code)
-    except  ObjectDoesNotExist:
-        sys.stderr.write('Failed.')
-        invalid_invitation = "Sorry, this invitation has expired."
-        return render(request, 'accounts/invalidreg.html', {
-            'invalid_invitation': invalid_invitation,
-        })
-    if token.expire < datetime.datetime.now():
-        invalid_invitation = "Sorry, this invitation has expired."
-        return render(request, 'accounts/invalidreg.html', {
-            'invalid_invitation': invalid_invitation,
-        })
+    # oldschool registration tokens
+    # try:
+    #     token = Token.objects.get(code=code)
+    # except  ObjectDoesNotExist:
+    #     sys.stderr.write('Failed.')
+    #     invalid_invitation = "Sorry, this invitation has expired."
+    #     return render(request, 'accounts/invalidreg.html', {
+    #         'invalid_invitation': invalid_invitation,
+    #     })
+    # if token.expire < datetime.datetime.now():
+    #     invalid_invitation = "Sorry, this invitation has expired."
+    #     return render(request, 'accounts/invalidreg.html', {
+    #         'invalid_invitation': invalid_invitation,
+    #     })
     if request.method == 'GET':
         redirect_to = request.GET.get('next', '/')
         # render a registration form
