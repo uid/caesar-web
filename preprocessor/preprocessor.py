@@ -17,11 +17,12 @@ from django.db import transaction
 # Preprocessor imports
 from crawler import crawl_submissions
 from parse import parse_files
+from checkstyle import generate_checkstyle_comments
 
 settings = {
     'assignment_id': 2,
     'assignment_name': 'ps3',
-    'save_comments': False,
+    'generate_comments': True,
     'save_data': True,
     'staff_dir': '~/staff',
     'student_submission_dir': '/home/mglidden/ps3-late',
@@ -53,4 +54,7 @@ student_code = crawl_submissions(settings['student_submission_dir'])
 
 code_objects = [parse_files(username, files, batch, assignment, save=settings['save_data']) for (username, files) in student_code.iteritems()]
 
-print "Found %s submissions." % (len(code_objects))
+print "Found %s submissions. Generating checkstyle comments." % (len(code_objects))
+
+if settings['generate_comments']:
+  generate_checkstyle_comments(code_objects, settings['save_data'])
