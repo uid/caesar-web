@@ -166,6 +166,8 @@ class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     def __split_lines(self):
         # move forward
+        #TODO: fix (mglidden)
+        return;
         first_line_offset = 0
         offset = 0
         while self.data[first_line_offset] == '\n' or self.data[first_line_offset] == '\r':
