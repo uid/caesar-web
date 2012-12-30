@@ -1,6 +1,6 @@
 import os
 import datetime
-from chunks.models import Chunk, Assignment
+from chunks.models import Chunk, Assignment, Semester
 
 from sorl.thumbnail import ImageField
 
@@ -18,6 +18,12 @@ class Extension(models.Model):
     user = models.ForeignKey(User, related_name='extensions')
     assignment = models.ForeignKey(Assignment, related_name='extensions')
     slack_used = models.IntegerField(default=0, blank=True, null=True)
+
+class Member(models.Model):
+    role = models.CharField(max_length=16)
+    slack_budget = models.IntegerField(default=5, blank=False, null=False)
+    user = models.ForeignKey(User, related_name='membership')
+    semester = models.ForeignKey(Semester, related_name='members')
 
 class UserProfile(models.Model):
     # def get_photo_path(instance, filename):

@@ -16,6 +16,16 @@ import datetime
 import app_settings
 from collections import defaultdict
 
+class Subject(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(blank=False, null=False, max_length=32)
+
+class Semester(models.Model):
+    id = models.AutoField(primary_key=True)
+    subject = models.ForeignKey(Subject, related_name='semesters')
+    semester = models.CharField(blank=True, null=False, max_length=32)
+    is_current_semester = models.BooleanField(default=False)
+
 class Assignment(models.Model):
     SEMESTER_CHOICES = (
         ('FA11', "Fall 2011"),
@@ -24,6 +34,7 @@ class Assignment(models.Model):
         ('SP13', "Spring 2013"),
     )
     id = models.AutoField(primary_key=True)
+    semester = models.ForeignKey(Semester, related_name='assignments')
     name = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
     duedate = models.DateTimeField(null=True, blank=True)
