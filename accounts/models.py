@@ -1,6 +1,6 @@
 import os
 import datetime
-from chunks.models import Chunk
+from chunks.models import Chunk, Assignment
 
 from sorl.thumbnail import ImageField
 
@@ -13,6 +13,11 @@ from django.dispatch import receiver
 class Token(models.Model):
     expire = models.DateTimeField(null=True, blank=True)
     code = models.CharField(null=True, blank=True, max_length=20)
+
+class Extension(models.Model):
+    user = models.ForeignKey(User, related_name='extensions')
+    assignment = models.ForeignKey(Assignment, related_name='extensions')
+    slack_used = models.IntegerField(default=0, blank=True, null=True)
 
 class UserProfile(models.Model):
     # def get_photo_path(instance, filename):
@@ -38,7 +43,6 @@ class UserProfile(models.Model):
     reputation = models.IntegerField(default=0, editable=True)
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
-    extension_days = models.IntegerField(default=5)
     semester_taken = models.CharField(max_length=4, choices=SEMESTER_CHOICES,
                                       blank=True, null=True)
 
@@ -69,6 +73,11 @@ class UserProfile(models.Model):
       if self.user.first_name and self.user.last_name:
         return self.user.first_name + ' ' + self.user.last_name
       return self.user.username
+
+    def extension_days(self):
+      total_days = 5 #TODO: change after multi-class refactor
+      used_days = sum([extension.slack_used for extension in self.extensions.all()])
+      return total_days - used_days
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

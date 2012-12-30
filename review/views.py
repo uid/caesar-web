@@ -460,21 +460,27 @@ def all_activity(request, assign, username):
 @login_required
 def request_extension(request, assignment_id):
     user = request.user
+    # User is going to request an extension
     if request.method == 'GET':
         current_assignment = Assignment.objects.get(id=assignment_id)
         submission = Submission.objects.get(assignment=current_assignment, author=user)
-        #make sure user got here legally
+        # Make sure user got here legally
         if datetime.datetime.now() >  submission.duedate + datetime.timedelta(minutes=30):
             return redirect('review.views.dashboard')
-        extension = user.profile.extension_days
+
+        extension = user.profile.extension_days()
         extended_days = (submission.duedate - current_assignment.duedate).days
+
+        # Number of late days the student would use
         late_days = 0
         if datetime.datetime.now() > current_assignment.duedate + datetime.timedelta(minutes=30):
             late_days = (datetime.datetime.now() - current_assignment.duedate + datetime.timedelta(minutes=30)).days + 1
+
         days = range(late_days, min(extension+extended_days+1, current_assignment.max_extension+1))
         written_days = []
         for day in range(days[-1]+1):
             written_days.append(current_assignment.duedate + datetime.timedelta(days=day))
+
         if current_assignment.multiplier == 2: #beta submission
             if (submission.duedate - current_assignment.duedate).seconds/3600 == 12: #has extension
                 extended_days = 1
@@ -492,22 +498,24 @@ def request_extension(request, assignment_id):
             'written_days': written_days,
             'total_days': user.profile.extension_days + extended_days
         })
-    else:
+    else: # user already requested an extension
         days = request.POST.get('dayselect', None)
         try:
-            extension = int(days)
-            total_left = user.profile.extension_days
+            extension_days = int(days)
+            total_left = user.profile.extension_days()
             current_assignment = Assignment.objects.get(id=assignment_id)
             submission = Submission.objects.get(assignment=current_assignment, author=user)
             extended_days = (submission.duedate - current_assignment.duedate).days
             if (submission.duedate - current_assignment.duedate).seconds/3600 == 12:
                 extended_days = 1
             total_days = total_left + extended_days
-            if extension > total_days or extension < 0 or extension > current_assignment.max_extension:
+            if extension_days > total_days or extension_days < 0 or extension_days > current_assignment.max_extension:
                 return redirect('review.views.dashboard')
-            user.profile.extension_days = total_days - extension
-            user.profile.save()
-            submission.duedate = current_assignment.duedate+datetime.timedelta(days=extension)
+            extension = Extension(slack_used=extension_days, user=user, assignment=current_assignment)
+            extension.save()
+            #user.profile.extension_days = total_days - extension
+            #user.profile.save()
+            submission.duedate = current_assignment.duedate + datetime.timedelta(days=extension_days)
             if current_assignment.multiplier == 2: #beta submission
                 hours = extension * 12
                 submission.duedate = current_assignment.duedate + datetime.timedelta(hours=hours)
