@@ -1,5 +1,10 @@
 import settings
 from re import match
+from django.core.mail import EmailMultiAlternatives
+from hashlib import md5
+from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
+from urllib import quote_plus
 
 def get_names():
     f = open(settings.project_path('accounts') + '/second-wave-alums.txt')
@@ -23,8 +28,24 @@ def check_name(first, last, email, username):
         return True
     return False
 
+# also ensure that this email isn't in the system already
 def check_email(email):
     if len(email) > 13:
         if match("^[a-zA-Z0-9._%-+]+@alum\.mit\.edu$", email) != None:
             return True
     return False
+
+def send_email(email):
+    token = md5("Nobody inspects the spammish repetition"+email).hexdigest()
+    
+    subject, from_email, to = 'Caesar registration request', 'admin@caesar.com', email
+    url = ''.join(['http://',Site.objects.get_current().domain,\
+            reverse('accounts.views.register', args=(quote_plus(email), token))])
+    text_body = 'Sign up at '+url
+    html_body = 'Sign up at <a href="'+url+'">this link</a>.'
+
+    msg = EmailMultiAlternatives(subject, text_body, from_email, [to])
+    msg.attach_alternative(html_body, "text/html")
+    msg.send()
+    return True
+

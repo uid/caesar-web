@@ -8,7 +8,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
-from limit_registration import check_name, check_email
+from limit_registration import check_name, check_email, send_email
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Token
 from accounts.models import UserProfile
@@ -16,7 +16,6 @@ from accounts.forms import ReputationForm
 import datetime
 import sys
 import re
-from hashlib import sha224
 
 def login(request):
     if request.method == 'GET':
@@ -51,17 +50,17 @@ def invalid_registration(request):
 
 def registration_request (request):
     if request.method == 'GET':
-        return render(request, 'accounts/registration_request.html', {
-            'form': ''
-        })
+        return render(request, 'accounts/registration_request.html')
     else:
         redirect_to = request.POST.get('next', '/')
         #check if the email is a valid alum email
-        valid_email = check_email(request.POST['email'])
+        email = request.POST['email']
+        valid_email = check_email(email)
         if valid_email:
             # should send out an email with SHA hash as token
-            token = sha224("Nobody inspects the spammish repetition").hexdigest()
-            return HttpResponseRedirect('accounts/register/'+token)
+            # redirect to some sort of success page
+            send_email(email)
+            return render(request, 'accounts/registration_request_complete.html')
         else:
             invalid_invitation = "You need a valid @alum.mit.edu account to request an invitation."
     return render(request, 'accounts/invalidreg.html', {
@@ -70,7 +69,6 @@ def registration_request (request):
     })
     
 def register(request, code):
-    sys.stderr.write('In register. \n')
     invalid_invitation = ""
     token = None
     # oldschool registration tokens
