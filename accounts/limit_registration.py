@@ -4,7 +4,7 @@ from django.core.mail import EmailMultiAlternatives
 from hashlib import md5
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
-from urllib import quote_plus
+from urllib import quote_plus, unquote_plus
 
 def get_names():
     f = open(settings.project_path('accounts') + '/second-wave-alums.txt')
@@ -37,7 +37,7 @@ def check_email(email):
 
 def send_email(email):
     token = md5("Nobody inspects the spammish repetition"+email).hexdigest()
-    
+
     subject, from_email, to = 'Caesar registration request', 'admin@caesar.com', email
     url = ''.join(['http://',Site.objects.get_current().domain,\
             reverse('accounts.views.register', args=(quote_plus(email), token))])
@@ -49,3 +49,6 @@ def send_email(email):
     msg.send()
     return True
 
+def verify_token(email, token):
+    token_check = md5("Nobody inspects the spammish repetition"+unquote_plus(email)).hexdigest()
+    return token == token_check

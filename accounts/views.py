@@ -8,7 +8,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
-from limit_registration import check_name, check_email, send_email
+from limit_registration import check_name, check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Token
 from accounts.models import UserProfile
@@ -68,23 +68,13 @@ def registration_request (request):
         'invalid_invitation': invalid_invitation
     })
     
-def register(request, code):
+def register(request, email, code):
     invalid_invitation = ""
-    token = None
-    # oldschool registration tokens
-    # try:
-    #     token = Token.objects.get(code=code)
-    # except  ObjectDoesNotExist:
-    #     sys.stderr.write('Failed.')
-    #     invalid_invitation = "Sorry, this invitation has expired."
-    #     return render(request, 'accounts/invalidreg.html', {
-    #         'invalid_invitation': invalid_invitation,
-    #     })
-    # if token.expire < datetime.datetime.now():
-    #     invalid_invitation = "Sorry, this invitation has expired."
-    #     return render(request, 'accounts/invalidreg.html', {
-    #         'invalid_invitation': invalid_invitation,
-    #     })
+    if not verify_token(email, code):
+        invalid_invitation = "Sorry, this invitation link is invalid."+str(verify_token(email, code))
+        return render(request, 'accounts/invalidreg.html', {
+            'invalid_invitation': invalid_invitation,
+        })
     if request.method == 'GET':
         redirect_to = request.GET.get('next', '/')
         # render a registration form
