@@ -5,10 +5,10 @@ from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailFie
 
 class UserForm(auth.forms.UserCreationForm):
     username = CharField(max_length=8, 
-            help_text='Please use your Athena username if you have one.')
+            help_text='Please use your Athena username if you have one. You will be signing in with your email address.')
     first_name = CharField(max_length=30)
     last_name = CharField(max_length=30)
-    email = EmailField()
+    email = EmailField(help_text="You will use your email to sign in.")
     class Meta(auth.forms.UserCreationForm.Meta):
         fields = ('username', 'first_name', 'last_name', 'email',)
 

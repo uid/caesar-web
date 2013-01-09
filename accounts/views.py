@@ -8,7 +8,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
-from limit_registration import check_name, check_email, send_email, verify_token
+from limit_registration import check_user, check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Token
 from accounts.models import UserProfile
@@ -71,7 +71,7 @@ def registration_request (request):
 def register(request, email, code):
     invalid_invitation = ""
     if not verify_token(email, code):
-        invalid_invitation = "Sorry, this invitation link is invalid."+str(verify_token(email, code))
+        invalid_invitation = "Sorry, this invitation link is invalid."
         return render(request, 'accounts/invalidreg.html', {
             'invalid_invitation': invalid_invitation,
         })
@@ -83,17 +83,16 @@ def register(request, email, code):
         redirect_to = request.POST.get('next', '/')
         # create a new user
         form = UserForm(request.POST)
-        #check if username, first_name, or last_name ar in the list of permitted users
-        valid_name = check_name(request.POST['first_name'], request.POST['last_name'], request.POST['email'], request.POST['username'])
-        if not valid_name:
-            invalid_invitation = "Your name/email does not appear on the invitation list."
-        if form.is_valid() and valid_name:
+        #check if username, first_name, or last_name are in the list of permitted users
+        valid_user = check_user(request.POST['email'], email)
+        if not valid_user:
+            invalid_invitation = "Your email does not match the invitation."
+        if form.is_valid() and valid_user:
             user = form.save()
-        username = request.POST['username']
+        username = request.POST['email']
         password = request.POST['password1']
         user = authenticate(username=username, password=password)
         if user is not None:
-            user.profile.token = token
             user.profile.save()
             if user.is_active:
                 auth.login(request, user)
