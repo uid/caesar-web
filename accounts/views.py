@@ -100,7 +100,8 @@ def register(request, email, code):
     return render(request, 'accounts/register.html', {
         'form': form,
         'next': redirect_to,
-        'invalid_invitation': invalid_invitation
+        'invalid_invitation': invalid_invitation,
+        'email': email
     })
     
 @staff_member_required
