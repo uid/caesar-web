@@ -36,12 +36,6 @@ class UserProfile(models.Model):
         ('T', 'Teaching staff'),
         ('S', 'Student'),
     )
-    SEMESTER_CHOICES = (
-        ('FA11', "Fall 2011"),
-        ('SP12', "Spring 2012"),
-        ('FA12', "Fall 2012"),
-        ('SP13', "Spring 2013"),
-    )
     user = models.OneToOneField(User, related_name='profile')
     # photo = ImageField(upload_to=get_photo_path)
     assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
@@ -49,8 +43,6 @@ class UserProfile(models.Model):
     reputation = models.IntegerField(default=0, editable=True)
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
-    semester_taken = models.CharField(max_length=4, choices=SEMESTER_CHOICES,
-                                      blank=True, null=True)
 
     token = models.ForeignKey(Token, related_name='invited', default=None, null=True)
     def __unicode__(self):

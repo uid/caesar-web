@@ -66,7 +66,7 @@ class Assignment(models.Model):
     def __unicode__(self):
         return self.name
     def is_current_semester(self):
-        return self.semester == 'FA12'
+        return self.semester.is_current_semester
     def is_life_assignment(self):
         return datetime.datetime.now() < submission.assignment.code_review_end_date and self.is_live
 
