@@ -20,29 +20,27 @@ class Subject(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(blank=False, null=False, max_length=32)
 
+    def __str__(self):
+      return self.name
+
 class Semester(models.Model):
     id = models.AutoField(primary_key=True)
     subject = models.ForeignKey(Subject, related_name='semesters')
     semester = models.CharField(blank=True, null=False, max_length=32)
     is_current_semester = models.BooleanField(default=False)
 
+    def __str__(self):
+      return self.semester
+
 class Assignment(models.Model):
-    SEMESTER_CHOICES = (
-        ('FA11', "Fall 2011"),
-        ('SP12', "Spring 2012"),
-        ('FA12', "Fall 2012"),
-        ('SP13', "Spring 2013"),
-    )
     id = models.AutoField(primary_key=True)
-    semester = models.ForeignKey(Semester, related_name='assignments')
+    semester = models.ForeignKey(Semester, related_name='assignments', blank=False, null=True)
     name = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
     duedate = models.DateTimeField(null=True, blank=True)
     code_review_end_date = models.DateTimeField(null=True, blank=True)
     is_live = models.BooleanField(default=False)
     max_extension = models.IntegerField(default=2)
-    semester = models.CharField(max_length=4, choices=SEMESTER_CHOICES,
-                                      blank=True, null=True)
     multiplier = models.IntegerField(default=1)
     student_count = models.IntegerField(default=5)
     student_count_default = models.IntegerField(default=5)

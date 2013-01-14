@@ -39,7 +39,7 @@ def dashboard(request):
     old_completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__assignment__semester='FA12') \
+        .exclude(chunk__file__submission__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -54,7 +54,7 @@ def dashboard(request):
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester='FA12') \
+        .filter(chunk__file__submission__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -62,7 +62,7 @@ def dashboard(request):
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()-datetime.timedelta(minutes=30)) \
         .order_by('duedate')\
-        .filter(assignment__semester="FA12")\
+        .filter(assignment__semester__is_current_semester=True) \
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -75,11 +75,11 @@ def dashboard(request):
         submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
 
-    #get all the submissions that the user submitted, in the current semester
+    #get all the submissions that the user submitted, in previous semester
     old_submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('duedate')\
-        .exclude(assignment__semester="FA12")\
+        .order_by('duedate') \
+        .exclude(assignment__semester__is_current_semester=False) \
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
