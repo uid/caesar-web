@@ -16,22 +16,31 @@ import datetime
 import app_settings
 from collections import defaultdict
 
-class Assignment(models.Model):
-    SEMESTER_CHOICES = (
-        ('FA11', "Fall 2011"),
-        ('SP12', "Spring 2012"),
-        ('FA12', "Fall 2012"),
-        ('SP13', "Spring 2013"),
-    )
+class Subject(models.Model):
     id = models.AutoField(primary_key=True)
+    name = models.CharField(blank=False, null=False, max_length=32)
+
+    def __str__(self):
+      return self.name
+
+class Semester(models.Model):
+    id = models.AutoField(primary_key=True)
+    subject = models.ForeignKey(Subject, related_name='semesters')
+    semester = models.CharField(blank=True, null=False, max_length=32)
+    is_current_semester = models.BooleanField(default=False)
+
+    def __str__(self):
+      return self.semester
+
+class Assignment(models.Model):
+    id = models.AutoField(primary_key=True)
+    semester = models.ForeignKey(Semester, related_name='assignments', blank=False, null=True)
     name = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
     duedate = models.DateTimeField(null=True, blank=True)
     code_review_end_date = models.DateTimeField(null=True, blank=True)
     is_live = models.BooleanField(default=False)
     max_extension = models.IntegerField(default=2)
-    semester = models.CharField(max_length=4, choices=SEMESTER_CHOICES,
-                                      blank=True, null=True)
     multiplier = models.IntegerField(default=1)
     student_count = models.IntegerField(default=5)
     student_count_default = models.IntegerField(default=5)
@@ -57,7 +66,7 @@ class Assignment(models.Model):
     def __unicode__(self):
         return self.name
     def is_current_semester(self):
-        return self.semester == 'FA12'
+        return self.semester.is_current_semester
     def is_life_assignment(self):
         return datetime.datetime.now() < submission.assignment.code_review_end_date and self.is_live
 
@@ -112,6 +121,14 @@ def create_current_assignment(sender, instance, created, **kwargs):
         instance.save()
 
 
+class Batch(models.Model):
+    assignment = models.ForeignKey(Assignment, related_name='batches')
+    is_live = models.BooleanField(default=False)
+
+    class Meta:
+      verbose_name_plural = 'batches'
+
+
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
@@ -122,6 +139,8 @@ class Submission(models.Model):
     revision = models.IntegerField(null=True, blank=True)
     revision_date = models.DateTimeField(null=True, blank=True)
     duedate = models.DateTimeField(null=True, blank=True)
+    batch = models.ForeignKey(Batch, blank=True, null=True, related_name='submissions')
+
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
@@ -156,6 +175,8 @@ class File(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     def __split_lines(self):
         # move forward
+        #TODO: fix (mglidden)
+        return;
         first_line_offset = 0
         offset = 0
         while self.data[first_line_offset] == '\n' or self.data[first_line_offset] == '\r':
@@ -197,8 +218,9 @@ class Chunk(models.Model):
     modified = models.DateTimeField(auto_now=True)
     class_type = models.CharField(max_length=4, choices=CLASS_TYPE_CHOICES,
                             blank=True, null=True)
-
-    staff_portion = models.IntegerField(default = 0)
+    staff_portion = models.IntegerField(default=0)
+    student_lines = models.IntegerField(default=0)
+    chunk_info = models.TextField(blank=True, null=True)
 
     simulated_tasks = None
 
@@ -352,35 +374,6 @@ class Chunk(models.Model):
     def comment_count(self):
       return len(self.comments.filter())
 
-
-class ChunkProfile(models.Model):
-    id = models.AutoField(primary_key=True)
-    chunk = models.OneToOneField(Chunk, related_name='profile')
-    for_nesting_depth = models.IntegerField(blank=True, null=True) #deepest for loop count
-    if_nesting_depth = models.IntegerField(blank=True, null=True) #deepest if count
-    synchronized_count = models.IntegerField(blank=True, null=True)
-    valid = models.BooleanField(blank=True, default=False)
-    viable_comments = models.IntegerField(blank=True, null=True)
-    static_comments = models.IntegerField(blank=True, null=True)
-    comment_words = models.IntegerField(blank=True, null=True)
-    student_lines = models.IntegerField(blank=True, null=True)
-    return_count = models.IntegerField(blank=True, null=True)
-
-class Fingerprint(models.Model):
-    # This ID is basically useless, but Django currently doesn't support
-    # composite primary keys
-    id = models.AutoField(primary_key=True)
-    chunk = models.ForeignKey(Chunk, related_name='fingerprints',
-                              db_index=True, editable=False)
-    value = models.IntegerField(db_index=True, editable=False)
-    position = models.IntegerField(editable=False)
-
-    class Meta:
-        unique_together = ('chunk', 'position',)
-        db_table = u'fingerprints'
-
-    def __unicode__(self):
-        return u'%d: [%d, %d]' % (self.chunk_id, self.position, self.value)
 class StaffMarker(models.Model):
     chunk = models.ForeignKey(Chunk, related_name='staffmarkers')
     start_line = models.IntegerField(blank=True, null=True)

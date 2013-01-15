@@ -39,7 +39,7 @@ def dashboard(request):
     old_completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__assignment__semester='FA12') \
+        .exclude(chunk__file__submission__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -54,7 +54,7 @@ def dashboard(request):
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester='FA12') \
+        .filter(chunk__file__submission__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -62,7 +62,7 @@ def dashboard(request):
     submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()-datetime.timedelta(minutes=30)) \
         .order_by('duedate')\
-        .filter(assignment__semester="FA12")\
+        .filter(assignment__semester__is_current_semester=True) \
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -75,11 +75,11 @@ def dashboard(request):
         submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
 
-    #get all the submissions that the user submitted, in the current semester
+    #get all the submissions that the user submitted, in previous semester
     old_submissions = Submission.objects.filter(name=user.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('duedate')\
-        .exclude(assignment__semester="FA12")\
+        .order_by('duedate') \
+        .exclude(assignment__semester__is_current_semester=False) \
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -137,15 +137,8 @@ def student_stats(request):
         total_user_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='U').count()
         total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
         zero_chunk_users = len(filter(lambda sub: len(sub.files.all()) != 0 and len(sub.chunks()) == 0, assignment.submissions.all()))
-        no_profile_chunks = 0
-        for submission in assignment.submissions.all():
-          for chunk in submission.chunks():
-            try:
-              profile = chunk.profile
-            except Exception:
-              no_profile_chunks += 1
 
-        assignment_data.append( (assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, zero_chunk_users, no_profile_chunks) )
+        assignment_data.append( (assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, zero_chunk_users) )
     return render(request, 'review/studentstats.html', {
         'assignment_data': assignment_data,
         'total_students': total_students,
@@ -467,21 +460,27 @@ def all_activity(request, assign, username):
 @login_required
 def request_extension(request, assignment_id):
     user = request.user
+    # User is going to request an extension
     if request.method == 'GET':
         current_assignment = Assignment.objects.get(id=assignment_id)
         submission = Submission.objects.get(assignment=current_assignment, author=user)
-        #make sure user got here legally
+        # Make sure user got here legally
         if datetime.datetime.now() >  submission.duedate + datetime.timedelta(minutes=30):
             return redirect('review.views.dashboard')
-        extension = user.profile.extension_days
+
+        extension = user.profile.extension_days()
         extended_days = (submission.duedate - current_assignment.duedate).days
+
+        # Number of late days the student would use
         late_days = 0
         if datetime.datetime.now() > current_assignment.duedate + datetime.timedelta(minutes=30):
             late_days = (datetime.datetime.now() - current_assignment.duedate + datetime.timedelta(minutes=30)).days + 1
+
         days = range(late_days, min(extension+extended_days+1, current_assignment.max_extension+1))
         written_days = []
         for day in range(days[-1]+1):
             written_days.append(current_assignment.duedate + datetime.timedelta(days=day))
+
         if current_assignment.multiplier == 2: #beta submission
             if (submission.duedate - current_assignment.duedate).seconds/3600 == 12: #has extension
                 extended_days = 1
@@ -499,22 +498,24 @@ def request_extension(request, assignment_id):
             'written_days': written_days,
             'total_days': user.profile.extension_days + extended_days
         })
-    else:
+    else: # user already requested an extension
         days = request.POST.get('dayselect', None)
         try:
-            extension = int(days)
-            total_left = user.profile.extension_days
+            extension_days = int(days)
+            total_left = user.profile.extension_days()
             current_assignment = Assignment.objects.get(id=assignment_id)
             submission = Submission.objects.get(assignment=current_assignment, author=user)
             extended_days = (submission.duedate - current_assignment.duedate).days
             if (submission.duedate - current_assignment.duedate).seconds/3600 == 12:
                 extended_days = 1
             total_days = total_left + extended_days
-            if extension > total_days or extension < 0 or extension > current_assignment.max_extension:
+            if extension_days > total_days or extension_days < 0 or extension_days > current_assignment.max_extension:
                 return redirect('review.views.dashboard')
-            user.profile.extension_days = total_days - extension
-            user.profile.save()
-            submission.duedate = current_assignment.duedate+datetime.timedelta(days=extension)
+            extension = Extension(slack_used=extension_days, user=user, assignment=current_assignment)
+            extension.save()
+            #user.profile.extension_days = total_days - extension
+            #user.profile.save()
+            submission.duedate = current_assignment.duedate + datetime.timedelta(days=extension_days)
             if current_assignment.multiplier == 2: #beta submission
                 hours = extension * 12
                 submission.duedate = current_assignment.duedate + datetime.timedelta(hours=hours)
@@ -539,7 +540,7 @@ def student_dashboard(request, username):
     old_completed_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__assignment__semester='FA12') \
+        .exclude(chunk__file__submission__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -553,7 +554,7 @@ def student_dashboard(request, username):
     completed_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission__assignment') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester='FA12') \
+        .filter(chunk__file__submission__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -561,7 +562,7 @@ def student_dashboard(request, username):
     submissions = Submission.objects.filter(name=participant.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
         .order_by('duedate')\
-        .filter(assignment__semester="FA12")\
+        .filter(assignment__semester__is_current_semester=True)\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -577,7 +578,7 @@ def student_dashboard(request, username):
     old_submissions = Submission.objects.filter(name=participant.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
         .order_by('duedate')\
-        .exclude(assignment__semester="FA12")\
+        .exclude(assignment__semester__is_current_semester=True)\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -685,7 +686,7 @@ def search(request):
     if request.method == 'POST':
         querystring = request.POST['value'].strip()
         if querystring:
-            comments = Comment.objects.filter(chunk__file__submission__assignment__semester="FA12",
+            comments = Comment.objects.filter(chunk__file__submission__assignment__semester__is_current_semester=True,
                                               text__icontains = querystring)
             review_data = view_helper(comments[:15])
             return render(request, 'review/search.html', {

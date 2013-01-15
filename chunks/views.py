@@ -246,7 +246,7 @@ def simualte(request, assignment_id):
         num = 0
         if name in chunks_graph:
             lines_dict, num = chunks_graph[name]
-        lines = min(chunk.profile.student_lines, 200)
+        lines = min(chunk.student_lines, 200)
         if lines in lines_dict:
             copies = lines_dict[lines]
             if not (lines == 200 and copies == 10):
