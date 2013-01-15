@@ -77,7 +77,7 @@ def register(request, email, code):
     if request.method == 'GET':
         redirect_to = request.GET.get('next', '/')
         # render a registration form
-        form = UserForm()
+        form = UserForm(initial={'email': email, 'username':email.replace("@alum.mit.edu", "")})
     else:
         # create a new user
         form = UserForm(request.POST)
