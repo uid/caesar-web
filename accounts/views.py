@@ -83,15 +83,17 @@ def register(request, email, code):
         form = UserForm(request.POST)
         if form.is_valid():
             user = form.save()
-        username = request.POST['email']
-        password = request.POST['password1']
-        user = authenticate(username=username, password=password)
-        redirect_to = reverse('review.views.summary', args=([username]))
-        if user is not None:
-            user.profile.save()
-            if user.is_active:
-                auth.login(request, user)
-                return HttpResponseRedirect(redirect_to)
+            username = request.POST['username']
+            password = request.POST['password1']
+            user = authenticate(username=username, password=password)
+            redirect_to = reverse('review.views.summary', args=([username]))
+            if user is not None:
+                if user.is_active:
+                    user.profile.save()
+                    auth.login(request, user)
+                    return redirect(redirect_to)
+            else:
+                return redirect('/')
     return render(request, 'accounts/register.html', {
         'form': form,
         'next': redirect_to,

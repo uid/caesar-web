@@ -6,6 +6,7 @@ from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from urllib import quote_plus, unquote_plus
 from django.contrib.auth.models import User
+from django.conf import settings
 
 def get_names():
     f = open(settings.project_path('accounts') + '/second-wave-alums.txt')
@@ -40,9 +41,9 @@ def check_email(email):
     return True
 
 def send_email(email):
-    token = md5("Nobody inspects the spammish repetition"+email).hexdigest()
+    token = md5(settings.SECRET_KEY+email).hexdigest()
 
-    subject, from_email, to = 'Caesar registration request', 'admin@caesar.com', email
+    subject, from_email, to = 'Caesar registration request', 'caesar@csail.mit.edu', email
     url = ''.join(['http://',Site.objects.get_current().domain,\
             reverse('accounts.views.register', args=(quote_plus(email), token))])
     text_body = 'Sign up at '+url
@@ -54,5 +55,5 @@ def send_email(email):
     return True
 
 def verify_token(email, token):
-    token_check = md5("Nobody inspects the spammish repetition"+unquote_plus(email)).hexdigest()
+    token_check = md5(settings.SECRET_KEY+unquote_plus(email)).hexdigest()
     return token == token_check and len(User.objects.filter(email=email)) == 0
