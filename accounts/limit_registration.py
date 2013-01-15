@@ -56,8 +56,3 @@ def send_email(email):
 def verify_token(email, token):
     token_check = md5("Nobody inspects the spammish repetition"+unquote_plus(email)).hexdigest()
     return token == token_check and len(User.objects.filter(email=email)) == 0
-
-# checks for user validity before saving the user model
-def check_user(form_email, email):
-    # check for email uniqueness
-    return form_email == email

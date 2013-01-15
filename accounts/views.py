@@ -8,11 +8,12 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
-from limit_registration import check_user, check_email, send_email, verify_token
+from limit_registration import check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import Token
 from accounts.models import UserProfile
 from accounts.forms import ReputationForm
+from django.core.urlresolvers import reverse
 import datetime
 import sys
 import re
@@ -78,18 +79,14 @@ def register(request, email, code):
         # render a registration form
         form = UserForm()
     else:
-        redirect_to = request.POST.get('next', '/')
         # create a new user
         form = UserForm(request.POST)
-        #check if username, first_name, or last_name are in the list of permitted users
-        valid_user = check_user(request.POST['email'], email)
-        if not valid_user:
-            invalid_invitation = "Your email does not match the invitation."
-        if form.is_valid() and valid_user:
+        if form.is_valid():
             user = form.save()
         username = request.POST['email']
         password = request.POST['password1']
         user = authenticate(username=username, password=password)
+        redirect_to = reverse('review.views.summary', args=([username]))
         if user is not None:
             user.profile.save()
             if user.is_active:
