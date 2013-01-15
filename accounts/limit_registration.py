@@ -5,6 +5,7 @@ from hashlib import md5
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from urllib import quote_plus, unquote_plus
+from django.contrib.auth.models import User
 
 def get_names():
     f = open(settings.project_path('accounts') + '/second-wave-alums.txt')
@@ -30,10 +31,13 @@ def check_name(first, last, email, username):
 
 # also ensure that this email isn't in the system already
 def check_email(email):
-    if len(email) > 13:
-        if match("^[a-zA-Z0-9._%-+]+@alum\.mit\.edu$", email) != None:
-            return True
-    return False
+    # if actually an ___@alum.mit.edu address
+    if match("^[a-zA-Z0-9._%-+]+@alum\.mit\.edu$", email) == None:
+        return 'You need a valid @alum.mit.edu address to register.'
+    # if that email isn't in the system yet
+    if len(User.objects.filter(email=email)) != 0:
+        return 'That email has been registered already.'
+    return True
 
 def send_email(email):
     token = md5("Nobody inspects the spammish repetition"+email).hexdigest()
@@ -51,7 +55,7 @@ def send_email(email):
 
 def verify_token(email, token):
     token_check = md5("Nobody inspects the spammish repetition"+unquote_plus(email)).hexdigest()
-    return token == token_check
+    return token == token_check and len(User.objects.filter(email=email)) == 0
 
 # checks for user validity before saving the user model
 def check_user(form_email, email):

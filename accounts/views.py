@@ -56,16 +56,14 @@ def registration_request (request):
         #check if the email is a valid alum email
         email = request.POST['email']
         valid_email = check_email(email)
-        if valid_email:
+        if valid_email == True:
             # should send out an email with SHA hash as token
             # redirect to some sort of success page
             send_email(email)
             return render(request, 'accounts/registration_request_complete.html')
-        else:
-            invalid_invitation = "You need a valid @alum.mit.edu account to request an invitation."
     return render(request, 'accounts/invalidreg.html', {
         'next': redirect_to,
-        'invalid_invitation': invalid_invitation
+        'invalid_invitation': valid_email
     })
     
 def register(request, email, code):
