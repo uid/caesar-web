@@ -578,7 +578,7 @@ def student_dashboard(request, username):
     old_submissions = Submission.objects.filter(name=participant.username) \
         .filter(duedate__lt=datetime.datetime.now()) \
         .order_by('duedate')\
-        .exclude(assignment__semester__is_current_semester=True)
+        .exclude(assignment__semester__is_current_semester=True)\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
