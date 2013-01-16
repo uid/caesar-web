@@ -44,6 +44,13 @@ class UserProfile(models.Model):
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
 
+    # photo = ??
+    # about = ??
+    twitter = models.CharField(max_length=16, blank=True)
+    github = models.CharField(max_length=30, blank=True)
+    linkedin = models.URLField(blank=True)
+    website = models.URLField(blank=True)
+
     token = models.ForeignKey(Token, related_name='invited', default=None, null=True)
     def __unicode__(self):
         return self.user.__unicode__()
