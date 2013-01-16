@@ -8,12 +8,14 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404
+from django.core.urlresolvers import reverse
 
 from chunks.models import Chunk, Assignment, Submission, StaffMarker
 from tasks.models import Task
 from tasks.routing import assign_tasks
 from models import Comment, Vote, Star
 from review.forms import CommentForm, ReplyForm, EditCommentForm
+from accounts.forms import UserProfileForm
 from accounts.models import UserProfile
 from simplewiki.models import Article
 
@@ -382,6 +384,24 @@ def summary(request, username):
     return render(request, 'review/summary.html', {
         'assignment_data': assignment_data,
         'participant': participant
+    })
+
+@login_required
+def edit_profile(request, username):
+    """Edit user profile."""
+    profile = User.objects.get(username=username).profile
+    img = None
+
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect(reverse('review.views.summary', args=([username])))
+    else:
+        form = UserProfileForm(instance=profile)
+
+    return render(request, 'review/edit_profile.html', {
+        'form': form
     })
 
 @login_required
