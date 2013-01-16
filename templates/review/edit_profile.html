@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+{% endblock %}
+
+{% block content %}
+<div id="profile-container" class="span-24">
+    <h2>Editing Profile</h2>
+    <form id="register-form" method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <p>
+          <label for="{{ field.id }}">
+            {{ field.label }}{% if field.field.required %}*{% endif %}
+          </label><br/>
+          {{ field }} <br/>
+          {{ field.help_text }}
+        </p>
+
+        {% for error in field.errors %}
+        <p class="error">{{ error }}</p>
+        {% endfor %}
+
+        {% endfor %}
+
+        <button type="submit">Save</button>
+
+    </form>
+</div>
+{% endblock %}
