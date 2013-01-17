@@ -1,0 +1,15 @@
+.social li {
+	float: left;
+	margin: 5px;
+	font-size: 20pt;
+}
+.social a {
+	color: #333;
+}
+.social {
+	list-style: none;
+	margin: 10px 0;
+}
+#profile-photo {
+	margin-top: 20px;
+}
