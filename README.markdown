@@ -30,6 +30,26 @@ installed and your working directory is the project root:
 
 The fabfile should take care of the rest, in theory.
 
+Enable JPEG and PNG support for photos:
+
+    pip uninstall PIL
+    sudo apt-get install libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev
+    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
+    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
+    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
+    pip install PIL
+
+The install script should now display at the end:
+
+    --------------------------------------------------------------------
+    *** TKINTER support not available
+    --- JPEG support available
+    --- ZLIB (PNG/ZIP) support available
+    --- FREETYPE2 support available
+    *** LITTLECMS support not available
+    --------------------------------------------------------------------
+
+
 CSAIL Debian Lenny
 ------------------
 
@@ -169,4 +189,24 @@ Note: when running ./manage.py syncdb, Django may ask if you want to create a ne
     sudo ln -sf /var/django/caesar/apache/caesar /etc/apache2/sites-available
     sudo a2ensite caesar
     sudo /etc/init.d/apache2 restart
+
+### Enable JPEG and PNG support for photos:
+
+    pip uninstall PIL
+    sudo apt-get install libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev
+    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
+    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
+    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
+    pip install PIL
+
+The install script should now display at the end:
+
+    --------------------------------------------------------------------
+    *** TKINTER support not available
+    --- JPEG support available
+    --- ZLIB (PNG/ZIP) support available
+    --- FREETYPE2 support available
+    *** LITTLECMS support not available
+    --------------------------------------------------------------------
+
 

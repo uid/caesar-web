@@ -4,6 +4,7 @@ from chunks.models import Chunk, Assignment, Semester
 
 from sorl.thumbnail import ImageField
 from accounts.fields import MarkdownTextField
+from accounts.storage import OverwriteStorage
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -27,11 +28,10 @@ class Member(models.Model):
     semester = models.ForeignKey(Semester, related_name='members')
 
 class UserProfile(models.Model):
-    # def get_photo_path(instance, filename):
-    #     return os.path.join(
-    #             settings.PROFILE_PHOTO_DIR,
-    #             instance.user.username,
-    #             filename)
+    def get_photo_path(instance, filename):
+        return os.path.join(
+                settings.PROFILE_PHOTO_DIR,
+                instance.user.username)
 
     ROLE_CHOICES = (
         ('T', 'Teaching staff'),
@@ -45,7 +45,7 @@ class UserProfile(models.Model):
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
 
-    photo = models.ImageField(upload_to="images/", blank=True, null=True)
+    photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True)
     about = MarkdownTextField(allow_html=False, blank=True)
 
     # social network links
