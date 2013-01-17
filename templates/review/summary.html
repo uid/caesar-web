@@ -40,7 +40,11 @@ $(document).ready(function() {
 
  <div class="row">
     <div class="span3">
-      <img id='profile-photo' src="http://placehold.it/180x144&text=Student" />
+        {% if participant.profile.photo %}
+          <img id='profile-photo' src="{{ participant.profile.photo.url }}" />
+        {% else %}
+          <img id='profile-photo' src="http://placehold.it/180x144&text=Student" />
+        {% endif %}
       <ul class='social'>
         {% if participant.profile.twitter %}
           <a href='http://twitter.com/{{ participant.profile.twitter}}'><li><i class="foundicon-twitter"></i></li></a>
@@ -73,6 +77,7 @@ $(document).ready(function() {
 <div class="row">
     <div class="span3">
       <h3>About Me</h3>
+      {{ participant.profile.about_html|safe }}
     </div>
 
     <div class="span9" id='code'>

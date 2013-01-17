@@ -23,6 +23,10 @@ from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
+from PIL import Image as PImage
+from os.path import join as pjoin
+from django.conf import settings
+
 import datetime
 import sys
 
@@ -396,6 +400,12 @@ def edit_profile(request, username):
         form = UserProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
+            if request.FILES:
+                # resize and save image under same filename
+                imfn = pjoin(settings.MEDIA_ROOT, profile.photo.name)
+                im = PImage.open(imfn)
+                im.thumbnail((180,180), PImage.ANTIALIAS)
+                im.save(imfn, "JPEG")
             return redirect(reverse('review.views.summary', args=([username])))
     else:
         form = UserProfileForm(instance=profile)
