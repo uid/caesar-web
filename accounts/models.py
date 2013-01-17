@@ -3,6 +3,7 @@ import datetime
 from chunks.models import Chunk, Assignment, Semester
 
 from sorl.thumbnail import ImageField
+from accounts.fields import MarkdownTextField
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -44,8 +45,10 @@ class UserProfile(models.Model):
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
 
-    # photo = ??
-    # about = ??
+    photo = models.ImageField(upload_to="images/", blank=True, null=True)
+    about = MarkdownTextField(allow_html=False, blank=True)
+
+    # social network links
     twitter = models.CharField(max_length=16, blank=True)
     github = models.CharField(max_length=30, blank=True)
     linkedin = models.URLField(blank=True)

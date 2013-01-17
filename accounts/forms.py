@@ -1,7 +1,7 @@
 from django.contrib import auth
 
 from django.forms import ModelForm, Form
-from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField
+from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField, URLField
 from accounts.models import UserProfile
 
 class UserForm(auth.forms.UserCreationForm):
@@ -22,6 +22,10 @@ class UserProfileForm(ModelForm):
     last_name = CharField(label=('Last Name'), max_length=30)
     email = EmailField()
 
+    class Meta:
+        model = UserProfile
+        fields = ('twitter', 'github', 'website', 'linkedin',)
+
     def __init__(self, *args, **kw):
         super(UserProfileForm, self).__init__(*args, **kw)
         self.fields['first_name'].initial = self.instance.user.first_name
@@ -32,6 +36,10 @@ class UserProfileForm(ModelForm):
             'first_name',
             'last_name',
             'email',
+            'twitter',
+            'github',
+            'website',
+            'linkedin',
             ]
 
     def save(self, *args, **kw):
@@ -41,6 +49,3 @@ class UserProfileForm(ModelForm):
         self.instance.user.email = self.cleaned_data.get('email')
         self.instance.user.save()
 
-    class Meta:
-        model = UserProfile
-        fields = ('first_name', 'last_name', 'email',)
