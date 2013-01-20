@@ -30,7 +30,7 @@ class Semester(models.Model):
     is_current_semester = models.BooleanField(default=False)
 
     def __str__(self):
-      return self.semester
+      return '%s - %s' % (self.subject, self.semester)
 
 class Assignment(models.Model):
     id = models.AutoField(primary_key=True)
