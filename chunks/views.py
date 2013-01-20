@@ -38,8 +38,7 @@ def view_chunk(request, chunk_id):
         snippet = chunk.generate_snippet(comment.start, comment.end)
         return (comment, vote, snippet)
 
-    comment_data = map(get_comment_data,
-                       chunk.comments.select_related('author__profile'))
+    comment_data = map(get_comment_data, chunk.comments.select_related('author__profile'))
 
     lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)

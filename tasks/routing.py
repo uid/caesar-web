@@ -5,6 +5,7 @@ import itertools
 
 from django.db.models import Count
 from django.contrib import auth
+from django.contrib.auth.models import User as User_django
 
 from chunks import models
 from models import Task
@@ -61,10 +62,10 @@ class Chunk:
         self.submission = submission
         self.reviewers = set()
         self.class_type = chunk['class_type']
-        self.student_lines = chunk['profile__student_lines']
-        self.return_count = chunk['profile__return_count']
-        self.for_nesting_depth = chunk['profile__for_nesting_depth']
-        self.if_nesting_depth = chunk['profile__if_nesting_depth']
+        self.student_lines = chunk['student_lines']
+        self.return_count = 0
+        self.for_nesting_depth = 0
+        self.if_nesting_depth = 0
 
     def assign_reviewer(self, user):
         if user in self.reviewers:
@@ -299,7 +300,7 @@ def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map=defaultd
 
     tasks = []
     for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, assignment.reviewers_per_chunk, assignment.min_student_lines, chunk_type_priorities):
-      task = Task(reviewer_id=reviewer.id, chunk_id=chunk_id)
+      task = Task(reviewer_id=User_django.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id)
 
       chunk_id_task_map[chunk_id].append(task)
       chunk_map[chunk_id].reviewers.add(reviewer)

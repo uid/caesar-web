@@ -139,6 +139,8 @@ def bulk_add(request):
       else:
         user = User(username=user_str, email=user_email)
         user.save()
+        user.profile.role = 'S'
+        user.profile.save()
         created_users += 1
 
       if not user.membership.filter(semester=semester):

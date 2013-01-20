@@ -31,7 +31,12 @@ def dashboard(request):
     user = request.user
     new_task_count = 0
     open_assignments = False
-    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now(), is_live=True):
+
+    assignments = []
+    for membership in user.membership.all():
+      assignments.extend(filter(lambda assignment: assignment.is_live, membership.semester.assignments.all()))
+
+    for assignment in assignments:
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
         #do not give tasks to students who got extensions
         if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
