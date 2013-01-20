@@ -15,6 +15,7 @@ from chunks.models import Assignment, Submission, File, Chunk, Batch
 from django.db import transaction
 
 # Preprocessor imports
+import parse
 from crawler import crawl_submissions
 from parse import parse_files
 from checkstyle import generate_checkstyle_comments
@@ -59,6 +60,10 @@ if settings['save_data']:
 student_code = crawl_submissions(settings['student_submission_dir'])
 
 code_objects = [parse_files(username, files, batch, assignment, save=settings['save_data']) for (username, files) in student_code.iteritems()]
+
+if parse.failed_users:
+  print "To add the missing users to Caesar, go to caesar.csail.mit.edu/accounts/bulk_add/ and add the folowing list of users:"
+  print ','.join(parse.failed_users)
 
 print "Found %s submissions. Generating checkstyle comments." % (len(code_objects))
 
