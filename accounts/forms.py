@@ -1,11 +1,12 @@
 from django.contrib import auth
 
 from django.forms import ModelForm, Form
-from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField, URLField
+from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField, URLField, ModelChoiceField
 from accounts.models import UserProfile
+from chunks.models import Semester
 
 class UserForm(auth.forms.UserCreationForm):
-    username = CharField(max_length=8, 
+    username = CharField(max_length=8,
             help_text='Please use your Athena username if you have one.')
     first_name = CharField(max_length=30)
     last_name = CharField(max_length=30)
@@ -49,3 +50,6 @@ class UserProfileForm(ModelForm):
         self.instance.user.email = self.cleaned_data.get('email')
         self.instance.user.save()
 
+class UserBulkAddForm(Form):
+  users = CharField(widget=Textarea(attrs={'cols': 10, 'rows': 10}))
+  semester = ModelChoiceField(queryset=Semester.objects.all())

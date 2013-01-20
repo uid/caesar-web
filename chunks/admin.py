@@ -7,6 +7,7 @@ class AssignmentAdmin(admin.ModelAdmin):
     search_fields = ('name', 'semester')
 
 class ChunkAdmin(admin.ModelAdmin):
+    list_display = ('name', 'file', 'start', 'end', 'class_type', 'staff_portion', 'student_lines', 'chunk_info')
     search_fields = ('name', 'file__path', 'file__submission__name')
 
 class StaffMarkerAdmin(admin.ModelAdmin):

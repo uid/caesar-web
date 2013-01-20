@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+
+{% block css %}
+{{ block.super }}
+
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb" href="{% url review.views.manage %}">manage</a>
+  <span class="breadcrumb">adjust reputations</span>
+{% endblock %}
+
+{% block content %}
+
+{% if message %}
+<br />
+<br />
+<p><h2>
+  {{ message }}
+</h2></p>
+{% endif %}
+
+<p>
+<h4>Enter a list of comma seperated usernames to add to the system, and choose a semester to make them members of. Everyone is automatically made a student.</h4>
+</p>
+
+<form id="new-comment-form" 
+  action="{% url accounts.views.bulk_add %}" method="post">
+  {% csrf_token %}
+  {{ form.users }}
+  <br />
+  {{ form.semester }}
+  <br/>
+  <div class ="centered">
+  <button type="submit">Save</button>
+  <button id="cancel-button" type="button">Cancel</button>
+  </div>
+</form>
+{% endblock %}

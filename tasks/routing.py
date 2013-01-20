@@ -120,7 +120,7 @@ def load_chunks(assignment, user_map, django_user):
     django_chunks = models.Chunk.objects \
             .filter(file__submission__assignment=assignment) \
             .exclude(file__submission__author=django_user) \
-            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'profile__student_lines', 'profile__return_count', 'profile__for_nesting_depth', 'profile__if_nesting_depth')
+            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
     django_tasks = Task.objects.filter(
             chunk__file__submission__assignment=assignment) \
             .exclude(chunk__file__submission__author=django_user) \
