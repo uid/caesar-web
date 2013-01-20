@@ -81,9 +81,8 @@ class Assignment(models.Model):
 @receiver(post_save, sender=Assignment)
 def create_current_assignment(sender, instance, created, **kwargs):
     if created:
-        current_semester = 'FA12'
-        instance.semester = current_semester
-        past = Assignment.objects.filter(semester = current_semester).order_by('duedate').exclude(id = instance.id).reverse()
+        # This code appears to copy parms from previous assignments in that semester.
+        past = Assignment.objects.filter(semester = instance.semester).order_by('duedate').exclude(id = instance.id).reverse()
         if past.count() > 0:
             pick = past[0]
             for assignment in past:
