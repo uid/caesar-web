@@ -143,7 +143,7 @@ class Submission(models.Model):
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
-        return self.name
+        return '%s, for %s, %s' % (self.name, self.assignment, self.assignment.semester)
 
     @models.permalink
     def get_absolute_url(self):
