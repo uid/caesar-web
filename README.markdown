@@ -170,3 +170,9 @@ Note: when running ./manage.py syncdb, Django may ask if you want to create a ne
     sudo a2ensite caesar
     sudo /etc/init.d/apache2 restart
 
+To run Caesar in debug mode, use the following command:
+    python -m pdb manage.py runserver localhost:8888
+
+This will cause Django to automatically reload all altered code. Additionally, by using:
+    import pdb; pdb.set_trace()
+you can drop down into a PBD session (incredibly useful for debugging crashes & bugs)
