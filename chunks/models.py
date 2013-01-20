@@ -64,7 +64,7 @@ class Assignment(models.Model):
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):
-        return self.name
+        return '%s, %s' % (self.name, self.semester)
     def is_current_semester(self):
         return self.semester.is_current_semester
     def is_life_assignment(self):
@@ -127,6 +127,9 @@ class Batch(models.Model):
     class Meta:
       verbose_name_plural = 'batches'
 
+    def __str__(self):
+      return 'batch %s for %s' % (self.id, self.assignment)
+
 
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
@@ -143,7 +146,7 @@ class Submission(models.Model):
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
-        return '%s, for %s, %s' % (self.name, self.assignment, self.assignment.semester)
+        return '%s, for %s' % (self.name, self.assignment)
 
     @models.permalink
     def get_absolute_url(self):
