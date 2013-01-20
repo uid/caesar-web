@@ -195,7 +195,7 @@ class File(models.Model):
         db_table = u'files'
         unique_together = (('path', 'submission'))
     def __unicode__(self):
-        return self.path
+        return '%s - %s' % (self.path, self.submission)
 
 
 class ChunkManager(models.Manager):
@@ -246,7 +246,7 @@ class Chunk(models.Model):
         file_data = self.file.data
         # Rewind backwards from the offset to the beginning of the line
         first_line_offset = self.start
-        while file_data[first_line_offset] != '\n':
+        while first_line_offset >= 0 and file_data[first_line_offset] != '\n':
             first_line_offset -= 1
         first_line_offset += 1
         if first_line_offset < 0:
