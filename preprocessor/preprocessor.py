@@ -68,4 +68,4 @@ if parse.failed_users:
 print "Found %s submissions. Generating checkstyle comments." % (len(code_objects))
 
 if settings['generate_comments']:
-  generate_checkstyle_comments(code_objects, settings['save_data'])
+  generate_checkstyle_comments(code_objects, settings['save_data'], batch)

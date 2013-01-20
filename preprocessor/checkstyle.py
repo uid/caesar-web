@@ -20,7 +20,7 @@ def run_checkstyle(path):
   return proc.communicate()[0]
 
 # This probably won't support multi-chunks per file properly
-def generate_comments(chunk, checkstyle_user):
+def generate_comments(chunk, checkstyle_user, batch):
   xml = run_checkstyle(chunk.file.path)
   dom = parseString(xml)
 
@@ -34,6 +34,7 @@ def generate_comments(chunk, checkstyle_user):
       comments.append(Comment(
         text=node.getAttribute('message'),
         chunk=chunk,
+        batch=batch,
         author=checkstyle_user,
         start=node.getAttribute('line'),
         end=node.getAttribute('line')))
@@ -42,7 +43,7 @@ def generate_comments(chunk, checkstyle_user):
   print 'Found %s comments' % (len(comments))
   return comments
 
-def generate_checkstyle_comments(code_objects, save):
+def generate_checkstyle_comments(code_objects, save, batch):
   checkstyle_user = User.objects.filter(username='checkstyle')
   if checkstyle_user:
     checkstyle_user = checkstyle_user[0]
@@ -55,6 +56,6 @@ def generate_checkstyle_comments(code_objects, save):
     i += 1
     print "%s of %s. %s chunks for this submission." % (i, len(code_objects), len(chunks))
     for chunk in chunks:
-      comments = generate_comments(chunk, checkstyle_user)
+      comments = generate_comments(chunk, checkstyle_user, batch)
       if save:
         [comment.save() for comment in comments]
