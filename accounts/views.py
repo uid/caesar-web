@@ -61,7 +61,7 @@ def registration_request (request):
         if valid_email == True:
             # should send out an email with SHA hash as token
             # redirect to some sort of success page
-            send_email(email)
+            send_email(email, request)
             return render(request, 'accounts/registration_request_complete.html')
     return render(request, 'accounts/invalidreg.html', {
         'next': redirect_to,
