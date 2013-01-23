@@ -25,7 +25,7 @@ class UserProfileForm(ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('twitter', 'github', 'website', 'linkedin',)
+        fields = ('twitter', 'github', 'website', 'linkedin','photo','about',)
 
     def __init__(self, *args, **kw):
         super(UserProfileForm, self).__init__(*args, **kw)
@@ -37,6 +37,8 @@ class UserProfileForm(ModelForm):
             'first_name',
             'last_name',
             'email',
+            'photo',
+            'about',
             'twitter',
             'github',
             'website',

@@ -56,7 +56,7 @@ $(document).ready(function() {
           <a href='{{ participant.profile.linkedin}}'><li><i class="foundicon-linkedin"></i></li></a>
         {% endif %}
         {% if participant.profile.website %}
-          <a href='http://github.com/{{ participant.profile.website}}'><li><i class="foundicon-rss"></i></li></a>
+          <a href='{{ participant.profile.website}}'><li><i class="foundicon-rss"></i></li></a>
         {% endif %}
       </ul>
 
@@ -81,8 +81,9 @@ $(document).ready(function() {
     </div>
 
     <div class="span9" id='code'>
-      <h3>Reviews (+{{participant.profile.reputation}})</h3>
+      <h3>My Review Activity</h3>
       {% for assignment, review_data in assignment_data %}
+        {% if review_data %}
           <h3 class="assignment-display">
             <a name="assignment-display"></a> {{ assignment.name }} {%if not assignment.is_current_semester %} - {{ assignment.get_semester_display }} {% endif %}
             <div class="view-all-activity">
@@ -115,6 +116,7 @@ $(document).ready(function() {
             {% empty %}
             {% endfor %}
           </table>
+          {% endif %}
           {% empty %}
             <p>The user has no activity yet.</p>
           {% endfor %}
