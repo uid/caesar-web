@@ -27,6 +27,9 @@ class Member(models.Model):
     user = models.ForeignKey(User, related_name='membership')
     semester = models.ForeignKey(Semester, related_name='members')
 
+    def __str__(self):
+      return '%s (%s), %s' % (self.user.username, self.role, self.semester)
+
 class UserProfile(models.Model):
     def get_photo_path(instance, filename):
         return os.path.join(

@@ -209,4 +209,9 @@ The install script should now display at the end:
     *** LITTLECMS support not available
     --------------------------------------------------------------------
 
+To run Caesar in debug mode, use the following command:
+    python -m pdb manage.py runserver localhost:8888
 
+This will cause Django to automatically reload all altered code. Additionally, by using:
+    import pdb; pdb.set_trace()
+you can drop down into a PBD session (incredibly useful for debugging crashes & bugs)

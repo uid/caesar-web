@@ -1,6 +1,8 @@
 from chunks.models import Assignment, Submission, File, Chunk, Batch
 from django.contrib.auth.models import User
 
+failed_users = []
+
 def get_type(file):
   if 'Test.java' in file.path:
     return 'test'
@@ -24,6 +26,7 @@ def parse_files(username, files, batch, assignment, save):
     user = user[0]
   else:
     print "User %s doesn't exist in the database." % (username)
+    failed_users.append(username)
     return None
 
   # Creating the Submission object

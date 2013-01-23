@@ -35,7 +35,12 @@ def dashboard(request):
     user = request.user
     new_task_count = 0
     open_assignments = False
-    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now(), is_live=True):
+
+    assignments = []
+    for membership in user.membership.all():
+      assignments.extend(filter(lambda assignment: assignment.is_live, membership.semester.assignments.all()))
+
+    for assignment in assignments:
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
         #do not give tasks to students who got extensions
         if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
@@ -127,12 +132,14 @@ def student_stats(request):
         total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
         all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__assignment=assignment).exclude(username='checkstyle').distinct()
         alums_participating = all_alums.count()
-        total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
-        one_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=1)).count()
-        half_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(hours=12)).count()
-        one_day_extension = max(one_day_extension, half_day_extension)
-        two_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=2)).count()
-        three_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=3)).count()
+        total_extension = 0; one_day_extension = 0; half_day_extension = 0; two_day_extension = 0; three_day_extension = 0
+        if (assignment.duedate):
+          total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
+          one_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=1)).count()
+          half_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(hours=12)).count()
+          one_day_extension = max(one_day_extension, half_day_extension)
+          two_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=2)).count()
+          three_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=3)).count()
         total_tasks = Task.objects.filter(chunk__file__submission__assignment=assignment).count()
         assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__assignment=assignment).distinct().count()
         total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__assignment=assignment).distinct().count()
