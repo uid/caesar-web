@@ -82,6 +82,7 @@ def register(request, email, code):
     else:
         # create a new user
         form = UserForm(request.POST)
+        redirect_to = '/'
         if form.is_valid():
             user = form.save()
             username = request.POST['username']
