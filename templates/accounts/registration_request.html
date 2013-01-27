@@ -21,7 +21,7 @@
   <form method="post" action="{% url accounts.views.registration_request %}">
     {% csrf_token %}
 
-    <label for="email">Enter your email here:</label><br />
+    <label for="email">Enter your email here:</label>
     <input type="text" name="email" id="email}" placeholder="___@alum.mit.edu" />
 
     <input type="hidden" name="next" value="{{ next }}" />
