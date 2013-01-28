@@ -64,6 +64,11 @@ $(document).ready(function() {
     <div class="span9">
       <h2 class="name">{{ participant.first_name }} {{ participant.last_name }} <small>{{ participant.username }}</small></h2>
       <h4 class="task header"> reputation: {{participant.profile.reputation}}</h4>
+      {% for membership in participant.membership.all %}
+        <span class='label current-{{membership.semester.is_current_semester}} class'>
+          {{ membership.semester }} ({{ membership.role }})
+        </span>
+      {% endfor %}
       {% if user == participant %}
         <a class='btn btn-small' href="{% url review.views.edit_profile user.username %}">Edit profile</a>
       {% endif %}

@@ -124,3 +124,34 @@ table.assignment-stream {
 .column-right{
     float: right;
 }
+.social li {
+    float: left;
+    margin: 5px;
+    font-size: 20pt;
+}
+.social a {
+    color: #333;
+}
+.social {
+    list-style: none;
+    margin: 10px 0;
+}
+#profile-photo {
+    margin-top: 20px;
+}
+#profile-photo.edit-profile {
+    height: 73px;
+    margin-top: 0;
+}
+.row .span9 {
+    margin-left: 0;
+    padding-left: 19px;
+    border-left: 1px solid #eee;
+}
+.label.class {
+    font-size: 1em;
+    font-weight: normal;
+}
+.label.class.current-True {
+    background-color: #468847;
+}

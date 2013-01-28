@@ -41,7 +41,7 @@ class UserProfile(models.Model):
         ('S', 'Student'),
     )
     user = models.OneToOneField(User, related_name='profile')
-    # photo = ImageField(upload_to=get_photo_path)
+    
     assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
         related_name='reviewers')
     reputation = models.IntegerField(default=0, editable=True)
