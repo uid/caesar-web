@@ -7,18 +7,39 @@
 {% endblock %}
 
 {% block content %}
+
 <div id="profile-container" class="span-24">
     <h2>Editing Profile</h2>
-    <form enctype="multipart/form-data" id="register-form" method="post">
+    <form enctype="multipart/form-data" id="register-form" method="post" class="form-horizontal">
         {% csrf_token %}
+
         {% for field in form %}
-        <p>
-          <label for="{{ field.id }}">
-            {{ field.label }}{% if field.field.required %}*{% endif %}
+
+        <div class="control-group">
+
+        {% if field.label == "Photo" %}
+          <div class="control-label">
+            <strong>Photo</strong>
+          </div>
+
+            <div class="controls">
+              <img id='profile-photo' class='edit-profile img-rounded' src="{{ photo }}"/>
+              <label for="photo-clear_id"><input type="checkbox" name="photo-clear" id="photo-clear_id"> Clear</label>
+              Change: <input type="file" name="photo" id="id_photo">
+            </div>
+
+        {% else %}
+          <label class="control-label" for="{{ field.id }}">
+            <strong>{{ field.label }}{% if field.field.required %}*{% endif %}</strong>
           </label>
-          {{ field }}
-          {{ field.help_text }}
-        </p>
+
+          <div class="controls">
+            {{ field }}
+            <div class='muted'>{{ field.help_text|safe }}</div>
+          </div>
+        {% endif %}
+
+        </div>
 
         {% for error in field.errors %}
         <p class="error">{{ error }}</p>
@@ -30,4 +51,6 @@
 
     </form>
 </div>
+        
+
 {% endblock %}

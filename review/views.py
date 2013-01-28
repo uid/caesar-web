@@ -401,7 +401,12 @@ def summary(request, username):
 def edit_profile(request, username):
     """Edit user profile."""
     profile = User.objects.get(username=username).profile
+    photo = None
     img = None
+    if profile.photo:
+        photo = profile.photo.url
+    else:
+        photo = "http://placehold.it/180x144&text=Student"
 
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES, instance=profile)
@@ -412,13 +417,14 @@ def edit_profile(request, username):
                 imfn = pjoin(settings.MEDIA_ROOT, profile.photo.name)
                 im = PImage.open(imfn)
                 im.thumbnail((180,180), PImage.ANTIALIAS)
-                im.save(imfn, "JPEG")
+                im.save(imfn, "PNG")
             return redirect(reverse('review.views.summary', args=([username])))
     else:
         form = UserProfileForm(instance=profile)
 
     return render(request, 'review/edit_profile.html', {
-        'form': form
+        'form': form,
+        'photo': photo,
     })
 
 @login_required

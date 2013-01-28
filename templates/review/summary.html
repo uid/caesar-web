@@ -41,9 +41,9 @@ $(document).ready(function() {
  <div class="row">
     <div class="span3">
         {% if participant.profile.photo %}
-          <img id='profile-photo' src="{{ participant.profile.photo.url }}" />
+          <img id='profile-photo' class='img-rounded' src="{{ participant.profile.photo.url }}" />
         {% else %}
-          <img id='profile-photo' src="http://placehold.it/180x144&text=Student" />
+          <img id='profile-photo' class='img-rounded' src="http://placehold.it/180x144&text=Student" />
         {% endif %}
       <ul class='social'>
         {% if participant.profile.twitter %}
@@ -65,7 +65,7 @@ $(document).ready(function() {
       <h2 class="name">{{ participant.first_name }} {{ participant.last_name }} <small>{{ participant.username }}</small></h2>
       <h4 class="task header"> reputation: {{participant.profile.reputation}}</h4>
       {% if user == participant %}
-        <a href="{% url review.views.edit_profile user.username %}">Edit profile</a>
+        <a class='btn btn-small' href="{% url review.views.edit_profile user.username %}">Edit profile</a>
       {% endif %}
       {%if user.profile.is_staff %}
           <a class="breadcrumb first-breadcrumb" href="{% url review.views.student_dashboard participant.username%}"> [{{participant.username}} Dashboard]</a> 

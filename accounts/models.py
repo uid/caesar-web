@@ -48,14 +48,20 @@ class UserProfile(models.Model):
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
 
-    photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True)
-    about = MarkdownTextField(allow_html=False, blank=True)
+    photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True,\
+        help_text='Use a JPEG or PNG photo.')
+    about = MarkdownTextField(allow_html=False, blank=True, \
+        help_text='Format using <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a>.')
 
     # social network links
-    twitter = models.CharField(max_length=16, blank=True)
-    github = models.CharField(max_length=30, blank=True)
-    linkedin = models.URLField(blank=True)
-    website = models.URLField(blank=True)
+    twitter = models.CharField(max_length=16, blank=True, \
+        help_text='username. (ex.) caesar-uid')
+    github = models.CharField(max_length=30, blank=True, \
+        help_text='username. (ex.) uid')
+    linkedin = models.URLField(blank=True,\
+        help_text='URL')
+    website = models.URLField(blank=True,\
+        help_text='URL')
 
     token = models.ForeignKey(Token, related_name='invited', default=None, null=True)
     def __unicode__(self):

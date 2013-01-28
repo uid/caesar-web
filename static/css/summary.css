@@ -13,3 +13,7 @@
 #profile-photo {
 	margin-top: 20px;
 }
+#profile-photo.edit-profile {
+	height: 73px;
+	margin-top: 0;
+}
