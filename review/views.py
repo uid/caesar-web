@@ -399,6 +399,9 @@ def summary(request, username):
 
 @login_required
 def edit_profile(request, username):
+    # can't edit if not current user
+    if request.user.username != username:
+        return redirect(reverse('review.views.summary', args=([username])))
     """Edit user profile."""
     profile = User.objects.get(username=username).profile
     photo = None
