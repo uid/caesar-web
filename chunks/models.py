@@ -35,7 +35,7 @@ class Semester(models.Model):
         help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
 
     semester = models.CharField(blank=True, null=False, max_length=32)
-    is_current_semester = models.BooleanField(default=False)
+    is_current_semester = models.BooleanField(default=False, verbose_name='Is in progress')
 
     def __str__(self):
       return '%s - %s' % (self.subject, self.semester)

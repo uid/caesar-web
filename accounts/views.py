@@ -141,7 +141,7 @@ def bulk_add(request):
         'message': 'Invalid form. Are you missing a field?'})
 
     # todo(mglidden): use a regex instead of three replace statements
-    users = form.cleaned_data['users'].replace('\r\n', ',').replace('\n', ',').replace(', ', ',').split(',')
+    users = form.cleaned_data['users'].replace(' ', ',').replace('\t', ',').replace('\r\n', ',').replace('\n', ',').replace(', ', ',').split(',')
 
     semester = form.cleaned_data['semester']
 
