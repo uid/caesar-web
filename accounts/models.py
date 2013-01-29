@@ -51,15 +51,15 @@ class UserProfile(models.Model):
     photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True,\
         help_text='Use a JPEG or PNG photo.')
     about = MarkdownTextField(allow_html=False, blank=True, \
-        help_text='Format using <a href="http://daringfireball.net/projects/markdown/syntax">Markdown</a>.')
+        help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
 
     # social network links
     twitter = models.CharField(max_length=16, blank=True, \
-        help_text='username. (ex.) caesar-uid')
+        help_text='username. (ex.) ben-bitdiddle')
     github = models.CharField(max_length=30, blank=True, \
-        help_text='username. (ex.) uid')
+        help_text='username. (ex.) bitdiddle')
     linkedin = models.URLField(blank=True,\
-        help_text='URL')
+        help_text='public profile URL. (ex.) http://www.linkedin.com/in/kiranbhattaram/')
     website = models.URLField(blank=True,\
         help_text='URL')
 
