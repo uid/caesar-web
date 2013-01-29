@@ -6,6 +6,8 @@ from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
+from accounts.fields import MarkdownTextField
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -26,6 +28,12 @@ class Subject(models.Model):
 class Semester(models.Model):
     id = models.AutoField(primary_key=True)
     subject = models.ForeignKey(Subject, related_name='semesters')
+
+    description = models.CharField(max_length=140, blank=True, \
+        help_text='Subject Name. (ex.) Software Construction')
+    about = MarkdownTextField(allow_html=False, blank=True, \
+        help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
+
     semester = models.CharField(blank=True, null=False, max_length=32)
     is_current_semester = models.BooleanField(default=False)
 
