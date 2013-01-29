@@ -1,10 +1,10 @@
 from django.contrib import auth
 
 from django.forms import ModelForm, Form
-from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField, URLField, ModelChoiceField
+from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField, URLField, ModelChoiceField, IntegerField
 from accounts.models import UserProfile
 from chunks.models import Semester
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 import re
 
 class UserForm(auth.forms.UserCreationForm):
@@ -15,8 +15,17 @@ class UserForm(auth.forms.UserCreationForm):
     first_name = CharField(max_length=30)
     last_name = CharField(max_length=30)
     email = EmailField()
+    class_year = IntegerField(validators=[MinValueValidator(1920), MaxValueValidator(2050)],\
+        help_text='yyyy format. (ex.) 2013',\
+        error_messages={'min_value': ('Enter a valid graduation year.'), 'max_value': ('Enter a valid graduation year.')})
+
     class Meta(auth.forms.UserCreationForm.Meta):
-        fields = ('username', 'first_name', 'last_name', 'email',)
+        fields = ('username', 'first_name', 'last_name', 'class_year', 'email',)
+
+    def save(self, *args, **kwargs):
+        super(UserForm, self).save(*args, **kwargs)
+        self.instance.profile.class_year = self.cleaned_data.get('class_year')
+        self.instance.profile.save()
 
 
 class ReputationForm(Form):
