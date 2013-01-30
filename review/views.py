@@ -36,6 +36,15 @@ def dashboard(request):
     new_task_count = 0
     open_assignments = False
 
+    #todo(mglidden): DELETE
+    if user.profile.tasks.count() == 0:
+      new_task_count += 3
+      open_assignments = True
+      chunk_ids = [1, 2, 3]
+      for chunk_id in chunk_ids:
+        t = Task(reviewer_id=user.profile.id, chunk_id=chunk_id)
+        t.save()
+
     assignments = []
     for membership in user.membership.all():
       assignments.extend(filter(lambda assignment: assignment.is_live, membership.semester.assignments.all()))
