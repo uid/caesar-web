@@ -53,8 +53,8 @@ class UserProfile(models.Model):
         help_text='Use a JPEG or PNG photo.')
     about = MarkdownTextField(allow_html=False, blank=True, \
         help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
-    company = models.CharField(max_length=100, default='MIT')
-    class_year = models.IntegerField(validators=[MinValueValidator(1920), MaxValueValidator(2050)], null=True)
+    company = models.CharField(max_length=100, default='MIT', blank=True)
+    class_year = models.IntegerField(validators=[MinValueValidator(1920), MaxValueValidator(2050)], null=True, blank=True)
 
     # social network links
     twitter = models.CharField(max_length=16, blank=True, \
