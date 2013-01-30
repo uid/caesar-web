@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load account_extras %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/membership.css" type="text/css" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script type="text/javascript" src="{{ STATIC_URL }}js/membership.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class='row'>
+  <div class='span12'>
+    <h1>Available Classes</h1>
+
+    {% for semester in semesters.all %}
+    <div class='class-description well well-large'>
+      <h2>{{ semester.subject.name }}: {{ semester.description }}</h2>
+      <p>{{ semester.about_html|safe }}</p>
+
+      {% if not semester|is_enrolled:enrolled_classes %}
+        <div class='btn btn-info volunteer' data-semester='{{ semester.id }}' data-enrolled='False'>Volunteer</div>
+      {% else %}
+        <div class='btn btn-danger volunteer' data-semester='{{ semester.id }}' data-enrolled='True'>Stop Volunteering</div>
+      {% endif %}
+
+    </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+{% endblock %}

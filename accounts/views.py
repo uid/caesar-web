@@ -103,6 +103,28 @@ def register(request, email, code):
         'email': email
     })
 
+def edit_membership(request):
+    """Allow users to enroll in classes."""
+    user = request.user
+    enrolled_classes = request.user.membership
+
+    if request.method == "POST":
+        # handle ajax post to this url
+        semester_id = request.POST['semester_id']
+        semester = Semester.objects.get(pk=semester_id)
+
+        if request.POST['enrolled']=='True':
+            m = request.user.membership.filter(semester=semester)
+            m.delete()
+        else:
+            m = Member(user=request.user, role='volunteer', semester=semester)
+            m.save()
+
+    return render(request, 'accounts/edit_membership.html', {
+        'semesters': Semester.objects.filter(is_current_semester=True),
+        'enrolled_classes': enrolled_classes,
+    })
+
 @staff_member_required
 def bulk_add(request):
   if request.method == 'GET':

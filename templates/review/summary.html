@@ -75,9 +75,10 @@ $(document).ready(function() {
       {% endfor %}
       {% if user == participant %}
         <a class='btn btn-small' href="{% url review.views.edit_profile user.username %}">Edit profile</a>
+        <a class='btn btn-small' href="{% url accounts.views.edit_membership %}">Enroll in Classes</a>
       {% endif %}
       {%if user.profile.is_staff %}
-          <a class="breadcrumb first-breadcrumb" href="{% url review.views.student_dashboard participant.username%}"> [{{participant.username}} Dashboard]</a> 
+          <a class="breadcrumb first-breadcrumb" href="{% url review.views.student_dashboard e%}"> [{{participant.username}} Dashboard]</a> 
       {%endif%}
     </div>
   </div>

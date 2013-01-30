@@ -21,5 +21,6 @@ urlpatterns = patterns('',
     (r'registration/$', 'accounts.views.registration_request'),
     (r'^registration/complete/$', direct_to_template,
                            {'template': 'accounts/registration_request_complete.html'}),
+    (r'^enroll/', 'accounts.views.edit_membership'),
     (r'bulk_add/', 'accounts.views.bulk_add'),
 )
