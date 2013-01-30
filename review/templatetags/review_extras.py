@@ -7,4 +7,4 @@ def class_year(value):
   if value:
     return "'"+str(value)[2:]
   else:
-    return "<no year specified>"
+    return ""
