@@ -74,8 +74,10 @@ $(document).ready(function() {
         </span>
       {% endfor %}
       {% if user == participant %}
+      <div class='buttons'>
         <a class='btn btn-small' href="{% url review.views.edit_profile user.username %}">Edit profile</a>
         <a class='btn btn-small' href="{% url accounts.views.edit_membership %}">Volunteer for Classes</a>
+      </div>
       {% endif %}
       {%if user.profile.is_staff %}
           <a class="breadcrumb first-breadcrumb" href="{% url review.views.student_dashboard e%}"> [{{participant.username}} Dashboard]</a> 
