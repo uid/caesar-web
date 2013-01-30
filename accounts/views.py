@@ -88,7 +88,7 @@ def register(request, email, code):
             username = request.POST['username']
             password = request.POST['password1']
             user = authenticate(username=username, password=password)
-            redirect_to = reverse('review.views.summary', args=([username]))
+            redirect_to = '/'
             if user is not None:
                 if user.is_active:
                     user.profile.save()
