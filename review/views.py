@@ -20,7 +20,7 @@ from accounts.models import UserProfile
 from simplewiki.models import Article
 
 from pygments import highlight
-from pygments.lexers import JavaLexer
+from pygments.lexers import JavaLexer, SchemeLexer
 from pygments.formatters import HtmlFormatter
 
 from PIL import Image as PImage
