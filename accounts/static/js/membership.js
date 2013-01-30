@@ -30,9 +30,8 @@
 })();
 
 $(document).ready(function() {
-	var toggle_button = function() {
-		var b = $('.btn.volunteer'),
-			status, text;
+	var toggle_button = function(data, b) {
+		var status, text;
 
 		if (b.hasClass('btn-danger')) {
 			text = 'Volunteer';
@@ -50,8 +49,8 @@ $(document).ready(function() {
 	var toggle_class_status = function() {
 		var id = $(this).data('semester'),
 			status = $(this).data('enrolled'),
-			csrftoken = $.cookie('csrftoken');
-		$.post(caesar.urls.edit_membership, {semester_id: id, enrolled: status}, toggle_button);
+			div = $(this);
+		$.post(caesar.urls.edit_membership, {semester_id: id, enrolled: status}, function(data) { toggle_button(data, div); });
 	};
 
 	$('.btn.volunteer').click(toggle_class_status);

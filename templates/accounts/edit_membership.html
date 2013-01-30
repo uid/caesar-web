@@ -13,6 +13,11 @@
 
 {% endblock %}
 
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb" href="{% url accounts.views.edit_membership %}">Volunteer for Classes</a>
+{% endblock %}
+
 {% block content %}
 
 <div class='row'>
@@ -21,7 +26,7 @@
 
     {% for semester in semesters.all %}
     <div class='class-description well well-large'>
-      <h2>{{ semester.subject.name }}: {{ semester.description }}</h2>
+      <h2>{{ semester.subject.name }}: {{ semester.description }} <small>{{ semester.semester }}</small></h2>
       <p>{{ semester.about_html|safe }}</p>
 
       {% if not semester|is_enrolled:enrolled_classes %}
