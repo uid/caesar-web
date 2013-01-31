@@ -103,6 +103,7 @@ def register(request, email, code):
         'email': email
     })
 
+@login_required
 def edit_membership(request):
     """Allow users to enroll in classes."""
     user = request.user
