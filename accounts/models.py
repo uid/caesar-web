@@ -104,6 +104,6 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile, created = UserProfile.objects.get_or_create(user=instance)
         if created:
-            profile.role = 'S'
+            # profile.role = 'S'
             profile.save()
 
