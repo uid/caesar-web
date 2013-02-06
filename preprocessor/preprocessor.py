@@ -17,16 +17,17 @@ from django.db import transaction
 # Preprocessor imports
 import parse
 from crawler import crawl_submissions
-from parse import parse_files
+from parse import parse_all_files, parse_staff_code
 from checkstyle import generate_checkstyle_comments
 
+# NOTE: I never tested directories with traling slashes. Sorry I don't have time to make it more robust :(
 settings = {
     'assignment_id': 2,
     'assignment_name': 'ps3',
     'generate_comments': True,
-    'save_data': True,
+    'save_data': False,
     'semester_id': 1,
-    'staff_dir': '~/staff',
+    'staff_dir': '/home/mglidden/staff/ps3',
     'student_submission_dir': '/home/mglidden/ps3-late',
     }
 
@@ -50,6 +51,8 @@ else:
   print "Shutting down preprocessor."
   exit()
 
+staff_code = parse_staff_code(settings['staff_dir'])
+
 batch = Batch(assignment=assignment)
 if settings['save_data']:
   batch.save()
@@ -59,7 +62,7 @@ if settings['save_data']:
 # Crawling the file system.
 student_code = crawl_submissions(settings['student_submission_dir'])
 
-code_objects = [parse_files(username, files, batch, assignment, save=settings['save_data']) for (username, files) in student_code.iteritems()]
+code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, assignment, settings['save_data'], staff_code)
 
 if parse.failed_users:
   print "To add the missing users to Caesar, go to caesar.csail.mit.edu/accounts/bulk_add/ and add the folowing list of users:"
