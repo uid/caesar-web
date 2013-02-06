@@ -25,7 +25,7 @@ settings = {
     'assignment_id': 2,
     'assignment_name': 'ps3',
     'generate_comments': True,
-    'save_data': False,
+    'save_data': True,
     'semester_id': 1,
     'staff_dir': '/home/mglidden/staff/ps3',
     'student_submission_dir': '/home/mglidden/ps3-late',

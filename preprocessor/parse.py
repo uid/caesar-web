@@ -15,7 +15,8 @@ def parse_staff_code(staff_dir):
   for files in staff_files.values():
     for file_path in files:
       relative_path = '/'.join(file_path.split('/')[num_subdirs:])
-      staff_code[relative_path] = open(file_path).read()
+      staff_lines = open(file_path).read()
+      staff_code[relative_path] = set([line.strip() for line in staff_lines.split('\n')])
 
   return staff_code
 
@@ -74,45 +75,27 @@ def parse_student_files(username, files, batch, assignment, save, student_base_d
       relative_path = '/'.join(file_path.split('/')[num_subdirs:])
 
       if relative_path in staff_code:
-        diff = diff_object.diff_main(staff_code[relative_path], file.data)
-        start_line = 0
-        is_staff_code = False
+        staff_lines = []
+        is_staff_line = False
+        line_start = 0
         current_line = 0
-        import pdb; pdb.set_trace()
-        for diff_value, code in diff:
-          if diff_value == -1:
-            continue
+        for line in file.data.split('\n'):
+          if line.strip() in staff_code[relative_path]:
+            if not is_staff_line:
+              line_start = current_line
+            is_staff_line = True
+          else:
+            if is_staff_line:
+              staff_lines.append((line_start, current_line - 1))
+            is_staff_line = False
+          current_line += 1
 
-          line_count = len(code.split('\n'))
-          if code and code[-1] == '\n':
-            line_count -= 1
-          elif not code:
-            line_count = 0
-          if diff_value == 0 and not is_staff_code:
-            is_staff_code = True
-            start_line = current_line
-          elif diff_value != 0:
-            if is_staff_code:
-              staff_marker = StaffMarker(chunk=chunk, start_line=start_line, end_line=current_line + line_count)
-              if save:
-                staff_marker.save()
+        if is_staff_line:
+          staff_lines.append((line_start, current_line - 1))
 
-              print staff_marker.start_line
-              print staff_marker.end_line
-              print ''
-
-            is_staff_code = False
-
-          current_line += line_count
-
-        if is_staff_code:
-          staff_marker = StaffMarker(chunk=chunk, start_line=start_line, end_line=current_line)
-          if save:
-            staff_marker.save()
-
-
-        print ''
-        print len(file.data.split('\n'))
-        print '\n\n'
+        if save:
+          for start, end in staff_lines:
+            sm = StaffMarker(chunk=chunk, start_line=start, end_line=end)
+            sm.save()
 
   return (submission, file_objects, chunk_objects)
