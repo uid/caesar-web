@@ -79,7 +79,7 @@ $(document).ready(function() {
       </div>
       {% endif %}
       {%if user.profile.is_staff %}
-          <a class="breadcrumb first-breadcrumb" href="{% url review.views.student_dashboard e%}"> [{{participant.username}} Dashboard]</a> 
+          <a class="breadcrumb first-breadcrumb" href="{% url review.views.student_dashboard participant.username %}"> [{{participant.username}} Dashboard]</a> 
       {%endif%}
     </div>
   </div>
