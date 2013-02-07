@@ -22,6 +22,9 @@ class Extension(models.Model):
     assignment = models.ForeignKey(Assignment, related_name='extensions')
     slack_used = models.IntegerField(default=0, blank=True, null=True)
 
+    def __str__(self):
+      return '%s (%s) %s days' % (self.user.username, self.assignment, self.slack_used)
+
 class Member(models.Model):
     role = models.CharField(max_length=16)
     slack_budget = models.IntegerField(default=5, blank=False, null=False)
@@ -95,8 +98,8 @@ class UserProfile(models.Model):
       return self.user.username
 
     def extension_days(self):
-      total_days = 5 #TODO: change after multi-class refactor
-      used_days = sum([extension.slack_used for extension in self.extensions.all()])
+      total_days = 10 #TODO: change after multi-class refactor
+      used_days = sum([extension.slack_used for extension in self.user.extensions.all()])
       return total_days - used_days
 
 @receiver(post_save, sender=User)

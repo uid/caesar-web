@@ -16,7 +16,7 @@ from tasks.routing import assign_tasks
 from models import Comment, Vote, Star
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
-from accounts.models import UserProfile
+from accounts.models import UserProfile, Extension
 from simplewiki.models import Article
 
 from pygments import highlight
@@ -543,7 +543,7 @@ def request_extension(request, assignment_id):
             'days': days,
             'current_day': extended_days,
             'written_days': written_days,
-            'total_days': user.profile.extension_days + extended_days
+            'total_days': user.profile.extension_days() + extended_days
         })
     else: # user already requested an extension
         days = request.POST.get('dayselect', None)
@@ -558,7 +558,8 @@ def request_extension(request, assignment_id):
             total_days = total_left + extended_days
             if extension_days > total_days or extension_days < 0 or extension_days > current_assignment.max_extension:
                 return redirect('review.views.dashboard')
-            extension = Extension(slack_used=extension_days, user=user, assignment=current_assignment)
+            extension,created = Extension.objects.get_or_create(user=user, assignment=current_assignment)
+            extension.slack_used=extension_days
             extension.save()
             #user.profile.extension_days = total_days - extension
             #user.profile.save()
