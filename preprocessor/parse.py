@@ -53,10 +53,10 @@ def parse_student_files(username, files, batch, assignment, save, student_base_d
     return None
 
   # Creating the Submission object
-  submission = Submission(assignment=assignment, batch=batch, author=user, name=username)
+  submission,created = Submission.objects.get_or_create(assignment=assignment, author=user, name=username)
   print submission
-  if save:
-    submission.save()
+  if created:
+    print "*** new submission for this student"
 
   file_objects = []
   chunk_objects = []
