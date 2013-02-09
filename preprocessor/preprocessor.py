@@ -22,13 +22,13 @@ from checkstyle import generate_checkstyle_comments
 
 # NOTE: I never tested directories with traling slashes. Sorry I don't have time to make it more robust :(
 settings = {
-    'assignment_id': 2,
-    'assignment_name': 'ps3',
-    'generate_comments': True,
+    'assignment_id': 5,
+    'assignment_name': 'ps0-beta',
+    'generate_comments': False,
     'save_data': True,
-    'semester_id': 1,
-    'staff_dir': '/home/mglidden/staff/ps3',
-    'student_submission_dir': '/home/mglidden/ps3-late',
+    'semester_id': 2,
+    'staff_dir': 'ps0-staff',
+    'student_submission_dir': 'ps0-students'
     }
 
 starting_time = time.time()
@@ -65,10 +65,11 @@ student_code = crawl_submissions(settings['student_submission_dir'])
 code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, assignment, settings['save_data'], staff_code)
 
 if parse.failed_users:
-  print "To add the missing users to Caesar, go to caesar.csail.mit.edu/accounts/bulk_add/ and add the folowing list of users:"
+  print "To add the missing users to Caesar, use scripts/loadusers.py to add the folowing list of users:"
   print ','.join(parse.failed_users)
 
-print "Found %s submissions. Generating checkstyle comments." % (len(code_objects))
+print "Found %s submissions." % (len(code_objects))
 
 if settings['generate_comments']:
+  print "Generating checkstyle comments..."
   generate_checkstyle_comments(code_objects, settings['save_data'], batch)
