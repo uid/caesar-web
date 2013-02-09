@@ -182,6 +182,7 @@ class File(models.Model):
     path = models.CharField(max_length=200)
     data = models.TextField()
     submission = models.ForeignKey(Submission, related_name='files')
+    batch = models.ForeignKey(Batch, blank=True, null=True, related_name='files')
     created = models.DateTimeField(auto_now_add=True)
     def __split_lines(self):
         first_line_offset = 0

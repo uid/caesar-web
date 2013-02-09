@@ -34,9 +34,9 @@ def get_name(file):
 def create_chunk(file):
   return Chunk(file=file, name=get_name(file), start=0, end=len(file.data), class_type=get_type(file), staff_portion=0, student_lines=0)
 
-def create_file(file_path, submission):
+def create_file(file_path, submission, batch):
   file_data = open(file_path).read()
-  return File(path=file_path, submission=submission, data=file_data)
+  return File(path=file_path, submission=submission, data=file_data, batch=batch)
 
 def parse_all_files(student_code, student_base_dir, batch, assignment, save, staff_code):
   return [parse_student_files(username, files, batch, assignment, save, student_base_dir, staff_code) for (username, files) in student_code.iteritems()]
@@ -63,7 +63,7 @@ def parse_student_files(username, files, batch, assignment, save, student_base_d
 
   # Creating the File objects
   for file_path in files:
-    file = create_file(file_path, submission)
+    file = create_file(file_path, submission, batch)
     file_objects.append(file)
     if save:
       file.save()
