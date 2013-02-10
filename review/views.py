@@ -38,11 +38,11 @@ def dashboard(request):
 
     assignments = []
     for membership in user.membership.all():
-      assignments.extend(filter(lambda assignment: assignment.is_live, membership.semester.assignments.all()))
+      assignments.extend(filter(lambda assignment: assignment.is_live and assignment.code_review_end_date > datetime.datetime.now(), membership.semester.assignments.all()))
 
     for assignment in assignments:
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
-        current_tasks = user.get_profile().tasks.exclude(status='C').exclude(status='U').filter(chunk__file__submission__assignment=assignment)
+        current_tasks = user.get_profile().tasks.filter(chunk__file__submission__assignment=assignment)
         #do not give tasks to students who got extensions or already have tasks for this assignment
         if (not current_tasks.count()) and (len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now()):
             open_assignments = True
@@ -686,7 +686,11 @@ def more_work(request):
         current_tasks = user.get_profile().tasks.exclude(status='C').exclude(status='U')
         total = 0
         if not current_tasks.count():
-            for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now(), is_live=True):
+            assignments = []
+            for membership in user.membership.all():
+              assignments.extend(filter(lambda assignment: assignment.is_live and assignment.code_review_end_date > datetime.datetime.now(), membership.semester.assignments.all()))
+
+            for assignment in assignments:
                 active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
                 #do not give tasks to students who got extensions
                 if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
