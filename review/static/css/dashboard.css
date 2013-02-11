@@ -151,3 +151,10 @@ table.current-assignment {
 .assignment-line {
     border-bottom: 1px solid #aaa;
 }
+.instructions {
+    background-color: #e6efc2;
+    color: #333;
+    font-weight: normal;
+    font-size: 1em;
+    text-shadow: none;
+}

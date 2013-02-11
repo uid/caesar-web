@@ -27,7 +27,11 @@ def crawl_submissions(base_dir, file_extensions=DEFAULT_FILE_EXTENSIONS):
   student_code = defaultdict(list)
 
   for student_dir in student_dirs:
-    for root, _, files in os.walk(base_dir + '/' + student_dir):
+    filepath = base_dir + '/' + student_dir
+    # Make sure we only take non-hidden directories
+    if (not os.path.isdir(filepath)) or student_dir[0] == '.':
+      continue
+    for root, _, files in os.walk(filepath):
       student_code[student_dir].extend([root + '/' + file_path for file_path in files])
     # Only take files of the extension we want.
     student_code[student_dir] = filter(has_valid_file_extension_helper(file_extensions), student_code[student_dir])

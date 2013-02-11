@@ -7,7 +7,6 @@ class AssignmentAdmin(admin.ModelAdmin):
     search_fields = ('name', 'semester')
 
 class ChunkAdmin(admin.ModelAdmin):
-    readonly_fields = ('name', 'file', 'start', 'end', 'created', 'modified', 'staff_portion', 'class_type')
     list_display = ('name', 'file', 'start', 'end', 'class_type', 'staff_portion', 'student_lines', 'chunk_info')
     search_fields = ('name', 'file__path', 'file__submission__name')
 

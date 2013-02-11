@@ -6,6 +6,8 @@ from pygments import highlight
 from pygments.lexers import JavaLexer
 from pygments.formatters import HtmlFormatter
 
+from accounts.fields import MarkdownTextField
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -26,11 +28,17 @@ class Subject(models.Model):
 class Semester(models.Model):
     id = models.AutoField(primary_key=True)
     subject = models.ForeignKey(Subject, related_name='semesters')
+
+    description = models.CharField(max_length=140, blank=True, \
+        help_text='Subject Name. (ex.) Software Construction')
+    about = MarkdownTextField(allow_html=False, blank=True, \
+        help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
+
     semester = models.CharField(blank=True, null=False, max_length=32)
-    is_current_semester = models.BooleanField(default=False)
+    is_current_semester = models.BooleanField(default=False, verbose_name='Is in progress')
 
     def __str__(self):
-      return self.semester
+      return '%s - %s' % (self.subject, self.semester)
 
 class Assignment(models.Model):
     id = models.AutoField(primary_key=True)
@@ -64,7 +72,7 @@ class Assignment(models.Model):
     class Meta:
         db_table = u'assignments'
     def __unicode__(self):
-        return self.name
+        return '%s, %s' % (self.name, self.semester)
     def is_current_semester(self):
         return self.semester.is_current_semester
     def is_life_assignment(self):
@@ -81,9 +89,8 @@ class Assignment(models.Model):
 @receiver(post_save, sender=Assignment)
 def create_current_assignment(sender, instance, created, **kwargs):
     if created:
-        current_semester = 'FA12'
-        instance.semester = current_semester
-        past = Assignment.objects.filter(semester = current_semester).order_by('duedate').exclude(id = instance.id).reverse()
+        # This code appears to copy parms from previous assignments in that semester.
+        past = Assignment.objects.filter(semester = instance.semester).order_by('duedate').exclude(id = instance.id).reverse()
         if past.count() > 0:
             pick = past[0]
             for assignment in past:
@@ -128,6 +135,9 @@ class Batch(models.Model):
     class Meta:
       verbose_name_plural = 'batches'
 
+    def __str__(self):
+      return 'batch %s for %s' % (self.id, self.assignment)
+
 
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
@@ -144,7 +154,7 @@ class Submission(models.Model):
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
-        return self.name
+        return '%s, for %s' % (self.name, self.assignment)
 
     @models.permalink
     def get_absolute_url(self):
@@ -172,11 +182,9 @@ class File(models.Model):
     path = models.CharField(max_length=200)
     data = models.TextField()
     submission = models.ForeignKey(Submission, related_name='files')
+    batch = models.ForeignKey(Batch, blank=True, null=True, related_name='files')
     created = models.DateTimeField(auto_now_add=True)
     def __split_lines(self):
-        # move forward
-        #TODO: fix (mglidden)
-        return;
         first_line_offset = 0
         offset = 0
         while self.data[first_line_offset] == '\n' or self.data[first_line_offset] == '\r':
@@ -193,7 +201,7 @@ class File(models.Model):
         db_table = u'files'
         unique_together = (('path', 'submission'))
     def __unicode__(self):
-        return self.path
+        return '%s - %s' % (self.path, self.submission)
 
 
 class ChunkManager(models.Manager):
@@ -244,7 +252,7 @@ class Chunk(models.Model):
         file_data = self.file.data
         # Rewind backwards from the offset to the beginning of the line
         first_line_offset = self.start
-        while file_data[first_line_offset] != '\n':
+        while first_line_offset >= -len(file_data) and file_data[first_line_offset] != '\n':
             first_line_offset -= 1
         first_line_offset += 1
         if first_line_offset < 0:
@@ -299,9 +307,9 @@ class Chunk(models.Model):
         #         start_line >= 0:
         #     snippet_length += len(self.lines[start_line][1].strip()) + 1
         #     start_line -= 1
-        snippet_lines = self.lines[start_line:end_line + 1]
-        self.start_line = start_line
+        self.start_line = max(0, start_line)
         self.end_line = end_line+1
+        snippet_lines = self.lines[self.start_line:self.end_line + 1]
         return ' '.join(zip(*snippet_lines)[1])
 
     def get_highlighted_lines(self):

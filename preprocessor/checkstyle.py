@@ -1,3 +1,5 @@
+import re
+
 from chunks.models import Assignment, Submission, File, Chunk, Batch
 from review.models import Comment
 from django.contrib.auth.models import User
@@ -5,8 +7,37 @@ from xml.dom.minidom import parseString
 from subprocess import Popen, PIPE
 
 checkstyle_settings = {
-    'settings': '/home/mglidden/checkstyle-5.6/sun_checks.xml',
-    'jar': '/home/mglidden/checkstyle-5.6/checkstyle-5.6-all.jar',
+    'settings': '/var/django/caesar/preprocessor/checks.xml',
+    'jar': '/var/django/caesar/preprocessor/checkstyle-5.6-all.jar',
+    }
+
+comment_regexs = {
+    '.*is a magic number': 'important',
+    'Missing a Javadoc comment': 'important',
+    '.*must match pattern': 'important',
+    'Inner assignments should be avoided': 'important',
+    '.+ must match pattern': 'namingconvention',
+    '.+ is a magic number': 'magicnumber',
+    'Expected \\@param tag': 'javadoc',
+    'Unused \\@throws tag': 'javadoc',
+    'Unused \\@param tag': 'javadoc',
+    'Expected \\@throws': 'javadoc',
+    'Missing a Javadoc': 'javadoc',
+    'Unused Javadoc tag.': 'javadoc',
+    'Expected an \\@return tag': 'javadoc',
+    'Unable to get class information for \\@throws tag': 'javadoc',
+    'Duplicate \\@return tag': 'javadoc',
+    '.+ construct must use .\\{\\}.s': 'braces',
+    '.\\}. should be on the same line': 'braces',
+    '.\\}. should be on a new line': 'braces',
+    'Array brackets at illegal position.': 'braces',
+    '.\\{. should be on the previous line.': 'braces',
+    '.\\}. should be alone on a line': 'braces',
+    'Method length is .+ max allowed is': 'size',
+    'More than .+ parameters': 'size',
+    'Inner assignments should be avoided': 'innerassignment',
+    'Definition of .equals': 'hashcode',
+    'Variable .+ must be private and have accessor methods': 'scope',
     }
 
 def run_checkstyle(path):
@@ -19,8 +50,14 @@ def run_checkstyle(path):
     stdout=PIPE)
   return proc.communicate()[0]
 
+def _post_process_comment(comment):
+  for regex, tag in comment_regexs.iteritems():
+    if re.match(regex, comment):
+      return "%s #%s" % (comment, tag)
+  return comment
+
 # This probably won't support multi-chunks per file properly
-def generate_comments(chunk, checkstyle_user):
+def generate_comments(chunk, checkstyle_user, batch):
   xml = run_checkstyle(chunk.file.path)
   dom = parseString(xml)
 
@@ -32,8 +69,9 @@ def generate_comments(chunk, checkstyle_user):
     node = to_traverse.pop()
     if node.nodeName == 'error' or node.nodeName == 'warning':
       comments.append(Comment(
-        text=node.getAttribute('message'),
+        text=_post_process_comment(node.getAttribute('message')),
         chunk=chunk,
+        batch=batch,
         author=checkstyle_user,
         start=node.getAttribute('line'),
         end=node.getAttribute('line')))
@@ -42,7 +80,7 @@ def generate_comments(chunk, checkstyle_user):
   print 'Found %s comments' % (len(comments))
   return comments
 
-def generate_checkstyle_comments(code_objects, save):
+def generate_checkstyle_comments(code_objects, save, batch):
   checkstyle_user = User.objects.filter(username='checkstyle')
   if checkstyle_user:
     checkstyle_user = checkstyle_user[0]
@@ -55,6 +93,6 @@ def generate_checkstyle_comments(code_objects, save):
     i += 1
     print "%s of %s. %s chunks for this submission." % (i, len(code_objects), len(chunks))
     for chunk in chunks:
-      comments = generate_comments(chunk, checkstyle_user)
+      comments = generate_comments(chunk, checkstyle_user, batch)
       if save:
         [comment.save() for comment in comments]

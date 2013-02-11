@@ -5,6 +5,7 @@ from chunks.models import Chunk, Assignment, Semester
 from sorl.thumbnail import ImageField
 from accounts.fields import MarkdownTextField
 from accounts.storage import OverwriteStorage
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -21,11 +22,17 @@ class Extension(models.Model):
     assignment = models.ForeignKey(Assignment, related_name='extensions')
     slack_used = models.IntegerField(default=0, blank=True, null=True)
 
+    def __str__(self):
+      return '%s (%s) %s days' % (self.user.username, self.assignment, self.slack_used)
+
 class Member(models.Model):
     role = models.CharField(max_length=16)
     slack_budget = models.IntegerField(default=5, blank=False, null=False)
     user = models.ForeignKey(User, related_name='membership')
     semester = models.ForeignKey(Semester, related_name='members')
+
+    def __str__(self):
+      return '%s (%s), %s' % (self.user.username, self.role, self.semester)
 
 class UserProfile(models.Model):
     def get_photo_path(instance, filename):
@@ -38,21 +45,29 @@ class UserProfile(models.Model):
         ('S', 'Student'),
     )
     user = models.OneToOneField(User, related_name='profile')
-    # photo = ImageField(upload_to=get_photo_path)
+    
     assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
         related_name='reviewers')
     reputation = models.IntegerField(default=0, editable=True)
     role = models.CharField(max_length=1, choices=ROLE_CHOICES,
                             blank=True, null=True)
 
-    photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True)
-    about = MarkdownTextField(allow_html=False, blank=True)
+    photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True,\
+        help_text='Use a JPEG or PNG photo.')
+    about = MarkdownTextField(allow_html=False, blank=True, \
+        help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
+    company = models.CharField(max_length=100, default='MIT', blank=True)
+    class_year = models.IntegerField(validators=[MinValueValidator(1920), MaxValueValidator(2050)], null=True, blank=True)
 
     # social network links
-    twitter = models.CharField(max_length=16, blank=True)
-    github = models.CharField(max_length=30, blank=True)
-    linkedin = models.URLField(blank=True)
-    website = models.URLField(blank=True)
+    twitter = models.CharField(max_length=16, blank=True, \
+        help_text='username. (ex.) ben-bitdiddle')
+    github = models.CharField(max_length=30, blank=True, \
+        help_text='username. (ex.) bitdiddle')
+    linkedin = models.URLField(blank=True,\
+        help_text='public profile URL. (ex.) http://www.linkedin.com/in/kiranbhattaram/')
+    website = models.URLField(blank=True,\
+        help_text='URL')
 
     token = models.ForeignKey(Token, related_name='invited', default=None, null=True)
     def __unicode__(self):
@@ -83,8 +98,8 @@ class UserProfile(models.Model):
       return self.user.username
 
     def extension_days(self):
-      total_days = 5 #TODO: change after multi-class refactor
-      used_days = sum([extension.slack_used for extension in self.extensions.all()])
+      total_days = 10 #TODO: change after multi-class refactor
+      used_days = sum([extension.slack_used for extension in self.user.extensions.all()])
       return total_days - used_days
 
 @receiver(post_save, sender=User)
@@ -92,6 +107,6 @@ def create_user_profile(sender, instance, created, **kwargs):
     if created:
         profile, created = UserProfile.objects.get_or_create(user=instance)
         if created:
-            profile.role = 'S'
+            # profile.role = 'S'
             profile.save()
 

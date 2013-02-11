@@ -9,9 +9,11 @@
         <p>
           <label for="{{ field.id }}">
             {{ field.label }}{% if field.field.required %}*{% endif %}
-          </label><br/>
-          {{ field }} <br/>
-          {{ field.help_text }}
+          </label>
+          {{ field }}
+          <span class='help'>
+            {{ field.help_text }}
+          </span>
         </p>
 
         {% for error in field.errors %}

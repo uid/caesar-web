@@ -16,11 +16,11 @@ from tasks.routing import assign_tasks
 from models import Comment, Vote, Star
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
-from accounts.models import UserProfile
+from accounts.models import UserProfile, Extension
 from simplewiki.models import Article
 
 from pygments import highlight
-from pygments.lexers import JavaLexer
+from pygments.lexers import JavaLexer, SchemeLexer
 from pygments.formatters import HtmlFormatter
 
 from PIL import Image as PImage
@@ -35,10 +35,16 @@ def dashboard(request):
     user = request.user
     new_task_count = 0
     open_assignments = False
-    for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now(), is_live=True):
+
+    assignments = []
+    for membership in user.membership.all():
+      assignments.extend(filter(lambda assignment: assignment.is_live and assignment.code_review_end_date > datetime.datetime.now(), membership.semester.assignments.all()))
+
+    for assignment in assignments:
         active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
-        #do not give tasks to students who got extensions
-        if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
+        current_tasks = user.get_profile().tasks.filter(chunk__file__submission__assignment=assignment)
+        #do not give tasks to students who got extensions or already have tasks for this assignment
+        if (not current_tasks.count()) and (len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now()):
             open_assignments = True
             new_task_count += assign_tasks(assignment, user)
 
@@ -127,12 +133,14 @@ def student_stats(request):
         total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
         all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__assignment=assignment).exclude(username='checkstyle').distinct()
         alums_participating = all_alums.count()
-        total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
-        one_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=1)).count()
-        half_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(hours=12)).count()
-        one_day_extension = max(one_day_extension, half_day_extension)
-        two_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=2)).count()
-        three_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=3)).count()
+        total_extension = 0; one_day_extension = 0; half_day_extension = 0; two_day_extension = 0; three_day_extension = 0
+        if (assignment.duedate):
+          total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
+          one_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=1)).count()
+          half_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(hours=12)).count()
+          one_day_extension = max(one_day_extension, half_day_extension)
+          two_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=2)).count()
+          three_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=3)).count()
         total_tasks = Task.objects.filter(chunk__file__submission__assignment=assignment).count()
         assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__assignment=assignment).distinct().count()
         total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__assignment=assignment).distinct().count()
@@ -392,9 +400,17 @@ def summary(request, username):
 
 @login_required
 def edit_profile(request, username):
+    # can't edit if not current user
+    if request.user.username != username:
+        return redirect(reverse('review.views.summary', args=([username])))
     """Edit user profile."""
     profile = User.objects.get(username=username).profile
+    photo = None
     img = None
+    if profile.photo:
+        photo = profile.photo.url
+    else:
+        photo = "http://placehold.it/180x144&text=Student"
 
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES, instance=profile)
@@ -405,13 +421,14 @@ def edit_profile(request, username):
                 imfn = pjoin(settings.MEDIA_ROOT, profile.photo.name)
                 im = PImage.open(imfn)
                 im.thumbnail((180,180), PImage.ANTIALIAS)
-                im.save(imfn, "JPEG")
+                im.save(imfn, "PNG")
             return redirect(reverse('review.views.summary', args=([username])))
     else:
         form = UserProfileForm(instance=profile)
 
     return render(request, 'review/edit_profile.html', {
-        'form': form
+        'form': form,
+        'photo': photo,
     })
 
 @login_required
@@ -526,7 +543,7 @@ def request_extension(request, assignment_id):
             'days': days,
             'current_day': extended_days,
             'written_days': written_days,
-            'total_days': user.profile.extension_days + extended_days
+            'total_days': user.profile.extension_days() + extended_days
         })
     else: # user already requested an extension
         days = request.POST.get('dayselect', None)
@@ -541,7 +558,8 @@ def request_extension(request, assignment_id):
             total_days = total_left + extended_days
             if extension_days > total_days or extension_days < 0 or extension_days > current_assignment.max_extension:
                 return redirect('review.views.dashboard')
-            extension = Extension(slack_used=extension_days, user=user, assignment=current_assignment)
+            extension,created = Extension.objects.get_or_create(user=user, assignment=current_assignment)
+            extension.slack_used=extension_days
             extension.save()
             #user.profile.extension_days = total_days - extension
             #user.profile.save()
@@ -668,7 +686,11 @@ def more_work(request):
         current_tasks = user.get_profile().tasks.exclude(status='C').exclude(status='U')
         total = 0
         if not current_tasks.count():
-            for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now(), is_live=True):
+            assignments = []
+            for membership in user.membership.all():
+              assignments.extend(filter(lambda assignment: assignment.is_live and assignment.code_review_end_date > datetime.datetime.now(), membership.semester.assignments.all()))
+
+            for assignment in assignments:
                 active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
                 #do not give tasks to students who got extensions
                 if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():

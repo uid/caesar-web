@@ -101,10 +101,7 @@ $(document).ready(function() {
         <span class="red-text"> </br> Extended to: {{submission.duedate}} </span>
         {% endif %}
     </td>
-    {%if user.profile.extension_days != 0 or submission.assignment.duedate != submission.duedate %}
-        <td class="=grey-text"><a href="{% url review.views.request_extension submission.assignment.id %}"> request extension</a></td>
-    {%endif%}
-    </td>
+    <td class="=grey-text"><a href="{% url review.views.request_extension submission.assignment.id %}"> request extension</a></td>
 
   </tr>
   {% empty %}
@@ -182,7 +179,8 @@ $(document).ready(function() {
     {% include "review/task.html" %}
   {% empty %}
  <div class="task-empty">No tasks left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>. {%if open_assignments %} Or <button id="more_work" type="button">Get more tasks!</button> <span id="progress"><img src="{{ STATIC_URL }}img/progress.gif"/></span>{% endif%}{% endfor %}
-</div></div>
+</div>
+</div>
 
 <h2 class="task-header">code already reviewed</h2>
 <div id="task-section">
