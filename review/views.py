@@ -365,8 +365,9 @@ def change_task(request):
 
 @login_required
 def summary(request, username):
-    participant = User.objects.get(username__exact=username)
-    if not participant:
+    try:
+        participant = User.objects.get(username__exact=username)
+    except:
         raise Http404
     assignment_data = []
     #get all assignments
