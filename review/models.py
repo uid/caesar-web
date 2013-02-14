@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.conf import settings
 
 from accounts.models import UserProfile
-from chunks.models import Chunk
+from chunks.models import Chunk, Batch
 
 import sys
 
@@ -35,6 +35,7 @@ class Comment(models.Model):
     # to allow for retrieving comments in threaded order in one query
     thread_id = models.IntegerField(null=True)
     deleted = models.BooleanField(default=False)
+    batch = models.ForeignKey(Batch, blank=True, null=True, related_name='comments')
 
     def __unicode__(self):
         return self.text

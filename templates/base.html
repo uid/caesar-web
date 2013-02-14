@@ -5,6 +5,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>{% block title %}Caesar{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     {% block css %}
     <link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" media="screen, projection" />
@@ -15,6 +16,7 @@
     <link rel="stylesheet" href="{{ STATIC_URL}}css/smoothness/jquery-ui.css" type="text/css" media="screen"/>
     <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css" type="text/css" />
     <link rel="stylesheet" href="{{ STATIC_URL }}css/toolbar.css" type="text/css" />
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" type="text/css">
     {% endblock %}
 
     {% block js %}
@@ -33,7 +35,8 @@
                 unvote: '{% url review.views.unvote %}',
                 edit_comment: '{% url review.views.edit_comment %}',
                 cancel_assignment: '{% url review.views.cancel_assignment %}',
-                more_work: '{%url review.views.more_work %}'
+                more_work: '{%url review.views.more_work %}',
+                edit_membership: '{% url accounts.views.edit_membership %}'
             }
         };
 
@@ -132,6 +135,18 @@
 
 </head>
   <body>
+
+    <div id="messages">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{message.tags}}">
+            <a class="close" data-dismiss="alert">×</a>
+            {{message}}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
     <div class="container ">
 
       {% block header %}
@@ -181,9 +196,9 @@
       {% endblock %}
 
       {% block footer %}
-      <div id="footer" class="span-24 prepend-top">
-          Some Icons are Copyright © <a href="http://p.yusukekamiyamane.com/" target="_blank">Yusuke Kamiyamane.</a>
-      </div>
+      <footer id="footer" class="footer span-24 prepend-top">
+          Questions or comments about this system? Please contact <a href="mailto:caesar@csail.mit.edu">caesar@csail.mit.edu</a>.
+      </footer>
       {% endblock %}
     </div>
   </body>

@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 from pygments import highlight
-from pygments.lexers import JavaLexer
+from pygments.lexers import JavaLexer, SchemeLexer
 from pygments.formatters import HtmlFormatter
 
 from simplewiki.models import Article
@@ -38,10 +38,13 @@ def view_chunk(request, chunk_id):
         snippet = chunk.generate_snippet(comment.start, comment.end)
         return (comment, vote, snippet)
 
-    comment_data = map(get_comment_data,
-                       chunk.comments.select_related('author__profile'))
+    comment_data = map(get_comment_data, chunk.comments.select_related('author__profile'))
 
-    lexer = JavaLexer()
+    # TODO(mglidden): remove
+    if chunk.id == 1:
+      lexer = SchemeLexer()
+    else:
+      lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     numbers, lines = zip(*chunk.lines)
     # highlight the code this way to correctly identify multi-line constructs
@@ -246,7 +249,7 @@ def simualte(request, assignment_id):
         num = 0
         if name in chunks_graph:
             lines_dict, num = chunks_graph[name]
-        lines = min(chunk.profile.student_lines, 200)
+        lines = min(chunk.student_lines, 200)
         if lines in lines_dict:
             copies = lines_dict[lines]
             if not (lines == 200 and copies == 10):
