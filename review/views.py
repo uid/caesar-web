@@ -575,7 +575,10 @@ def request_extension(request, assignment_id):
 
 @login_required
 def student_dashboard(request, username):
-    participant = User.objects.get(username=username)
+    try:
+        participant = User.objects.get(username=username)
+    except:
+        raise Http404
     user = request.user
     if user.profile.role != 'T':
         raise Http404
