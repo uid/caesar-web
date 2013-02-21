@@ -12,6 +12,7 @@ from models import Task
 import random
 import sys
 import app_settings
+import logging
 
 __all__ = ['assign_tasks']
 
@@ -223,19 +224,22 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
 
 
     def make_chunk_sort_key(user):
-      def chunk_sort_key(chunk):
-        review_priority = len(chunk.reviewers)
-
+      def chunk_sort_key(chunk):        
+        num_nonstaff_reviewers = len([u for u in chunk.reviewers if u.role != "staff"])
         if user.role == 'staff':
-          if len(chunk.reviewers) <= reviewers_per_chunk:
-            review_priority = -1 * len(chunk.reviewers)
+          # prioritize chunks that are approaching their quota of nonstaff reviewers
+          review_priority = max(reviewers_per_chunk - num_nonstaff_reviewers, 0)
+          # deprioritize chunks that already have staff reviewers
+          review_priority += len([u for u in chunk.reviewers if u.role == "staff"])
         else:
-          if len(chunk.reviewers) < reviewers_per_chunk:
-            review_priority = 0
-
+          if num_nonstaff_reviewers < reviewers_per_chunk:
+            review_priority = 0 # high priority!  try to finish the quota on this chunk
+          else:
+            review_priority = num_nonstaff_reviewers # prioritize chunks with fewer reviewers
+        
         if chunk.student_lines <= min_student_lines:
-            review_priority = 15
-
+            review_priority = 100000 # deprioritize really short chunks
+        
         type_priority = 0
         if chunk.name in priority_dict:
             type_priority = priority_dict[chunk.name]
@@ -257,9 +261,9 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             -(chunk.student_lines if chunk.student_lines != None else 0),
         )
       return chunk_sort_key
-
+    
     key = make_chunk_sort_key(user)
-
+    
     if not chunks:
         return
     for _ in itertools.repeat(None, count):
