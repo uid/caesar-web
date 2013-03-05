@@ -1,10 +1,5 @@
 import os
-
-# run tests in memory
-if 'test' in sys.argv:
-    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
-# don't migrate for tests
-SOUTH_TESTS_MIGRATE = False
+import sys
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 def project_path(s):
@@ -140,7 +135,6 @@ INSTALLED_APPS = (
     'south',
     'sorl.thumbnail',
     'debug_toolbar',
-    'django_extensions',
 
     'utils',
     'accounts',
@@ -178,3 +172,9 @@ MINIMUM_SNIPPET_LENGTH = 80
 
 
 from settings_local import *
+
+# run tests in memory
+if 'test' in sys.argv:
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
+# don't migrate for tests
+SOUTH_TESTS_MIGRATE = False
