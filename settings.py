@@ -1,5 +1,11 @@
 import os
 
+# run tests in memory
+if 'test' in sys.argv:
+    DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
+# don't migrate for tests
+SOUTH_TESTS_MIGRATE = False
+
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 def project_path(s):
     return os.path.join(PROJECT_ROOT, s)
