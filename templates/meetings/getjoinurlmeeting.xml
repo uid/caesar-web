@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<header>
+		<securityContext>
+			<webExID>eecs-code-review</webExID>
+			<password>otseitis</password>
+			<siteName>mit</siteName>
+		</securityContext>
+	</header>
+	<body>
+		<bodyContent
+		xsi:type="java:com.webex.service.binding.meeting.GetjoinurlMeeting">
+			<sessionKey>{{meeting_key}}</sessionKey>
+		</bodyContent>
+	</body>
+</serv:message>

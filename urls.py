@@ -17,6 +17,7 @@ urlpatterns = patterns('',
         'template_name': 'accounts/login.html',    
     }),
     (r'^chunks/', include('chunks.urls')),
+    (r'^meetings/', include('meetings.urls')),
     (r'^review/', include('review.urls')),
     (r'^wiki/', include('simplewiki.urls')),
 

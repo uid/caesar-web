@@ -103,6 +103,9 @@ class UserProfile(models.Model):
       used_days = sum([extension.slack_used for extension in self.user.extensions.all()])
       return total_days - used_days
 
+    def get_scheduled_meetings(self): 
+        return self.meeting_set.exclude(meeting_status ='F').exclude(meeting_status='D').all()
+
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

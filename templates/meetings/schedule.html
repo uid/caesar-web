@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block css %}
+
+{{ block.super }}
+<title>Schedule Meeting</title>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/login.css" type="text/css" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
+<script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+<script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+<!--{{meeting_form.media}} -->
+<style>
+	.hdr {
+		font-family: Verdana;
+		font-size: 10pt;
+		font-weight: bold;
+	}
+	.reg {
+		font-family: Verdana;
+		font-size: 8pt;
+		font-weight: bold;
+	}
+</style>
+
+<script>
+	$(document).ready(function() {
+		$(".datePicker").datepicker();
+	});
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div align="center">
+	<h1>Schedule Meeting</h1>
+	<table border="0" width="60%" cellspacing="0" cellpadding="0">
+		<form method="post" action="/schedule/">
+			{% csrf_token %}
+			<tr>
+				<td class="reg" width="100%"  colspan="2" align="center"> {{meeting_form.as_table}} </td>
+			</tr>
+			<tr>
+				<td class="reg" width="50%">&nbsp;</td>
+				<td class="reg" width="50%">&nbsp;</td>
+			</tr>
+			<tr>
+				<td class="reg" width="100%"  colspan="2" align="center">
+				<input type="submit" value="Submit" name="B1" tabindex="9">
+				<input type="reset" value="Reset" name="B2" tabindex="10">
+				</td>
+			</tr>
+			<tr>
+				<td class="reg" width="50%">&nbsp;</td>
+				<td class="reg" width="50%">&nbsp;</td>
+			</tr>
+		</form>
+	</table>
+</div>
+
+{% endblock %}

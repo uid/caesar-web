@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block css %}
+
+{{ block.super }}
+<title>View Meetings</title>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/login.css" type="text/css" />
+{% endblock %}
+
+{% block content %}
+{% if meeting_map_items%}
+<table>
+	{% for meeting, meeting_url in meeting_map_items %}
+	<tr style='background-color:{%cycle FFFFFF,EEEEEE as rowcolor%}'>
+		<td> {{ meeting.meeting_name }} </td>
+		<td> {{meeting.meeting_start_datetime}} </td>
+		<td><a href="{{meeting_url}}"> Join </a></td>
+		<td><a href="/edit/{{meeting.meeting_key}}"> Edit </a></td>
+		<td><a href="/delete/{{meeting.meeting_key}}"> Delete </a></td>
+		{% if meeting.meeting_status == 'I' %}
+		<td style='color:red'>In Progress!</td>
+		{% else %}
+		<td></td>
+		{% endif %}
+	</tr>
+	{% endfor %}
+</table>
+{% else %}
+<p>
+	No meetings scheduled.
+</p>
+{% endif %}
+<p>
+	<a href="/schedule/"> Schedule Meeting </a>
+</p>

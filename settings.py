@@ -139,6 +139,7 @@ INSTALLED_APPS = (
     'utils',
     'accounts',
     'chunks',
+    'meetings'
     'review',
     'tasks',
     'simplewiki',

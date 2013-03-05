@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<header>
+		<securityContext>
+			<webExID>eecs-code-review</webExID>
+			<password>otseitis</password>
+			<siteName>mit</siteName>
+		</securityContext>
+	</header>
+	<body>
+		<bodyContent
+		xsi:type="java:com.webex.service.binding.meeting.SetMeeting">
+			<metaData>
+				<confName>{{meeting.meeting_name|safe}}</confName>
+			</metaData>
+			<participants>
+				<attendees>
+					{% for user in attendees %}
+					<attendee>
+						<person>
+							<name>{{user.username|safe}}</name>
+							<email>{{user.email|safe}}</email>
+						</person>
+						{% if '@mit.edu' in user.email %}
+						<role>HOST</role>
+						{% else %}
+						<role>ATTENDEE</role>
+						{% endif %}
+					</attendee>
+					{% endfor %}
+				</attendees>
+			</participants>
+			<schedule>
+				<startDate>{{meeting.meeting_start_datetime|date:"m/d/Y H:i:00"|safe}}</startDate>
+				<duration>{{meeting.meeting_duration}}</duration>
+				<timeZoneID>11</timeZoneID>
+			</schedule>
+			<meetingkey>{{meeting.meeting_key}}</meetingkey>
+		</bodyContent>
+	</body>
+</serv:message>

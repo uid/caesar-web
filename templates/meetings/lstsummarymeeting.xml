@@ -1,0 +1,26 @@
+<serv:message xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<header>
+		<securityContext>
+			<webExID>eecs-code-review</webExID>
+			<password>otseitis</password>
+			<siteName>mit</siteName>
+		</securityContext>
+	</header>
+	<body>
+		<bodyContent
+		xsi:type="java:com.webex.service.binding.meeting.LstsummaryMeeting">
+			<listControl>
+				<startFrom>1</startFrom>
+				<listMethod>OR</listMethod>
+			</listControl>
+			<dateScopeType>
+				<timeZoneID>11</timeZoneID>
+				<endDateStart>{{endDateStart|date:"m/d/Y H:i:00"|safe}}</endDateStart>
+			</dateScopeType>
+			<order>
+				<orderBy>STARTTIME</orderBy>
+				<orderAD>DESC</orderAD>
+			</order>
+		</bodyContent>
+	</body>
+</serv:message>
