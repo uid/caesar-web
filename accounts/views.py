@@ -91,6 +91,7 @@ def register(request, email, code):
             redirect_to = '/'
             if user is not None:
                 if user.is_active:
+                    user.profile.role = 'A'
                     user.profile.save()
                     auth.login(request, user)
                     return redirect(redirect_to)
