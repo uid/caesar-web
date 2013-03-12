@@ -55,6 +55,6 @@ function getFormattedHashtagText(text) {
 
 function formatHashtags() {
     $('.comment-text').each(function(i, l) {
-        l.innerHTML =  getFormattedHashtagText(l.textContent);
+        $(l).html(getFormattedHashtagText($(l).html()));
     });
 }
