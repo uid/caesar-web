@@ -41,7 +41,7 @@ def dashboard(request):
 
     for review_milestone in live_review_milestones:
         current_tasks = user.get_profile().tasks.filter(milestone__id=review_milestone.id)
-        active_sub = Submission.objects.filter(name=user.username, milestone=review_milestone.submission_milestone)
+        active_sub = Submission.objects.filter(name=user.username, milestone__id=review_milestone.submission_milestone.id)
         #do not give tasks to students who got extensions or already have tasks for this assignment
         if (not current_tasks.count()) and active_sub.count():
             open_assignments = True
@@ -147,7 +147,7 @@ def student_stats(request):
             num_extensions = Extension.objects.filter(milestone=milestone).filter(slack_used=num_days).count()
             exstension_data.append((num_days, num_extensions))
             
-        total_tasks = Task.objects.filter(milestone_submission_milestone=milestone).count()
+        total_tasks = Task.objects.filter(milestone__submission_milestone__id=milestone.id).count()
         assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__milestone=milestone).distinct().count()
         total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__milestone=milestone).distinct().count()
         total_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).count()
@@ -458,7 +458,7 @@ def all_activity(request, review_milestone_id, username):
         raise Http404
     #get all relevant chunks
     chunks = Chunk.objects \
-        .filter(file__submission__milestone__id = review_milestone__submission_milestone__id) \
+        .filter(file__submission__milestone__id = review_milestone.submission_milestone.id) \
         .filter(Q(comments__author=participant) | Q(comments__votes__author=participant)) \
         .select_related('comments__votes', 'comments__author_profile')
     chunk_set = set()
@@ -682,7 +682,7 @@ def more_work(request):
 
              for milestone in live_review_milestones:
                 current_tasks = user.get_profile().tasks.filter(milestone=milestone)
-                active_sub = Submission.objects.filter(name=user.username, milestone=milestone.reviewmilestone.submission_milestone)
+                active_sub = Submission.objects.filter(name=user.username, milestone__id=milestone.reviewmilestone.submission_milestone.id)
                 #do not give tasks to students who got extensions or already have tasks for this assignment
                 if (not current_tasks.count()) and active_sub.count():
                     open_assignments = True

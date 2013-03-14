@@ -417,7 +417,7 @@ def list_users(request, review_milestone_id):
     return [checkstyle, students, alum, staff]
 
   review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
-  submissions = Submission.objects.filter(milestone=review_milestone.submission_milestone)
+  submissions = Submission.objects.filter(milestone__id=review_milestone.submission_milestone.id)
   data = {}
   chunk_task_map = defaultdict(list)
   chunk_map = {}

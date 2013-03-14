@@ -89,7 +89,7 @@ def create_current_assignment(sender, instance, created, **kwargs):
             pick = past[0]
             for milestone in past:
                 #check that the assignment had tasks assigned
-                chunks = Chunk.objects.filter(file__submission__milestone__id=milestone_id)
+                chunks = Chunk.objects.filter(file__submission__milestone__id=milestone.id)
                 tasks = False
                 for chunk in chunks:
                     if chunk.tasks.count() > 0:
@@ -197,7 +197,7 @@ class Submission(models.Model):
         return chunks
 
     def code_review_end_date(self):
-        review_milestones = ReviewMilestone.filter(submission_milestone_id=self.milestone.id)
+        review_milestones = ReviewMilestone.filter(submission_milestone__id=self.milestone.id)
         if review_milestones:
             return review_milestones.latest('duedate').duedate
         else:
