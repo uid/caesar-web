@@ -116,11 +116,11 @@ def load_chunks(submission_milestone, user_map, django_user):
 
     django_submissions = submission_milestone.submissions.exclude(author=django_user).values()
     django_chunks = models.Chunk.objects \
-            .filter(file__submission__milestone=submission_milestone) \
+            .filter(file__submission__milestone__id=submission_milestone.id) \
             .exclude(file__submission__milestone__author=django_user) \
             .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
     django_tasks = Task.objects.filter(
-            chunk__file__submission__milestone=submission_milestone) \
+            chunk__file__submission__milestone__id=submission_milestone.id) \
             .exclude(chunk__file__submission__author=django_user) \
                     .select_related('reviewer__user') \
 
