@@ -1,4 +1,4 @@
-from chunks.models import Chunk, File, Assignment, Submission, StaffMarker
+from chunks.models import Chunk, File, Assignment, ReviewMilestone, Submission, StaffMarker
 from chunks.forms import SimulateRoutingForm
 from review.models import Comment, Vote, Star
 from tasks.models import Task
@@ -26,7 +26,7 @@ from collections import defaultdict
 def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
-    if user.profile.is_student() and not chunk.file.submission.assignment.is_current_semester() and user != chunk.file.submission.author:
+    if user.profile.is_student() and not chunk.file.submission.assignment().is_current_semester() and user != chunk.file.submission.author:
         raise Http404
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
@@ -89,9 +89,9 @@ def view_all_chunks(request, viewtype, submission_id):
     submission = Submission.objects.get(id = submission_id)
     if not files:
         raise Http404
-    assignment = files[0].submission.assignment
-    assignment_name = assignment.name
-    if user.profile.is_student() and not assignment.is_current_semester() and user != submission.author:
+    milestone = files[0].submission.milestone
+    milestone_name = milestone.full_name()
+    if user.profile.is_student() and not milestone.assignment.is_current_semester() and user != submission.author:
         raise Http404
     paths = []
     user_stats = []
@@ -179,7 +179,7 @@ def view_all_chunks(request, viewtype, submission_id):
     path_and_stats = zip(paths, user_stats, static_stats)
 
     return render(request, 'chunks/view_all_chunks.html', {
-        'assignment_name': assignment_name,
+        'milestone_name': milestone_name,
         'path_and_stats': path_and_stats,
         'file_data': file_data,
         'code_only': code_only,
@@ -188,51 +188,13 @@ def view_all_chunks(request, viewtype, submission_id):
         'full_view': True,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
+
+# simulalte?
 @login_required
-def submit_assignment(request, assignment_id):
+def simualte(request, review_milestone_id):
     user = request.user
-    current_assignment = Assignment.objects.get(id=assignment_id)
-    if datetime.datetime.now() > current_assignment.duedate:
-        return render(request, 'chunks/submit_assignment.html', {
-            'submission': submission,
-            'author': author,
-            'new_submission': False,
-            'late': True
-        })
-    #check if there is an existing submission
-    submission = Submission.objects.get(author=user, assignment=current_assignment)
-    p = subprocess.Popen(['/Users/elena/Documents/Praetor/praetor/codeTester', '/Users/elena/Documents/Praetor/server_files/trunk'], stdout=subprocess.PIPE)
-    afile, err = p.communicate()
-    changedate = "Last Changed Date: "
-    changerevision = "Last Changed Rev: "
-    changeauthor = "Last Changed Author: "
-    dateindex = afile.find(changedate)
-    date = afile[dateindex + len(changedate):]
-    year, month, day = date.split(" ")[0].split("-")
-    hour, minute, sec = date.split(" ")[1].split(":")
-    submission.revision_date = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(sec))
-    #warn about time since last submission
-    hour_buffer = datetime.datetime.now() - datetime.timedelta(hours=1)
-    warn_hours = False
-    if submission.revision_date < hour_buffer:
-        warn_hours = True
-    revindex = afile.find(changerevision)
-    rev = int(afile[revindex + len(changerevision): dateindex])
-    #check that this is a new revision and not the one that was already stored
-    new_submission = True
-    if rev == submission.revision:
-        new_submission = False
-    submission.revision = rev
-    #verify author
-    authorindex = afile.find(changeauthor)
-    author = afile[authorindex + len(changeauthor): revindex]
-    submission.save()
-    return redirect('review.views.dashboard')
-@login_required
-def simualte(request, assignment_id):
-    user = request.user
-    assignment = Assignment.objects.get(id=assignment_id)
-    assignment_chunks = Chunk.objects.filter(file__submission__assignment__id = assignment_id).select_related('file__submission__assignment', 'profile')
+    review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
+    milestone_chunks = Chunk.objects.filter(file__submission__milestone__id = review_milestone.submission_milestone.id).select_related('file__submission__milestone', 'profile')
 
     chunks_graph = dict()
     edited = set()
@@ -241,7 +203,7 @@ def simualte(request, assignment_id):
     max_important = 0
     max_test = 0
     max_unimportant = 0
-    for chunk in assignment_chunks:
+    for chunk in milestone_chunks:
         name = chunk.name
         if name is None:
             continue
@@ -320,7 +282,7 @@ def simualte(request, assignment_id):
 	    chunks_data.append((name, 0))
 
     if request.method == 'GET':
-        to_assign = assignment.chunks_to_assign
+        to_assign = review_milestone.chunks_to_assign
         if to_assign is not None:
             count = 0
             for chunk_info in to_assign.split(",")[0:-1]:
@@ -330,7 +292,8 @@ def simualte(request, assignment_id):
 
 
         return render(request, 'chunks/simulate.html', {
-            'assignment': assignment,
+            'assignment': review_milestone.assignment,
+            'review_milestone': review_milestone,
             'chunks_data': chunks_data,
             'important_graph': important_graphs,
             'unimportant_graph': unimportant_graphs,
@@ -343,6 +306,7 @@ def simualte(request, assignment_id):
         students = request.POST['students']
         alums = request.POST['alums']
         staff = request.POST['staff']
+        assignment = review_milestone.assignment
         assignment.students = students
         assignment.alums = alums
         assignment.staff = staff
@@ -350,11 +314,11 @@ def simualte(request, assignment_id):
         assignment.student_count = request.POST['student_tasks']
         assignment.alum_count = request.POST['alum_tasks']
         assignment.staff_count = request.POST['staff_tasks']
-
-        assignment.reviewers_per_chunk = request.POST['per_chunk']
-        assignment.min_student_lines = request.POST['min_lines']
         assignment.save()
 
+        review_milestone.reviewers_per_chunk = request.POST['per_chunk']
+        review_milestone.min_student_lines = request.POST['min_lines']
+        review_milestone.save()
 
         chunks_raw = request.POST.getlist('chunk')
         checked = set()
@@ -376,12 +340,13 @@ def simualte(request, assignment_id):
                 chunks_data[count] = (split_info[0], int(split_info[1]))
                 count += 1
 
-        assignment.chunks_to_assign = to_assign
-        assignment.save()
+        review_milestone.chunks_to_assign = to_assign
+        review_milestone.save()
 
 
         return render(request, 'chunks/simulate.html', {
             'assignment': assignment,
+            'review_milestone': review_milestone,
             'chunks_data': chunks_data,
             'important_graph': important_graphs,
             'unimportant_graph': unimportant_graphs,
@@ -392,7 +357,7 @@ def simualte(request, assignment_id):
         })
 
 @login_required
-def list_users(request, assignment_id):
+def list_users(request, review_milestone_id):
   def cmp_user_data(user_data1, user_data2):
     user1 = user_data1['user']
     user2 = user_data2['user']
@@ -451,8 +416,8 @@ def list_users(request, assignment_id):
 
     return [checkstyle, students, alum, staff]
 
-  assignment = Assignment.objects.get(id=assignment_id)
-  submissions = Submission.objects.filter(assignment=assignment_id)
+  review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
+  submissions = Submission.objects.filter(milestone=review_milestone.submission_milestone)
   data = {}
   chunk_task_map = defaultdict(list)
   chunk_map = {}
@@ -467,8 +432,8 @@ def list_users(request, assignment_id):
     form = SimulateRoutingForm(request.POST)
 
   if form: #and form.is_valid():
-    #chunk_task_map = simulate_tasks(assignment, form.cleaned_data['num_students'], form.cleaned_data['num_staff'], form.cleaned_data['num_alum'])
-    chunk_task_map = simulate_tasks(assignment, 0, 0, 0)
+    #chunk_task_map = simulate_tasks(review_milestone, form.cleaned_data['num_students'], form.cleaned_data['num_staff'], form.cleaned_data['num_alum'])
+    chunk_task_map = simulate_tasks(review_milestone, 0, 0, 0)
 
     for (chunk_id, tasks) in chunk_task_map.iteritems():
       for task in tasks:

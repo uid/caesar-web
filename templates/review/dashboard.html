@@ -93,15 +93,15 @@ $(document).ready(function() {
 </div>
 
 <table class="current-assignment">
-  {% for submission in current_submissions %}
+  {% for submission, extension in current_submission_data %}
   <tr class="assignment-line">
-    <td class="black-text"> {{ submission.assignment.name }} </td>
-    <td class="grey-text"> Due on: {{ submission.assignment.duedate }} 
-        {%if submission.assignment.duedate != submission.duedate %}
-        <span class="red-text"> </br> Extended to: {{submission.duedate}} </span>
+    <td class="black-text"> {{ submission.milestone.full_name}} </td>
+    <td class="grey-text"> Due on: {{ submission.milestone.duedate }} 
+        {%if extension %}
+          <span class="red-text"> </br> Extended to: {{extension.new_duedate}} </span>
         {% endif %}
     </td>
-    <td class="=grey-text"><a href="{% url review.views.request_extension submission.assignment.id %}"> request extension</a></td>
+    <td class="=grey-text"><a href="{% url review.views.request_extension submission.milestone.id %}"> request extension</a></td>
 
   </tr>
   {% empty %}
@@ -116,7 +116,7 @@ $(document).ready(function() {
   
   <div id ="submission-{{submission.id}}" class="submission-line">
     <span class="chunk-name">
-      {{ submission.assignment.name }}
+      {{ submission.milestone.full_name }}
     </span>
     <span class="task-stats">
       <span class="reviewer-count" title="Reviewers">
@@ -143,7 +143,7 @@ $(document).ready(function() {
   
       <div id ="submission-{{submission.id}}" class="submission-line">
         <span class="chunk-name">
-          {{ submission.assignment.name }}
+          {{ submission.milestone.full_name }}
         </span>
         <span class="task-stats">
           <span class="reviewer-count" title="Reviewers">

@@ -42,13 +42,13 @@ def view(request, wiki_url):
         if revision.revision_user not in contributors:
             contributors.append(revision.revision_user)
     num_uses_total = Comment.objects.filter(text__icontains='#' + article.slug).count()
-    current_semester_comments = Comment.objects.filter(chunk__file__submission__assignment__semester="FA12",
+    current_semester_comments = Comment.objects.filter(chunk__file__submission__milestone__assignment__semester="FA12",
                                                        text__icontains = "#" + article.slug).distinct().exclude(author__username = "checkstyle")
     
     review_data = view_helper(current_semester_comments[0:15])
-    commenters = User.objects.filter(comments__chunk__file__submission__assignment__semester="FA12",
+    commenters = User.objects.filter(comments__chunk__file__submission__milestone__assignment__semester="FA12",
                                      comments__text__icontains = "#" + article.slug).exclude(username="checkstyle").distinct()
-    num_checkstyle_uses_semester = Comment.objects.filter(chunk__file__submission__assignment__semester="FA12",
+    num_checkstyle_uses_semester = Comment.objects.filter(chunk__file__submission__milestone__assignment__semester="FA12",
                                                           text__icontains = "#" + article.slug,
                                                           author__username = "checkstyle").count()
     
