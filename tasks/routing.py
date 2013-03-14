@@ -93,12 +93,8 @@ def _convert_assignment_to_priority(assignment):
     to_assign = assignment.chunks_to_assign
     priority_dict = dict()
     for chunk_info in to_assign.split(",")[0:-1]:
-        split_info = chunk_info.split(" ")
-        if int(split_info[1]):
-            priority_dict[split_info[0]] = -1
-        else:
-            priority_dict[split_info[0]] = 0
-
+        [chunkname, priority] = chunk_info.split(" ")
+        priority_dict[chunkname] = -int(priority)
     return priority_dict
 
 def load_users():
