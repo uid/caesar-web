@@ -23,7 +23,7 @@
 <div id=user-chunk-list>
   {% for user_data in users_data %}
     <div class='user-chunk'>
-      <div class = '{% if user_data.submission.chunk_count > 0 %}multi-chunks{% else %} zero-chunk {% endif %}'>
+      <div class = '{% if user_data.has_chunks > 0 %}multi-chunks{% else %} zero-chunk {% endif %}'>
         <span class='author'>{{user_data.user.first_name}} {{user_data.user.last_name}}, {{user_data.user.username}}</span>
         <span class='author-role'>{{user_data.user.profile.role_str}}</span>
       </div>

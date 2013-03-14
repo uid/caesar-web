@@ -9,6 +9,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from pygments import highlight
 from pygments.lexers import JavaLexer, SchemeLexer
@@ -415,13 +416,7 @@ def list_users(request, assignment_id):
         'reviewers_dicts': None,
         }
   def chunk_dict(chunk):
-    return {
-        'reviewer-count': chunk.reviewer_count,
-        'id': chunk.id,
-        'name': chunk.name,
-        'reviewers_dicts': None,
-        'tasks': chunk.tasks.all(),
-        }
+    return 
 
   def reviewers_comment_strs(chunk=None, tasks=None):
     comment_count = defaultdict(int)
@@ -429,8 +424,8 @@ def list_users(request, assignment_id):
       for comment in chunk.comments.all():
         comment_count[comment.author.profile] += 1
 
-    if chunk and (not tasks or len(tasks) == 0):
-      tasks = chunk.tasks.all()
+    #if chunk and (not tasks or len(tasks) == 0):
+    #  tasks = chunk.tasks.all()
 
     checkstyle = []; students = []; alum = []; staff = []
     for task in tasks:
@@ -452,16 +447,35 @@ def list_users(request, assignment_id):
     return [checkstyle, students, alum, staff]
 
   assignment = Assignment.objects.get(id=assignment_id)
-  submissions = Submission.objects.filter(assignment=assignment_id)
   data = {}
   chunk_task_map = defaultdict(list)
   chunk_map = {}
   form = None
 
-  for submission in submissions:
-    data[submission.author.id] = {'tasks': [], 'user': submission.author, 'chunks': [chunk_dict(chunk) for chunk in submission.chunks()], 'submission': submission}
-    for chunk in submission.chunks():
+  for user in User.objects.select_related("profile").filter(Q(submissions__assignment=assignment_id) | Q(profile__tasks__chunk__file__submission__assignment=assignment_id)):
+      data[user.id] = {'tasks': [], 'user': user, 'chunks': [], 'has_chunks': False, 'submission': None}
+
+  for submission in Submission.objects.select_related('author__profile').filter(assignment=assignment_id):
+      data[submission.author_id]['submission'] = submission
+
+  for chunk in Chunk.objects.select_related('file__submission').filter(file__submission__assignment=assignment_id):
       chunk_map[chunk.id] = chunk
+      authorid = chunk.file.submission.author_id
+      data[authorid]['chunks'].append({
+        'reviewer-count': chunk.reviewer_count,
+        'id': chunk.id,
+        'name': chunk.name,
+        'reviewers_dicts': None,
+        'tasks': [],
+        })
+      data[authorid]['has_chunks'] = True
+      
+  for task in Task.objects.select_related('chunk__file__submission__author', 'reviewer__user').filter(chunk__file__submission__assignment=assignment_id):
+      authorid = task.chunk.file.submission.author_id
+      chunkid = task.chunk_id
+      for chunk in data[authorid]['chunks']:
+          if chunk["id"] == chunkid:
+              chunk["tasks"].append(task)
 
   if request.method == 'POST':
     form = SimulateRoutingForm(request.POST)
@@ -472,26 +486,22 @@ def list_users(request, assignment_id):
 
     for (chunk_id, tasks) in chunk_task_map.iteritems():
       for task in tasks:
-        if task.reviewer.user.id not in data:
-          data[task.reviewer.user.id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
+        if task.reviewer.userid not in data:
+          data[task.reviewer.user_id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
         else:
-          data[task.reviewer.user.id]['tasks'].append(task_dict(task))
+          data[task.reviewer.user_id]['tasks'].append(task_dict(task))
 
   else:
+
     for user_id in data.keys():
       for chunk in data[user_id]['chunks']:
         chunk_task_map[chunk['id']] = chunk['tasks']
         for task in chunk['tasks']:
-          user_id = task.reviewer.user.id
-          if user_id not in data:
-            data[user_id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
-          else:
-            data[user_id]['tasks'].append(task_dict(task))
+          user_id = task.reviewer.user_id
+          data[user_id]['tasks'].append(task_dict(task))
 
   chunk_reviewers_map = defaultdict(list)
-  for (chunk_id, tasks) in chunk_task_map.iteritems():
-    chunk_reviewers_map[chunk_id] = reviewers_comment_strs(chunk=chunk_map.get(chunk_id), tasks=tasks)
-
+  
   for user_data in data.values():
     for chunk in user_data['chunks']:
       chunk['reviewers_dicts'] = chunk_reviewers_map[chunk['id']]
