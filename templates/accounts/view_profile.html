@@ -93,13 +93,13 @@ $(document).ready(function() {
 
     <div class="span9" id='code'>
       <h3>My Review Activity</h3>
-      {% for assignment, review_data in assignment_data %}
+      {% for review_milestone, review_data in review_milestone_data %}
         {% if review_data %}
           <h3 class="assignment-display">
-            <a name="assignment-display"></a> {{ assignment.name }} {%if not assignment.is_current_semester %} - {{ assignment.get_semester_display }} {% endif %}
+            <a name="assignment-display"></a> {{ review_milestone.full_name }} {%if not review_milestone.assignment.is_current_semester %} - {{ review_milestone.assignment.get_semester_display }} {% endif %}
             <div class="view-all-activity">
-              {%if assignment.is_current_semester or not user.profile.is_student %}
-              <a href="{% url review.views.all_activity assignment.id participant.username %}"> view with code</a>
+              {%if review_milestone.assignment.is_current_semester or not user.profile.is_student %}
+              <a href="{% url review.views.all_activity review_milestone.id participant.username %}"> view with code</a>
               {% endif %}
             </div>
           </h3>
@@ -109,7 +109,7 @@ $(document).ready(function() {
                                     {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
                                     {% endif %}
                     {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
-                    {% endif %}" class="{%if assignment.is_current_semester or not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
+                    {% endif %}" class="{%if review_milestone.assignment.is_current_semester or not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
               
               <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
               

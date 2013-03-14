@@ -10,7 +10,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404
 from django.core.urlresolvers import reverse
 
-from chunks.models import Chunk, Assignment, Submission, StaffMarker
+from chunks.models import Chunk, Assignment, Milestone, ReviewMilestone, Submission, StaffMarker
 from tasks.models import Task
 from tasks.routing import assign_tasks
 from models import Comment, Vote, Star
@@ -32,45 +32,44 @@ def dashboard(request):
     new_task_count = 0
     open_assignments = False
 
-    assignments = []
-    for membership in user.membership.all():
-      assignments.extend(filter(lambda assignment: assignment.is_live and assignment.code_review_end_date > datetime.datetime.now(), membership.semester.assignments.all()))
+    live_review_milestones = ReviewMilestone.objects.filter(assignment__is_live=True, assigned_date__lt=datetime.datetime.now(),\
+         duedate__gt=datetime.datetime.now(), assignment__semester__members_user=user).all()
 
-    for assignment in assignments:
-        active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
-        current_tasks = user.get_profile().tasks.filter(chunk__file__submission__assignment=assignment)
+    for review_milestone in live_review_milestones:
+        current_tasks = user.get_profile().tasks.filter(milestone__id=review_milestone.id)
+        active_sub = Submission.objects.filter(name=user.username, milestone=review_milestone.submission_milestone)
         #do not give tasks to students who got extensions or already have tasks for this assignment
-        if (not current_tasks.count()) and (len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now()):
+        if (not current_tasks.count()) and active_sub.count():
             open_assignments = True
-            new_task_count += assign_tasks(assignment, user)
+            new_task_count += assign_tasks(milestone, user)
 
     old_completed_tasks = user.get_profile().tasks \
-        .select_related('chunk__file__submission__assignment') \
+        .select_related('chunk__file__submission__milestone') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__assignment__semester__is_current_semester=True) \
+        .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
 
     active_tasks = user.get_profile().tasks \
-        .select_related('chunk__file__submission_assignment') \
+        .select_related('chunk__file__submission__milestone') \
         .exclude(status='C') \
         .exclude(status='U') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
     completed_tasks = user.get_profile().tasks \
-        .select_related('chunk__file__submission__assignment') \
+        .select_related('chunk__file__submission__milestone') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester__is_current_semester=True) \
+        .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
     #get all the submissions that the user submitted, in the current semester
     submissions = Submission.objects.filter(name=user.username) \
-        .filter(duedate__lt=datetime.datetime.now()-datetime.timedelta(minutes=30)) \
-        .order_by('duedate')\
-        .filter(assignment__semester__is_current_semester=True) \
+        .filter(milestone__duedate__lt=datetime.datetime.now()-datetime.timedelta(minutes=30)) \
+        .order_by('milestone__duedate')\
+        .filter(milestone_assignment__semester__is_current_semester=True) \
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -83,10 +82,10 @@ def dashboard(request):
         submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
 
-    #get all the submissions that the user submitted, in previous semester
+    #get all the submissions that the user submitted, in previous semesters
     old_submissions = Submission.objects.filter(name=user.username) \
-        .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('duedate') \
+        .filter(milestone_duedate__lt=datetime.datetime.now()) \
+        .order_by('milestone_duedate') \
         .exclude(assignment__semester__is_current_semester=False) \
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
@@ -100,10 +99,19 @@ def dashboard(request):
         old_submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
 
-    #find the current assignments
+    #find the current submissions
     current_submissions = Submission.objects.filter(name=user.username)\
-        .filter(duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
-        .order_by('duedate')
+        .filter(milestone__duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
+        .filter(milestone__assigned_date__lt= datetime.datetime.now() - datetime.timedelta(minutes=30))
+        .order_by('milestone_duedate')
+
+    current_submission_data = []
+    for submission in current_submissions:
+        extensions = Extension.objects.filter(milestone=submission.milestone, user=user)
+        if extensions:
+            current_submission_data.append((submission, extensions[0]))
+        else:
+            current_submission_data.append((submission, None))
 
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
@@ -112,45 +120,43 @@ def dashboard(request):
         'new_task_count': new_task_count,
         'submission_data': submission_data,
         'old_submission_data': old_submission_data,
-        'current_submissions': current_submissions,
+        'current_submission_data': current_submission_data,
         'open_assignments': open_assignments,
     })
 
 @staff_member_required
 def student_stats(request):
-    assignments = Assignment.objects.all().order_by('duedate').reverse()[0:5]
+    milestones = Milestone.objects.filter(type=Milestone.SUBMISSION).all().orderby('-duedate')[0:5]
     total_students = User.objects.filter(profile__role='S').count()
     total_alum = User.objects.exclude(profile__role='S').exclude(profile__role='T').count()
     all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T')
     total_staff = User.objects.filter(profile__role='T').count()
 
-    assignment_data = []
-    for assignment in assignments:
-        total_chunks = Chunk.objects.filter(file__submission__assignment=assignment).count()
-        all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__assignment=assignment).exclude(username='checkstyle').distinct()
+    milestone_data = []
+    for milestone in milestones:
+        total_chunks = Chunk.objects.filter(file__submission__milestone=milestone).count()
+        all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__milestone=milestone).exclude(username='checkstyle').distinct()
         alums_participating = all_alums.count()
-        total_extension = 0; one_day_extension = 0; half_day_extension = 0; two_day_extension = 0; three_day_extension = 0
-        if (assignment.duedate):
-          total_extension = Submission.objects.filter(duedate__gt = assignment.duedate).filter(assignment=assignment).count()
-          one_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=1)).count()
-          half_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(hours=12)).count()
-          one_day_extension = max(one_day_extension, half_day_extension)
-          two_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=2)).count()
-          three_day_extension = Submission.objects.filter(duedate = assignment.duedate + datetime.timedelta(days=3)).count()
-        total_tasks = Task.objects.filter(chunk__file__submission__assignment=assignment).count()
-        assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__assignment=assignment).distinct().count()
-        total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__assignment=assignment).distinct().count()
-        total_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).count()
-        total_checkstyle = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='S').count()
-        total_staff_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(author__profile__role='T').count()
-        total_student_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(author__profile__role='S').count()
-        total_user_comments = Comment.objects.filter(chunk__file__submission__assignment=assignment).filter(type='U').count()
+        num_total_extensions = Extension.objects.filter(milestone=milestone).count()
+        extension_data = []
+        for num_days in range(1, milestone.max_extension):
+            num_extensions = Extension.objects.filter(milestone=milestone).filter(slack_used=num_days).count()
+            exstension_data.append((num_days, num_extensions))
+            
+        total_tasks = Task.objects.filter(milestone_submission_milestone=milestone).count()
+        assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__milestone=milestone).distinct().count()
+        total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__milestone=milestone).distinct().count()
+        total_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).count()
+        total_checkstyle = Comment.objects.filter(chunk__file__submission__milestone=milestone).filter(type='S').count()
+        total_staff_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).filter(author__profile__role='T').count()
+        total_student_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).filter(author__profile__role='S').count()
+        total_user_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).filter(type='U').count()
         total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
-        #zero_chunk_users = len(filter(lambda sub: len(sub.files.all()) != 0 and len(sub.chunks()) == 0, assignment.submissions.all()))
-        
-        assignment_data.append( (assignment, total_chunks, alums_participating, total_extension, one_day_extension, two_day_extension, three_day_extension, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments) )
+        zero_chunk_users = len(filter(lambda sub: len(sub.files.all()) != 0 and len(sub.chunks()) == 0, milestone.submissions.all()))
+        milestone_data.append( (milestone, total_chunks, alums_participating, num_total_extensions, extension_data, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, zero_chunk_users) )
+
     return render(request, 'review/studentstats.html', {
-        'assignment_data': assignment_data,
+        'milestone_data': milestone_data,
         'total_students': total_students,
         'total_alums': total_alum,
         'total_staff': total_staff,
@@ -367,22 +373,22 @@ def allusers(request):
     })
 
 @login_required
-def all_activity(request, assign, username):
+def all_activity(request, review_milestone_id, username):
     participant = User.objects.get(username__exact=username)
     if not participant:
         raise Http404
     user = request.user
     #get all assignments
-    assignment = Assignment.objects.get(id__exact=assign)
-    if user.profile.is_student() and not assignment.is_current_semester():
+    review_milestone = ReviewMilestone.objects.get(id__exact=review_milestone_id)
+    if user.profile.is_student() and not review_milestone.assignment.is_current_semester():
         raise Http404
     #get all relevant chunks
     chunks = Chunk.objects \
-        .filter(file__submission__assignment = assignment) \
+        .filter(file__submission__milestone__id = review_milestone__submission_milestone__id) \
         .filter(Q(comments__author=participant) | Q(comments__votes__author=participant)) \
         .select_related('comments__votes', 'comments__author_profile')
     chunk_set = set()
-    assignment_data = []
+    review_milestone_data = []
 
     lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
@@ -423,83 +429,68 @@ def all_activity(request, assign, username):
             else:
                 highlighted_comments.append(None)
         comment_data = zip(comments, highlighted_comments, highlighted_votes)
-        assignment_data.append((chunk, highlighted_lines, comment_data, chunk.file))
+        review_milestone_data.append((chunk, highlighted_lines, comment_data, chunk.file))
 
     return render(request, 'review/all_activity.html', {
-        'assignment_data': assignment_data,
+        'review_milestone_data': review_milestone_data,
         'participant': participant,
         'activity_view': True,
         'full_view': True,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
+
 @login_required
-def request_extension(request, assignment_id):
+def request_extension(request, milestone_id):
     user = request.user
     # User is going to request an extension
     if request.method == 'GET':
-        current_assignment = Assignment.objects.get(id=assignment_id)
-        submission = Submission.objects.get(assignment=current_assignment, author=user)
+        current_milestone = Milestone.objects.get(id=milestone_id)
         # Make sure user got here legally
-        if datetime.datetime.now() >  submission.duedate + datetime.timedelta(minutes=30):
+        user_duedate = user.profile.get_user_duedate(current_milestone)
+        if datetime.datetime.now() > user_duedate + datetime.timedelta(minutes=30):
             return redirect('review.views.dashboard')
 
-        extension = user.profile.extension_days()
-        extended_days = (submission.duedate - current_assignment.duedate).days
+        total_extension_days_left = user.profile.extension_days()
+        current_extension = (user_duedate - current_milestone.duedate).days
 
-        # Number of late days the student would use
         late_days = 0
-        if datetime.datetime.now() > current_assignment.duedate + datetime.timedelta(minutes=30):
-            late_days = (datetime.datetime.now() - current_assignment.duedate + datetime.timedelta(minutes=30)).days + 1
+        if datetime.datetime.now() > current_milestone.duedate + datetime.timedelta(minutes=30):
+            late_days = (datetime.datetime.now() - current_milestone.duedate + datetime.timedelta(minutes=30)).days + 1
+       
+        possible_extensions = range(late_days, min(total_extension_days_left+current_extension+1, current_milestone.max_extension+1))
 
-        days = range(late_days, min(extension+extended_days+1, current_assignment.max_extension+1))
-        written_days = []
-        for day in range(days[-1]+1):
-            written_days.append(current_assignment.duedate + datetime.timedelta(days=day))
+        written_dates = []
+        for day in range(possible_extensions[-1]+1):
+            extension = day * datetime.timedelta(days=1)
+            written_dates.append(current_milestone.duedate + extension)
 
-        if current_assignment.multiplier == 2: #beta submission
-            if (submission.duedate - current_assignment.duedate).seconds/3600 == 12: #has extension
-                extended_days = 1
-            late_days = 0
-            if datetime.datetime.now() > current_assignment.duedate + datetime.timedelta(minutes=30):
-                late_days = 1
-            days = range(late_days, min(extension+extended_days+1, current_assignment.max_extension+1))
-            written_days = []
-            for day in range(days[-1]+1):
-                hours = day * 12
-                written_days.append(current_assignment.duedate + datetime.timedelta(hours=hours))
+
         return render(request, 'review/extension_form.html', {
-            'days': days,
-            'current_day': extended_days,
-            'written_days': written_days,
-            'total_days': user.profile.extension_days() + extended_days
+            'possible_extensions': possible_extensions,
+            'current_extension': current_extension,
+            'written_dates': written_dates,
+            'total_extension_days': total_extension_days_left + current_extension
         })
     else: # user already requested an extension
         days = request.POST.get('dayselect', None)
         try:
             extension_days = int(days)
-            total_left = user.profile.extension_days()
-            current_assignment = Assignment.objects.get(id=assignment_id)
-            submission = Submission.objects.get(assignment=current_assignment, author=user)
-            extended_days = (submission.duedate - current_assignment.duedate).days
-            if (submission.duedate - current_assignment.duedate).seconds/3600 == 12:
-                extended_days = 1
-            total_days = total_left + extended_days
-            if extension_days > total_days or extension_days < 0 or extension_days > current_assignment.max_extension:
+            current_milestone = Milestone.objects.get(id=milestone_id)
+            user_duedate = user.profile.get_user_duedate(current_milestone)
+            current_extension = (user_duedate - current_milestone.duedate).days
+            total_extension_days_left = user.profile.extension_days()
+            total_extension_days = total_extension_days_left + current_extension
+            
+            if extension_days > total_extension_days or extension_days < 0 or extension_days > current_milestone.max_extension:
                 return redirect('review.views.dashboard')
-            extension,created = Extension.objects.get_or_create(user=user, assignment=current_assignment)
-            extension.slack_used=extension_days
+            extension,created = Extension.objects.get_or_create(user=user, milestone=current_milestone)
+            extension.slack_used = extension_days
             extension.save()
-            #user.profile.extension_days = total_days - extension
-            #user.profile.save()
-            submission.duedate = current_assignment.duedate + datetime.timedelta(days=extension_days)
-            if current_assignment.multiplier == 2: #beta submission
-                hours = extension * 12
-                submission.duedate = current_assignment.duedate + datetime.timedelta(hours=hours)
-            submission.save()
             return redirect('review.views.dashboard')
         except ValueError:
             return redirect('review.views.dashboard')
 
+#TODO: consolidate this with dashboard
 @login_required
 def student_dashboard(request, username):
     try:
@@ -511,29 +502,24 @@ def student_dashboard(request, username):
         raise Http404
     new_task_count = 0
 
-    # for assignment in Assignment.objects.filter(code_review_end_date__gt=datetime.datetime.now()):
-    #     active_sub = Submission.objects.filter(name=participant.username).filter(assignment=assignment)
-    #     #do not give tasks to students who got extensions
-    #     if len(active_sub) == 0 or active_sub[0].duedate < datetime.datetime.now():
-    #         new_task_count += assign_tasks(assignment, participant)
     old_completed_tasks = participant.get_profile().tasks \
-        .select_related('chunk__file__submission__assignment') \
+        .select_related('chunk__file__submission__milestone') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__assignment__semester__is_current_semester=True) \
+        .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
     active_tasks = participant.get_profile().tasks \
-        .select_related('chunk__file__submission_assignment') \
+        .select_related('chunk__file__submission__milestone') \
         .exclude(status='C') \
         .exclude(status='U') \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
     completed_tasks = participant.get_profile().tasks \
-        .select_related('chunk__file__submission__assignment') \
+        .select_related('chunk__file__submission__milestone') \
         .filter(status='C') \
-        .filter(chunk__file__submission__assignment__semester__is_current_semester=True) \
+        .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
@@ -617,17 +603,19 @@ def more_work(request):
         current_tasks = user.get_profile().tasks.exclude(status='C').exclude(status='U')
         total = 0
         if not current_tasks.count():
-            assignments = []
-            for membership in user.membership.all():
-              assignments.extend(filter(lambda assignment: assignment.is_live and assignment.code_review_end_date > datetime.datetime.now(), membership.semester.assignments.all()))
+            live_review_milestones = ReviewMilestone.objects.filter(assignment__is_live=True, assigned_date__lt=datetime.datetime.now(),\
+                                        duedate__gt=datetime.datetime.now(), assignment__semester__members_user=user).all()
 
-            for assignment in assignments:
-                active_sub = Submission.objects.filter(name=user.username).filter(assignment=assignment)
-                #do not give tasks to students who got extensions
-                if len(active_sub) == 0 or active_sub[0].duedate + datetime.timedelta(minutes=30) < datetime.datetime.now():
-                    total += assign_tasks(assignment, user, max_tasks=2, assign_more=True)
+             for milestone in live_review_milestones:
+                current_tasks = user.get_profile().tasks.filter(milestone=milestone)
+                active_sub = Submission.objects.filter(name=user.username, milestone=milestone.reviewmilestone.submission_milestone)
+                #do not give tasks to students who got extensions or already have tasks for this assignment
+                if (not current_tasks.count()) and active_sub.count():
+                    open_assignments = True
+                    total += assign_tasks(milestone, user, max_tasks=2, assign_more=True)
+                    
             active_tasks = user.get_profile().tasks \
-                .select_related('chunk__file__submission_assignment') \
+                .select_related('chunk__file__submission__milestone__assignment') \
                 .exclude(status='C') \
                 .exclude(status='U') \
                 .annotate(comment_count=Count('chunk__comments', distinct=True),
@@ -669,7 +657,7 @@ def search(request):
     if request.method == 'POST':
         querystring = request.POST['value'].strip()
         if querystring:
-            comments = Comment.objects.filter(chunk__file__submission__assignment__semester__is_current_semester=True,
+            comments = Comment.objects.filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True,
                                               text__icontains = querystring)
             review_data = view_helper(comments[:15])
             return render(request, 'review/search.html', {

@@ -1,6 +1,6 @@
 import os
 import datetime
-from chunks.models import Chunk, Assignment, Semester
+from chunks.models import Chunk, Assignment, Milestone, Semester
 
 from sorl.thumbnail import ImageField
 from accounts.fields import MarkdownTextField
@@ -19,11 +19,17 @@ class Token(models.Model):
 
 class Extension(models.Model):
     user = models.ForeignKey(User, related_name='extensions')
-    assignment = models.ForeignKey(Assignment, related_name='extensions')
+    milestone = models.ForeignKey(Milestone, related_name='extensions')
     slack_used = models.IntegerField(default=0, blank=True, null=True)
 
+    def assignment(self):
+        return self.milestone.assignment
+
+    def new_duedate(self):
+        return milestone.duedate + datetime.timedelta(days=slack_used)
+
     def __str__(self):
-      return '%s (%s) %s days' % (self.user.username, self.assignment, self.slack_used)
+      return '%s (%s) %s days' % (self.user.username, self.milestone.full_name(), self.slack_used)
 
 class Member(models.Model):
     role = models.CharField(max_length=16)
@@ -102,6 +108,13 @@ class UserProfile(models.Model):
       total_days = 10 #TODO: change after multi-class refactor
       used_days = sum([extension.slack_used for extension in self.user.extensions.all()])
       return total_days - used_days
+
+    def get_user_duedate(self, milestone):
+        milestones = milestone.extensions.filter(user=self.user)
+        if milestones:
+            return milestones[0].new_duedate()
+        return milestone.duedate
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, raw=False, **kwargs):

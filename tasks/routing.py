@@ -89,8 +89,8 @@ def _convert_role(role):
 def _convert_role_to_count(assignment, role):
     return {'staff': assignment.staff_count, 'student': assignment.student_count, 'other':assignment.alum_count}.get(role)
 
-def _convert_assignment_to_priority(assignment):
-    to_assign = assignment.chunks_to_assign
+def _convert_review_milestone_to_priority(review_milestone):
+    to_assign = review_milestone.chunks_to_assign
     priority_dict = dict()
     for chunk_info in to_assign.split(",")[0:-1]:
         [chunkname, priority] = chunk_info.split(" ")
@@ -109,18 +109,18 @@ def load_users():
     return user_map
 
 
-def load_chunks(assignment, user_map, django_user):
+def load_chunks(submission_milestone, user_map, django_user):
     chunks = []
     chunk_map = {}
     submissions = {}
 
-    django_submissions = assignment.submissions.exclude(author=django_user).values()
+    django_submissions = submission_milestone.submissions.exclude(author=django_user).values()
     django_chunks = models.Chunk.objects \
-            .filter(file__submission__assignment=assignment) \
-            .exclude(file__submission__author=django_user) \
+            .filter(file__submission__milestone=submission_milestone) \
+            .exclude(file__submission__milestone__author=django_user) \
             .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
     django_tasks = Task.objects.filter(
-            chunk__file__submission__assignment=assignment) \
+            chunk__file__submission__milestone=submission_milestone) \
             .exclude(chunk__file__submission__author=django_user) \
                     .select_related('reviewer__user') \
 
@@ -271,7 +271,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         else:
             return
 
-def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map=defaultdict(list), max_tasks=sys.maxint, assign_more=False):
+def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=defaultdict(list), max_tasks=sys.maxint, assign_more=False):
     """
     Returns a list of tasks that should be assigned to the given reviewer.
     assignment: assignment that tasks should be generated for
@@ -280,14 +280,15 @@ def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map=defaultd
     chunk_id_task_map: map of chunk ids to lists of the assigned tasks. If simulating routing, use the same chunk_id_task_map each time.
     """
 
-    #unfinished_task_count = Task.objects.filter(reviewer=reviewer.id, chunk__file__submission__assignment=assignment).exclude(status='C').count()
-    unfinished_tasks = Task.objects.filter(reviewer=reviewer.id, chunk__file__submission__assignment=assignment)
+    #unfinished_task_count = Task.objects.filter(reviewer=reviewer.id, chunk__file__submission__milestone__assignment=assignment).exclude(status='C').count()
+    unfinished_tasks = Task.objects.filter(reviewer=reviewer.id, milestone=review_milestone)
     if assign_more:
       unfinished_tasks = unfinished_tasks.exclude(status='C').exclude(status='U')
 
     unfinished_task_count = unfinished_tasks.count()
 
-    num_tasks_to_assign = assignment.num_tasks_for_user(reviewer) - unfinished_task_count
+    # Should task milestones have num_tasks_for_user?
+    num_tasks_to_assign = review_milestone.assignment.num_tasks_for_user(reviewer) - unfinished_task_count
     if num_tasks_to_assign <= 0:
       return []
 
@@ -296,11 +297,12 @@ def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map=defaultd
 
     num_tasks_to_assign = min(num_tasks_to_assign, max_tasks)
 
-    chunk_type_priorities = _convert_assignment_to_priority(assignment)
+    # Might need to refactor
+    chunk_type_priorities = _convert_review_milestone_to_priority(review_milestone)
 
     tasks = []
-    for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, assignment.reviewers_per_chunk, assignment.min_student_lines, chunk_type_priorities):
-      task = Task(reviewer_id=User_django.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id)
+    for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, review_milestone.reviewers_per_chunk, review_milestone.min_student_lines, chunk_type_priorities):
+      task = Task(reviewer_id=User_django.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone__id=review_milestone.id)
 
       chunk_id_task_map[chunk_id].append(task)
       chunk_map[chunk_id].reviewers.add(reviewer)
@@ -309,22 +311,22 @@ def _generate_tasks(assignment, reviewer, chunk_map,  chunk_id_task_map=defaultd
 
     return tasks
 
-def assign_tasks(assignment, reviewer, max_tasks=sys.maxint, assign_more=False):
+def assign_tasks(review_milestone, reviewer, max_tasks=sys.maxint, assign_more=False):
   user_map = load_users()
-  chunks = load_chunks(assignment, user_map, reviewer)
+  chunks = load_chunks(review_milestone.submission_milestone, user_map, reviewer)
   chunk_map = {}
   for chunk in chunks:
     chunk_map[chunk.id] = chunk
 
-  tasks = _generate_tasks(assignment, user_map[reviewer.id], chunk_map, max_tasks=max_tasks, assign_more=assign_more)
+  tasks = _generate_tasks(review_milestone, user_map[reviewer.id], chunk_map, max_tasks=max_tasks, assign_more=assign_more)
 
   [task.save() for task in tasks]
 
   return len(tasks)
 
-def simulate_tasks(assignment, num_students, num_staff, num_alum):
+def simulate_tasks(review_milestone, num_students, num_staff, num_alum):
   user_map = load_users()
-  chunks = load_chunks(assignment, user_map, None)
+  chunks = load_chunks(review_milestone.submission_milestone, user_map, None)
   chunk_map = {}
   for chunk in chunks:
     chunk_map[chunk.id] = chunk
@@ -338,6 +340,6 @@ def simulate_tasks(assignment, num_students, num_staff, num_alum):
   #  else:
   #    reviewer =
   for reviewer in user_map.values():
-    _generate_tasks(assignment, user_map[reviewer.id], chunk_map, chunk_id_task_map=chunk_id_task_map)
+    _generate_tasks(review_milestone, user_map[reviewer.id], chunk_map, chunk_id_task_map=chunk_id_task_map)
 
   return chunk_id_task_map
