@@ -170,6 +170,7 @@ DEBUG_TOOLBAR_PANELS = (
 # PROJECT SPECIFIC SETTINGS
 MINIMUM_SNIPPET_LENGTH = 80
 
+FIXTURE_DIRS = [project_path('fixtures')]
 
 from settings_local import *
 

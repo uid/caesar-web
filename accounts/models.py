@@ -104,8 +104,8 @@ class UserProfile(models.Model):
       return total_days - used_days
 
 @receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
+def create_user_profile(sender, instance, created, raw=False, **kwargs):
+    if created and not raw:
         profile, created = UserProfile.objects.get_or_create(user=instance)
         if created:
             profile.save()

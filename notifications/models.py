@@ -47,8 +47,8 @@ NEW_REPLY_SUBJECT_TEMPLATE = Template(
 
 
 @receiver(post_save, sender=Comment)
-def send_comment_notification(sender, instance, created=False, **kwargs):
-    if created:
+def send_comment_notification(sender, instance, created=False, raw=False, **kwargs):
+    if created and not raw:
         site = Site.objects.get_current()
         context = Context({
             'site': site,

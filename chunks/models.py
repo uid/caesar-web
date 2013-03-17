@@ -87,8 +87,8 @@ class Assignment(models.Model):
         return self.alum_count
 
 @receiver(post_save, sender=Assignment)
-def create_current_assignment(sender, instance, created, **kwargs):
-    if created:
+def create_current_assignment(sender, instance, created, raw=False, **kwargs):
+    if created and not raw:
         # This code appears to copy parms from previous assignments in that semester.
         past = Assignment.objects.filter(semester = instance.semester).order_by('duedate').exclude(id = instance.id).reverse()
         if past.count() > 0:
@@ -170,8 +170,8 @@ class Submission(models.Model):
         return chunks
 
 @receiver(post_save, sender=Assignment)
-def create_user_submission(sender, instance, created, **kwargs):
-    if created:
+def create_user_submission(sender, instance, created, raw=False, **kwargs):
+    if created and not raw:
         users = User.objects.filter(profile__role='S')
         for auser in users:
             submission, created = Submission.objects.get_or_create(assignment=instance, name=auser.username,
