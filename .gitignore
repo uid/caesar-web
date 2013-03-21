@@ -2,7 +2,6 @@ settings_local.py
 *~
 *.pyc
 .DS_Store
-/sitestatic
 /media
 /data
 /task_sim_data.csv
