@@ -1,0 +1,50 @@
+#login-container {
+    width: 700px;    
+    margin: 0px auto;
+    position: relative;
+    clear: both;
+    height: 400px;
+}
+
+#standard-login-box {
+    padding: 20px;
+    margin: 10px;
+    border: 1px solid #ddd;
+    position: absolute;
+    width: 288px;
+}
+
+#browser{
+    position: absolute;
+    top: 375px;
+    left: 200px;
+}
+
+
+input[type=text],input[type=password] {
+    width: 100%;
+}
+
+input[type=submit] {
+    margin: 0px;
+}
+
+#register-link {
+    float: right;
+}
+
+#cert-login-box {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 10px;
+    width: 288px;
+    position: absolute;
+    left: 350px;
+    text-align: center;
+}
+
+#cert-login-button {
+    margin: 0px auto;
+    display: inline-block;
+    padding: 8px 8px;
+}

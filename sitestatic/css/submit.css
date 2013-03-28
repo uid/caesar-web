@@ -1,0 +1,16 @@
+div.grey-container {
+    background-color: #eee;
+    padding-top: 2em;
+}
+.success{
+    font-size: 14pt;
+    padding: 0em 3em 3em 3em;
+    
+}
+.failure {
+    font-size: 14pt;
+    padding: 0em 3em 3em 3em;
+}
+.bigger-selector{
+    width: 3em;
+}
