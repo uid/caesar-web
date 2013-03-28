@@ -86,6 +86,11 @@ def view_chunk(request, chunk_id):
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
     user = request.user
+
+    # block a user who's crawling
+    if user.username=="dekehu":
+        raise Http404
+
     files = File.objects.filter(submission=submission_id).select_related('chunks')
     submission = Submission.objects.get(id = submission_id)
     if not files:

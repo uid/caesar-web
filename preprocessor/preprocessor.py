@@ -22,13 +22,13 @@ from checkstyle import generate_checkstyle_comments
 
 # NOTE: I never tested directories with traling slashes. Sorry I don't have time to make it more robust :(
 settings = {
-    'assignment_id': 5,
-    'assignment_name': 'ps0-beta',
+    'assignment_id': 9,
+    'assignment_name': 'ps2-beta',
     'generate_comments': False,
     'save_data': True,
     'semester_id': 2,
-    'staff_dir': 'ps0-staff',
-    'student_submission_dir': 'ps0-students'
+    'staff_dir': 'Private/ps2/starting-load/starting',
+    'student_submission_dir': 'Private/ps2/2day-slack-load'
     }
 
 starting_time = time.time()
