@@ -109,18 +109,18 @@ def load_users():
     return user_map
 
 
-def load_chunks(submission_milestone, user_map, django_user):
+def load_chunks(submit_milestone, user_map, django_user):
     chunks = []
     chunk_map = {}
     submissions = {}
 
-    django_submissions = submission_milestone.submissions.exclude(author=django_user).values()
+    django_submissions = submit_milestone.submissions.exclude(author=django_user).values()
     django_chunks = models.Chunk.objects \
-            .filter(file__submission__milestone__id=submission_milestone.id) \
+            .filter(file__submission__milestone=submit_milestone) \
             .exclude(file__submission__milestone__author=django_user) \
             .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
     django_tasks = Task.objects.filter(
-            chunk__file__submission__milestone__id=submission_milestone.id) \
+            chunk__file__submission__milestone=submit_milestone) \
             .exclude(chunk__file__submission__author=django_user) \
                     .select_related('reviewer__user') \
 
@@ -302,7 +302,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
 
     tasks = []
     for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, review_milestone.reviewers_per_chunk, review_milestone.min_student_lines, chunk_type_priorities):
-      task = Task(reviewer_id=User_django.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone__id=review_milestone.id)
+      task = Task(reviewer_id=User_django.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone=review_milestone)
 
       chunk_id_task_map[chunk_id].append(task)
       chunk_map[chunk_id].reviewers.add(reviewer)
@@ -313,7 +313,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
 
 def assign_tasks(review_milestone, reviewer, max_tasks=sys.maxint, assign_more=False):
   user_map = load_users()
-  chunks = load_chunks(review_milestone.submission_milestone, user_map, reviewer)
+  chunks = load_chunks(review_milestone.submit_milestone, user_map, reviewer)
   chunk_map = {}
   for chunk in chunks:
     chunk_map[chunk.id] = chunk
@@ -326,7 +326,7 @@ def assign_tasks(review_milestone, reviewer, max_tasks=sys.maxint, assign_more=F
 
 def simulate_tasks(review_milestone, num_students, num_staff, num_alum):
   user_map = load_users()
-  chunks = load_chunks(review_milestone.submission_milestone, user_map, None)
+  chunks = load_chunks(review_milestone.submit_milestone, user_map, None)
   chunk_map = {}
   for chunk in chunks:
     chunk_map[chunk.id] = chunk

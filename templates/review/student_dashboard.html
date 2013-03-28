@@ -72,15 +72,15 @@ $(document).ready(function() {
 </div>
 
 <table class="current-assignment">
-  {% for submission, extension in current_submission_data %}
+  {% for milestone, extension in current_milestone_data %}
   <tr class="assignment-line">
-    <td class="black-text"> {{ submission.milestone.full_name }} </td>
-    <td class="grey-text"> Due on: {{ submission.milestone.duedate }} 
+    <td class="black-text"> {{ milestone.full_name }} </td>
+    <td class="grey-text"> Due on: {{ milestone.duedate }} 
         {%if extension %}
           <span class="red-text"> </br> Extended to: {{extension.new_duedate}} </span>
         {% endif %}
     </td>
-    <td class="=grey-text"><a href="{% url review.views.request_extension submission.milestone.id %}"> request extension</a></td>
+    <td class="=grey-text"><a href="{% url review.views.request_extension milestone.id %}"> request extension</a></td>
 
   </tr>
   {% empty %}

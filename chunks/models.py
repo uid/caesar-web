@@ -84,12 +84,12 @@ class Assignment(models.Model):
 def create_current_assignment(sender, instance, created, **kwargs):
     if created:
         # This code appears to copy parms from previous assignments in that semester.
-        past = Milestone.objects.filter(assignment_semester = instance.semester).order_by('-duedate').exclude(id = instance.id)
+        past = SubmitMilestone.objects.filter(assignment__semester = instance.semester).order_by('-duedate').exclude(assignment__id = instance.id)
         if past.count() > 0:
             pick = past[0]
             for milestone in past:
                 #check that the assignment had tasks assigned
-                chunks = Chunk.objects.filter(file__submission__milestone__id=milestone.id)
+                chunks = Chunk.objects.filter(file__submission__milestone=milestone)
                 tasks = False
                 for chunk in chunks:
                     if chunk.tasks.count() > 0:
@@ -123,10 +123,10 @@ def create_current_assignment(sender, instance, created, **kwargs):
 
 
 class Milestone(models.Model):
-    SUBMISSION = 'S'
+    SUBMIT = 'S'
     REVIEW = 'R'
     TYPE_CHOICES = (
-        (SUBMISSION, 'Submission'),
+        (SUBMIT, 'Submit'),
         (REVIEW, 'Review'),
     )
 
@@ -142,16 +142,28 @@ class Milestone(models.Model):
         return '%s - %s' % (self.assignment.name, self.name)
 
     def __unicode__(self):
-        return '%s - %s' % (self.assignment, self.name)
+        return '%s - %s - (%s)' % (self.assignment, self.name, self.get_type_display())
 
-class SubmissionMilestone(Milestone):
+class SubmitMilestone(Milestone):
     pass
+
+@receiver(post_save, sender=SubmitMilestone)
+def set_submit_type(sender, instance, created, **kwargs):
+    if created:
+        instance.type=Milestone.SUBMIT
+        instance.save()
 
 class ReviewMilestone(Milestone):
     reviewers_per_chunk = models.IntegerField(default=2)
     min_student_lines = models.IntegerField(default=30)
-    submission_milestone = models.ForeignKey(SubmissionMilestone, related_name='review_milestones')
+    submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestones')
     chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
+
+@receiver(post_save, sender=ReviewMilestone)
+def set_review_type(sender, instance, created, **kwargs):
+    if created:
+        instance.type=Milestone.REVIEW
+        instance.save()
 
 class Batch(models.Model):
     assignment = models.ForeignKey(Assignment, related_name='batches')
@@ -172,7 +184,7 @@ class Submission(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     revision = models.IntegerField(null=True, blank=True)
     revision_date = models.DateTimeField(null=True, blank=True)
-    milestone = models.ForeignKey(Milestone, related_name='submissions')
+    milestone = models.ForeignKey(SubmitMilestone, related_name='submissions')
     batch = models.ForeignKey(Batch, blank=True, null=True, related_name='submissions')
 
     class Meta:
@@ -197,7 +209,7 @@ class Submission(models.Model):
         return chunks
 
     def code_review_end_date(self):
-        review_milestones = ReviewMilestone.filter(submission_milestone__id=self.milestone.id)
+        review_milestones = ReviewMilestone.filter(submit_milestone=self.milestone)
         if review_milestones:
             return review_milestones.latest('duedate').duedate
         else:
