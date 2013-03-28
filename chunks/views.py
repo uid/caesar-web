@@ -23,6 +23,8 @@ import datetime
 import sys
 from collections import defaultdict
 
+import logging
+
 @login_required
 def view_chunk(request, chunk_id):
     user = request.user
@@ -470,3 +472,29 @@ def list_users(request, review_milestone_id):
       task['reviewers_dicts'] = chunk_reviewers_map[task['chunk'].id]
 
   return render(request, 'chunks/list_users.html', {'users_data': sorted(data.values(), cmp=cmp_user_data), 'form': SimulateRoutingForm()})
+
+@login_required
+def publish_code(request):
+    """Allow users to publish their written code."""
+    submissions = Submission.objects.filter(author=request.user)
+
+    if request.method == "POST":
+        # handle ajax post to this url
+        submission_id = request.POST['submission_id']
+        submission = Submission.objects.get(pk=submission_id)
+        if submission.author != request.user:
+            raise PermissionDenied
+
+        if request.POST['published']=='False':
+            logging.info('Publishing!')
+            submission.published = True
+            submission.save()
+        else:
+            logging.info('Unpublishing!')
+            submission.published = False
+            submission.save()
+
+    return render(request, 'chunks/publish_code.html', {
+        'user': request.user,
+        'submissions': submissions,
+    })

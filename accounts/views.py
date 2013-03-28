@@ -12,7 +12,7 @@ from limit_registration import check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import UserProfile, Member
 from accounts.forms import ReputationForm
-from chunks.models import Semester
+from chunks.models import Semester, Submission
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import datetime
@@ -142,6 +142,7 @@ def view_profile(request, username):
     review_milestone_data = []
     #get all review milestones
     review_milestones = ReviewMilestone.objects.all().order_by('-assigned_date')
+    submissions = Submission.objects.filter(author=participant).filter(published=True)
     for review_milestone in review_milestones:
         #get all comments that the user wrote
         comments = Comment.objects.filter(author=participant) \
@@ -167,7 +168,8 @@ def view_profile(request, username):
         review_milestone_data.append((review_milestone, review_data))
     return render(request, 'accounts/view_profile.html', {
         'review_milestone_data': review_milestone_data,
-        'participant': participant
+        'participant': participant,
+        'submissions': submissions,
     })
 
 @login_required
