@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from chunks.models import Assignment, Submission, File, Chunk, StaffMarker, Batch, Subject, Semester
+from chunks.models import Assignment, ReviewMilestone, SubmitMilestone, Submission, File, Chunk, StaffMarker, Batch, Subject, Semester
 
 class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'duedate', 'code_review_end_date', 'semester', 'student_count', 'alum_count', 'staff_count')
+    list_display = ('name', 'semester', 'student_count', 'alum_count', 'staff_count')
     search_fields = ('name', 'semester')
 
 class ChunkAdmin(admin.ModelAdmin):
@@ -13,8 +13,16 @@ class ChunkAdmin(admin.ModelAdmin):
 class StaffMarkerAdmin(admin.ModelAdmin):
     list_display = ('chunk', 'start_line', 'end_line')
 
+class ReviewMilestoneAdmin(admin.ModelAdmin):
+	exclude = ('type',)
+
+class SubmitMilestoneAdmin(admin.ModelAdmin):
+	exclude = ('type',)
+
 admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Submission)
+admin.site.register(ReviewMilestone, ReviewMilestoneAdmin)
+admin.site.register(SubmitMilestone, SubmitMilestoneAdmin)
 admin.site.register(File)
 admin.site.register(Batch)
 admin.site.register(Chunk, ChunkAdmin)

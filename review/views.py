@@ -9,8 +9,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404
 from django.core.urlresolvers import reverse
+from  django.core.exceptions import ObjectDoesNotExist
 
-from chunks.models import Chunk, Assignment, Milestone, ReviewMilestone, Submission, StaffMarker
+from chunks.models import Chunk, Assignment, Milestone, SubmitMilestone, ReviewMilestone, Submission, StaffMarker
 from tasks.models import Task
 from tasks.routing import assign_tasks
 from models import Comment, Vote, Star
@@ -33,15 +34,17 @@ def dashboard(request):
     open_assignments = False
 
     live_review_milestones = ReviewMilestone.objects.filter(assignment__is_live=True, assigned_date__lt=datetime.datetime.now(),\
-         duedate__gt=datetime.datetime.now(), assignment__semester__members_user=user).all()
+         duedate__gt=datetime.datetime.now(), assignment__semester__members__user=user).all()
 
     for review_milestone in live_review_milestones:
-        current_tasks = user.get_profile().tasks.filter(milestone__id=review_milestone.id)
-        active_sub = Submission.objects.filter(name=user.username, milestone__id=review_milestone.submission_milestone.id)
+        current_tasks = user.get_profile().tasks.filter(milestone=review_milestone)
+        active_sub = Submission.objects.filter(author=user, milestone=review_milestone.submit_milestone)
+        membership = Member.obects.filter(user=user, semester=review_milestone.assignment.semester)
         #do not give tasks to students who got extensions or already have tasks for this assignment
-        if (not current_tasks.count()) and active_sub.count():
+        #(TODO) refactor member.role to not be so arbitrary
+        if (not current_tasks.count()) and (active_sub.count() or not 'student' in membership.role):
             open_assignments = True
-            new_task_count += assign_tasks(milestone, user)
+            new_task_count += assign_tasks(review_milestone, user)
 
     old_completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
@@ -49,7 +52,6 @@ def dashboard(request):
         .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
-
 
     active_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
@@ -65,11 +67,11 @@ def dashboard(request):
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
-    #get all the submissions that the user submitted, in the current semester
-    submissions = Submission.objects.filter(name=user.username) \
-        .filter(milestone__duedate__lt=datetime.datetime.now()-datetime.timedelta(minutes=30)) \
+    #get all the submissions that the user submitted
+    submissions = Submission.objects.filter(author=user) \
+        .filter(milestone__duedate__lt=datetime.datetime.now()) \
         .order_by('milestone__duedate')\
-        .filter(milestone_assignment__semester__is_current_semester=True) \
+        .filter(milestone__assignment__semester__is_current_semester=True)\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -83,10 +85,10 @@ def dashboard(request):
                                   user_comments, static_comments))
 
     #get all the submissions that the user submitted, in previous semesters
-    old_submissions = Submission.objects.filter(name=user.username) \
-        .filter(milestone_duedate__lt=datetime.datetime.now()) \
-        .order_by('milestone_duedate') \
-        .exclude(assignment__semester__is_current_semester=False) \
+    old_submissions = Submission.objects.filter(author=user) \
+        .filter(milestone__duedate__lt=datetime.datetime.now()) \
+        .order_by('milestone__duedate')\
+        .exclude(milestone__assignment__semester__is_current_semester=True)\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -100,18 +102,18 @@ def dashboard(request):
                                   user_comments, static_comments))
 
     #find the current submissions
-    current_submissions = Submission.objects.filter(name=user.username)\
-        .filter(milestone__duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
-        .filter(milestone__assigned_date__lt= datetime.datetime.now() - datetime.timedelta(minutes=30))
-        .order_by('milestone_duedate')
+    current_milestones = Milestone.objects.filter(assignment__semester__members__user=user)\
+        .filter(duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
+        .filter(assigned_date__lt= datetime.datetime.now() - datetime.timedelta(minutes=30))\
+        .order_by('duedate')
 
-    current_submission_data = []
-    for submission in current_submissions:
-        extensions = Extension.objects.filter(milestone=submission.milestone, user=user)
-        if extensions:
-            current_submission_data.append((submission, extensions[0]))
-        else:
-            current_submission_data.append((submission, None))
+    current_milestone_data = []
+    for milestone in current_milestones:
+        try:
+            user_extension = milestone.extensions.get(user=user)
+            current_milestone_data.append((milestone, user_extension))
+        except ObjectDoesNotExist:
+            current_milestone_data.append((milestone, None))
 
     return render(request, 'review/dashboard.html', {
         'active_tasks': active_tasks,
@@ -120,43 +122,43 @@ def dashboard(request):
         'new_task_count': new_task_count,
         'submission_data': submission_data,
         'old_submission_data': old_submission_data,
-        'current_submission_data': current_submission_data,
+        'current_milestone_data': current_milestone_data,
         'open_assignments': open_assignments,
     })
 
 @staff_member_required
 def student_stats(request):
-    milestones = Milestone.objects.filter(type=Milestone.SUBMISSION).all().orderby('-duedate')[0:5]
+    submit_milestones = SubmitMilestone.objects.all().order_by('-duedate')[0:5]
     total_students = User.objects.filter(profile__role='S').count()
     total_alum = User.objects.exclude(profile__role='S').exclude(profile__role='T').count()
     all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T')
     total_staff = User.objects.filter(profile__role='T').count()
 
-    milestone_data = []
-    for milestone in milestones:
-        total_chunks = Chunk.objects.filter(file__submission__milestone=milestone).count()
-        all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__milestone=milestone).exclude(username='checkstyle').distinct()
+    submit_milestone_data = []
+    for submit_milestone in submit_milestones:
+        total_chunks = Chunk.objects.filter(file__submission__milestone=submit_milestone).count()
+        all_alums = User.objects.exclude(profile__role='S').exclude(profile__role='T').filter(comments__chunk__file__submission__milestone=submit_milestone).exclude(username='checkstyle').distinct()
         alums_participating = all_alums.count()
-        num_total_extensions = Extension.objects.filter(milestone=milestone).count()
+        num_total_extensions = Extension.objects.filter(milestone=submit_milestone).count()
         extension_data = []
-        for num_days in range(1, milestone.max_extension):
-            num_extensions = Extension.objects.filter(milestone=milestone).filter(slack_used=num_days).count()
-            exstension_data.append((num_days, num_extensions))
+        for num_days in range(1, submit_milestone.max_extension+1):
+            num_extensions = Extension.objects.filter(milestone=submit_milestone).filter(slack_used=num_days).count()
+            extension_data.append((num_days, num_extensions))
             
-        total_tasks = Task.objects.filter(milestone__submission_milestone__id=milestone.id).count()
-        assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__milestone=milestone).distinct().count()
-        total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__milestone=milestone).distinct().count()
-        total_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).count()
-        total_checkstyle = Comment.objects.filter(chunk__file__submission__milestone=milestone).filter(type='S').count()
-        total_staff_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).filter(author__profile__role='T').count()
-        total_student_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).filter(author__profile__role='S').count()
-        total_user_comments = Comment.objects.filter(chunk__file__submission__milestone=milestone).filter(type='U').count()
+        total_tasks = Task.objects.filter(milestone__submit_milestone=submit_milestone).count()
+        assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__milestone=submit_milestone).distinct().count()
+        total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__milestone=submit_milestone).distinct().count()
+        total_comments = Comment.objects.filter(chunk__file__submission__milestone=submit_milestone).count()
+        total_checkstyle = Comment.objects.filter(chunk__file__submission__milestone=submit_milestone).filter(type='S').count()
+        total_staff_comments = Comment.objects.filter(chunk__file__submission__milestone=submit_milestone).filter(author__profile__role='T').count()
+        total_student_comments = Comment.objects.filter(chunk__file__submission__milestone=submit_milestone).filter(author__profile__role='S').count()
+        total_user_comments = Comment.objects.filter(chunk__file__submission__milestone=submit_milestone).filter(type='U').count()
         total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
-        zero_chunk_users = len(filter(lambda sub: len(sub.files.all()) != 0 and len(sub.chunks()) == 0, milestone.submissions.all()))
-        milestone_data.append( (milestone, total_chunks, alums_participating, num_total_extensions, extension_data, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, zero_chunk_users) )
+        zero_chunk_users = len(filter(lambda sub: len(sub.files.all()) != 0 and len(sub.chunks()) == 0, submit_milestone.submissions.all()))
+        submit_milestone_data.append( (submit_milestone, total_chunks, alums_participating, num_total_extensions, extension_data, total_tasks, assigned_chunks, total_chunks_with_human, total_comments, total_checkstyle, total_alum_comments, total_staff_comments, total_student_comments, total_user_comments, zero_chunk_users) )
 
     return render(request, 'review/studentstats.html', {
-        'milestone_data': milestone_data,
+        'submit_milestone_data': submit_milestone_data,
         'total_students': total_students,
         'total_alums': total_alum,
         'total_staff': total_staff,
@@ -384,7 +386,7 @@ def all_activity(request, review_milestone_id, username):
         raise Http404
     #get all relevant chunks
     chunks = Chunk.objects \
-        .filter(file__submission__milestone__id = review_milestone.submission_milestone.id) \
+        .filter(file__submission__milestone= review_milestone.submit_milestone) \
         .filter(Q(comments__author=participant) | Q(comments__votes__author=participant)) \
         .select_related('comments__votes', 'comments__author_profile')
     chunk_set = set()
@@ -484,8 +486,11 @@ def request_extension(request, milestone_id):
             if extension_days > total_extension_days or extension_days < 0 or extension_days > current_milestone.max_extension:
                 return redirect('review.views.dashboard')
             extension,created = Extension.objects.get_or_create(user=user, milestone=current_milestone)
-            extension.slack_used = extension_days
-            extension.save()
+            if extension_days == 0: # Don't keep extensions with 0 slack days
+                extension.delete()
+            else:
+                extension.slack_used = extension_days
+                extension.save()
             return redirect('review.views.dashboard')
         except ValueError:
             return redirect('review.views.dashboard')
@@ -524,10 +529,10 @@ def student_dashboard(request, username):
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
     #get all the submissions that the participant submitted
-    submissions = Submission.objects.filter(name=participant.username) \
-        .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('duedate')\
-        .filter(assignment__semester__is_current_semester=True)\
+    submissions = Submission.objects.filter(author=participant) \
+        .filter(milestone__duedate__lt=datetime.datetime.now()) \
+        .order_by('milestone__duedate')\
+        .filter(milestone__assignment__semester__is_current_semester=True)\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -539,11 +544,12 @@ def student_dashboard(request, username):
         reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
         submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
-    #get all the submissions that the user submitted, in the current semester
-    old_submissions = Submission.objects.filter(name=participant.username) \
-        .filter(duedate__lt=datetime.datetime.now()) \
-        .order_by('duedate')\
-        .exclude(assignment__semester__is_current_semester=True)\
+
+    #get all the submissions that the user submitted, in previous semesters
+    old_submissions = Submission.objects.filter(author=participant) \
+        .filter(milestone__duedate__lt=datetime.datetime.now()) \
+        .order_by('milestone__duedate')\
+        .exclude(milestone__assignment__semester__is_current_semester=True)\
         .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
@@ -556,8 +562,19 @@ def student_dashboard(request, username):
         old_submission_data.append((submission, reviewer_count, submission.last_modified,
                                   user_comments, static_comments))
 
-    #find the current assignments
-    current_submissions = Submission.objects.filter(name=participant.username).filter(duedate__gt=datetime.datetime.now()).order_by('duedate')
+    #find the current submissions
+    current_milestones = Milestone.objects.filter(assignment__semester__members__user=participant)\
+        .filter(duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
+        .filter(assigned_date__lt= datetime.datetime.now() - datetime.timedelta(minutes=30))\
+        .order_by('duedate')
+
+    current_milestone_data = []
+    for milestone in current_milestones:
+        try:
+            user_extension = milestone.extensions.get(user=user)
+            current_milestone_data.append((milestone, user_extension))
+        except ObjectDoesNotExist:
+            current_milestone_data.append((milestone, None))
 
     return render(request, 'review/student_dashboard.html', {
         'participant': participant,
@@ -567,7 +584,7 @@ def student_dashboard(request, username):
         'new_task_count': new_task_count,
         'submission_data': submission_data,
         'old_submission_data': old_submission_data,
-        'current_submissions': current_submissions,
+        'current_milestone_data': current_milestone_data,
     })
 
 @staff_member_required
@@ -604,11 +621,11 @@ def more_work(request):
         total = 0
         if not current_tasks.count():
             live_review_milestones = ReviewMilestone.objects.filter(assignment__is_live=True, assigned_date__lt=datetime.datetime.now(),\
-                                        duedate__gt=datetime.datetime.now(), assignment__semester__members_user=user).all()
+                duedate__gt=datetime.datetime.now(), assignment__semester__members_user=user).all()
 
-             for milestone in live_review_milestones:
+            for milestone in live_review_milestones:
                 current_tasks = user.get_profile().tasks.filter(milestone=milestone)
-                active_sub = Submission.objects.filter(name=user.username, milestone__id=milestone.reviewmilestone.submission_milestone.id)
+                active_sub = Submission.objects.filter(name=user.username, milestone=milestone.reviewmilestone.submit_milestone)
                 #do not give tasks to students who got extensions or already have tasks for this assignment
                 if (not current_tasks.count()) and active_sub.count():
                     open_assignments = True

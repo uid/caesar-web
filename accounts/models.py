@@ -6,6 +6,7 @@ from sorl.thumbnail import ImageField
 from accounts.fields import MarkdownTextField
 from accounts.storage import OverwriteStorage
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -26,7 +27,7 @@ class Extension(models.Model):
         return self.milestone.assignment
 
     def new_duedate(self):
-        return milestone.duedate + datetime.timedelta(days=slack_used)
+        return self.milestone.duedate + datetime.timedelta(days=self.slack_used)
 
     def __str__(self):
       return '%s (%s) %s days' % (self.user.username, self.milestone.full_name(), self.slack_used)
@@ -110,10 +111,11 @@ class UserProfile(models.Model):
       return total_days - used_days
 
     def get_user_duedate(self, milestone):
-        milestones = milestone.extensions.filter(user=self.user)
-        if milestones:
-            return milestones[0].new_duedate()
-        return milestone.duedate
+        try:
+            user_extension = milestone.extensions.get(user=self.user)
+            return user_extension.new_duedate()
+        except ObjectDoesNotExist:
+            return milestone.duedate
 
 
 @receiver(post_save, sender=User)

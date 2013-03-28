@@ -195,7 +195,7 @@ def view_all_chunks(request, viewtype, submission_id):
 def simualte(request, review_milestone_id):
     user = request.user
     review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
-    milestone_chunks = Chunk.objects.filter(file__submission__milestone__id = review_milestone.submission_milestone.id).select_related('file__submission__milestone', 'profile')
+    milestone_chunks = Chunk.objects.filter(file__submission__milestone=review_milestone.submit_milestone).select_related('file__submission__milestone', 'profile')
 
     chunks_graph = dict()
     edited = set()
@@ -412,7 +412,7 @@ def list_users(request, review_milestone_id):
     return [checkstyle, students, alum, staff]
 
   review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
-  submissions = Submission.objects.filter(milestone=review_milestone.submission_milestone)
+  submissions = Submission.objects.filter(milestone=review_milestone.submit_milestone)
 
   data = {}
   chunk_task_map = defaultdict(list)
