@@ -75,7 +75,7 @@ $(document).ready(function() {
       {% endfor %}
       {% if user == participant %}
       <div class='buttons'>
-        <a class='btn btn-small' href="{% url review.views.edit_profile user.username %}">Edit profile</a>
+        <a class='btn btn-small' href="{% url accounts.views.edit_profile user.username %}">Edit profile</a>
       </div>
       {% endif %}
       {%if user.profile.is_staff %}

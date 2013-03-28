@@ -23,10 +23,6 @@ from pygments import highlight
 from pygments.lexers import JavaLexer, SchemeLexer
 from pygments.formatters import HtmlFormatter
 
-from PIL import Image as PImage
-from os.path import join as pjoin
-from django.conf import settings
-
 import datetime
 import sys
 
@@ -362,75 +358,6 @@ def change_task(request):
         return redirect(next_task.chunk)
     except Task.DoesNotExist:
         return redirect('review.views.dashboard')
-
-@login_required
-def summary(request, username):
-    try:
-        participant = User.objects.get(username__exact=username)
-    except:
-        raise Http404
-    assignment_data = []
-    #get all assignments
-    assignments = Assignment.objects.all().order_by('created').reverse()
-    for assignment in assignments:
-        #get all comments that the user wrote
-        comments = Comment.objects.filter(author=participant).filter(chunk__file__submission__assignment = assignment).select_related('chunk')
-        review_data = []
-        for comment in comments:
-            if comment.is_reply():
-                #false means not a vote activity
-                review_data.append(("reply-comment", comment, comment.generate_snippet(), False, None))
-            else:
-                review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
-
-        votes = Vote.objects.filter(author=participant) \
-                    .filter(comment__chunk__file__submission__assignment = assignment) \
-                    .select_related('comment__chunk')
-        for vote in votes:
-            if vote.value == 1:
-                #true means vote activity
-                review_data.append(("vote-up", vote.comment, vote.comment.generate_snippet(), True, vote))
-            elif vote.value == -1:
-                review_data.append(("vote-down", vote.comment, vote.comment.generate_snippet(), True, vote))
-        review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
-        assignment_data.append((assignment, review_data))
-    return render(request, 'review/summary.html', {
-        'assignment_data': assignment_data,
-        'participant': participant
-    })
-
-@login_required
-def edit_profile(request, username):
-    # can't edit if not current user
-    if request.user.username != username:
-        return redirect(reverse('review.views.summary', args=([username])))
-    """Edit user profile."""
-    profile = User.objects.get(username=username).profile
-    photo = None
-    img = None
-    if profile.photo:
-        photo = profile.photo.url
-    else:
-        photo = "http://placehold.it/180x144&text=Student"
-
-    if request.method == "POST":
-        form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            if request.FILES:
-                # resize and save image under same filename
-                imfn = pjoin(settings.MEDIA_ROOT, profile.photo.name)
-                im = PImage.open(imfn)
-                im.thumbnail((180,180), PImage.ANTIALIAS)
-                im.save(imfn, "PNG")
-            return redirect(reverse('review.views.summary', args=([username])))
-    else:
-        form = UserProfileForm(instance=profile)
-
-    return render(request, 'review/edit_profile.html', {
-        'form': form,
-        'photo': photo,
-    })
 
 @login_required
 def allusers(request):
