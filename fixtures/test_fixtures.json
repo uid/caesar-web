@@ -738,10 +738,10 @@
       "is_active": true, 
       "is_superuser": true, 
       "is_staff": true, 
-      "last_login": "2013-03-17 15:10:10", 
+      "last_login": "2013-03-28 08:17:31", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$83c83$dfeee5e378059cc1603080bca242f7f6b98ff59a", 
       "email": "rcm@mit.edu", 
       "date_joined": "2011-08-22 21:53:16"
     }
@@ -756,10 +756,10 @@
       "is_active": true, 
       "is_superuser": true, 
       "is_staff": true, 
-      "last_login": "2013-03-17 10:37:58", 
+      "last_login": "2013-03-28 08:17:20", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "sha1$3ac02$363899b3a738fbcaec850b5e9759489fa0e99a73", 
+      "password": "sha1$05710$8fac6f25480cfabf606fa58a3c099f293dedeec8", 
       "email": "kiranb@mit.edu", 
       "date_joined": "2011-09-09 23:28:50"
     }
@@ -777,7 +777,7 @@
       "last_login": "2012-12-05 11:40:43", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$33194$4bec97bd4c68816f4eda6aee2b9707365d0870dc", 
       "email": "graves@mit.edu", 
       "date_joined": "2011-09-09 23:29:08"
     }
@@ -795,7 +795,7 @@
       "last_login": "2013-02-13 19:22:17", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$5ae0b$4bd6920155547d71b9797b8f3d86300cf7ec886e", 
       "email": "pnomario58686@mit.edu", 
       "date_joined": "2012-02-09 16:40:07"
     }
@@ -813,7 +813,7 @@
       "last_login": "2013-02-12 17:28:14", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$1d049$28dc7bf4840d463542273a50d1cbe282f929eaef", 
       "email": "ernie2959358@mit.edu", 
       "date_joined": "2012-09-07 23:47:12"
     }
@@ -831,7 +831,7 @@
       "last_login": "2013-02-14 12:42:55", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "sha1$9a603$878d716c3dbcb68c86cc5a554c6d06364950a292", 
+      "password": "sha1$ab9b3$2a561b14456cd465c39743953db65beb2af86273", 
       "email": "polovoco20384792@alum.mit.edu", 
       "date_joined": "2013-01-30 18:10:12"
     }
@@ -849,7 +849,7 @@
       "last_login": "2013-02-09 20:26:47", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$7d10d$aaf4e6c9cefc869339e8518bc77b9d7fd00c9148", 
       "email": "gregk9283847@mit.edu", 
       "date_joined": "2013-02-06 20:46:01"
     }
@@ -867,7 +867,7 @@
       "last_login": "2013-02-10 17:47:52", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$2a090$b5546ef427fda65a963f9d0dedc41846adb1cafe", 
       "email": "qsitters496930@mit.edu", 
       "date_joined": "2013-02-06 20:46:02"
     }
@@ -885,7 +885,7 @@
       "last_login": "2013-02-13 12:29:07", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$ef37d$7c258b6c0f6e152b3988460fa8993607013b8a4d", 
       "email": "kathleenhanna1p8392u@mit.edu", 
       "date_joined": "2013-02-06 20:46:04"
     }
@@ -903,7 +903,7 @@
       "last_login": "2013-02-10 21:37:08", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$d76eb$3b43f81867a77c8a2c9a95ee678ee583cf8cf6f2", 
       "email": "kimdeal1093842@mit.edu", 
       "date_joined": "2013-02-06 20:46:06"
     }
@@ -921,7 +921,7 @@
       "last_login": "2013-02-09 22:47:08", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$eeb7c$ea97fe3bdb362a48c5c8a633ff59fb6b0b76d458", 
       "email": "mikewatt21083@mit.edu", 
       "date_joined": "2013-02-06 20:46:07"
     }
@@ -939,7 +939,7 @@
       "last_login": "2013-02-10 16:46:25", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$842fc$9f11e9ea97f4555290b601013da0c92931050fca", 
       "email": "davidbowie219p83@mit.edu", 
       "date_joined": "2013-02-06 20:46:07"
     }
@@ -957,7 +957,7 @@
       "last_login": "2013-02-10 21:47:13", 
       "groups": [], 
       "user_permissions": [], 
-      "password": "!", 
+      "password": "sha1$9be40$de1f7b41e521e57b84df2f13e3c9f2076f14ab6d", 
       "email": "iggypop032894@mit.edu", 
       "date_joined": "2013-02-09 14:00:08"
     }
@@ -8747,6 +8747,70 @@
     }
   }, 
   {
+    "pk": "a93707636178f80bf53ff1efaee87370", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-03-31 14:07:01", 
+      "session_data": "MDAxY2ZiMjk5ZWUxNzdlMzdmZmExMTcyMWE1NzkyOWNmNDUzNzkxYjqAAn1xAVUKdGVzdGNvb2tp\nZXECVQZ3b3JrZWRxA3Mu\n"
+    }
+  }, 
+  {
+    "pk": "f22beae12b17bb92c8dc630c6c35d981", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-04-01 09:50:42", 
+      "session_data": "MDAxY2ZiMjk5ZWUxNzdlMzdmZmExMTcyMWE1NzkyOWNmNDUzNzkxYjqAAn1xAVUKdGVzdGNvb2tp\nZXECVQZ3b3JrZWRxA3Mu\n"
+    }
+  }, 
+  {
+    "pk": "67cd617f068ae865f08ead3ec48e9fb8", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-04-01 09:50:43", 
+      "session_data": "MDAxY2ZiMjk5ZWUxNzdlMzdmZmExMTcyMWE1NzkyOWNmNDUzNzkxYjqAAn1xAVUKdGVzdGNvb2tp\nZXECVQZ3b3JrZWRxA3Mu\n"
+    }
+  }, 
+  {
+    "pk": "fe8422106f08be2e4d2d5385d621c3af", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-04-01 14:06:50", 
+      "session_data": "MDAxY2ZiMjk5ZWUxNzdlMzdmZmExMTcyMWE1NzkyOWNmNDUzNzkxYjqAAn1xAVUKdGVzdGNvb2tp\nZXECVQZ3b3JrZWRxA3Mu\n"
+    }
+  }, 
+  {
+    "pk": "e060b8e9b5d6464f972f3142d0aab0d5", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-04-02 14:21:23", 
+      "session_data": "MDAxY2ZiMjk5ZWUxNzdlMzdmZmExMTcyMWE1NzkyOWNmNDUzNzkxYjqAAn1xAVUKdGVzdGNvb2tp\nZXECVQZ3b3JrZWRxA3Mu\n"
+    }
+  }, 
+  {
+    "pk": "5701123a69f378d6fb1127e36b3f8ec0", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-04-03 13:54:33", 
+      "session_data": "MDAxY2ZiMjk5ZWUxNzdlMzdmZmExMTcyMWE1NzkyOWNmNDUzNzkxYjqAAn1xAVUKdGVzdGNvb2tp\nZXECVQZ3b3JrZWRxA3Mu\n"
+    }
+  }, 
+  {
+    "pk": "7686bfd5dc1c81b7a062e5bbda7c7364", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-04-11 08:17:35", 
+      "session_data": "ZjdhNGEwM2YwMzU0OGY1MWJmNTJlYjE4ZGQ2OGI5YTk3ZWE1MzJhODqAAn1xAS4=\n"
+    }
+  }, 
+  {
+    "pk": "ac8a368774ab84a774b9dabce03f454f", 
+    "model": "sessions.session", 
+    "fields": {
+      "expire_date": "2013-04-11 08:17:20", 
+      "session_data": "NDViZjg4ZjUxNzU4NzQyNWU5NDI4ZjcxZjVmMWM2NjE1YzlkODJjZTqAAn1xAShVEl9hdXRoX3Vz\nZXJfYmFja2VuZHECVR1taXQuYXV0aC5TU0xSZW1vdGVVc2VyQmFja2VuZHEDVQ1fYXV0aF91c2Vy\nX2lkcQSKARt1Lg==\n"
+    }
+  }, 
+  {
     "pk": 1, 
     "model": "sites.site", 
     "fields": {
@@ -9202,6 +9266,48 @@
       "applied": "2013-02-09 15:46:22", 
       "app_name": "chunks", 
       "migration": "0031_auto__add_field_file_batch"
+    }
+  }, 
+  {
+    "pk": "sorl-thumbnail||thumbnails||ecc439a2f73501f61f2a0a6f9e838eab", 
+    "model": "thumbnail.kvstore", 
+    "fields": {
+      "value": "[\"a23c7094532b05e6ee9ebd39aedb3ed2\"]"
+    }
+  }, 
+  {
+    "pk": "sorl-thumbnail||image||a23c7094532b05e6ee9ebd39aedb3ed2", 
+    "model": "thumbnail.kvstore", 
+    "fields": {
+      "value": "{\"storage\": \"django.core.files.storage.FileSystemStorage\", \"name\": \"cache/40/a6/40a614d0b3946c24a1b5d33e3a2350f8.jpg\", \"size\": [20, 20]}"
+    }
+  }, 
+  {
+    "pk": "sorl-thumbnail||image||ecc439a2f73501f61f2a0a6f9e838eab", 
+    "model": "thumbnail.kvstore", 
+    "fields": {
+      "value": "{\"storage\": \"accounts.storage.OverwriteStorage\", \"name\": \"photos/profiles/rcm\", \"size\": [120, 180]}"
+    }
+  }, 
+  {
+    "pk": "sorl-thumbnail||thumbnails||958e07cecc580a38baeaa83efa5503c4", 
+    "model": "thumbnail.kvstore", 
+    "fields": {
+      "value": "[\"6b118302ebd088f725b2588a13f9e9d2\"]"
+    }
+  }, 
+  {
+    "pk": "sorl-thumbnail||image||6b118302ebd088f725b2588a13f9e9d2", 
+    "model": "thumbnail.kvstore", 
+    "fields": {
+      "value": "{\"storage\": \"django.core.files.storage.FileSystemStorage\", \"name\": \"cache/65/f0/65f0116ca3edbd518156bb501ea255dd.jpg\", \"size\": [20, 20]}"
+    }
+  }, 
+  {
+    "pk": "sorl-thumbnail||image||958e07cecc580a38baeaa83efa5503c4", 
+    "model": "thumbnail.kvstore", 
+    "fields": {
+      "value": "{\"storage\": \"accounts.storage.OverwriteStorage\", \"name\": \"photos/profiles/kiranb\", \"size\": [180, 180]}"
     }
   }, 
   {
