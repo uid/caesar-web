@@ -55,7 +55,7 @@
         <td>
         Wiki page edited by 
         {% for contributor in contributors %}
-            <a href="/review/user/{{ contributor.username }}">{{ contributor.username }}</a>{% if not forloop.last %},{% endif %} 
+            <a href="{% url accounts.views.view_profile contributor.username %}">{{ contributor.username }}</a>{% if not forloop.last %},{% endif %} 
         {% endfor %}
         <hr>
         {% if num_student_uses_semester == 0 %}

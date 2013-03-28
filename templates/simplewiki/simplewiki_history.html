@@ -48,7 +48,7 @@
                             {% endifnotequal %}
                         {% endif %}
                     </label>
-                <td width="18%" style="vertical-align:top"><a href="/review/user/{{revision.get_user}}/">{{ revision.get_user}}</a>
+                <td width="18%" style="vertical-align:top"><a href="{% url accounts.views.view_profile revision.get_user %}">{{ revision.get_user}}</a>
                 <br/>
                 {{ revision.revision_date|date}} {{ revision.revision_date|time}}
                 </td>
