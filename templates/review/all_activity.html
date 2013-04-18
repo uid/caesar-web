@@ -67,7 +67,7 @@ $(document).ready(function() {
   {% if participant != user %}
     <a class="breadcrumb" href="{% url review.views.allusers %}">all users</a>
   {% endif %}
-  <a class="breadcrumb" href="{% url review.views.summary participant.username %}">{{participant.username}}</a>
+  <a class="breadcrumb" href="{% url accounts.views.view_profile participant.username %}">{{participant.username}}</a>
   <span class="breadcrumb">all activity</span>
 {% endblock %}
 
@@ -76,7 +76,7 @@ $(document).ready(function() {
 
 {% block content %}
 
-{% for chunk, highlighted_lines, comment_data, file in assignment_data%}
+{% for chunk, highlighted_lines, comment_data, file in review_milestone_data%}
 <h2 class="file-name-display">
 <A NAME="{{chunk.name}}"></A> {{ chunk.name }}
 </h2>

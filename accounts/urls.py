@@ -23,4 +23,6 @@ urlpatterns = patterns('',
                            {'template': 'accounts/registration_request_complete.html'}),
     (r'^enroll/', 'accounts.views.edit_membership'),
     (r'bulk_add/', 'accounts.views.bulk_add'),
+    (r'^user/(?P<username>\w+)/edit', 'accounts.views.edit_profile'),
+    (r'^user/(?P<username>\w+)', 'accounts.views.view_profile'),
 )

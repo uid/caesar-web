@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load review_extras %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/social_foundicons.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/general_foundicons.css" type="text/css" />
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+
+<script>
+$(document).ready(function() {
+
+    $('.activity-line').click(function(e) {
+      var activityType = this.id.split('-')[0]
+      var comment_Id = this.id.split('-')[1];
+      var chunk_Id = this.id.split('-')[2];
+      window.location = "/chunks/view/" + chunk_Id + "#" + activityType + "-" + comment_Id;
+      return false;
+    });
+
+});
+</script>
+
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  {% if user != participant %}
+    <a class="breadcrumb" href="{% url review.views.allusers %}">all users</a>
+  {% endif %}
+  <span class="breadcrumb">{{ participant.username }}</span>
+{% endblock %}
+
+
+{% block content %}
+
+ <div class="row">
+    <div class="span3">
+        {% if participant.profile.photo %}
+          <img id='profile-photo' class='img-rounded' src="{{ participant.profile.photo.url }}" />
+        {% else %}
+          <img id='profile-photo' class='img-rounded' src="http://placehold.it/180x144&text=Student" />
+        {% endif %}
+      <ul class='social'>
+        {% if participant.profile.twitter %}
+          <a href='http://twitter.com/{{ participant.profile.twitter}}'><li><i class="social foundicon-twitter"></i></li></a>
+        {% endif %}
+        {% if participant.profile.github %}
+          <a href='http://github.com/{{ participant.profile.github}}'><li><i class="social foundicon-github"></i></li></a>
+        {% endif %}
+        {% if participant.profile.linkedin %}
+          <a href='{{ participant.profile.linkedin}}'><li><i class="social foundicon-linkedin"></i></li></a>
+        {% endif %}
+        {% if participant.profile.website %}
+          <a href='{{ participant.profile.website}}'><li><i class="foundicon-globe"></i></li></a>
+        {% endif %}
+        <a href='mailto:{{ participant.email }}'><li><i class='foundicon-mail'></i></li></a>
+      </ul>
+
+    </div>
+    <div class="span9">
+      <h2 class="name">{{ participant.first_name }} {{ participant.last_name }} {{participant.profile.class_year|class_year}} <small>{{ participant.username }}</small></h2>
+      <div class='company'>{{participant.profile.company}}</div>
+      <h4 class="task header"> reputation: {{participant.profile.reputation}}</h4>
+      {% for membership in participant.membership.all %}
+        <span class='label current-{{membership.semester.is_current_semester}} class'>
+          {{ membership.semester }} ({{ membership.role }})
+        </span>
+      {% endfor %}
+      {% if user == participant %}
+      <div class='buttons'>
+        <a class='btn btn-small' href="{% url accounts.views.edit_profile user.username %}">Edit profile</a>
+      </div>
+      {% endif %}
+      {%if user.profile.is_staff %}
+          <a class="breadcrumb first-breadcrumb" href="{% url review.views.student_dashboard participant.username %}"> [{{participant.username}} Dashboard]</a> 
+      {%endif%}
+    </div>
+  </div>
+
+
+<div class="row">
+    <div class="span3">
+      <h3>About Me</h3>
+      {{ participant.profile.about_html|safe }}
+    </div>
+
+    <div class="span9" id='code'>
+      <h3>My Review Activity</h3>
+      {% for review_milestone, review_data in review_milestone_data %}
+        {% if review_data %}
+          <h3 class="assignment-display">
+            <a name="assignment-display"></a> {{ review_milestone.full_name }} {%if not review_milestone.assignment.is_current_semester %} - {{ review_milestone.assignment.get_semester_display }} {% endif %}
+            <div class="view-all-activity">
+              {%if review_milestone.assignment.is_current_semester or not user.profile.is_student %}
+              <a href="{% url review.views.all_activity review_milestone.id participant.username %}"> view with code</a>
+              {% endif %}
+            </div>
+          </h3>
+          <table class="assignment-stream">
+            {% for type, comment, snippet, is_vote, vote in review_data %}
+            <tr id="{% if is_vote %}{% if vote.value == 1 %}voteup-{{comment.id}}-{{comment.chunk.id}}
+                                    {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
+                                    {% endif %}
+                    {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
+                    {% endif %}" class="{%if review_milestone.assignment.is_current_semester or not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
+              
+              <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
+              
+              {% if comment.upvote_count == 0 and comment.downvote_count == 0 or is_vote %}
+              <td colspan="2" class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
+            {% else %}
+              <td>{% if comment.upvote_count > 0 %}<span class="positive-votes">+{{comment.upvote_count}}</span>{% endif %}{% if comment.upvote_count > 0 and comment.downvote_count > 0 %}/{% endif %}{% if comment.downvote_count > 0 %}<span class="negative-votes">-{{comment.downvote_count}}</span>{% endif %}</td>
+              <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {{ snippet }} </td>
+            {% endif %}
+
+              <td class="grey-text"> {{ comment.chunk.name }} </td>
+              <td class="grey-text"> {{ comment.modified }} </td>
+              
+            </tr>
+            {% empty %}
+            {% endfor %}
+          </table>
+          {% endif %}
+          {% empty %}
+            <p>The user has no activity yet.</p>
+          {% endfor %}
+    </div>
+  </div>
+
+{% endblock %}

@@ -11,7 +11,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 import time
 
 # Django imports
-from chunks.models import Assignment, Submission, File, Chunk, Batch
+from chunks.models import Assignment, Submission, File, Chunk, Batch, SubmitMilestone
 from django.db import transaction
 
 # Preprocessor imports
@@ -22,13 +22,11 @@ from checkstyle import generate_checkstyle_comments
 
 # NOTE: I never tested directories with traling slashes. Sorry I don't have time to make it more robust :(
 settings = {
-    'assignment_id': 5,
-    'assignment_name': 'ps0-beta',
-    'generate_comments': False,
-    'save_data': True,
-    'semester_id': 2,
-    'staff_dir': 'ps0-staff',
-    'student_submission_dir': 'ps0-students'
+    'submit_milestone_id': 16,
+    'generate_comments': True,
+    'save_data': False,
+    'staff_dir': '/tmp/ps1-staff',
+    'student_submission_dir': '/tmp/ps1-submissions'
     }
 
 starting_time = time.time()
@@ -38,31 +36,21 @@ starting_time = time.time()
 # load time, but it will automatically roll back the changes if there's an exception.
 # with transaction.commit_on_success():
 
-# Finding / creating the assignment object
-assignments = Assignment.objects.filter(id=settings['assignment_id'])
-if (len(assignments) > 0): # Adding more submissions to an already-created assignment
-  assignment = assignments[0]
-  print "Found existing assignment. Adding assignments to %s." % (assignment.name)
-elif settings['semester_id']:
-  assignment = Assignment(id=settings['assignment_id'], name=settings['assignment_name'], semester_id=settings['semester_id'])
-  print "Creating a new assignment. Remember to update the settings: caesar.csail.mit.edu/admin/chunks/assignment/%s" % (settings['assignment_id'])
-else:
-  print "Must supply an assignment_id or a semester_id (otherwise we don't know which semester to add the assignment to)."
-  print "Shutting down preprocessor."
-  exit()
+# Finding the submit milestone object
+submit_milestone = SubmitMilestone.objects.get(id=settings['submit_milestone_id'])
+print "Found existing submit milestone. Adding code to %s." % (submit_milestone.full_name())
 
 staff_code = parse_staff_code(settings['staff_dir'])
 
-batch = Batch(assignment=assignment)
+batch = Batch(name=submit_milestone.full_name())
 if settings['save_data']:
   batch.save()
-  assignment.save()
   print "Batch ID: %s" % (batch.id)
 
 # Crawling the file system.
 student_code = crawl_submissions(settings['student_submission_dir'])
 
-code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, assignment, settings['save_data'], staff_code)
+code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, submit_milestone, settings['save_data'], staff_code)
 
 if parse.failed_users:
   print "To add the missing users to Caesar, use scripts/loadusers.py to add the folowing list of users:"

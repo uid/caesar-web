@@ -322,13 +322,13 @@ class CreateArticleForm(RevisionForm):
         model = Revision
         fields = ['title', 'contents',]
 
-def set_revision(sender, *args, **kwargs):
+def set_revision(sender, raw=False, **kwargs):
     """Signal handler to ensure that a new revision is always chosen as the
     current revision - automatically. It simplifies stuff greatly. Also
     stores previous revision for diff-purposes"""
     instance = kwargs['instance']
     created = kwargs['created']
-    if created and instance.article:
+    if created and instance.article and not raw:
         instance.article.current_revision = instance
         instance.article.save()
 

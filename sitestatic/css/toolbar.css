@@ -1,0 +1,100 @@
+#toolbar {
+    z-index: 1000;
+    position: relative;
+    margin-left: 0;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    border-radius: 0px 0px 10px 10px ;
+}
+
+#toolbar-main {
+    background: #eee;
+    border: 1px solid #ccc;
+    border-top: 0;
+    margin-left: 0;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+}
+
+#toolbar-breadcrumbs {
+    display: inline-block;
+}
+
+#toolbar-breadcrumbs .breadcrumb {
+    display: inline-block;
+    padding: 5px 15px;
+    border-radius: 0px 10px 10px 0px / 0px 15px 15px 0px;
+    text-decoration: none;
+    color: #000;
+    margin: -1px;
+    margin-left: -12px;
+
+    border: 1px solid #ccc;
+    border-left: 0px;
+}
+
+#toolbar-breadcrumbs a.breadcrumb.first-breadcrumb {
+    margin-left: -1px;
+    border-left: 1px solid #ccc;
+    padding-left: 10px;
+}
+
+#toolbar-breadcrumbs a.breadcrumb:hover {
+    color: #09f;
+}
+
+#toolbar-breadcrumbs .dropdown {
+    display: inline-block;
+}
+
+#toolbar-breadcrumbs .dropdown-link {
+    cursor: pointer;
+}
+
+#toolbar-breadcrumbs .dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: #eee;
+    padding: 5px;
+    list-style: none;
+    border: 1px solid #ccc;
+}
+
+#toolbar-actions {
+    display: inline-block;
+    float: right;
+}
+
+#toolbar-user {
+    float: right;
+    margin: 3px; 
+}
+
+#toolbar-logged-in .user-photo {
+    vertical-align: middle;    
+    border: 1px solid #fff;
+}
+
+#secondary-toolbar {
+    font-size: 1.1em;
+    background: #fafafa; 
+    border: 1px solid #ccc;
+    border-top: 0px;
+    margin-left: 0;
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    border-radius: 0px 0px 10px 10px ;
+}
+
+#secondary-toolbar-inner {
+    margin: 1em;
+}
+div.clear-both{
+    clear: both;
+}

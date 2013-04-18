@@ -6,18 +6,13 @@ Replace these with more appropriate tests for your application.
 """
 
 from django.test import TestCase
+from accounts.models import User
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+class UserTest(TestCase):
+    fixtures = ['test_fixtures.json']
+
+    def test_existence(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Tests that rcm is actually loaded.
         """
-        self.failUnlessEqual(1 + 1, 2)
-
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
-
->>> 1 + 1 == 2
-True
-"""}
-
+        self.assertTrue(User.objects.filter(username='rcm').exists())

@@ -1,0 +1,254 @@
+
+.js #instructions-text {
+    display: none;
+}
+#task-count {
+    display: inline-block;
+    font-weight: bold;
+    font-size: 1em;
+}
+
+#view-all-code {
+    display: block;
+    float: right;
+    padding: 0px 5px;
+}
+
+#chunk-navigation {
+    float: right;
+}
+#chunk-navigation form {
+    display: inline-block;
+}
+
+#chunk-display {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    padding-left: 18px;
+}
+#nonchunk-display {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+    padding-left: 18px;
+}
+#file-action {
+    color: #000;
+    font-size: 14px;
+    font-weight: bold;
+    -webkit-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    writing-mode: tb-rl;
+    filter: flipv fliph;
+    position: fixed;
+    height: 20px;
+    width: 75px;
+    right: -27px;
+    top: 150px;
+    padding: 5px 5px;
+    text-align: center;
+    background-color: #eee;
+    border: 1px solid #000;
+    cursor: pointer;
+    z-index: 1;
+}
+#filesystem-text {
+    position: fixed;
+    right: 32px;
+    top: 123px;
+    padding: 5px 5px;
+    background-color: #eee;
+    border: 1px solid #000;
+    z-index: 1;
+    opacity: 0.7;
+}
+#code-table-display {
+    vertical-align:top;
+}
+.file-name-display {
+    padding: 10px 10px;
+    background-color: #eee;
+}
+.chunk-line {
+    font-family: monospace;
+    font-size: 11px;
+    margin: 0;
+    display: block;
+    position: relative;
+}
+.chunk-line-student{
+    background-color: #E0E0E0;
+}
+.colorred{
+    color:red;
+}
+.chunk-line-staff{
+    background-color: #FFFFFF;
+}
+.nonchunk-line {
+    font-family: monospace;
+    font-size: 11px;
+    margin: 0;
+    display: block;
+    position: relative;
+    background-color: #FFF;
+}
+
+.line {
+    display: block;
+}
+
+.chunk-line .comment-marker {
+    color: #555;
+    font-family: sans-serif;
+    display: block;
+    background: url('../img/balloon.png') no-repeat 0px 0px;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    left: -18px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 9px;
+    line-height: 14px;
+}
+
+.chunk-line .comment-marker:hover {
+    background-color: #eee;
+}
+
+.line-code {
+    display: inline;
+}
+
+.line-number {
+    display: inline-block;
+    text-align: right;
+    width: 2.5em;
+    background-color: #ccf;
+    margin-right: 1em;
+    padding: 0 .25em;
+}
+
+.ui-selected {
+    background-color: #FC6;
+}
+.ui-selecting {
+    background-color: #FC6;
+}
+
+.line.highlighted {
+    background-color: #FF6;
+}
+
+.comment-count {
+    display: inline;
+    background-image: url('../img/balloon.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+    margin-right: 4px;
+}
+.robot-count {
+    display: inline;
+    background-image: url('../img/robot.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+}
+
+/* list chunks css */
+.chunk {
+  margin-left: 25px;
+  padding: 0 5px;
+  position: relative;
+  overflow: auto;
+}
+
+.zero-reviewer-chunk {
+}
+
+.multi-reviewer-chunk {
+}
+
+.chunk-info {
+  display: inline;
+  float: right;
+}
+
+.user-chunk {
+  font-size: 14px;
+  margin-top: 3px;
+  padding: 0 5px;
+}
+
+.zero-chunk {
+  background: #ffc;
+}
+
+.multi-chunks {
+}
+
+.chunks {
+  padding: 0 5px;
+}
+
+.last-task {
+  margin-bottom: 12px;
+}
+
+.last-chunk{
+  margin-bottom: 12px;
+}
+
+.chunk-link {
+  color:#333;
+}
+
+.chunk-link:hover {
+  color:#111;
+}
+
+#user-chunk-list {
+  padding-top: 10px;
+}
+
+.author-role {
+  left: 35%;
+  position: absolute;
+}
+
+.task {
+  background: #fff;
+  margin-left:25px;
+  padding: 0 5px;
+  overflow: auto;
+}
+
+.completed-task {
+  background:#DEF;
+}
+
+#toggle-buttons {
+  margin: 15px 0 0 3px;
+}
+
+.reviewers-col {
+  float: left;
+  width: 150px;
+}
+
+.uncompleted {
+  background-color: white;
+}
+
+.uncompleted {
+  background-color: white;
+}
+
+.completed {
+  background-color: #def;
+}

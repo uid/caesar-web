@@ -6,18 +6,19 @@ Replace these with more appropriate tests for your application.
 """
 
 from django.test import TestCase
+from chunks.models import Submission, File
 
-class SimpleTest(TestCase):
-    def test_basic_addition(self):
+class UserTest(TestCase):
+    fixtures = ['test_fixtures.json']
+
+    def test_chunks(self):
         """
-        Tests that 1 + 1 always equals 2.
+        Count number of chunks that exist
         """
-        self.failUnlessEqual(1 + 1, 2)
+        self.assertTrue(Submission.objects.all().count() == 8)
 
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
-
->>> 1 + 1 == 2
-True
-"""}
-
+    def test_files(self):
+        """
+        Count number of submissions that exist
+        """
+        self.assertTrue(File.objects.all().count() == 64)

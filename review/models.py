@@ -97,18 +97,19 @@ class Vote(models.Model):
 
 
 @receiver(pre_save, sender=Vote)
-def update_reputation_on_vote_save(sender, instance, **kwargs):
-    comment_author = instance.comment.author.get_profile()
-    if instance.id:
-        old_vote = Vote.objects.get(pk=instance.id)
-        if old_vote.value > 0:
-            comment_author.reputation -= old_vote.value * Vote.REPUTATION_WEIGHT
+def update_reputation_on_vote_save(sender, instance, raw=False, **kwargs):
+    if not raw:
+        comment_author = instance.comment.author.get_profile()
+        if instance.id:
+            old_vote = Vote.objects.get(pk=instance.id)
+            if old_vote.value > 0:
+                comment_author.reputation -= old_vote.value * Vote.REPUTATION_WEIGHT
 
-    new_value = int(instance.value)
-    if new_value > 0:
-        comment_author.reputation += new_value * Vote.REPUTATION_WEIGHT
+        new_value = int(instance.value)
+        if new_value > 0:
+            comment_author.reputation += new_value * Vote.REPUTATION_WEIGHT
 
-    comment_author.save()
+        comment_author.save()
 
 
 @receiver(pre_delete, sender=Vote)

@@ -8,9 +8,9 @@
 
 {% block js %}
 {{ block.super }}
-<script src="http://api.jquery.com/scripts/events.js"></script>
-<script src="http://code.highcharts.com/highcharts.js"></script>
-<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+<script src="{{ STATIC_URL }}js/highcharts-3.0.0.js"></script>
+<script src="{{ STATIC_URL }}js/highcharts-exporting.js"></script>
 <script>
 $(document).ready(function(){
 
@@ -361,48 +361,48 @@ $(document).ready(function(){
 
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
-  <span class="breadcrumb">Assignment Info</span>
+  <span class="breadcrumb">Milestone Info</span>
 {% endblock %}
 
 {% block content %}
 <form id="simluate-form" 
-  action="/chunks/simulate/{{assignment.id}}" method="post">
+  action="/chunks/simulate/{{review_milestone.id}}" method="post">
   {% csrf_token %}
 
-<p> <h1 class="task-header"> Settings for {{ assignment.name }}. </h1> </p>
+<p> <h1 class="task-header"> Settings for {{ review_milestone.full_name }}. </h1> </p>
 
-<p> Assign <input type="text" id="per-chunk" class="count" name="per_chunk" value="{{ assignment.reviewers_per_chunk }}" size=3/> non staff users (students and alums) to each class for review. Staff will serve as quality control and be assigned as a <span id="next-reviewer"> 3rd</span> reviewer to as many classes as possible. </p>
+<p> Assign <input type="text" id="per-chunk" class="count" name="per_chunk" value="{{ review_milestone.reviewers_per_chunk }}" size=3/> non staff users (students and alums) to each class for review. Staff will serve as quality control and be assigned as a <span id="next-reviewer"> 3rd</span> reviewer to as many classes as possible. </p>
 
 <p><h2 class="task-header">For the reviewing process we can expect: </h2>
-Baseline values for {{assignment.name}} in <span class="purple"> purple. </span> <br/>
+Baseline values for {{review_milestone.full_name}} in <span class="purple"> purple. </span> <br/>
 <table class="assignment-stream">
   <tr class="non-activity-line">
     <td class="line-up"> 
-       <input type="text" id="total-students" class="count line-up" name="students" value="{{ assignment.students }}" size=3/> <br/> <span class="purple line-up"> {{assignment.students_default}} </span>
+       <input type="text" id="total-students" class="count line-up" name="students" value="{{ review_milestone.students }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.students_default}} </span>
     </td>
     <td class="center-up"> students </td>
     <td class="line-up"> reviewing </td>
-    <td class="line-up">  <input type="text" id="per-student" class="count line-up" name="student_tasks" value="{{ assignment.student_count }}" size=3/> <br/> <span class="purple line-up"> {{assignment.student_count_default}} </span></td>
+    <td class="line-up">  <input type="text" id="per-student" class="count line-up" name="student_tasks" value="{{ review_milestone.student_count }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.student_count_default}} </span></td>
     <td class="center-up"> tasks each. </td>
     <td class="last-left"><span id="student-tasks">0 tasks total.</span></td>
   </tr>
   <tr class="non-activity-line">
       <td class="line-up"> 
-         <input type="text" id="total-alums" class="count line-up" name="alums" value="{{ assignment.alums }}" size=3/> <br/> <span class="purple line-up"> {{assignment.alums_default}} </span>
+         <input type="text" id="total-alums" class="count line-up" name="alums" value="{{ review_milestone.alums }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.alums_default}} </span>
       </td>
       <td class="center-up"> alums </td>
       <td class="line-up"> reviewing </td>
-      <td class="line-up">  <input type="text" id="per-alum" class="count line-up" name="alum_tasks" value="{{ assignment.alum_count }}" size=3/> <br/> <span class="purple line-up"> {{assignment.alum_count_default}} </span> </td>
+      <td class="line-up">  <input type="text" id="per-alum" class="count line-up" name="alum_tasks" value="{{ review_milestone.alum_count }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.alum_count_default}} </span> </td>
       <td class="center-up"> tasks each. </td>
       <td class="last-left"><span id="alum-tasks"> 0  tasks total.</span></td>
   </tr>
   <tr class="non-activity-line">
       <td class="line-up"> 
-         <input type="text" name="staff"  class="line-up" value="{{ assignment.staff }}" size=3/> <br/> <span class="purple line-up"> {{assignment.staff_default}} </span>
+         <input type="text" name="staff"  class="line-up" value="{{ review_milestone.staff }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.staff_default}} </span>
       </td>
       <td class="center-up"> staff </td>
       <td class="line-up"> reviewing </td>
-      <td class="line-up">  <input type="text" name="staff_tasks" class="line-up" value="{{ assignment.staff_count }}" size=3/> <br/> <span class="purple line-up"> {{assignment.staff_count_default}} </span> </td>
+      <td class="line-up">  <input type="text" name="staff_tasks" class="line-up" value="{{ review_milestone.staff_count }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.staff_count_default}} </span> </td>
       <td class="center-up"> tasks each. </td>
       <td class="last-left"> </td>
   </tr>
@@ -412,12 +412,12 @@ Baseline values for {{assignment.name}} in <span class="purple"> purple. </span>
       <td> </td>
       <td> </td>
       <td> </td>
-      <td class="last-left"><span id='task-class'>/ ({{ assignment.reviewers_per_chunk }} tasks/class).</span> <br/></td>
+      <td class="last-left"><span id='task-class'>/ ({{ review_milestone.reviewers_per_chunk }} tasks/class).</span> <br/></td>
   </tr>
 </table>
 <h2 class="task-header result" id="power"> At most <span id="power-number" class="green"> 0 </span> classes will reviewed.</h2></p>
 
-<p> Only classes with at least <input type="text" id="min-lines" class="lines" name="min_lines" value="{{ assignment.min_student_lines }}" size=3/> student lines will be considered for review. </p>
+<p> Only classes with at least <input type="text" id="min-lines" class="lines" name="min_lines" value="{{ review_milestone.min_student_lines }}" size=3/> student lines will be considered for review. </p>
 Click and drag in the plot area to zoom in. 
 <div id="important-graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
 <div id="test-graph" style="min-width: 400px; height: 400px; margin: 0 auto"></div>

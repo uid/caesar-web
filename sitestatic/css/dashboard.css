@@ -1,0 +1,160 @@
+.task-header {
+    margin: 0px;
+}
+div.assignment-header {
+    padding-top: 2em;
+}
+.task-list {
+    margin-bottom: 18px;
+}
+.task-line {
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    height: 18px;
+    clear: both;
+    padding: 2px 0px;
+}
+.non-task-line {
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    height: 18px;
+    clear: both;
+    padding: 2px 0px;
+}
+.non-task-line:hover {
+    background-color: #eee;
+}
+.add-new-assignment {
+    font-size: small;
+    display: block;
+    float: right;
+    padding: 0px 5px;
+}
+.task-line:hover {
+    background-color: #eee;
+    cursor: pointer;
+}
+.assignment-line {
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    height: 18px;
+    clear: both;
+    padding: 2px 0px;
+}
+
+.submission-line {
+    border-bottom: 1px solid #aaa;
+    position: relative;
+    height: 18px;
+    clear: both;
+    padding: 2px 0px;
+}
+
+.submission-line:hover {
+    background-color: #eee;
+    cursor: pointer;
+}
+
+.new.task-line {
+    font-weight: bold;
+}
+
+.chunk-name {
+    display: block;
+    position: absolute;
+    width: 25em;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.task-snippet {
+    display: block; 
+    color: #777;
+    font-family: monospace;
+    font-size: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-left: 25em;
+    clear: none;
+}
+.submit-assignment {
+    display: block; 
+    color: black;
+    font-family: monospace;
+    font-size: 12px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    clear: right;
+    margin-right: 4px;
+}
+
+.task-stats {
+    display: block;
+    float: right;
+    padding: 0px 5px;
+}
+.progress{
+    display: none;
+}
+
+.comment-count {
+    display: inline;
+    background-image: url('../img/balloon.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+    margin-right: 4px;
+}
+.reviewer-count {
+    display: inline;
+    background-image: url('../img/user-silhouette.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+}
+.robot-count {
+    display: inline;
+    background-image: url('../img/robot.png');
+    background-repeat: no-repeat;
+    height: 16px;
+    padding-left: 18px;
+}
+
+table.current-assignment {
+    margin-bottom: 2em;
+    border-collapse: collapse;
+}
+.history{
+    color: #0E6996;
+    cursor: pointer;
+}
+.history-submissions{
+    color: #0E6996;
+    cursor: pointer;
+}
+.grey-text {
+    color: #777;
+    width: 20em;
+}
+.submit-text {
+}
+.black-text {
+    color: black;
+    width: 10em;
+}
+.red-text{
+    color: red;
+}
+.assignment-line {
+    border-bottom: 1px solid #aaa;
+}
+.instructions {
+    background-color: #e6efc2;
+    color: #333;
+    font-weight: normal;
+    font-size: 1em;
+    text-shadow: none;
+}

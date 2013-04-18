@@ -47,8 +47,8 @@ NEW_REPLY_SUBJECT_TEMPLATE = Template(
 
 
 @receiver(post_save, sender=Comment)
-def send_comment_notification(sender, instance, created=False, **kwargs):
-    if created:
+def send_comment_notification(sender, instance, created=False, raw=False, **kwargs):
+    if created and not raw:
         site = Site.objects.get_current()
         context = Context({
             'site': site,
@@ -78,7 +78,7 @@ def send_comment_notification(sender, instance, created=False, **kwargs):
         if submission_author and submission_author.email \
                 and instance.author != submission_author\
                 and instance.author.username != "checkstyle" \
-                and datetime.datetime.now() > submission.assignment.code_review_end_date:
+                and datetime.datetime.now() > submission.code_review_end_date():
             to = submission_author.email
             subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
             notification = Notification(recipient = submission_author, reason='C')

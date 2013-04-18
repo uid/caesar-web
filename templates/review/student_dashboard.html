@@ -56,7 +56,7 @@ $(document).ready(function() {
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
   <a class="breadcrumb" href="{% url review.views.allusers %}">all users</a>
-  <a class="breadcrumb" href="{% url review.views.summary participant%}">{{participant.username}}</a>
+  <a class="breadcrumb" href="{% url accounts.views.view_profile participant%}">{{participant.username}}</a>
   <span class="breadcrumb">{{ participant.username }} Dashboard</span>
 {% endblock %}
 
@@ -72,19 +72,17 @@ $(document).ready(function() {
 </div>
 
 <table class="current-assignment">
-  {% for submission in current_submissions %}
+  {% for milestone, extension in current_milestone_data %}
   <tr class="assignment-line">
-    <td class="black-text"> {{ submission.assignment.name }} </td>
-    <td class="grey-text"> Due on: {{ submission.assignment.duedate }} 
-        {%if submission.assignment.duedate != submission.duedate %}
-        <span class="red-text"> </br> Extended to: {{submission.duedate}} </span>
+    <td class="black-text"> {{ milestone.full_name }} </td>
+    <td class="grey-text"> Due on: {{ milestone.duedate }} 
+        {%if extension %}
+          <span class="red-text"> </br> Extended to: {{extension.new_duedate}} </span>
         {% endif %}
     </td>
-    {%if participant.profile.extension_days != 0 or submission.assignment.duedate != submission.duedate %}
-        <td class="=grey-text">[ {{participant.profile.extension_days}} slack days left] </td>
-    {%endif%}
-    </td>
-
+    {% if milestone.max_extension > 0 %}
+      <td class="=grey-text"><a href="{% url review.views.request_extension milestone.id %}"> request extension</a></td>
+    {% endif %}
   </tr>
   {% empty %}
   {% endfor %}
@@ -98,7 +96,7 @@ $(document).ready(function() {
   
   <div id ="submission-{{submission.id}}" class="submission-line">
     <span class="chunk-name">
-      {{ submission.assignment.name }}
+      {{ submission.milestone.full_name }}
     </span>
     <span class="task-stats">
       <span class="reviewer-count" title="Reviewers">
@@ -125,7 +123,7 @@ $(document).ready(function() {
   
       <div id ="submission-{{submission.id}}" class="submission-line">
         <span class="chunk-name">
-          {{ submission.assignment.name }}
+          {{ submission.milestone.full_name }}
         </span>
         <span class="task-stats">
           <span class="reviewer-count" title="Reviewers">

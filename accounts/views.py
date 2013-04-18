@@ -19,6 +19,12 @@ import datetime
 import sys
 import re
 
+from PIL import Image as PImage
+from os.path import join as pjoin
+from django.conf import settings
+from chunks.models import ReviewMilestone
+from review.models import Comment, Vote
+
 def login(request):
     if request.method == 'GET':
         redirect_to = request.GET.get('next', '/')
@@ -125,6 +131,76 @@ def edit_membership(request):
     return render(request, 'accounts/edit_membership.html', {
         'semesters': Semester.objects.filter(is_current_semester=True),
         'enrolled_classes': enrolled_classes,
+    })
+
+@login_required
+def view_profile(request, username):
+    try:
+        participant = User.objects.get(username__exact=username)
+    except:
+        raise Http404
+    review_milestone_data = []
+    #get all review milestones
+    review_milestones = ReviewMilestone.objects.all().order_by('-assigned_date')
+    for review_milestone in review_milestones:
+        #get all comments that the user wrote
+        comments = Comment.objects.filter(author=participant) \
+                          .filter(chunk__file__submission__milestone= review_milestone.submit_milestone).select_related('chunk')
+        review_data = []
+        for comment in comments:
+            if comment.is_reply():
+                #false means not a vote activity
+                review_data.append(("reply-comment", comment, comment.generate_snippet(), False, None))
+            else:
+                review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
+
+        votes = Vote.objects.filter(author=participant) \
+                    .filter(comment__chunk__file__submission__milestone = review_milestone.submit_milestone) \
+                    .select_related('comment__chunk')
+        for vote in votes:
+            if vote.value == 1:
+                #true means vote activity
+                review_data.append(("vote-up", vote.comment, vote.comment.generate_snippet(), True, vote))
+            elif vote.value == -1:
+                review_data.append(("vote-down", vote.comment, vote.comment.generate_snippet(), True, vote))
+        review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
+        review_milestone_data.append((review_milestone, review_data))
+    return render(request, 'accounts/view_profile.html', {
+        'review_milestone_data': review_milestone_data,
+        'participant': participant
+    })
+
+@login_required
+def edit_profile(request, username):
+    # can't edit if not current user
+    if request.user.username != username:
+        return redirect(reverse('accounts.views.view_profile', args=([username])))
+    """Edit user profile."""
+    profile = User.objects.get(username=username).profile
+    photo = None
+    img = None
+    if profile.photo:
+        photo = profile.photo.url
+    else:
+        photo = "http://placehold.it/180x144&text=Student"
+
+    if request.method == "POST":
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            if request.FILES:
+                # resize and save image under same filename
+                imfn = pjoin(settings.MEDIA_ROOT, profile.photo.name)
+                im = PImage.open(imfn)
+                im.thumbnail((180,180), PImage.ANTIALIAS)
+                im.save(imfn, "PNG")
+            return redirect(reverse('accounts.views.view_profile', args=([username])))
+    else:
+        form = UserProfileForm(instance=profile)
+
+    return render(request, 'accounts/edit_profile.html', {
+        'form': form,
+        'photo': photo,
     })
 
 @staff_member_required

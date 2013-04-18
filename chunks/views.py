@@ -1,4 +1,4 @@
-from chunks.models import Chunk, File, Assignment, Submission, StaffMarker
+from chunks.models import Chunk, File, Assignment, ReviewMilestone, Submission, StaffMarker
 from chunks.forms import SimulateRoutingForm
 from review.models import Comment, Vote, Star
 from tasks.models import Task
@@ -9,6 +9,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 
 from pygments import highlight
 from pygments.lexers import JavaLexer, SchemeLexer
@@ -26,7 +27,7 @@ from collections import defaultdict
 def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
-    if user.profile.is_student() and not chunk.file.submission.assignment.is_current_semester() and user != chunk.file.submission.author:
+    if user.profile.is_student() and not chunk.file.submission.milestone.assignment.is_current_semester() and user != chunk.file.submission.author:
         raise Http404
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
@@ -89,9 +90,9 @@ def view_all_chunks(request, viewtype, submission_id):
     submission = Submission.objects.get(id = submission_id)
     if not files:
         raise Http404
-    assignment = files[0].submission.assignment
-    assignment_name = assignment.name
-    if user.profile.is_student() and not assignment.is_current_semester() and user != submission.author:
+    milestone = files[0].submission.milestone
+    milestone_name = milestone.full_name()
+    if user.profile.is_student() and not milestone.assignment.is_current_semester() and user != submission.author:
         raise Http404
     paths = []
     user_stats = []
@@ -179,7 +180,7 @@ def view_all_chunks(request, viewtype, submission_id):
     path_and_stats = zip(paths, user_stats, static_stats)
 
     return render(request, 'chunks/view_all_chunks.html', {
-        'assignment_name': assignment_name,
+        'milestone_name': milestone_name,
         'path_and_stats': path_and_stats,
         'file_data': file_data,
         'code_only': code_only,
@@ -188,51 +189,13 @@ def view_all_chunks(request, viewtype, submission_id):
         'full_view': True,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
+
+# simulalte?
 @login_required
-def submit_assignment(request, assignment_id):
+def simualte(request, review_milestone_id):
     user = request.user
-    current_assignment = Assignment.objects.get(id=assignment_id)
-    if datetime.datetime.now() > current_assignment.duedate:
-        return render(request, 'chunks/submit_assignment.html', {
-            'submission': submission,
-            'author': author,
-            'new_submission': False,
-            'late': True
-        })
-    #check if there is an existing submission
-    submission = Submission.objects.get(author=user, assignment=current_assignment)
-    p = subprocess.Popen(['/Users/elena/Documents/Praetor/praetor/codeTester', '/Users/elena/Documents/Praetor/server_files/trunk'], stdout=subprocess.PIPE)
-    afile, err = p.communicate()
-    changedate = "Last Changed Date: "
-    changerevision = "Last Changed Rev: "
-    changeauthor = "Last Changed Author: "
-    dateindex = afile.find(changedate)
-    date = afile[dateindex + len(changedate):]
-    year, month, day = date.split(" ")[0].split("-")
-    hour, minute, sec = date.split(" ")[1].split(":")
-    submission.revision_date = datetime.datetime(int(year), int(month), int(day), int(hour), int(minute), int(sec))
-    #warn about time since last submission
-    hour_buffer = datetime.datetime.now() - datetime.timedelta(hours=1)
-    warn_hours = False
-    if submission.revision_date < hour_buffer:
-        warn_hours = True
-    revindex = afile.find(changerevision)
-    rev = int(afile[revindex + len(changerevision): dateindex])
-    #check that this is a new revision and not the one that was already stored
-    new_submission = True
-    if rev == submission.revision:
-        new_submission = False
-    submission.revision = rev
-    #verify author
-    authorindex = afile.find(changeauthor)
-    author = afile[authorindex + len(changeauthor): revindex]
-    submission.save()
-    return redirect('review.views.dashboard')
-@login_required
-def simualte(request, assignment_id):
-    user = request.user
-    assignment = Assignment.objects.get(id=assignment_id)
-    assignment_chunks = Chunk.objects.filter(file__submission__assignment__id = assignment_id).select_related('file__submission__assignment', 'profile')
+    review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
+    milestone_chunks = Chunk.objects.filter(file__submission__milestone=review_milestone.submit_milestone).select_related('file__submission__milestone', 'profile')
 
     chunks_graph = dict()
     edited = set()
@@ -241,7 +204,7 @@ def simualte(request, assignment_id):
     max_important = 0
     max_test = 0
     max_unimportant = 0
-    for chunk in assignment_chunks:
+    for chunk in milestone_chunks:
         name = chunk.name
         if name is None:
             continue
@@ -320,7 +283,7 @@ def simualte(request, assignment_id):
 	    chunks_data.append((name, 0))
 
     if request.method == 'GET':
-        to_assign = assignment.chunks_to_assign
+        to_assign = review_milestone.chunks_to_assign
         if to_assign is not None:
             count = 0
             for chunk_info in to_assign.split(",")[0:-1]:
@@ -330,7 +293,7 @@ def simualte(request, assignment_id):
 
 
         return render(request, 'chunks/simulate.html', {
-            'assignment': assignment,
+            'review_milestone': review_milestone,
             'chunks_data': chunks_data,
             'important_graph': important_graphs,
             'unimportant_graph': unimportant_graphs,
@@ -343,18 +306,16 @@ def simualte(request, assignment_id):
         students = request.POST['students']
         alums = request.POST['alums']
         staff = request.POST['staff']
-        assignment.students = students
-        assignment.alums = alums
-        assignment.staff = staff
+        review_milestone.students = students
+        review_milestone.alums = alums
+        review_milestone.staff = staff
 
-        assignment.student_count = request.POST['student_tasks']
-        assignment.alum_count = request.POST['alum_tasks']
-        assignment.staff_count = request.POST['staff_tasks']
-
-        assignment.reviewers_per_chunk = request.POST['per_chunk']
-        assignment.min_student_lines = request.POST['min_lines']
-        assignment.save()
-
+        review_milestone.student_count = request.POST['student_tasks']
+        review_milestone.alum_count = request.POST['alum_tasks']
+        review_milestone.staff_count = request.POST['staff_tasks']
+        review_milestone.reviewers_per_chunk = request.POST['per_chunk']
+        review_milestone.min_student_lines = request.POST['min_lines']
+        review_milestone.save()
 
         chunks_raw = request.POST.getlist('chunk')
         checked = set()
@@ -376,12 +337,12 @@ def simualte(request, assignment_id):
                 chunks_data[count] = (split_info[0], int(split_info[1]))
                 count += 1
 
-        assignment.chunks_to_assign = to_assign
-        assignment.save()
+        review_milestone.chunks_to_assign = to_assign
+        review_milestone.save()
 
 
         return render(request, 'chunks/simulate.html', {
-            'assignment': assignment,
+            'review_milestone': review_milestone,
             'chunks_data': chunks_data,
             'important_graph': important_graphs,
             'unimportant_graph': unimportant_graphs,
@@ -392,7 +353,7 @@ def simualte(request, assignment_id):
         })
 
 @login_required
-def list_users(request, assignment_id):
+def list_users(request, review_milestone_id):
   def cmp_user_data(user_data1, user_data2):
     user1 = user_data1['user']
     user2 = user_data2['user']
@@ -415,13 +376,7 @@ def list_users(request, assignment_id):
         'reviewers_dicts': None,
         }
   def chunk_dict(chunk):
-    return {
-        'reviewer-count': chunk.reviewer_count,
-        'id': chunk.id,
-        'name': chunk.name,
-        'reviewers_dicts': None,
-        'tasks': chunk.tasks.all(),
-        }
+    return 
 
   def reviewers_comment_strs(chunk=None, tasks=None):
     comment_count = defaultdict(int)
@@ -429,8 +384,8 @@ def list_users(request, assignment_id):
       for comment in chunk.comments.all():
         comment_count[comment.author.profile] += 1
 
-    if chunk and (not tasks or len(tasks) == 0):
-      tasks = chunk.tasks.all()
+    #if chunk and (not tasks or len(tasks) == 0):
+    #  tasks = chunk.tasks.all()
 
     checkstyle = []; students = []; alum = []; staff = []
     for task in tasks:
@@ -451,47 +406,64 @@ def list_users(request, assignment_id):
 
     return [checkstyle, students, alum, staff]
 
-  assignment = Assignment.objects.get(id=assignment_id)
-  submissions = Submission.objects.filter(assignment=assignment_id)
+  review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
+  submissions = Submission.objects.filter(milestone=review_milestone.submit_milestone)
+
   data = {}
   chunk_task_map = defaultdict(list)
   chunk_map = {}
   form = None
 
-  for submission in submissions:
-    data[submission.author.id] = {'tasks': [], 'user': submission.author, 'chunks': [chunk_dict(chunk) for chunk in submission.chunks()], 'submission': submission}
-    for chunk in submission.chunks():
+  for user in User.objects.select_related("profile").filter(Q(submissions__assignment=assignment_id) | Q(profile__tasks__chunk__file__submission__assignment=assignment_id)):
+      data[user.id] = {'tasks': [], 'user': user, 'chunks': [], 'has_chunks': False, 'submission': None}
+
+  for submission in Submission.objects.select_related('author__profile').filter(assignment=assignment_id):
+      data[submission.author_id]['submission'] = submission
+
+  for chunk in Chunk.objects.select_related('file__submission').filter(file__submission__assignment=assignment_id):
       chunk_map[chunk.id] = chunk
+      authorid = chunk.file.submission.author_id
+      data[authorid]['chunks'].append({
+        'reviewer-count': chunk.reviewer_count,
+        'id': chunk.id,
+        'name': chunk.name,
+        'reviewers_dicts': None,
+        'tasks': [],
+        })
+      data[authorid]['has_chunks'] = True
+      
+  for task in Task.objects.select_related('chunk__file__submission__author', 'reviewer__user').filter(chunk__file__submission__assignment=assignment_id):
+      authorid = task.chunk.file.submission.author_id
+      chunkid = task.chunk_id
+      for chunk in data[authorid]['chunks']:
+          if chunk["id"] == chunkid:
+              chunk["tasks"].append(task)
 
   if request.method == 'POST':
     form = SimulateRoutingForm(request.POST)
 
   if form: #and form.is_valid():
-    #chunk_task_map = simulate_tasks(assignment, form.cleaned_data['num_students'], form.cleaned_data['num_staff'], form.cleaned_data['num_alum'])
-    chunk_task_map = simulate_tasks(assignment, 0, 0, 0)
+    #chunk_task_map = simulate_tasks(review_milestone, form.cleaned_data['num_students'], form.cleaned_data['num_staff'], form.cleaned_data['num_alum'])
+    chunk_task_map = simulate_tasks(review_milestone, 0, 0, 0)
 
     for (chunk_id, tasks) in chunk_task_map.iteritems():
       for task in tasks:
-        if task.reviewer.user.id not in data:
-          data[task.reviewer.user.id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
+        if task.reviewer.userid not in data:
+          data[task.reviewer.user_id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
         else:
-          data[task.reviewer.user.id]['tasks'].append(task_dict(task))
+          data[task.reviewer.user_id]['tasks'].append(task_dict(task))
 
   else:
+
     for user_id in data.keys():
       for chunk in data[user_id]['chunks']:
         chunk_task_map[chunk['id']] = chunk['tasks']
         for task in chunk['tasks']:
-          user_id = task.reviewer.user.id
-          if user_id not in data:
-            data[user_id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
-          else:
-            data[user_id]['tasks'].append(task_dict(task))
+          user_id = task.reviewer.user_id
+          data[user_id]['tasks'].append(task_dict(task))
 
   chunk_reviewers_map = defaultdict(list)
-  for (chunk_id, tasks) in chunk_task_map.iteritems():
-    chunk_reviewers_map[chunk_id] = reviewers_comment_strs(chunk=chunk_map.get(chunk_id), tasks=tasks)
-
+  
   for user_data in data.values():
     for chunk in user_data['chunks']:
       chunk['reviewers_dicts'] = chunk_reviewers_map[chunk['id']]
