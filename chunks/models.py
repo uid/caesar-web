@@ -60,9 +60,13 @@ class Assignment(models.Model):
 class Milestone(models.Model):
     SUBMIT = 'S'
     REVIEW = 'R'
+    ATTEND_MEETING = 'A'
+    CREATE_MEETING = 'C'
     TYPE_CHOICES = (
         (SUBMIT, 'Submit'),
         (REVIEW, 'Review'),
+        (ATTEND_MEETING, 'Attend Meeting'),
+        (CREATE_MEETING, 'Create Meeting'),
     )
 
     id = models.AutoField(primary_key=True)
@@ -163,47 +167,22 @@ def set_review_type(sender, instance, created, **kwargs):
         instance.type=Milestone.REVIEW
         instance.save()
 
-class Milestone(models.Model):
-    SUBMIT = 'S'
-    REVIEW = 'R'
-    TYPE_CHOICES = (
-        (SUBMIT, 'Submit'),
-        (REVIEW, 'Review'),
-    )
-
-    id = models.AutoField(primary_key=True)
-    assignment = models.ForeignKey(Assignment, related_name='milestones')
-    assigned_date = models.DateTimeField(null=True, blank=True)
-    duedate = models.DateTimeField(null=True, blank=True)
-    name = models.CharField(max_length=50)
-    max_extension = models.IntegerField(default=2)
-    type = models.CharField(max_length=1, choices=TYPE_CHOICES)
-
-    def full_name(self):
-        return '%s - %s' % (self.assignment.name, self.name)
-
-    def __unicode__(self):
-        return '%s - %s - (%s)' % (self.assignment, self.name, self.get_type_display())
-
-class SubmitMilestone(Milestone):
+class AttendMeetingMilestone:
     pass
 
-@receiver(post_save, sender=SubmitMilestone)
-def set_submit_type(sender, instance, created, **kwargs):
+@receiver(post_save, sender=AttendMeetingMilestone)
+def set_attend_meeting_type(sender, instance, created, **kwargs):
     if created:
-        instance.type=Milestone.SUBMIT
+        instance.type=Milestone.ATTEND_MEETING
         instance.save()
 
-class ReviewMilestone(Milestone):
-    reviewers_per_chunk = models.IntegerField(default=2)
-    min_student_lines = models.IntegerField(default=30)
-    submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestones')
-    chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
+class CreateMeetingMilestone:
+    pass
 
-@receiver(post_save, sender=ReviewMilestone)
-def set_review_type(sender, instance, created, **kwargs):
+@receiver(post_save, sender=CreateMeetingMilestone)
+def set_attend_meeting_type(sender, instance, created, **kwargs):
     if created:
-        instance.type=Milestone.REVIEW
+        instance.type=Milestone.CREATE_MEETING
         instance.save()
 
 class Batch(models.Model):

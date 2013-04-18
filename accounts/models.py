@@ -41,6 +41,10 @@ class Member(models.Model):
     def __str__(self):
       return '%s (%s), %s' % (self.user.username, self.role, self.semester)
 
+class Mentoring(models.Model):
+    mentor = models.ForeignKey(User, related_name='protoge_matching')
+    protoge = models.ForeignKey(User, related_name='mentor_matching')
+
 class UserProfile(models.Model):
     def get_photo_path(instance, filename):
         return os.path.join(
