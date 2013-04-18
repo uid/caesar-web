@@ -13,14 +13,13 @@ class Migration(DataMigration):
             assigned_date = assignment.duedate
             duedate = assignment.code_review_end_date
             name = "Review Milestone"
-            max_extension = assignment.max_extension
             reviewers_per_chunk = assignment.reviewers_per_chunk
             min_student_lines = assignment.min_student_lines
             submit_milestone = orm['chunks.SubmitMilestone'].objects.filter(submissions=task.chunk.file.submission)[0]
             chunks_to_assign = assignment.chunks_to_assign
 
             task.milestone, created = orm['chunks.ReviewMilestone'].objects.get_or_create(assignment=assignment, assigned_date=assigned_date,\
-                                                            duedate=duedate, name=name, max_extension=max_extension,\
+                                                            duedate=duedate, name=name, max_extension=0, type='R',\
                                                             reviewers_per_chunk=reviewers_per_chunk, min_student_lines=min_student_lines,\
                                                             submit_milestone=submit_milestone, chunks_to_assign=chunks_to_assign)
             task.save()

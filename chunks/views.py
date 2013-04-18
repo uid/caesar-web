@@ -27,7 +27,7 @@ from collections import defaultdict
 def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
-    if user.profile.is_student() and not chunk.file.submission.assignment().is_current_semester() and user != chunk.file.submission.author:
+    if user.profile.is_student() and not chunk.file.submission.milestone.assignment.is_current_semester() and user != chunk.file.submission.author:
         raise Http404
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
@@ -293,7 +293,6 @@ def simualte(request, review_milestone_id):
 
 
         return render(request, 'chunks/simulate.html', {
-            'assignment': review_milestone.assignment,
             'review_milestone': review_milestone,
             'chunks_data': chunks_data,
             'important_graph': important_graphs,
@@ -307,15 +306,13 @@ def simualte(request, review_milestone_id):
         students = request.POST['students']
         alums = request.POST['alums']
         staff = request.POST['staff']
-        assignment = review_milestone.assignment
-        assignment.students = students
-        assignment.alums = alums
-        assignment.staff = staff
+        review_milestone.students = students
+        review_milestone.alums = alums
+        review_milestone.staff = staff
 
-        assignment.student_count = request.POST['student_tasks']
-        assignment.alum_count = request.POST['alum_tasks']
-        assignment.staff_count = request.POST['staff_tasks']
-        assignment.save()
+        review_milestone.student_count = request.POST['student_tasks']
+        review_milestone.alum_count = request.POST['alum_tasks']
+        review_milestone.staff_count = request.POST['staff_tasks']
 
         review_milestone.reviewers_per_chunk = request.POST['per_chunk']
         review_milestone.min_student_lines = request.POST['min_lines']
@@ -346,7 +343,6 @@ def simualte(request, review_milestone_id):
 
 
         return render(request, 'chunks/simulate.html', {
-            'assignment': assignment,
             'review_milestone': review_milestone,
             'chunks_data': chunks_data,
             'important_graph': important_graphs,

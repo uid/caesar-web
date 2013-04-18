@@ -86,8 +86,6 @@ class Chunk:
 
 def _convert_role(role):
     return {'T': 'staff', 'S': 'student'}.get(role, 'other')
-def _convert_role_to_count(assignment, role):
-    return {'staff': assignment.staff_count, 'student': assignment.student_count, 'other':assignment.alum_count}.get(role)
 
 def _convert_review_milestone_to_priority(review_milestone):
     to_assign = review_milestone.chunks_to_assign
@@ -117,7 +115,7 @@ def load_chunks(submit_milestone, user_map, django_user):
     django_submissions = submit_milestone.submissions.exclude(author=django_user).values()
     django_chunks = models.Chunk.objects \
             .filter(file__submission__milestone=submit_milestone) \
-            .exclude(file__submission__milestone__author=django_user) \
+            .exclude(file__submission__author=django_user) \
             .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
     django_tasks = Task.objects.filter(
             chunk__file__submission__milestone=submit_milestone) \
@@ -288,7 +286,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
     unfinished_task_count = unfinished_tasks.count()
 
     # Should task milestones have num_tasks_for_user?
-    num_tasks_to_assign = review_milestone.assignment.num_tasks_for_user(reviewer) - unfinished_task_count
+    num_tasks_to_assign = review_milestone.num_tasks_for_user(reviewer) - unfinished_task_count
     if num_tasks_to_assign <= 0:
       return []
 

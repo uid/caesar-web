@@ -22,7 +22,7 @@ import re
 from PIL import Image as PImage
 from os.path import join as pjoin
 from django.conf import settings
-from chunks.models import Assignment
+from chunks.models import ReviewMilestone
 from review.models import Comment, Vote
 
 def login(request):
@@ -139,12 +139,13 @@ def view_profile(request, username):
         participant = User.objects.get(username__exact=username)
     except:
         raise Http404
-    assignment_data = []
-    #get all assignments
-    assignments = Assignment.objects.all().order_by('created').reverse()
-    for assignment in assignments:
+    review_milestone_data = []
+    #get all review milestones
+    review_milestones = ReviewMilestone.objects.all().order_by('-assigned_date')
+    for review_milestone in review_milestones:
         #get all comments that the user wrote
-        comments = Comment.objects.filter(author=participant).filter(chunk__file__submission__assignment = assignment).select_related('chunk')
+        comments = Comment.objects.filter(author=participant) \
+                          .filter(chunk__file__submission__milestone= review_milestone.submit_milestone).select_related('chunk')
         review_data = []
         for comment in comments:
             if comment.is_reply():
@@ -154,7 +155,7 @@ def view_profile(request, username):
                 review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
 
         votes = Vote.objects.filter(author=participant) \
-                    .filter(comment__chunk__file__submission__assignment = assignment) \
+                    .filter(comment__chunk__file__submission__milestone = review_milestone.submit_milestone) \
                     .select_related('comment__chunk')
         for vote in votes:
             if vote.value == 1:
@@ -163,9 +164,9 @@ def view_profile(request, username):
             elif vote.value == -1:
                 review_data.append(("vote-down", vote.comment, vote.comment.generate_snippet(), True, vote))
         review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
-        assignment_data.append((assignment, review_data))
+        review_milestone_data.append((review_milestone, review_data))
     return render(request, 'accounts/view_profile.html', {
-        'assignment_data': assignment_data,
+        'review_milestone_data': review_milestone_data,
         'participant': participant
     })
 

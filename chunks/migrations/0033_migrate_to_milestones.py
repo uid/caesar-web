@@ -19,7 +19,8 @@ class Migration(DataMigration):
             max_extension = assignment.max_extension
 
             submission.milestone, created = orm['chunks.SubmitMilestone'].objects.get_or_create(assignment=assignment, assigned_date=assigned_date,\
-                                                                                        duedate=duedate, name=name, max_extension=max_extension)
+                                                                                        duedate=duedate, name=name, max_extension=max_extension,\
+                                                                                        type='S')
             submission.save()
 
     def backwards(self, orm):

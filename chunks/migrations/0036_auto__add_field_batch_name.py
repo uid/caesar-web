@@ -1,73 +1,25 @@
 # -*- coding: utf-8 -*-
 import datetime
 from south.db import db
-from south.v2 import DataMigration
+from south.v2 import SchemaMigration
 from django.db import models
 
-class Migration(DataMigration):
+
+class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        for extension in orm.Extension.objects.filter(milestone=-1):
-            milestones = orm['chunks.SubmitMilestone'].objects.filter(assignment=extension.assignment)
-            if milestones:
-                extension.milestone = milestones[0]
-            else:
-                assignment = extension.assignment
-                assigned_date = assignment.created
-                duedate = assignment.duedate
-                name = "Milestone"
-                max_extension = assignment.max_extension
-
-                extension.milestone, created = orm['chunks.SubmitMilestone'].objects.get_or_create(assignment=assignment, assigned_date=assigned_date,\
-                                                                                        duedate=duedate, name=name, max_extension=max_extension,\
-                                                                                        type='S')
-            extension.save() 
+        # Adding field 'Batch.name'
+        db.add_column('chunks_batch', 'name',
+                      self.gf('django.db.models.fields.CharField')(default='None', max_length=50),
+                      keep_default=False)
 
 
     def backwards(self, orm):
-        raise RuntimeError("Cannot reverse this migration.")
+        # Deleting field 'Batch.name'
+        db.delete_column('chunks_batch', 'name')
+
 
     models = {
-        'accounts.extension': {
-            'Meta': {'object_name': 'Extension'},
-            'assignment': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'extensions'", 'to': "orm['chunks.Assignment']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'milestone': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'extensions'", 'to': "orm['chunks.Milestone']"}),
-            'slack_used': ('django.db.models.fields.IntegerField', [], {'default': '0', 'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'extensions'", 'to': "orm['auth.User']"})
-        },
-        'accounts.member': {
-            'Meta': {'object_name': 'Member'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'role': ('django.db.models.fields.CharField', [], {'max_length': '16'}),
-            'semester': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'members'", 'to': "orm['chunks.Semester']"}),
-            'slack_budget': ('django.db.models.fields.IntegerField', [], {'default': '5'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'membership'", 'to': "orm['auth.User']"})
-        },
-        'accounts.token': {
-            'Meta': {'object_name': 'Token'},
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
-            'expire': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
-        },
-        'accounts.userprofile': {
-            'Meta': {'object_name': 'UserProfile'},
-            'about': ('accounts.fields.MarkdownTextField', [], {'blank': 'True'}),
-            'about_html': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'assigned_chunks': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'reviewers'", 'symmetrical': 'False', 'through': "orm['tasks.Task']", 'to': "orm['chunks.Chunk']"}),
-            'class_year': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'company': ('django.db.models.fields.CharField', [], {'default': "'MIT'", 'max_length': '100', 'blank': 'True'}),
-            'github': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'linkedin': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'}),
-            'photo': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'reputation': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
-            'role': ('django.db.models.fields.CharField', [], {'max_length': '1', 'null': 'True', 'blank': 'True'}),
-            'token': ('django.db.models.fields.related.ForeignKey', [], {'default': 'None', 'related_name': "'invited'", 'null': 'True', 'to': "orm['accounts.Token']"}),
-            'twitter': ('django.db.models.fields.CharField', [], {'max_length': '16', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'profile'", 'unique': 'True', 'to': "orm['auth.User']"}),
-            'website': ('django.db.models.fields.URLField', [], {'max_length': '200', 'blank': 'True'})
-        },
         'auth.group': {
             'Meta': {'object_name': 'Group'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -103,17 +55,9 @@ class Migration(DataMigration):
             'alum_count_default': ('django.db.models.fields.IntegerField', [], {'default': '3'}),
             'alums': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'alums_default': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
-            'chunks_to_assign': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'code_review_end_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'duedate': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_live': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'max_extension': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
-            'min_student_lines': ('django.db.models.fields.IntegerField', [], {'default': '30'}),
-            'multiplier': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'reviewers_per_chunk': ('django.db.models.fields.IntegerField', [], {'default': '2'}),
             'semester': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'assignments'", 'null': 'True', 'to': "orm['chunks.Semester']"}),
             'staff': ('django.db.models.fields.IntegerField', [], {'default': '15'}),
             'staff_count': ('django.db.models.fields.IntegerField', [], {'default': '10'}),
@@ -126,9 +70,9 @@ class Migration(DataMigration):
         },
         'chunks.batch': {
             'Meta': {'object_name': 'Batch'},
-            'assignment': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'batches'", 'to': "orm['chunks.Assignment']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_live': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+            'is_live': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'chunks.chunk': {
             'Meta': {'object_name': 'Chunk', 'db_table': "u'chunks'"},
@@ -182,6 +126,13 @@ class Migration(DataMigration):
             'semester': ('django.db.models.fields.CharField', [], {'max_length': '32', 'blank': 'True'}),
             'subject': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'semesters'", 'to': "orm['chunks.Subject']"})
         },
+        'chunks.staffmarker': {
+            'Meta': {'object_name': 'StaffMarker'},
+            'chunk': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'staffmarkers'", 'to': "orm['chunks.Chunk']"}),
+            'end_line': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'start_line': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'})
+        },
         'chunks.subject': {
             'Meta': {'object_name': 'Subject'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -189,11 +140,9 @@ class Migration(DataMigration):
         },
         'chunks.submission': {
             'Meta': {'object_name': 'Submission', 'db_table': "u'submissions'"},
-            'assignment': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['chunks.Assignment']"}),
             'author': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'submissions'", 'null': 'True', 'to': "orm['auth.User']"}),
             'batch': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'submissions'", 'null': 'True', 'to': "orm['chunks.Batch']"}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'duedate': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'milestone': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'submissions'", 'to': "orm['chunks.SubmitMilestone']"}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
@@ -210,20 +159,7 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
-        },
-        'tasks.task': {
-            'Meta': {'unique_together': "(('chunk', 'reviewer'),)", 'object_name': 'Task'},
-            'chunk': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tasks'", 'to': "orm['chunks.Chunk']"}),
-            'completed': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'milestone': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tasks'", 'to': "orm['chunks.ReviewMilestone']"}),
-            'opened': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'reviewer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tasks'", 'to': "orm['accounts.UserProfile']"}),
-            'started': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '1'})
         }
     }
 
-    complete_apps = ['accounts']
-    symmetrical = True
+    complete_apps = ['chunks']

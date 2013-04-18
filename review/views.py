@@ -17,7 +17,7 @@ from tasks.routing import assign_tasks
 from models import Comment, Vote, Star
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
-from accounts.models import UserProfile, Extension
+from accounts.models import UserProfile, Extension, Member
 from simplewiki.models import Article
 
 from pygments import highlight
@@ -26,6 +26,7 @@ from pygments.formatters import HtmlFormatter
 
 import datetime
 import sys
+import logging
 
 @login_required
 def dashboard(request):
@@ -33,18 +34,23 @@ def dashboard(request):
     new_task_count = 0
     open_assignments = False
 
-    live_review_milestones = ReviewMilestone.objects.filter(assignment__is_live=True, assigned_date__lt=datetime.datetime.now(),\
+    live_review_milestones = ReviewMilestone.objects.filter(assigned_date__lt=datetime.datetime.now(),\
          duedate__gt=datetime.datetime.now(), assignment__semester__members__user=user).all()
-
+    logging.debug('but')
     for review_milestone in live_review_milestones:
+        logging.debug('wut')
         current_tasks = user.get_profile().tasks.filter(milestone=review_milestone)
         active_sub = Submission.objects.filter(author=user, milestone=review_milestone.submit_milestone)
-        membership = Member.obects.filter(user=user, semester=review_milestone.assignment.semester)
-        #do not give tasks to students who got extensions or already have tasks for this assignment
-        #(TODO) refactor member.role to not be so arbitrary
-        if (not current_tasks.count()) and (active_sub.count() or not 'student' in membership.role):
-            open_assignments = True
-            new_task_count += assign_tasks(review_milestone, user)
+        try:
+            membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
+            #do not give tasks to students who got extensions or already have tasks for this assignment
+            #(TODO) refactor member.role to not be so arbitrary
+            if (not current_tasks.count()) and (active_sub.count() or not 'student' in membership.role):
+                logging.debug('mut')
+                open_assignments = True
+                new_task_count += assign_tasks(review_milestone, user)
+        except ObjectDoesNotExist:
+            pass
 
     old_completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
@@ -567,7 +573,7 @@ def student_dashboard(request, username):
     current_milestone_data = []
     for milestone in current_milestones:
         try:
-            user_extension = milestone.extensions.get(user=user)
+            user_extension = milestone.extensions.get(user=participant)
             current_milestone_data.append((milestone, user_extension))
         except ObjectDoesNotExist:
             current_milestone_data.append((milestone, None))
@@ -616,7 +622,7 @@ def more_work(request):
         current_tasks = user.get_profile().tasks.exclude(status='C').exclude(status='U')
         total = 0
         if not current_tasks.count():
-            live_review_milestones = ReviewMilestone.objects.filter(assignment__is_live=True, assigned_date__lt=datetime.datetime.now(),\
+            live_review_milestones = ReviewMilestone.objects.filter(assigned_date__lt=datetime.datetime.now(),\
                 duedate__gt=datetime.datetime.now(), assignment__semester__members_user=user).all()
 
             for milestone in live_review_milestones:

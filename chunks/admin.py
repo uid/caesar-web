@@ -4,7 +4,7 @@ from accounts.models import Extension, Member
 from chunks.models import Assignment, ReviewMilestone, SubmitMilestone, Submission, File, Chunk, StaffMarker, Batch, Subject, Semester
 
 class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'semester', 'student_count', 'alum_count', 'staff_count')
+    list_display = ('name', 'semester')
     search_fields = ('name', 'semester')
 
 class ChunkAdmin(admin.ModelAdmin):

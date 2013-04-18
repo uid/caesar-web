@@ -8,6 +8,7 @@
 
 {% block js %}
 {{ block.super }}
+
 <script src="{{ STATIC_URL }}js/highcharts-3.0.0.js"></script>
 <script src="{{ STATIC_URL }}js/highcharts-exporting.js"></script>
 <script>
@@ -377,31 +378,31 @@ Baseline values for {{review_milestone.full_name}} in <span class="purple"> purp
 <table class="assignment-stream">
   <tr class="non-activity-line">
     <td class="line-up"> 
-       <input type="text" id="total-students" class="count line-up" name="students" value="{{ assignment.students }}" size=3/> <br/> <span class="purple line-up"> {{assignment.students_default}} </span>
+       <input type="text" id="total-students" class="count line-up" name="students" value="{{ review_milestone.students }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.students_default}} </span>
     </td>
     <td class="center-up"> students </td>
     <td class="line-up"> reviewing </td>
-    <td class="line-up">  <input type="text" id="per-student" class="count line-up" name="student_tasks" value="{{ assignment.student_count }}" size=3/> <br/> <span class="purple line-up"> {{assignment.student_count_default}} </span></td>
+    <td class="line-up">  <input type="text" id="per-student" class="count line-up" name="student_tasks" value="{{ review_milestone.student_count }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.student_count_default}} </span></td>
     <td class="center-up"> tasks each. </td>
     <td class="last-left"><span id="student-tasks">0 tasks total.</span></td>
   </tr>
   <tr class="non-activity-line">
       <td class="line-up"> 
-         <input type="text" id="total-alums" class="count line-up" name="alums" value="{{ assignment.alums }}" size=3/> <br/> <span class="purple line-up"> {{assignment.alums_default}} </span>
+         <input type="text" id="total-alums" class="count line-up" name="alums" value="{{ review_milestone.alums }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.alums_default}} </span>
       </td>
       <td class="center-up"> alums </td>
       <td class="line-up"> reviewing </td>
-      <td class="line-up">  <input type="text" id="per-alum" class="count line-up" name="alum_tasks" value="{{ assignment.alum_count }}" size=3/> <br/> <span class="purple line-up"> {{assignment.alum_count_default}} </span> </td>
+      <td class="line-up">  <input type="text" id="per-alum" class="count line-up" name="alum_tasks" value="{{ review_milestone.alum_count }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.alum_count_default}} </span> </td>
       <td class="center-up"> tasks each. </td>
       <td class="last-left"><span id="alum-tasks"> 0  tasks total.</span></td>
   </tr>
   <tr class="non-activity-line">
       <td class="line-up"> 
-         <input type="text" name="staff"  class="line-up" value="{{ assignment.staff }}" size=3/> <br/> <span class="purple line-up"> {{assignment.staff_default}} </span>
+         <input type="text" name="staff"  class="line-up" value="{{ review_milestone.staff }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.staff_default}} </span>
       </td>
       <td class="center-up"> staff </td>
       <td class="line-up"> reviewing </td>
-      <td class="line-up">  <input type="text" name="staff_tasks" class="line-up" value="{{ assignment.staff_count }}" size=3/> <br/> <span class="purple line-up"> {{assignment.staff_count_default}} </span> </td>
+      <td class="line-up">  <input type="text" name="staff_tasks" class="line-up" value="{{ review_milestone.staff_count }}" size=3/> <br/> <span class="purple line-up"> {{review_milestone.staff_count_default}} </span> </td>
       <td class="center-up"> tasks each. </td>
       <td class="last-left"> </td>
   </tr>

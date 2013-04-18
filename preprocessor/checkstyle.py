@@ -1,6 +1,6 @@
 import re
 
-from chunks.models import Assignment, Submission, File, Chunk, Batch
+from chunks.models import Submission, File, Chunk, Batch
 from review.models import Comment
 from django.contrib.auth.models import User
 from xml.dom.minidom import parseString
