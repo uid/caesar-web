@@ -313,7 +313,6 @@ def simualte(request, review_milestone_id):
         review_milestone.student_count = request.POST['student_tasks']
         review_milestone.alum_count = request.POST['alum_tasks']
         review_milestone.staff_count = request.POST['staff_tasks']
-
         review_milestone.reviewers_per_chunk = request.POST['per_chunk']
         review_milestone.min_student_lines = request.POST['min_lines']
         review_milestone.save()

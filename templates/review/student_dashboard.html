@@ -83,7 +83,6 @@ $(document).ready(function() {
     {% if milestone.max_extension > 0 %}
       <td class="=grey-text"><a href="{% url review.views.request_extension milestone.id %}"> request extension</a></td>
     {% endif %}
-
   </tr>
   {% empty %}
   {% endfor %}
