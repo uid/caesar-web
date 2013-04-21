@@ -316,3 +316,69 @@ def reputation_adjustment(request):
                 'success': success,
                 'err': err
             })
+
+@login_required
+def allusers(request):
+    participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile').order_by('last_name')
+    return render(request, 'accounts/allusers.html', {
+        'participants': participants,
+    })
+
+@login_required
+def request_extension(request, milestone_id):
+    user = request.user
+    # User is going to request an extension
+    if request.method == 'GET':
+        current_milestone = Milestone.objects.get(id=milestone_id)
+        # Make sure user got here legally
+        user_duedate = user.profile.get_user_duedate(current_milestone)
+        if datetime.datetime.now() > user_duedate + datetime.timedelta(minutes=30):
+            return redirect('dashboard.views.dashboard')
+
+        total_extension_days_left = user.profile.extension_days()
+        current_extension = (user_duedate - current_milestone.duedate).days
+
+        late_days = 0
+        if datetime.datetime.now() > current_milestone.duedate + datetime.timedelta(minutes=30):
+            late_days = (datetime.datetime.now() - current_milestone.duedate + datetime.timedelta(minutes=30)).days + 1
+
+        possible_extensions = range(late_days, min(total_extension_days_left+current_extension+1, current_milestone.max_extension+1))
+
+        written_dates = []
+        for day in range(possible_extensions[-1]+1):
+            extension = day * datetime.timedelta(days=1)
+            written_dates.append(current_milestone.duedate + extension)
+
+
+        return render(request, 'accounts/extension_form.html', {
+            'possible_extensions': possible_extensions,
+            'current_extension': current_extension,
+            'written_dates': written_dates,
+            'total_extension_days': total_extension_days_left + current_extension
+        })
+    else: # user already requested an extension
+        days = request.POST.get('dayselect', None)
+        try:
+            extension_days = int(days)
+            current_milestone = Milestone.objects.get(id=milestone_id)
+            user_duedate = user.profile.get_user_duedate(current_milestone)
+            current_extension = (user_duedate - current_milestone.duedate).days
+            total_extension_days_left = user.profile.extension_days()
+            total_extension_days = total_extension_days_left + current_extension
+
+            if extension_days > total_extension_days or extension_days < 0 or extension_days > current_milestone.max_extension:
+                return redirect('dashboard.views.dashboard')
+            extension,created = Extension.objects.get_or_create(user=user, milestone=current_milestone)
+            if extension_days == 0: # Don't keep extensions with 0 slack days
+                extension.delete()
+            else:
+                extension.slack_used = extension_days
+                extension.save()
+            return redirect('dashboard.views.dashboard')
+        except ValueError:
+            return redirect('dashboard.views.dashboard')
+
+@staff_member_required
+def manage(request):
+    return render(request, 'accounts/manage.html', {
+    })

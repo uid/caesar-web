@@ -190,9 +190,8 @@ def view_all_chunks(request, viewtype, submission_id):
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
 
-# simulalte?
 @login_required
-def simualte(request, review_milestone_id):
+def simulate(request, review_milestone_id):
     user = request.user
     review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
     milestone_chunks = Chunk.objects.filter(file__submission__milestone=review_milestone.submit_milestone).select_related('file__submission__milestone', 'profile')

@@ -48,48 +48,25 @@ $(document).ready(function() {
         $(this).text(toggleTaskText[semesterIndex]);
     });
 
-    $('#progress').hide();
-    $('#more_work').click(function(e) {
-        $('#progress').show();
-        $.post(caesar.urls.more_work, {
-        }, function(data) {
-            $('#more_work').hide();
-            //$('.result').append('<div class="success">You have '+data.total+' new review tasks</div>');
-            $('.result').append('<div class="success">You have '+data.total +' new review tasks.</div>');
-            $('.task-empty').hide();
-            $('#new-task-list').append('<div id=task-'
-            + data.one.task_id + '-' + data.one.task_chunk_id + ' class="task-line new"> <span class="chunk-name">' 
-            + data.one.task_chunk_name + '</span><span class="task-stats"><span class="comment-count" title="Comments">' + data.one.task_comment_count + '</span><span class="reviewer-count" title="Reviewers">' + data.one.task_reviewer_count + '</span></span><span class="task-snippet">'+ data.one.task_chunk_generate_snippet + '</span></div>');
-            $('#new-task-list').append('<div id=task-'
-            + data.two.task_id + '-' + data.two.task_chunk_id +' class="task-line new"> <span class="chunk-name">' 
-            + data.two.task_chunk_name + '</span><span class="task-stats"><span class="comment-count" title="Comments">' + data.two.task_comment_count + '</span><span class="reviewer-count" title="Reviewers">' + data.two.task_reviewer_count + '</span></span><span class="task-snippet">'+ data.two.task_chunk_generate_snippet + '</span></div>');
-            
-            $('.task-line').click(function(e) {
-              var chunkId = this.id.split('-')[2];
-              window.location = "/chunks/view/" + chunkId;
-              return false;
-            });
-        },"json");
-    });
-
 });
 </script>
 
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb" href="{% url accounts.views.allusers %}">all users</a>
+  <a class="breadcrumb" href="{% url accounts.views.view_profile participant%}">{{participant.username}}</a>
+  <span class="breadcrumb">{{ participant.username }} Dashboard</span>
 {% endblock %}
 
 {% block secondary-toolbar %}
-{% include "review/dashboard_toolbar.html" %}
+{% include "dashboard/dashboard_toolbar.html" %}
 {% endblock %}
 
 {% block content %}
 
-<div class='row'>
-{% if user.profile.is_student %}
-<div class='span12 current-assignments'>
+{% if participant.profile.is_student %}
 <div class="assignment-header">
     <h2 class="task-header">current assignments</h2>
 </div>
@@ -104,17 +81,15 @@ $(document).ready(function() {
         {% endif %}
     </td>
     {% if milestone.max_extension > 0 %}
-      <td class="=grey-text"><a href="{% url review.views.request_extension milestone.id %}"> request extension</a></td>
+      <td class="=grey-text"><a href="{% url accounts.views.request_extension milestone.id %}"> request extension</a></td>
     {% endif %}
   </tr>
   {% empty %}
   {% endfor %}
 </table>
 {% endif %}
-</div>
 
 {% if submission_data or old_submission_data %}
-<div class='span12 submitted-assignments'>
 <h2 class="task-header">submitted assignments</h2>
 <div>
   {% for submission, reviewer_count, last_modified, user_comments, static_comments in submission_data %}
@@ -168,56 +143,50 @@ $(document).ready(function() {
       {% empty %}
       {% endfor %}
     </div>
-{% endif %}
-</div>
+    {% endif %}
 {% endif %}
 
-<div class='span12 to-review'>
-  <div class="result"></div>
-  {% if new_task_count > 0 %}
-  <div class="success">
-    You have {{ new_task_count }} new review task{{ new_task_count|pluralize }}.
-  </div>
-  {% endif %}
-  <h2 class="task-header">code to review</h2>
-  <div id="new-task-list" class="task-list">
-    {% for task in active_tasks.all %}
-      {% include "review/task.html" %}
-    {% empty %}
-   <div class="task-empty">No tasks left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>. {%if open_assignments %} Or <button id="more_work" type="button">Get more tasks!</button> <span id="progress"><img src="{{ STATIC_URL }}img/progress.gif"/></span>{% endif%}{% endfor %}
-  </div>
-  </div>
+
+<div class="span-24">
+{% if new_task_count > 0 %}
+<div class="success">
+  You have {{ new_task_count }} new review task{{ new_task_count|pluralize }}.
+</div>
+{% endif %}
+<h2 class="task-header">code to review</h2>
+<div class="task-list">
+  {% for task in active_tasks.all %}
+    {% include "dashboard/task.html" %}
+  {% empty %}
+ No tasks left. If you haven't already, please fill out our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>.  {% endfor %}
 </div>
 
-<div class='span12 already-reviewed'>
-  <h2 class="task-header">code already reviewed</h2>
-  <div id="task-section">
-    {% for task in completed_tasks.all %}
-      {% include "review/task.html" %}
-    {% empty %}
-    <div class="empty">
-    No recent tasks found.
+<h2 class="task-header">code already reviewed</h2>
+<div id="task-section">
+  {% for task in completed_tasks.all %}
+    {% include "dashboard/task.html" %}
+  {% empty %}
+  <div class="empty">
+  No recent tasks found.
+  </div>
+  {% endfor %}
+</div>
+{% if old_completed_tasks.all %}
+    <div class="history"> show previous semesters </div>
+    <div id="historic_content">
+    <div class="task-list">
+      {% for task in old_completed_tasks.all %}
+        {% if user.profile.is_student %}
+            {% include "dashboard/non_task.html" %}
+        {% else %}
+            {% include "dashboard/task.html" %}
+        {% endif %}
+      {% empty %}
+      No tasks found.
+      {% endfor %}
     </div>
-    {% endfor %}
-  </div>
-  {% if old_completed_tasks.all %}
-      <div class="history"> show previous semesters </div>
-      <div id="historic_content">
-      <div class="task-list">
-        {% for task in old_completed_tasks.all %}
-          {% if user.profile.is_student %}
-              {% include "review/non_task.html" %}
-          {% else %}
-              {% include "review/task.html" %}
-          {% endif %}
-        {% empty %}
-        No tasks found.
-        {% endfor %}
-      </div>
-      </div>
-  {% endif %}
-  </div>
+    </div>
+{% endif %}
 </div>
 
-</div>
 {% endblock %}

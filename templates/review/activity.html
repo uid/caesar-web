@@ -26,7 +26,7 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
   <span class="breadcrumb" href="{{ chunk.get_absolute_url }}">{{ chunk.name }}</span>
 {% endblock %}
 

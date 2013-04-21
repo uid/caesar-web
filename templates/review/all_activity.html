@@ -63,9 +63,9 @@ $(document).ready(function() {
 
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
   {% if participant != user %}
-    <a class="breadcrumb" href="{% url review.views.allusers %}">all users</a>
+    <a class="breadcrumb" href="{% url accounts.views.allusers %}">all users</a>
   {% endif %}
   <a class="breadcrumb" href="{% url accounts.views.view_profile participant.username %}">{{participant.username}}</a>
   <span class="breadcrumb">all activity</span>

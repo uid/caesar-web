@@ -34,8 +34,8 @@
                 vote: '{% url review.views.vote %}',
                 unvote: '{% url review.views.unvote %}',
                 edit_comment: '{% url review.views.edit_comment %}',
-                cancel_assignment: '{% url review.views.cancel_assignment %}',
-                more_work: '{%url review.views.more_work %}',
+                cancel_assignment: '{% url tasks.views.cancel_assignment %}',
+                more_work: '{%url tasks.views.more_work %}',
                 edit_membership: '{% url accounts.views.edit_membership %}'
             }
         };
@@ -160,7 +160,7 @@
           <div id="toolbar-user">
               {% if user.is_authenticated %}
               <div id="toolbar-logged-in">
-                <a href="/review/allusers"> view all users</a> |
+                <a href="/accounts/allusers"> view all users</a> |
                 {% thumbnail user.get_profile.photo "20x20" crop="center" as photo %}
                 <img class="user-photo" src="{{ photo.url }}"/>
                 {% empty %}
@@ -171,7 +171,7 @@
                 {% if user.is_staff %}
                 <a href="{% url admin:index %}">Admin</a>|
                 <a href="{% url review.views.search %}">Search </a>|
-                <a href="{% url review.views.manage %}">Manage </a>|
+                <a href="{% url accounts.views.manage %}">Manage </a>|
                 {% endif %}
                 <a href="{% url django.contrib.auth.views.logout %}">Logout</a>
               </div>

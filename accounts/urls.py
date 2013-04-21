@@ -25,4 +25,7 @@ urlpatterns = patterns('',
     (r'bulk_add/', 'accounts.views.bulk_add'),
     (r'^user/(?P<username>\w+)/edit', 'accounts.views.edit_profile'),
     (r'^user/(?P<username>\w+)', 'accounts.views.view_profile'),
+    (r'^request_extension/(?P<milestone_id>\d+)', 'accounts.views.request_extension'),
+    (r'^allusers/', 'accounts.views.allusers'),
+    (r'^manage/', 'accounts.views.manage'),
 )
