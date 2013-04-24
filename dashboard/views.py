@@ -144,6 +144,20 @@ def student_dashboard(request, username):
         .annotate(comment_count=Count('chunk__comments', distinct=True),
                   reviewer_count=Count('chunk__tasks', distinct=True))
 
+    active_tasks = participant.get_profile().tasks \
+       .select_related('chunk__file__submission_assignment') \
+       .exclude(status='C') \
+       .exclude(status='U') \
+       .annotate(comment_count=Count('chunk__comments', distinct=True),
+                 reviewer_count=Count('chunk__tasks', distinct=True))
+
+    completed_tasks = participant.get_profile().tasks \
+       .select_related('chunk__file__submission__assignment') \
+       .filter(status='C') \
+       .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
+       .annotate(comment_count=Count('chunk__comments', distinct=True),
+                 reviewer_count=Count('chunk__tasks', distinct=True))
+
     #get all the submissions that the participant submitted
     submissions = Submission.objects.filter(author=participant) \
         .filter(milestone__duedate__lt=datetime.datetime.now()) \
