@@ -1,4 +1,4 @@
-from chunks.models import Assignment, Submission, File, Chunk, Batch, StaffMarker
+from chunks.models import Submission, File, Chunk, StaffMarker
 from django.contrib.auth.models import User
 
 import os
@@ -34,14 +34,14 @@ def get_name(file):
 def create_chunk(file):
   return Chunk(file=file, name=get_name(file), start=0, end=len(file.data), class_type=get_type(file), staff_portion=0, student_lines=0)
 
-def create_file(file_path, submission, batch):
+def create_file(file_path, submission):
   file_data = open(file_path).read()
-  return File(path=file_path, submission=submission, data=file_data, batch=batch)
+  return File(path=file_path, submission=submission, data=file_data)
 
-def parse_all_files(student_code, student_base_dir, batch, assignment, save, staff_code):
-  return [parse_student_files(username, files, batch, assignment, save, student_base_dir, staff_code) for (username, files) in student_code.iteritems()]
+def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code):
+  return [parse_student_files(username, files, batch, submit_milestone, save, student_base_dir, staff_code) for (username, files) in student_code.iteritems()]
 
-def parse_student_files(username, files, batch, assignment, save, student_base_dir, staff_code):
+def parse_student_files(username, files, batch, submit_milestone, save, student_base_dir, staff_code):
   # staff_code is a dictionary from filename to staff code
   # Trying to find the user. Bail if they doen't exist in the DB.
   user = User.objects.filter(username=username)
@@ -52,18 +52,25 @@ def parse_student_files(username, files, batch, assignment, save, student_base_d
     failed_users.append(username)
     return None
 
+  # Shouldn't remake submissions
+  if Submission.objects.filter(milestone=submit_milestone, author=user, name=username).count() > 0:
+    print "Submission %s already exists in the database." % (username)
+    return None
+
   # Creating the Submission object
-  submission,created = Submission.objects.get_or_create(assignment=assignment, author=user, name=username)
+  submission = Submission(milestone=submit_milestone, author=user, name=username, batch=batch)
+  if save:
+    submission.save()
+
   print submission
-  if created:
-    print "*** new submission for this student"
+  print "*** new submission for this student"
 
   file_objects = []
   chunk_objects = []
 
   # Creating the File objects
   for file_path in files:
-    file = create_file(file_path, submission, batch)
+    file = create_file(file_path, submission)
     file_objects.append(file)
     if save:
       file.save()

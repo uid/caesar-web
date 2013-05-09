@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
 
-    (r'^$', RedirectView.as_view(url='review/')),
+    (r'^$', RedirectView.as_view(url='dashboard/')),
 
     (r'^accounts/*', include('accounts.urls')),
     (r'accounts/$', 'django.contrib.auth.views.login', {
@@ -19,6 +19,8 @@ urlpatterns = patterns('',
     (r'^chunks/', include('chunks.urls')),
     (r'^review/', include('review.urls')),
     (r'^wiki/', include('simplewiki.urls')),
+    (r'^dashboard/', include('dashboard.urls')),
+    (r'^tasks/', include('tasks.urls')),
 
     (r'^api/', include('api.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

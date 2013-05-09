@@ -22,7 +22,7 @@ import re
 from PIL import Image as PImage
 from os.path import join as pjoin
 from django.conf import settings
-from chunks.models import Assignment
+from chunks.models import ReviewMilestone
 from review.models import Comment, Vote
 
 def login(request):
@@ -139,12 +139,13 @@ def view_profile(request, username):
         participant = User.objects.get(username__exact=username)
     except:
         raise Http404
-    assignment_data = []
-    #get all assignments
-    assignments = Assignment.objects.all().order_by('created').reverse()
-    for assignment in assignments:
+    review_milestone_data = []
+    #get all review milestones
+    review_milestones = ReviewMilestone.objects.all().order_by('-assigned_date')
+    for review_milestone in review_milestones:
         #get all comments that the user wrote
-        comments = Comment.objects.filter(author=participant).filter(chunk__file__submission__assignment = assignment).select_related('chunk')
+        comments = Comment.objects.filter(author=participant) \
+                          .filter(chunk__file__submission__milestone= review_milestone.submit_milestone).select_related('chunk')
         review_data = []
         for comment in comments:
             if comment.is_reply():
@@ -154,7 +155,7 @@ def view_profile(request, username):
                 review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
 
         votes = Vote.objects.filter(author=participant) \
-                    .filter(comment__chunk__file__submission__assignment = assignment) \
+                    .filter(comment__chunk__file__submission__milestone = review_milestone.submit_milestone) \
                     .select_related('comment__chunk')
         for vote in votes:
             if vote.value == 1:
@@ -163,9 +164,9 @@ def view_profile(request, username):
             elif vote.value == -1:
                 review_data.append(("vote-down", vote.comment, vote.comment.generate_snippet(), True, vote))
         review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
-        assignment_data.append((assignment, review_data))
+        review_milestone_data.append((review_milestone, review_data))
     return render(request, 'accounts/view_profile.html', {
-        'assignment_data': assignment_data,
+        'review_milestone_data': review_milestone_data,
         'participant': participant
     })
 
@@ -315,3 +316,69 @@ def reputation_adjustment(request):
                 'success': success,
                 'err': err
             })
+
+@login_required
+def allusers(request):
+    participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile').order_by('last_name')
+    return render(request, 'accounts/allusers.html', {
+        'participants': participants,
+    })
+
+@login_required
+def request_extension(request, milestone_id):
+    user = request.user
+    # User is going to request an extension
+    if request.method == 'GET':
+        current_milestone = Milestone.objects.get(id=milestone_id)
+        # Make sure user got here legally
+        user_duedate = user.profile.get_user_duedate(current_milestone)
+        if datetime.datetime.now() > user_duedate + datetime.timedelta(minutes=30):
+            return redirect('dashboard.views.dashboard')
+
+        total_extension_days_left = user.profile.extension_days()
+        current_extension = (user_duedate - current_milestone.duedate).days
+
+        late_days = 0
+        if datetime.datetime.now() > current_milestone.duedate + datetime.timedelta(minutes=30):
+            late_days = (datetime.datetime.now() - current_milestone.duedate + datetime.timedelta(minutes=30)).days + 1
+
+        possible_extensions = range(late_days, min(total_extension_days_left+current_extension+1, current_milestone.max_extension+1))
+
+        written_dates = []
+        for day in range(possible_extensions[-1]+1):
+            extension = day * datetime.timedelta(days=1)
+            written_dates.append(current_milestone.duedate + extension)
+
+
+        return render(request, 'accounts/extension_form.html', {
+            'possible_extensions': possible_extensions,
+            'current_extension': current_extension,
+            'written_dates': written_dates,
+            'total_extension_days': total_extension_days_left + current_extension
+        })
+    else: # user already requested an extension
+        days = request.POST.get('dayselect', None)
+        try:
+            extension_days = int(days)
+            current_milestone = Milestone.objects.get(id=milestone_id)
+            user_duedate = user.profile.get_user_duedate(current_milestone)
+            current_extension = (user_duedate - current_milestone.duedate).days
+            total_extension_days_left = user.profile.extension_days()
+            total_extension_days = total_extension_days_left + current_extension
+
+            if extension_days > total_extension_days or extension_days < 0 or extension_days > current_milestone.max_extension:
+                return redirect('dashboard.views.dashboard')
+            extension,created = Extension.objects.get_or_create(user=user, milestone=current_milestone)
+            if extension_days == 0: # Don't keep extensions with 0 slack days
+                extension.delete()
+            else:
+                extension.slack_used = extension_days
+                extension.save()
+            return redirect('dashboard.views.dashboard')
+        except ValueError:
+            return redirect('dashboard.views.dashboard')
+
+@staff_member_required
+def manage(request):
+    return render(request, 'accounts/manage.html', {
+    })

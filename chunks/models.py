@@ -44,12 +44,56 @@ class Assignment(models.Model):
     id = models.AutoField(primary_key=True)
     semester = models.ForeignKey(Semester, related_name='assignments', blank=False, null=True)
     name = models.CharField(max_length=50)
-    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = u'assignments'
+
+    def __unicode__(self):
+        return '%s, %s' % (self.name, self.semester)
+
+    def is_current_semester(self):
+        return self.semester.is_current_semester
+
+    def is_live_assignment(self):
+        return self.milestones.latest('assigned_date').assigned_date and datetime.datetime.now() < self.milestones.latest('duedate').duedate
+
+class Milestone(models.Model):
+    SUBMIT = 'S'
+    REVIEW = 'R'
+    TYPE_CHOICES = (
+        (SUBMIT, 'Submit'),
+        (REVIEW, 'Review'),
+    )
+
+    id = models.AutoField(primary_key=True)
+    assignment = models.ForeignKey(Assignment, related_name='milestones')
+    assigned_date = models.DateTimeField(null=True, blank=True)
     duedate = models.DateTimeField(null=True, blank=True)
-    code_review_end_date = models.DateTimeField(null=True, blank=True)
-    is_live = models.BooleanField(default=False)
+    name = models.CharField(max_length=50)
     max_extension = models.IntegerField(default=2)
-    multiplier = models.IntegerField(default=1)
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES)
+
+    def full_name(self):
+        return '%s - %s' % (self.assignment.name, self.name)
+
+    def __unicode__(self):
+        return '%s - %s - (%s)' % (self.assignment, self.name, self.get_type_display())
+
+class SubmitMilestone(Milestone):
+    pass
+
+@receiver(post_save, sender=SubmitMilestone)
+def set_submit_type(sender, instance, created, **kwargs):
+    if created:
+        instance.type=Milestone.SUBMIT
+        instance.save()
+
+class ReviewMilestone(Milestone):
+    reviewers_per_chunk = models.IntegerField(default=2)
+    min_student_lines = models.IntegerField(default=30)
+    submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestones')
+    chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
+
     student_count = models.IntegerField(default=5)
     student_count_default = models.IntegerField(default=5)
     alum_count = models.IntegerField(default=3)
@@ -64,20 +108,6 @@ class Assignment(models.Model):
     staff = models.IntegerField(default=15)
     staff_default = models.IntegerField(default=15)
 
-    reviewers_per_chunk = models.IntegerField(default=2)
-    min_student_lines = models.IntegerField(default=30)
-
-    chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
-
-    class Meta:
-        db_table = u'assignments'
-    def __unicode__(self):
-        return '%s, %s' % (self.name, self.semester)
-    def is_current_semester(self):
-        return self.semester.is_current_semester
-    def is_life_assignment(self):
-        return datetime.datetime.now() < submission.assignment.code_review_end_date and self.is_live
-
     def num_tasks_for_user(self, user):
       if user.role == 'student':
         return self.student_count
@@ -86,20 +116,20 @@ class Assignment(models.Model):
       else:
         return self.alum_count
 
-@receiver(post_save, sender=Assignment)
-def create_current_assignment(sender, instance, created, raw=False, **kwargs):
-    if created and not raw:
+@receiver(post_save, sender=ReviewMilestone)
+def create_current_review_milestone(sender, instance, created, **kwargs):
+    if created:
         # This code appears to copy parms from previous assignments in that semester.
-        past = Assignment.objects.filter(semester = instance.semester).order_by('duedate').exclude(id = instance.id).reverse()
+        past = ReviewMilestone.objects.filter(assignment__semester = instance.assignment.semester).order_by('-duedate').exclude(id = instance.id)
         if past.count() > 0:
             pick = past[0]
-            for assignment in past:
+            for milestone in past:
                 #check that the assignment had tasks assigned
-                chunks = Chunk.objects.filter(file__submission__assignment=assignment)
+                chunks = Chunk.objects.filter(tasks__milestone=milestone)
                 tasks = False
                 for chunk in chunks:
                     if chunk.tasks.count() > 0:
-                        pick = assignment
+                        pick = milestone
                         tasks = True
                         break
                 if tasks:
@@ -109,7 +139,7 @@ def create_current_assignment(sender, instance, created, raw=False, **kwargs):
             instance.alum_count_default = pick.alum_count
             instance.staff_count_default = pick.staff_count
             #set number of students we can expect
-            users = User.objects.filter(profile__tasks__chunk__file__submission__assignment = pick).distinct()
+            users = User.objects.filter(profile__tasks__milestone= pick).distinct()
             students = users.filter(profile__role='S')
             alums = users.exclude(profile__role='S').exclude(profile__role='T')
             staff = users.filter(profile__role='T')
@@ -127,38 +157,44 @@ def create_current_assignment(sender, instance, created, raw=False, **kwargs):
         instance.staff_count = instance.staff_count_default
         instance.save()
 
+@receiver(post_save, sender=ReviewMilestone)
+def set_review_type(sender, instance, created, **kwargs):
+    if created:
+        instance.type=Milestone.REVIEW
+        instance.save()
 
 class Batch(models.Model):
-    assignment = models.ForeignKey(Assignment, related_name='batches')
-    is_live = models.BooleanField(default=False)
+    name = models.CharField(max_length=50)
 
     class Meta:
       verbose_name_plural = 'batches'
 
     def __str__(self):
-      return 'batch %s for %s' % (self.id, self.assignment)
+      return 'batch %s for %s' % (self.id, self.name)
 
 
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    assignment = models.ForeignKey(Assignment, related_name='submissions')
     author = models.ForeignKey(User,
             blank=True, null=True, related_name='submissions')
     created = models.DateTimeField(auto_now_add=True)
     revision = models.IntegerField(null=True, blank=True)
     revision_date = models.DateTimeField(null=True, blank=True)
-    duedate = models.DateTimeField(null=True, blank=True)
+    milestone = models.ForeignKey(SubmitMilestone, related_name='submissions')
     batch = models.ForeignKey(Batch, blank=True, null=True, related_name='submissions')
 
     class Meta:
         db_table = u'submissions'
     def __unicode__(self):
-        return '%s, for %s' % (self.name, self.assignment)
+        return '%s, for %s' % (self.name, self.milestone)
 
     @models.permalink
     def get_absolute_url(self):
-        return ('chunks.views.view_all_chunks', [str(self.assignment.name), str(self.name), "code"])
+        return ('chunks.views.view_all_chunks', [str(self.milestone.assignment.name), str(self.name), "code"])
+
+    def assignment(self):
+        return self.milestone.assignment
 
     def chunk_count(self):
         return len(self.chunks())
@@ -169,20 +205,18 @@ class Submission(models.Model):
             chunks.extend(f.chunks.filter())
         return chunks
 
-@receiver(post_save, sender=Assignment)
-def create_user_submission(sender, instance, created, raw=False, **kwargs):
-    if created and not raw:
-        users = User.objects.filter(profile__role='S')
-        for auser in users:
-            submission, created = Submission.objects.get_or_create(assignment=instance, name=auser.username,
-                                                                   author=auser, duedate=instance.duedate)
+    def code_review_end_date(self):
+        review_milestones = ReviewMilestone.objects.filter(submit_milestone=self.milestone)
+        if review_milestones:
+            return review_milestones.latest('duedate').duedate
+        else:
+            return self.milestone.duedate + datetime.timedelta(days=7)
 
 class File(models.Model):
     id = models.AutoField(primary_key=True)
     path = models.CharField(max_length=200)
     data = models.TextField()
     submission = models.ForeignKey(Submission, related_name='files')
-    batch = models.ForeignKey(Batch, blank=True, null=True, related_name='files')
     created = models.DateTimeField(auto_now_add=True)
     def __split_lines(self):
         first_line_offset = 0
@@ -206,7 +240,7 @@ class File(models.Model):
 
 class ChunkManager(models.Manager):
     def find_by_assignment(self, assignment):
-        return self.filter(file__submission__assignment=assignment)
+        return self.filter(file__submission__milestone__assignment=assignment)
 
 
 class Chunk(models.Model):
