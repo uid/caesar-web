@@ -14,10 +14,6 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.dispatch import receiver
 
-class Token(models.Model):
-    expire = models.DateTimeField(null=True, blank=True)
-    code = models.CharField(null=True, blank=True, max_length=20)
-
 class Extension(models.Model):
     user = models.ForeignKey(User, related_name='extensions')
     milestone = models.ForeignKey(Milestone, related_name='extensions')
@@ -77,7 +73,6 @@ class UserProfile(models.Model):
     website = models.URLField(blank=True,\
         help_text='URL')
 
-    token = models.ForeignKey(Token, related_name='invited', default=None, null=True)
     def __unicode__(self):
         return self.user.__unicode__()
 

@@ -10,7 +10,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
 from limit_registration import check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
-from accounts.models import Token, UserProfile, Member
+from accounts.models import UserProfile, Member
 from accounts.forms import ReputationForm
 from chunks.models import Semester
 from django.contrib.auth.models import User
