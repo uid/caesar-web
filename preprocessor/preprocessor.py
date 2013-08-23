@@ -22,9 +22,9 @@ from checkstyle import generate_checkstyle_comments
 
 # NOTE: I never tested directories with traling slashes. Sorry I don't have time to make it more robust :(
 settings = {
-    'submit_milestone_id': 16,
-    'generate_comments': True,
-    'save_data': False,
+    'submit_milestone_id': 1,
+    'generate_comments': False,
+    'save_data': True,
     'staff_dir': '/tmp/ps1-staff',
     'student_submission_dir': '/tmp/ps1-submissions'
     }
