@@ -71,6 +71,9 @@ def parse_student_files(username, files, batch, submit_milestone, save, student_
   # Creating the File objects
   for file_path in files:
     file = create_file(file_path, submission)
+    if len(file.data) == 0:
+      continue # don't import empty files
+
     file_objects.append(file)
     if save:
       file.save()
