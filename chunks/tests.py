@@ -35,8 +35,10 @@ class PublishCodeTest(TestCase):
         c.login(username='kimdeal', password='test')
         u = User.objects.get(username='kimdeal')
         submission = u.submissions.all()[0]
+        self.assertFalse(submission.published)
         c.post('/chunks/publish/', {'submission_id': '472', 'published': 'False'})
-        # TODO: test that the submission's published field is now true
+        u = User.objects.get(username='kimdeal')
+        submission = u.submissions.all()[0]
         self.assertTrue(submission.published)
 
     def test_publishing_others(self):
