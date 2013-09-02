@@ -92,6 +92,7 @@ $(document).ready(function() {
     </div>
 
     <div class="span9" id='code'>
+<!-- turn off Publishing until it's ready
       <h3>My Published Code</h3>
       {% if submissions %}
         {% for submission in submissions %}
@@ -104,6 +105,7 @@ $(document).ready(function() {
         <p>The user has no published code yet.</p>
       {% endif %}
       <a href='{% url chunks.views.publish_code %}' class='btn btn-small'>Start Publishing Code</a>
+-->
       <h3>My Review Activity</h3>
       {% for review_milestone, review_data in review_milestone_data %}
         {% if review_data %}
