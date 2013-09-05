@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models import Count
 
 from accounts.models import UserProfile
-from chunks.models import Chunk
+from chunks.models import Chunk, ReviewMilestone
 import app_settings
 
 class Task(models.Model):
@@ -17,7 +17,7 @@ class Task(models.Model):
     )
     chunk = models.ForeignKey(Chunk, related_name='tasks')
     reviewer = models.ForeignKey(UserProfile, related_name='tasks')
-    due = models.DateTimeField(blank=True, null=True)
+    milestone = models.ForeignKey(ReviewMilestone, related_name='tasks')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
     # TODO switch to a more robust model history tracking (e.g. versioning)
     created = models.DateTimeField(auto_now_add=True)

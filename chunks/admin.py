@@ -1,9 +1,10 @@
 from django.contrib import admin
 
-from chunks.models import Assignment, Submission, File, Chunk, StaffMarker, Batch, Subject, Semester
+from accounts.models import Extension, Member
+from chunks.models import Assignment, ReviewMilestone, SubmitMilestone, Submission, File, Chunk, StaffMarker, Batch, Subject, Semester
 
 class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'duedate', 'code_review_end_date', 'semester', 'student_count', 'alum_count', 'staff_count')
+    list_display = ('name', 'semester')
     search_fields = ('name', 'semester')
 
 class ChunkAdmin(admin.ModelAdmin):
@@ -13,8 +14,41 @@ class ChunkAdmin(admin.ModelAdmin):
 class StaffMarkerAdmin(admin.ModelAdmin):
     list_display = ('chunk', 'start_line', 'end_line')
 
+class MilestoneAdmin(admin.ModelAdmin):
+	def extension_data(self, obj):
+		num_no_extensions = Member.objects.filter(semester=obj.assignment.semester, role='student')\
+			.exclude(user__extensions__milestone=obj).count()
+		extensions = str(num_no_extensions)
+		for num_days in range(1, obj.max_extension+1):
+			num_extensions = Extension.objects.filter(milestone=obj).filter(slack_used=num_days).count()
+			extensions += ' / ' + str(num_extensions)
+		return extensions
+	extension_data.short_description = 'Extensions (0 Days / 1 Day / 2 Days / ...)'
+
+class ReviewMilestoneAdmin(MilestoneAdmin):
+	list_display = ('__unicode__', 'extension_data', 'review_info_link', 'routing_link', 'list_users_link',)
+	def review_info_link(self, obj):
+		return '<a href="%s%s">%s</a>' % ('/tasks/review_milestone_info/', obj.id, 'Review Info')
+	review_info_link.allow_tags = True
+	review_info_link.short_description = 'Review Info'
+	def routing_link(self, obj):
+		return '<a href="%s%s">%s</a>' % ('/chunks/simulate/', obj.id, 'Configure Routing')
+	routing_link.allow_tags = True
+	routing_link.short_description = 'Configure Routing'
+	def list_users_link(self, obj):
+		return '<a href="%s%s">%s</a>' % ('/chunks/list_users/', obj.id, 'List Users')
+	list_users_link.allow_tags = True
+	list_users_link.short_description = 'List Users'
+	exclude = ('type',)
+
+class SubmitMilestoneAdmin(MilestoneAdmin):
+	list_display = ('__unicode__', 'extension_data',)
+	exclude = ('type',)
+
 admin.site.register(Assignment, AssignmentAdmin)
 admin.site.register(Submission)
+admin.site.register(ReviewMilestone, ReviewMilestoneAdmin)
+admin.site.register(SubmitMilestone, SubmitMilestoneAdmin)
 admin.site.register(File)
 admin.site.register(Batch)
 admin.site.register(Chunk, ChunkAdmin)

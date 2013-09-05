@@ -1,11 +1,12 @@
 import os
 import datetime
-from chunks.models import Chunk, Assignment, Semester
+from chunks.models import Chunk, Assignment, Milestone, Semester
 
 from sorl.thumbnail import ImageField
 from accounts.fields import MarkdownTextField
 from accounts.storage import OverwriteStorage
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -13,17 +14,19 @@ from django.contrib.auth.models import User
 from django.conf import settings
 from django.dispatch import receiver
 
-class Token(models.Model):
-    expire = models.DateTimeField(null=True, blank=True)
-    code = models.CharField(null=True, blank=True, max_length=20)
-
 class Extension(models.Model):
     user = models.ForeignKey(User, related_name='extensions')
-    assignment = models.ForeignKey(Assignment, related_name='extensions')
+    milestone = models.ForeignKey(Milestone, related_name='extensions')
     slack_used = models.IntegerField(default=0, blank=True, null=True)
 
+    def assignment(self):
+        return self.milestone.assignment
+
+    def new_duedate(self):
+        return self.milestone.duedate + datetime.timedelta(days=self.slack_used)
+
     def __str__(self):
-      return '%s (%s) %s days' % (self.user.username, self.assignment, self.slack_used)
+      return '%s (%s) %s days' % (self.user.username, self.milestone.full_name(), self.slack_used)
 
 class Member(models.Model):
     role = models.CharField(max_length=16)
@@ -70,7 +73,6 @@ class UserProfile(models.Model):
     website = models.URLField(blank=True,\
         help_text='URL')
 
-    token = models.ForeignKey(Token, related_name='invited', default=None, null=True)
     def __unicode__(self):
         return self.user.__unicode__()
 
@@ -102,6 +104,14 @@ class UserProfile(models.Model):
       total_days = 10 #TODO: change after multi-class refactor
       used_days = sum([extension.slack_used for extension in self.user.extensions.all()])
       return total_days - used_days
+
+    def get_user_duedate(self, milestone):
+        try:
+            user_extension = milestone.extensions.get(user=self.user)
+            return user_extension.new_duedate()
+        except ObjectDoesNotExist:
+            return milestone.duedate
+
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, raw=False, **kwargs):

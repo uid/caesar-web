@@ -11,8 +11,8 @@
 <script>
 $(document).ready(function(){
     $("select").change(function () {
-          var written_days = [
-          {% for date in written_days %}
+          var written_dates = [
+          {% for date in written_dates %}
            '{{date}}',
           {% endfor %}
           ]
@@ -20,9 +20,9 @@ $(document).ready(function(){
           $("select option:selected").each(function () {
                 str = $(this).text();
               });
-          var day = parseInt(str);
-          var left = {{total_days}} - day;
-          $("#duedate").text("After this request, the current assignment will be due on " + written_days[day]);
+          var extension = parseInt(str);
+          var left = {{total_extension_days}} - extension;
+          $("#duedate").text("After this request, the current assignment will be due on " + written_dates[extension]);
           if (left == 1)
             $("#slackleft").text("I will have " + left + " slack day left for the rest of the semester.");
           else
@@ -33,7 +33,7 @@ $(document).ready(function(){
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
   <span class="breadcrumb">request extension</span>
 {% endblock %}
 
@@ -44,14 +44,14 @@ $(document).ready(function(){
   {% csrf_token %}
 I would like to use 
   <select name="dayselect">
-      {%for day in days %}
-      {%if day == current_day %}
-      <option value="{{day}}" class="bigger-selector" selected="selected"> {{day}} </option>
-      {%else%}
-      <option value="{{day}}" class="bigger-selector"> {{day}} </option>
-      {%endif%}
+      {%for extension in possible_extensions %}
+        {%if extension == current_extension %}
+          <option value="{{extension}}" class="bigger-selector" selected="selected"> {{extension}} </option>
+        {%else%}
+          <option value="{{extension}}" class="bigger-selector"> {{extension}} </option>
+        {%endif%}
       {%endfor%}
-  </select> slack day{{ current_day|pluralize }} on this assignment.
+  </select> slack day{{ current_extension|pluralize }} on this assignment.
   </br>
   <button type="submit">Save</button>
   <button onclick="document.location = '/review';" id="cancel-button" type="button">Cancel</button>

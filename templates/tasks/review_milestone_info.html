@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url review.views.dashboard %}">Dashboard</a>
+  <span class="breadcrumb">student stats</span>
+{% endblock %}
+
+{% block content %}
+
+<h2 class="task-header">{{ review_milestone.full_name }}
+  <a href="/chunks/simulate/{{review_milestone.id}}"> configure routing</a>
+  <a href="/chunks/list_users/{{review_milestone.id}}"> list users</a>
+</h2>
+<h4 class="task header"> total chunks: {{total_chunks}} </h4>
+<h4 class="task header"> alums participating: {{alums_participating}} </h4>
+<h4 class="task header"> total tasks: {{ total_tasks }} </h4>
+<h4 class="task header"> assigned_chunks: {{ assigned_chunks }} </h4>
+<h4 class="task header"> total chunks with human comment: {{ total_chunks_with_human }} </h4>
+<h4 class="task header"> total comments: {{total_comments}}  --> checkstyle: {{total_checkstyle}} | user: {{total_user_comments}} | alum: {{total_alum_comments}} | student: {{total_student_comments}} | staff: {{total_staff_comments}}</h4>
+<h4 class="task header"> number of students with a submission but no chunks: {{ zero_chunk_users }} </h4>
+    
+
+{% endblock %}
