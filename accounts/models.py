@@ -100,18 +100,6 @@ class UserProfile(models.Model):
         return self.user.first_name + ' ' + self.user.last_name
       return self.user.username
 
-    def extension_days(self):
-      total_days = 10 #TODO: change after multi-class refactor
-      used_days = sum([extension.slack_used for extension in self.user.extensions.all()])
-      return total_days - used_days
-
-    def get_user_duedate(self, milestone):
-        try:
-            user_extension = milestone.extensions.get(user=self.user)
-            return user_extension.new_duedate()
-        except ObjectDoesNotExist:
-            return milestone.duedate
-
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, raw=False, **kwargs):

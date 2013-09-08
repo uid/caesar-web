@@ -10,7 +10,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponseRedirect
 from limit_registration import check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
-from accounts.models import UserProfile, Member
+from accounts.models import UserProfile, Member, Extension
 from accounts.forms import ReputationForm
 from chunks.models import Semester, Submission
 from django.contrib.auth.models import User
@@ -22,7 +22,7 @@ import re
 from PIL import Image as PImage
 from os.path import join as pjoin
 from django.conf import settings
-from chunks.models import ReviewMilestone
+from chunks.models import Milestone,SubmitMilestone,ReviewMilestone
 from review.models import Comment, Vote
 
 def login(request):
@@ -330,15 +330,30 @@ def allusers(request):
 @login_required
 def request_extension(request, milestone_id):
     user = request.user
+
+    # what semester is this milestone in?
+    current_milestone = Milestone.objects.get(id=milestone_id)
+    semester = current_milestone.assignment.semester
+    membership = Member.objects.get(semester=semester, user=user)
+
+    # calculate how much slack budget user has left for this semester
+    slack_budget = membership.slack_budget
+    used_slack = sum([extension.slack_used for extension in Extension.objects.filter(user=user, milestone__assignment__semester=semester)])
+    total_extension_days_left = slack_budget - used_slack
+
+    # get the user's current personal due date for this assignment (including any existing extension)
+    try:
+        user_duedate = current_milestone.extensions.get(user=user).new_duedate()
+    except ObjectDoesNotExist:
+        user_duedate = current_milestone.duedate
+
     # User is going to request an extension
     if request.method == 'GET':
         current_milestone = Milestone.objects.get(id=milestone_id)
         # Make sure user got here legally
-        user_duedate = user.profile.get_user_duedate(current_milestone)
         if datetime.datetime.now() > user_duedate + datetime.timedelta(minutes=30):
             return redirect('dashboard.views.dashboard')
 
-        total_extension_days_left = user.profile.extension_days()
         current_extension = (user_duedate - current_milestone.duedate).days
 
         late_days = 0
@@ -359,14 +374,11 @@ def request_extension(request, milestone_id):
             'written_dates': written_dates,
             'total_extension_days': total_extension_days_left + current_extension
         })
-    else: # user already requested an extension
+    else: # user just submitted an extension request
         days = request.POST.get('dayselect', None)
         try:
             extension_days = int(days)
-            current_milestone = Milestone.objects.get(id=milestone_id)
-            user_duedate = user.profile.get_user_duedate(current_milestone)
             current_extension = (user_duedate - current_milestone.duedate).days
-            total_extension_days_left = user.profile.extension_days()
             total_extension_days = total_extension_days_left + current_extension
 
             if extension_days > total_extension_days or extension_days < 0 or extension_days > current_milestone.max_extension:
