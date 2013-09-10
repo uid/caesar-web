@@ -20,14 +20,43 @@ from crawler import crawl_submissions
 from parse import parse_all_files, parse_staff_code
 from checkstyle import generate_checkstyle_comments
 
-# NOTE: I never tested directories with traling slashes. Sorry I don't have time to make it more robust :(
+import argparse
+parser = argparse.ArgumentParser(description="""
+Make users into members of a class (as either students or staff).
+Also creates user accounts for any who don't already have a Caesar account.
+""")
+parser.add_argument('--milestone',
+                    type=int,
+                    required=True,
+                    help="id number of SubmitMilestone in Caesar. Go to Admin, Submit milestones, and take the last number from the link of the submit milestone you created for this set of submissions.")
+parser.add_argument('--checkstyle',
+                    action="store_true",
+                    help="runs Checkstyle on the students' Java code, and preloads its output as comments in Caesar.")
+parser.add_argument('-n', '--dry-run',
+                    action="store_true",
+                    help="just do a test run -- don't save anything into the Caesar database")
+parser.add_argument('--starting',
+                    required=True,
+                    help="folder containing starting code for the assignment.  Should contain one subfolder, under which is the starting code.")
+parser.add_argument('--submissions',
+                    required=True,
+                    help="folder containing student code for the assignment. Should contain subfolders named by student usernames: abc/, def/, ghi/, etc.")
+
+
+args = parser.parse_args()
+#print args
+
+stripTrailingSlash = lambda folder: folder[0:-1] if folder[-1]=='/' else folder
+
 settings = {
-    'submit_milestone_id': 1,
-    'generate_comments': False,
-    'save_data': True,
-    'staff_dir': '/tmp/ps1-staff',
-    'student_submission_dir': '/tmp/ps1-submissions'
+    'submit_milestone_id': args.milestone,
+    'generate_comments': args.checkstyle,
+    'save_data': not args.dry_run,
+    'staff_dir': stripTrailingSlash(args.starting),
+    'student_submission_dir': stripTrailingSlash(args.submissions)
     }
+#print settings
+exit()
 
 starting_time = time.time()
 
