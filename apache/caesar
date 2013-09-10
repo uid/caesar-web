@@ -27,3 +27,5 @@ Allow from all
 WSGIPassAuthorization On
 SSLOptions +StdEnvVars
 </Directory>
+
+CustomLog /var/log/apache2/performance.log "%h %l %u %t \"%r\" %>s %b %D"

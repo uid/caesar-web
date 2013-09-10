@@ -4,8 +4,3 @@ settings_local.py
 .DS_Store
 /media
 /data
-/task_sim_data.csv
-/task_sim_output.txt
-/accounts/second-wave-alums.txt
-/accounts/alum-wave-3.txt
-/scripts/*

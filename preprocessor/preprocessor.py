@@ -56,7 +56,6 @@ settings = {
     'student_submission_dir': stripTrailingSlash(args.submissions)
     }
 #print settings
-exit()
 
 starting_time = time.time()
 
@@ -70,6 +69,7 @@ submit_milestone = SubmitMilestone.objects.get(id=settings['submit_milestone_id'
 print "Found existing submit milestone. Adding code to %s." % (submit_milestone.full_name())
 
 staff_code = parse_staff_code(settings['staff_dir'])
+#print staff_code.keys()
 
 batch = Batch(name=submit_milestone.full_name())
 if settings['save_data']:
@@ -82,8 +82,9 @@ student_code = crawl_submissions(settings['student_submission_dir'])
 code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, submit_milestone, settings['save_data'], staff_code)
 
 if parse.failed_users:
-  print "To add the missing users to Caesar, use scripts/loadusers.py to add the folowing list of users:"
+  print "To add the missing users to Caesar, use scripts/addMembers.py to add the following list of users:"
   print ','.join(parse.failed_users)
+  print "Then reload their submissions."
 
 print "Found %s submissions." % (len(code_objects))
 

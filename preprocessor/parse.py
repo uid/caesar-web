@@ -15,7 +15,7 @@ def parse_staff_code(staff_dir):
   staff_code = {}
   for files in staff_files.values():
     for file_path in files:
-      relative_path = '/'.join(file_path.split('/')[num_subdirs:])
+      relative_path = '/'.join(file_path.split('/')[num_subdirs+1:])
       staff_lines = open(file_path).read()
       staff_code[relative_path] = set([line.strip() for line in staff_lines.split('\n')])
 
@@ -90,7 +90,8 @@ def parse_student_files(username, files, batch, submit_milestone, save, student_
       # Assuming that the student's directory looks like student_base_dir + '/' + username + '/' + project_name_dir
       num_subdirs = len(student_base_dir.split('/')) + 1 # + 1 for student username
       relative_path = '/'.join(file_path.split('/')[num_subdirs:])
-
+      #print "looking for student path " + relative_path
+      
       if relative_path in staff_code:
         # print "comparing with staff version of " + relative_path
         num_student_lines = 0
