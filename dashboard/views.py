@@ -47,23 +47,20 @@ def dashboard(request):
     old_completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
-        .annotate(comment_count=Count('chunk__comments', distinct=True),
-                  reviewer_count=Count('chunk__tasks', distinct=True))
+        .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
+    annotate_tasks_with_counts(old_completed_tasks)
 
     active_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
         .exclude(status='C') \
-        .exclude(status='U') \
-        .annotate(comment_count=Count('chunk__comments', distinct=True),
-                  reviewer_count=Count('chunk__tasks', distinct=True))
+        .exclude(status='U')
+    annotate_tasks_with_counts(active_tasks)
 
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
         .filter(status='C') \
-        .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
-        .annotate(comment_count=Count('chunk__comments', distinct=True),
-                  reviewer_count=Count('chunk__tasks', distinct=True))
+        .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
+    annotate_tasks_with_counts(completed_tasks)
 
     #get all the submissions that the user submitted
     submissions = Submission.objects.filter(author=user) \
@@ -140,23 +137,20 @@ def student_dashboard(request, username):
     old_completed_tasks = participant.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
         .filter(status='C') \
-        .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
-        .annotate(comment_count=Count('chunk__comments', distinct=True),
-                  reviewer_count=Count('chunk__tasks', distinct=True))
+        .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
+    annotate_tasks_with_counts(old_completed_tasks)
 
     active_tasks = participant.get_profile().tasks \
        .select_related('chunk__file__submission_assignment') \
        .exclude(status='C') \
-       .exclude(status='U') \
-       .annotate(comment_count=Count('chunk__comments', distinct=True),
-                 reviewer_count=Count('chunk__tasks', distinct=True))
+       .exclude(status='U')
+    annotate_tasks_with_counts(active_tasks)
 
     completed_tasks = participant.get_profile().tasks \
        .select_related('chunk__file__submission__assignment') \
        .filter(status='C') \
-       .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
-       .annotate(comment_count=Count('chunk__comments', distinct=True),
-                 reviewer_count=Count('chunk__tasks', distinct=True))
+       .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
+    annotate_tasks_with_counts(completed_tasks)
 
     #get all the submissions that the participant submitted
     submissions = Submission.objects.filter(author=participant) \
@@ -206,7 +200,7 @@ def student_dashboard(request, username):
         except ObjectDoesNotExist:
             current_milestone_data.append((milestone, None))
 
-    return render(request, 'dashboard/student_dashboard.html', {
+    return render(request, 'dashboard/dashboard.html', {
         'participant': participant,
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
@@ -217,4 +211,8 @@ def student_dashboard(request, username):
         'current_milestone_data': current_milestone_data,
     })
 
+
+def annotate_tasks_with_counts(tasks):
+    tasks.annotate(comment_count=Count('chunk__comments', distinct=True),
+                   reviewer_count=Count('chunk__tasks', distinct=True))
 

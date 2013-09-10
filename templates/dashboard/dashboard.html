@@ -16,8 +16,7 @@ $(document).ready(function() {
       return false;
     });
     $('.task-line').click(function(e) {
-      var chunkId = this.id.split('-')[2];
-      window.location = "/chunks/view/" + chunkId;
+      window.location = $(this).attr("data-href")
       return false;
     });
 
@@ -65,8 +64,7 @@ $(document).ready(function() {
             + data.two.task_chunk_name + '</span><span class="task-stats"><span class="comment-count" title="Comments">' + data.two.task_comment_count + '</span><span class="reviewer-count" title="Reviewers">' + data.two.task_reviewer_count + '</span></span><span class="task-snippet">'+ data.two.task_chunk_generate_snippet + '</span></div>');
             
             $('.task-line').click(function(e) {
-              var chunkId = this.id.split('-')[2];
-              window.location = "/chunks/view/" + chunkId;
+              window.location = $(this).attr("data-href")
               return false;
             });
         },"json");
@@ -205,11 +203,7 @@ $(document).ready(function() {
       <div id="historic_content">
       <div class="task-list">
         {% for task in old_completed_tasks.all %}
-          {% if user.profile.is_student %}
-              {% include "dashboard/non_task.html" %}
-          {% else %}
-              {% include "dashboard/task.html" %}
-          {% endif %}
+           {% include "dashboard/task.html" %}
         {% empty %}
         No tasks found.
         {% endfor %}

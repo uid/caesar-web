@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models import Count
 
 from accounts.models import UserProfile
-from chunks.models import Chunk, ReviewMilestone
+from chunks.models import Chunk, ReviewMilestone, Submission
 import app_settings
 
 class Task(models.Model):
@@ -15,7 +15,9 @@ class Task(models.Model):
         ('C', 'Completed'),
         ('U', 'Unfinished'),
     )
-    chunk = models.ForeignKey(Chunk, related_name='tasks')
+    
+    submission = models.ForeignKey(Submission, related_name='tasks')
+    chunk = models.ForeignKey(Chunk, related_name='tasks', null=True, blank=True)
     reviewer = models.ForeignKey(UserProfile, related_name='tasks')
     milestone = models.ForeignKey(ReviewMilestone, related_name='tasks')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
@@ -48,5 +50,8 @@ class Task(models.Model):
 
         self.save()
 
+    def name(self):
+        return self.chunk.name if self.chunk != None else self.submission.name
+    
     def author(self):
-      return self.chunk.file.submission.author
+      return self.submission.author

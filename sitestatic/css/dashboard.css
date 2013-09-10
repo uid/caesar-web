@@ -14,16 +14,6 @@ div.assignment-header {
     clear: both;
     padding: 2px 0px;
 }
-.non-task-line {
-    border-bottom: 1px solid #aaa;
-    position: relative;
-    height: 18px;
-    clear: both;
-    padding: 2px 0px;
-}
-.non-task-line:hover {
-    background-color: #eee;
-}
 .add-new-assignment {
     font-size: small;
     display: block;
