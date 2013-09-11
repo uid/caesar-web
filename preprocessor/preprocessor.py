@@ -22,10 +22,10 @@ from checkstyle import generate_checkstyle_comments
 
 import argparse
 parser = argparse.ArgumentParser(description="""
-Make users into members of a class (as either students or staff).
-Also creates user accounts for any who don't already have a Caesar account.
+Load student submissions into Caesar.
 """)
 parser.add_argument('--milestone',
+                    metavar="ID",
                     type=int,
                     required=True,
                     help="id number of SubmitMilestone in Caesar. Go to Admin, Submit milestones, and take the last number from the link of the submit milestone you created for this set of submissions.")
@@ -36,9 +36,11 @@ parser.add_argument('-n', '--dry-run',
                     action="store_true",
                     help="just do a test run -- don't save anything into the Caesar database")
 parser.add_argument('--starting',
+                    metavar="PATH",
                     required=True,
                     help="folder containing starting code for the assignment.  Should contain one subfolder, under which is the starting code.")
 parser.add_argument('--submissions',
+                    metavar="PATH",
                     required=True,
                     help="folder containing student code for the assignment. Should contain subfolders named by student usernames: abc/, def/, ghi/, etc.")
 
