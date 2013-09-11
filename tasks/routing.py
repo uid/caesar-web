@@ -118,8 +118,8 @@ def load_chunks(submit_milestone, user_map, django_user):
             .exclude(file__submission__author=django_user) \
             .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
     django_tasks = Task.objects.filter(
-            chunk__file__submission__milestone=submit_milestone) \
-            .exclude(chunk__file__submission__author=django_user) \
+            submission__milestone=submit_milestone) \
+            .exclude(submission__author=django_user) \
                     .select_related('reviewer__user') \
 
     # load all submissions and chunks into lightweight internal objects
@@ -144,9 +144,10 @@ def load_chunks(submit_milestone, user_map, django_user):
         chunk_map[chunk.id] = chunk
 
     for django_task in django_tasks:
-        chunk = chunk_map[django_task.chunk_id]
-        reviewer = user_map[django_task.reviewer.user_id]
-        chunk_map[django_task.chunk_id].assign_reviewer(reviewer)
+        if django_task.chunk:
+            chunk = chunk_map[django_task.chunk_id] # looks like dead code
+            reviewer = user_map[django_task.reviewer.user_id]
+            chunk_map[django_task.chunk_id].assign_reviewer(reviewer)
 
     return chunks
 
@@ -300,12 +301,13 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
 
     tasks = []
     for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, review_milestone.reviewers_per_chunk, review_milestone.min_student_lines, chunk_type_priorities):
-      task = Task(reviewer_id=User_django.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone=review_milestone)
+        submission = chunk_map[chunk_id].submission
+        task = Task(reviewer_id=User_django.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone=review_milestone, submission_id=submission.id)
 
-      chunk_id_task_map[chunk_id].append(task)
-      chunk_map[chunk_id].reviewers.add(reviewer)
-      chunk_map[chunk_id].submission.reviewers.add(reviewer)
-      tasks.append(task)
+        chunk_id_task_map[chunk_id].append(task)
+        chunk_map[chunk_id].reviewers.add(reviewer)
+        submission.reviewers.add(reviewer)
+        tasks.append(task)
 
     return tasks
 

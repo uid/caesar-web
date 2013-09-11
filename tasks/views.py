@@ -84,7 +84,7 @@ def change_task(request):
     try:
         next_task = request.user.get_profile().tasks.exclude(status='C').exclude(status='U') \
                                               .order_by('created')[0:1].get()
-        return redirect(next_task.chunk)
+        return redirect('chunks.views.view_chunk', next_task.chunk_id) if next_task.chunk else redirect('chunks.views.view_all_chunks', 'all', next_task.submission_id)
     except Task.DoesNotExist:
         return redirect('dashboard.views.dashboard')
 
