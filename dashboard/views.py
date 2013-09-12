@@ -98,17 +98,19 @@ def dashboard(request):
 
     #find the current submissions
     current_milestones = Milestone.objects.filter(assignment__semester__members__user=user)\
-        .filter(duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
-        .filter(assigned_date__lt= datetime.datetime.now() - datetime.timedelta(minutes=30))\
+        .filter(assigned_date__lt= datetime.datetime.now())\
         .order_by('duedate')
 
     current_milestone_data = []
     for milestone in current_milestones:
         try:
             user_extension = milestone.extensions.get(user=user)
-            current_milestone_data.append((milestone, user_extension))
+            extension_days = user_extension.slack_used
         except ObjectDoesNotExist:
-            current_milestone_data.append((milestone, None))
+            user_extension = None
+            extension_days = 0
+        if datetime.datetime.now() <= milestone.duedate + datetime.timedelta(days=extension_days) + datetime.timedelta(hours=2):
+            current_milestone_data.append((milestone, user_extension))
 
     return render(request, 'dashboard/dashboard.html', {
         'active_tasks': active_tasks,
