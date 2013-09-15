@@ -47,6 +47,10 @@ def makeuser(username, role, semester, extension_days):
         profile.role = 'T'
         if profile.reputation < 100:
             profile.reputation += 100
+    elif role == "volunteer":
+        profile.role = 'A'
+        if profile.reputation < 100:
+            profile.reputation += 100
     profile.save()
 
     member, created = Member.objects.get_or_create(user=user, semester=semester, role=role, slack_budget=extension_days)
@@ -123,7 +127,7 @@ parser.add_argument('--semester',
 parser.add_argument('--role',
                     nargs=1,
                     type=str,
-                    choices=["student", "staff"],
+                    choices=["student", "staff", "volunteer"],
                     default="student")
 parser.add_argument('--slackbudget',
                     nargs=1,
@@ -148,8 +152,8 @@ semester = Semester.objects.get(subject=subject, semester=args.semester[0])
 role=args.role[0]
 slackbudget=args.slackbudget[0]
 
-if role=="staff":
-    slackbudget=0 # staff doesn't need slack
+if role!="student":
+    slackbudget=0 # only students need slack
 
 if args.file:
     loadusers(args.file[0], role, semester, slackbudget)
