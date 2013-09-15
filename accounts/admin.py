@@ -12,6 +12,10 @@ class UserProfileInline(AdminImageMixin, admin.StackedInline):
 class UserProfileAdmin(UserAdmin):
     inlines = [UserProfileInline]
 
+UserAdmin.list_display += ('date_joined',)
+UserAdmin.list_filter += ('date_joined',)
+
 admin.site.register(User, UserProfileAdmin)
 admin.site.register(Member)
 admin.site.register(Extension)
+
