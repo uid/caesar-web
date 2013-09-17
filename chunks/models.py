@@ -2,10 +2,6 @@ import textwrap
 
 import tasks
 
-from pygments import highlight
-from pygments.lexers import JavaLexer
-from pygments.formatters import HtmlFormatter
-
 from accounts.fields import MarkdownTextField
 
 from django.db import models
@@ -346,17 +342,6 @@ class Chunk(models.Model):
         self.end_line = end_line+1
         snippet_lines = self.lines[self.start_line:self.end_line + 1]
         return ' '.join(zip(*snippet_lines)[1])
-
-    def get_highlighted_lines(self):
-        lexer = JavaLexer()
-        formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-        numbers, lines = zip(*self.lines)
-        # highlight the code this way to correctly identify multi-line
-        # constructs
-        # TODO implement a custom formatter to do this instead
-        highlighted_lines = zip(numbers,
-                highlight(self.data, lexer, formatter).splitlines())
-        return highlighted_lines
 
     def get_similar_chunks(self):
         if not self.cluster_id:

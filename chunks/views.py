@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 
 from pygments import highlight
-from pygments.lexers import JavaLexer, SchemeLexer
+from pygments.lexers import get_lexer_for_filename
 from pygments.formatters import HtmlFormatter
 
 from simplewiki.models import Article
@@ -43,11 +43,8 @@ def view_chunk(request, chunk_id):
 
     comment_data = map(get_comment_data, chunk.comments.select_related('author__profile'))
 
-    # TODO(mglidden): remove
-    if chunk.id == 1:
-      lexer = SchemeLexer()
-    else:
-      lexer = JavaLexer()
+    lexer = get_lexer_for_filename(chunk.file.path)
+    
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     numbers, lines = zip(*chunk.lines)
     # highlight the code this way to correctly identify multi-line constructs
@@ -116,11 +113,10 @@ def view_all_chunks(request, viewtype, submission_id):
     for afile in files:
         paths.append(os.path.relpath(afile.path, common_prefix))
 
-    lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     for afile in files:
         staff_lines = StaffMarker.objects.filter(chunk__file=afile).order_by('start_line', 'end_line')
-
+    	lexer = get_lexer_for_filename(afile.path)
         #prepare the file - get the lines that are part of chunk and the ones that aren't
         highlighted_lines_for_file = []
         numbers, lines = zip(*afile.lines)

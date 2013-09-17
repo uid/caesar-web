@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import HttpResponse, Http404
 from django.core.urlresolvers import reverse
-from  django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 
 from chunks.models import Chunk, Assignment, Milestone, SubmitMilestone, ReviewMilestone, Submission, StaffMarker
 from tasks.models import Task
@@ -21,7 +21,7 @@ from accounts.models import UserProfile, Extension, Member
 from simplewiki.models import Article
 
 from pygments import highlight
-from pygments.lexers import JavaLexer, SchemeLexer
+from pygments.lexers import get_lexer_for_filename
 from pygments.formatters import HtmlFormatter
 
 import datetime
@@ -219,13 +219,14 @@ def all_activity(request, review_milestone_id, username):
     chunk_set = set()
     review_milestone_data = []
 
-    lexer = JavaLexer()
+    # lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     for chunk in chunks:
         if chunk in chunk_set:
             continue
         else:
             chunk_set.add(chunk)
+        lexer = get_lexer_for_filename(chunk.file.path)
         participant_votes = dict((vote.comment.id, vote.value) \
                 for vote in participant.votes.filter(comment__chunk=chunk.id))
         numbers, lines = zip(*chunk.lines)

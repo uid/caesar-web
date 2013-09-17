@@ -1,7 +1,7 @@
 import os
 from collections import defaultdict
 
-DEFAULT_FILE_EXTENSIONS = ['java']
+DEFAULT_FILE_EXTENSIONS = ['java', 'c', 'h', 'cpp', 'CC', 'py', 'scm']
 
 def file_extension(filename):
   if '.' in filename:
