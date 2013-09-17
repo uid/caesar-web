@@ -128,7 +128,8 @@ parser.add_argument('--role',
                     nargs=1,
                     type=str,
                     choices=["student", "staff", "volunteer"],
-                    default="student")
+                    default="student",
+                    help="role of these users in the class")
 parser.add_argument('--slackbudget',
                     nargs=1,
                     type=int,
