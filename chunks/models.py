@@ -1,18 +1,19 @@
+import app_settings
+import datetime
+import logging
 import textwrap
-
 import tasks
 
 from accounts.fields import MarkdownTextField
-
+from collections import defaultdict
+from django_tools.middlewares import ThreadLocal
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
-
-import datetime
-import app_settings
-from collections import defaultdict
+from pygments.formatters import HtmlFormatter
 
 class Subject(models.Model):
     id = models.AutoField(primary_key=True)
@@ -226,6 +227,7 @@ class File(models.Model):
         #         offset += 1
         #     first_line_offset += 1
         # offset +=1
+
         self.lines = list(enumerate(self.data.splitlines(), start = 1))
 
     def __init__(self, *args, **kwargs):
@@ -278,9 +280,32 @@ class Chunk(models.Model):
 
     @property
     def lines(self):
+        self._check_permissions()
         if not hasattr(self, '_lines'):
             self._split_lines()
+
         return self._lines
+
+    def _check_permissions(self):
+        usr = ThreadLocal.get_current_user()
+
+        # The chunk_info field is set to 'restricted' if only authors and
+        # reviewers of the chunk are allowed to view it.
+        if self.chunk_info == None:
+          cinfo = ""
+        else:
+          cinfo = self.chunk_info
+        authors = [str(u.username) for u in self.file.submission.authors.filter()]
+        reviewers = [str(u.user.username) for u in self.sorted_reviewers()]
+        allowed_users = authors + reviewers
+
+        if cinfo.find('restricted') != -1 and not str(usr.username) in allowed_users:
+          # Don't stop super users from viewing chunks.
+          if not usr.is_superuser:
+            raise PermissionDenied
+        # logging to make sure the reviewers and authors lists are correct.
+        logger = logging.getLogger(__name__)
+        logger.info("authors" + str(authors) + "\n reviewers:" + str(reviewers));
 
     def _split_lines(self):
         file_data = self.file.data
@@ -296,6 +321,7 @@ class Chunk(models.Model):
         # TODO: make tab expansion configurable
         # TODO: more robust (custom) dedenting code
         data = file_data[first_line_offset:self.end].expandtabs(4)
+        #data = str(usr.__unicode__())
         self._data = textwrap.dedent(data)
         self._lines = list(enumerate(self.data.splitlines(), start=first_line))
 
@@ -373,6 +399,7 @@ class Chunk(models.Model):
         return students + alum + staff
 
     def reviewers_comment_strs(self, tasks=None):
+      #assert False C F check course policy
       comment_count = defaultdict(int)
       for comment in self.comments.all():
         comment_count[comment.author.profile] += 1

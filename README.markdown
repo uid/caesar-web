@@ -165,6 +165,11 @@ Note: This may not install ldap correctly if you're running OS X. If importing l
     easy_install-2.7 ElementTree
     easy_install-2.7 Markdown 
 
+You also need to install django_tools.middlewares by placing the django_tools
+folder (obtainable from https://github.com/jedie/django-tools/tree/master/django_tools)
+into a python2.7 path folder. To find a python2.7 path folder run python2.7, import sys,
+and then print sys.path. Put the django_tools folder in one of the folders in the sys.path
+list. Verify that its working by running python2.7 and trying to import django_tools.middlewares.ThreadLocal
 
 ### Configuring Caesar
 

@@ -95,6 +95,7 @@ MIDDLEWARE_CLASSES = (
     'mit.auth.SSLRemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware'
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
