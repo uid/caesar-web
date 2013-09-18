@@ -143,7 +143,7 @@ def view_profile(request, username):
     #get all review milestones
     review_milestones = ReviewMilestone.objects.all().order_by('-assigned_date')
     # turn off Publishing until it's ready
-    #submissions = Submission.objects.filter(author=participant).filter(published=True)
+    #submissions = Submission.objects.filter(authors=participant).filter(published=True)
     for review_milestone in review_milestones:
         #get all comments that the user wrote
         comments = Comment.objects.filter(author=participant) \

@@ -42,7 +42,6 @@ def makeuser(username, role, semester, extension_days):
     profile, created = UserProfile.objects.get_or_create(user=user)
     if role == "student":
         profile.role = 'S'
-#        make_submissions(user, semester)
     elif role == "staff":
         profile.role = 'T'
         if profile.reputation < 100:
@@ -75,26 +74,7 @@ def fetch_user_data_from_LDAP(user, ):
         raise ValueError, ("Could not find user with username '%s' (filter '%s')"%(username, userfilter))
     return user
 
-def make_submissions(user, semester):
-    for assignment in semester.assignments.all():
-        submission, created = Submission.objects.get_or_create(assignment=assignment, name=user.username,
-                                                               author=user, duedate=assignment.duedate)
 
-
-# Removes all users' roles, useful after class has ended and need to graduate students.
-# Need to update reputations separately. This also removes TA roles
-def clear_roles():
-
-    #get everyone with a role (which can be empty string or None)
-    users = UserProfile.objects.exclude(role__exact='').exclude(role__exact=None)
-    print 'Clearing roles for {0} users'.format(len(users))
-    
-    for u in users:
-        if u.role != 'S' and u.role != 'T':
-            print 'failure: '+ str(u.role)
-        u.role = None
-        u.save()
-        
 #gets a list of all student emails, outputs to 'student_emails.txt'
 def student_email():
     f = open('student_emails.txt', 'w')

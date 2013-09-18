@@ -53,5 +53,5 @@ class Task(models.Model):
     def name(self):
         return self.chunk.name if self.chunk != None else self.submission.name
     
-    def author(self):
-      return self.submission.author
+    def authors(self):
+      return self.submission.authors

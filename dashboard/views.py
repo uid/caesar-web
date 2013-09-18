@@ -32,7 +32,7 @@ def dashboard(request):
     for review_milestone in live_review_milestones:
         logging.debug('wut')
         current_tasks = user.get_profile().tasks.filter(milestone=review_milestone)
-        active_sub = Submission.objects.filter(author=user, milestone=review_milestone.submit_milestone)
+        active_sub = Submission.objects.filter(authors=user, milestone=review_milestone.submit_milestone)
         try:
             membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
             #do not give tasks to students who got extensions or already have tasks for this assignment
@@ -63,7 +63,7 @@ def dashboard(request):
     annotate_tasks_with_counts(completed_tasks)
 
     #get all the submissions that the user submitted
-    submissions = Submission.objects.filter(author=user) \
+    submissions = Submission.objects.filter(authors=user) \
         .filter(milestone__duedate__lt=datetime.datetime.now()) \
         .order_by('milestone__duedate')\
         .filter(milestone__assignment__semester__is_current_semester=True)\
@@ -80,7 +80,7 @@ def dashboard(request):
                                   user_comments, static_comments))
 
     #get all the submissions that the user submitted, in previous semesters
-    old_submissions = Submission.objects.filter(author=user) \
+    old_submissions = Submission.objects.filter(authors=user) \
         .filter(milestone__duedate__lt=datetime.datetime.now()) \
         .order_by('milestone__duedate')\
         .exclude(milestone__assignment__semester__is_current_semester=True)\
@@ -155,7 +155,7 @@ def student_dashboard(request, username):
     annotate_tasks_with_counts(completed_tasks)
 
     #get all the submissions that the participant submitted
-    submissions = Submission.objects.filter(author=participant) \
+    submissions = Submission.objects.filter(authors=participant) \
         .filter(milestone__duedate__lt=datetime.datetime.now()) \
         .order_by('milestone__duedate')\
         .filter(milestone__assignment__semester__is_current_semester=True)\
@@ -172,7 +172,7 @@ def student_dashboard(request, username):
                                   user_comments, static_comments))
 
     #get all the submissions that the user submitted, in previous semesters
-    old_submissions = Submission.objects.filter(author=participant) \
+    old_submissions = Submission.objects.filter(authors=participant) \
         .filter(milestone__duedate__lt=datetime.datetime.now()) \
         .order_by('milestone__duedate')\
         .exclude(milestone__assignment__semester__is_current_semester=True)\

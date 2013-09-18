@@ -4,9 +4,10 @@ from django.contrib.auth.models import User
 import os
 from diff_match_patch import diff_match_patch, patch_obj
 from crawler import crawl_submissions
+from sets import Set
 
 # :( global variables
-failed_users = []
+failed_users = Set()
 diff_object = diff_match_patch()
 
 def parse_staff_code(staff_dir):
@@ -38,32 +39,40 @@ def create_file(file_path, submission):
   file_data = open(file_path).read()
   return File(path=file_path, submission=submission, data=file_data)
 
-def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code):
-  return [parse_student_files(username, files, batch, submit_milestone, save, student_base_dir, staff_code) for (username, files) in student_code.iteritems()]
+def split_into_usernames(folderName):
+    return folderName.split("-")
 
-def parse_student_files(username, files, batch, submit_milestone, save, student_base_dir, staff_code):
+def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code):
+  return [parse_student_files(split_into_usernames(rootFolderName), files, batch, submit_milestone, save, student_base_dir, staff_code) for (rootFolderName, files) in student_code.iteritems()]
+
+def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code):
   # staff_code is a dictionary from filename to staff code
-  # Trying to find the user. Bail if they doen't exist in the DB.
-  user = User.objects.filter(username=username)
-  if (len(user) > 0):
-    user = user[0]
-  else:
-    print "User %s doesn't exist in the database." % (username)
-    failed_users.append(username)
+  # Trying to find the user(s) who wrote this submission. Bail if they don't all exist in the DB.
+  users = User.objects.filter(username__in=usernames)
+  
+  if users.count() != len(Set(usernames)):
+    missing_users = Set(usernames).difference([user.username for user in users])
+    for username in missing_users:
+      print "user %s doesn't exist in the database." % username
+    failed_users += missing_users
     return None
 
+  submission_name = "-".join(usernames)
+  
   # Shouldn't remake submissions
-  if Submission.objects.filter(milestone=submit_milestone, author=user, name=username).count() > 0:
-    print "Submission %s already exists in the database." % (username)
+  if Submission.objects.filter(milestone=submit_milestone, authors__in=users).count() > 0:
+    print "submission for %s already exists in the database." % submission_name
     return None
 
   # Creating the Submission object
-  submission = Submission(milestone=submit_milestone, author=user, name=username, batch=batch)
+  submission = Submission(milestone=submit_milestone, name=submission_name, batch=batch)
   if save:
+    submission.save()
+    for user in users:
+      submission.authors.add(user)
     submission.save()
 
   print submission
-  print "*** new submission for this student"
 
   file_objects = []
   chunk_objects = []

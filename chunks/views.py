@@ -29,7 +29,7 @@ import logging
 def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
-    if user.profile.is_student() and not chunk.file.submission.milestone.assignment.is_current_semester() and user != chunk.file.submission.author:
+    if user.profile.is_student() and not chunk.file.submission.milestone.assignment.is_current_semester() and not chunk.file.submission.has_author(user):
         raise Http404
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
@@ -96,7 +96,7 @@ def view_all_chunks(request, viewtype, submission_id):
         raise Http404
     milestone = files[0].submission.milestone
     milestone_name = milestone.full_name()
-    if user.profile.is_student() and not milestone.assignment.is_current_semester() and user != submission.author:
+    if user.profile.is_student() and not milestone.assignment.is_current_semester() and not submission.has_author(user):
         raise Http404
     paths = []
     user_stats = []
@@ -477,13 +477,13 @@ def list_users(request, review_milestone_id):
 @login_required
 def publish_code(request):
     """Allow users to publish their written code."""
-    submissions = Submission.objects.filter(author=request.user)
+    submissions = Submission.objects.filter(authors=request.user)
 
     if request.method == "POST":
         # handle ajax post to this url
         submission_id = request.POST['submission_id']
         submission = Submission.objects.get(pk=submission_id)
-        if submission.author != request.user:
+        if not submission.has_author(request.user):
             raise PermissionDenied
 
         if request.POST['published']=='False':

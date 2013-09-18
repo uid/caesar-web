@@ -45,9 +45,9 @@ class User:
         return self.id
 
 class Submission:
-    def __init__(self, id, author, chunks):
+    def __init__(self, id, authors, chunks):
         self.id = id
-        self.author = author
+        self.authors = authors
         self.reviewers = set()
         self.chunks = [Chunk(chunk=chunk, submission=self)
                 for chunk in chunks]
@@ -112,14 +112,14 @@ def load_chunks(submit_milestone, user_map, django_user):
     chunk_map = {}
     submissions = {}
 
-    django_submissions = submit_milestone.submissions.exclude(author=django_user).values()
+    django_submissions = submit_milestone.submissions.exclude(authors=django_user)
     django_chunks = models.Chunk.objects \
             .filter(file__submission__milestone=submit_milestone) \
-            .exclude(file__submission__author=django_user) \
+            .exclude(file__submission__authors=django_user) \
             .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
     django_tasks = Task.objects.filter(
             submission__milestone=submit_milestone) \
-            .exclude(submission__author=django_user) \
+            .exclude(submission__authors=django_user) \
                     .select_related('reviewer__user') \
 
     # load all submissions and chunks into lightweight internal objects
@@ -129,9 +129,9 @@ def load_chunks(submit_milestone, user_map, django_user):
 
     for django_submission in django_submissions:
         submission = Submission(
-                id=django_submission['id'],
-                author=user_map[django_submission['author_id']],
-                chunks=django_submission_chunks[django_submission['id']])
+                id=django_submission.id,
+                authors=[user_map[author.id] for author in django_submission.authors.all()],
+                chunks=django_submission_chunks[django_submission.id])
         if not submission.chunks:
             # toss out any submissions without chunks
             continue
@@ -246,7 +246,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             type_priority = 20
         return (
             user in chunk.reviewers,
-            user is chunk.submission.author,
+            user in chunk.submission.authors,
             review_priority,
             type_priority,
 -total_affinity(user, chunk.submission.reviewers),

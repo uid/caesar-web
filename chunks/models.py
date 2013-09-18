@@ -172,7 +172,7 @@ class Batch(models.Model):
 class Submission(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
-    author = models.ForeignKey(User,
+    authors = models.ManyToManyField(User,
             blank=True, null=True, related_name='submissions')
     created = models.DateTimeField(auto_now_add=True)
     revision = models.IntegerField(null=True, blank=True)
@@ -189,6 +189,9 @@ class Submission(models.Model):
     @models.permalink
     def get_absolute_url(self):
         return ('chunks.views.view_all_chunks', [str(self.milestone.assignment.name), str(self.name), "code"])
+
+    def has_author(self, user):
+        return self.authors.filter(pk=user.pk).exists()
 
     def assignment(self):
         return self.milestone.assignment
