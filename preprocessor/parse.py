@@ -42,10 +42,10 @@ def create_file(file_path, submission):
 def split_into_usernames(folderName):
     return folderName.split("-")
 
-def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code):
-  return [parse_student_files(split_into_usernames(rootFolderName), files, batch, submit_milestone, save, student_base_dir, staff_code) for (rootFolderName, files) in student_code.iteritems()]
+def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code, restricted):
+  return [parse_student_files(split_into_usernames(rootFolderName), files, batch, submit_milestone, save, student_base_dir, staff_code, restricted) for (rootFolderName, files) in student_code.iteritems()]
 
-def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code):
+def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code, restricted):
   # staff_code is a dictionary from filename to staff code
   # Trying to find the user(s) who wrote this submission. Bail if they don't all exist in the DB.
   users = User.objects.filter(username__in=usernames)
@@ -89,6 +89,8 @@ def parse_student_files(usernames, files, batch, submit_milestone, save, student
 
     chunk = create_chunk(file)
     chunk_objects.append(chunk)
+    if restricted: 
+      chunk.chunk_info = 'restricted'
     if save:
       chunk.save()
 

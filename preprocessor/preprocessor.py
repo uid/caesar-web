@@ -43,7 +43,9 @@ parser.add_argument('--submissions',
                     metavar="PATH",
                     required=True,
                     help="folder containing student code for the assignment. Should contain subfolders named by student usernames: abc/, def/, ghi/, etc.")
-
+parser.add_argument('--restrict',
+                    action="store_true",
+                    help="Restrict who can view the students' chunks to the student authors and any assigned reviewers")
 
 args = parser.parse_args()
 #print args
@@ -81,7 +83,7 @@ if settings['save_data']:
 # Crawling the file system.
 student_code = crawl_submissions(settings['student_submission_dir'])
 
-code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, submit_milestone, settings['save_data'], staff_code)
+code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, submit_milestone, settings['save_data'], staff_code, args.restrict)
 
 if parse.failed_users:
   print "To add the missing users to Caesar, use scripts/addMembers.py to add the following list of users:"
