@@ -15,6 +15,7 @@ from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
 from pygments.formatters import HtmlFormatter
 
+
 class Subject(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(blank=False, null=False, max_length=32)
@@ -244,6 +245,7 @@ class ChunkManager(models.Manager):
     def find_by_assignment(self, assignment):
         return self.filter(file__submission__milestone__assignment=assignment)
 
+import pdb
 
 class Chunk(models.Model):
     CLASS_TYPE_CHOICES = (
@@ -295,8 +297,15 @@ class Chunk(models.Model):
           cinfo = ""
         else:
           cinfo = self.chunk_info
+
+        return
+
+        # get the authors.
         authors = [str(u.username) for u in self.file.submission.authors.filter()]
-        reviewers = [str(u.user.username) for u in self.sorted_reviewers()]
+        # get the assigned reviewers.
+        assigned_reviewers = User.objects.filter(profile__tasks__submission=self.file.submission)
+        reviewers = [str(u.username) for u in assigned_reviewers]
+
         allowed_users = authors + reviewers
 
         if cinfo.find('restricted') != -1 and not str(usr.username) in allowed_users:
@@ -346,6 +355,20 @@ class Chunk(models.Model):
     #           Comment.get_comments_for_chunk(self))
 
     def generate_snippet(self, start=None, end=None):
+        #NOTE(TFK): Consider uncommenting this so that 6.172 shows
+        # a snippet that's actually useful to the mentors.
+        #if self.chunk_info == None:
+        #  cinfo = ""
+        #else:
+        #  cinfo = self.chunk_info
+        #if cinfo.find('restricted') != -1:
+        #  markers = self.staffmarkers.all()
+        #  total_lines = 0
+        #  for marker in markers:
+        #    total_lines += marker.end_line - marker.start_line
+        #  student_lines = len(self.file.lines) - total_lines
+        #  return "Student Lines: " + str(student_lines) + ", Staff Lines: "+str(total_lines)
+
         if start is None:
             start = self.lines[0][0]
         if end is None:

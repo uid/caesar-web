@@ -72,6 +72,7 @@ def send_comment_notification(sender, instance, created=False, raw=False, **kwar
             #notification.save()
             return
 
+        return # NOTE(TFK): The code below is broken since submissions can have multiple authors.
         submission_author = instance.chunk.file.submission.author
         submission = instance.chunk.file.submission
         #comment gets made on a submission after code review deadline has passed
