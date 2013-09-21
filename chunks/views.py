@@ -141,6 +141,8 @@ def view_all_chunks(request, viewtype, submission_id):
         user_comments = 0
         static_comments = 0
         for chunk in chunks:
+            if len(chunk.lines)==0:
+                continue
             numbers, lines = zip(*chunk.lines)
             chunk_start = numbers[0]
             chunk_end = chunk_start + len(numbers)
