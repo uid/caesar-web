@@ -298,8 +298,6 @@ class Chunk(models.Model):
         else:
           cinfo = self.chunk_info
 
-        return
-
         # get the authors.
         authors = [str(u.username) for u in self.file.submission.authors.filter()]
         # get the assigned reviewers.
