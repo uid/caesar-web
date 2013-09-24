@@ -1,4 +1,4 @@
-from chunks.models import Chunk, File, Assignment, ReviewMilestone, Submission, StaffMarker
+from chunks.models import Chunk, File, Assignment, ReviewMilestone, SubmitMilestone, Submission, StaffMarker
 from chunks.forms import SimulateRoutingForm
 from review.models import Comment, Vote, Star
 from tasks.models import Task
@@ -194,6 +194,16 @@ def view_all_chunks(request, viewtype, submission_id):
         'full_view': True,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
+
+@login_required
+def view_submission_for_milestone(request, viewtype, milestone_id, username):
+  if request.user.profile.role != 'T':
+    raise Http404
+  try:
+    submission = Submission.objects.get(milestone=milestone_id, authors__username=username)
+    return view_all_chunks(request, viewtype, submission.id)
+  except Submission.DoesNotExist:
+    raise Http404
 
 @login_required
 def simulate(request, review_milestone_id):
