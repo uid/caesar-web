@@ -26,6 +26,14 @@ class Task(models.Model):
     opened = models.DateTimeField(blank=True, null=True)
     started = models.DateTimeField(blank=True, null=True)
     completed = models.DateTimeField(blank=True, null=True)
+
+    # how should tasks be sorted in the dashboard?
+    def sort_key(self):
+        try:
+            return int(self.submission.name)
+        except:
+            return self.submission.name
+
     class Meta:
         unique_together = ('chunk', 'reviewer',)
 

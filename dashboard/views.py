@@ -19,6 +19,7 @@ import datetime
 import sys
 import logging
 
+import itertools
 
 @login_required
 def dashboard(request):
@@ -55,6 +56,10 @@ def dashboard(request):
         .exclude(status='C') \
         .exclude(status='U')
     annotate_tasks_with_counts(active_tasks)
+
+    # sort the active tasks before they are sent to the view
+    active_tasks = itertools.ifilter(lambda x: x is not None, active_tasks)
+    active_tasks = sorted(list(active_tasks), key=lambda x: x.sort_key())
 
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
