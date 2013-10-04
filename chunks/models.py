@@ -15,6 +15,15 @@ from django.core.exceptions import PermissionDenied
 from django.dispatch import receiver
 from pygments.formatters import HtmlFormatter
 
+class lazy_property(object):
+   def __init__(self, func):
+       self.func = func
+
+   def __get__(self, instance, cls):
+       result = self.func(instance)
+       setattr(instance, self.func.__name__, result)
+       return result
+
 
 class Subject(models.Model):
     id = models.AutoField(primary_key=True)
@@ -280,7 +289,7 @@ class Chunk(models.Model):
             self._split_lines()
         return self._data
 
-    @property
+    @lazy_property
     def lines(self):
         self._check_permissions()
         if not hasattr(self, '_lines'):
@@ -311,8 +320,8 @@ class Chunk(models.Model):
           if not usr.is_superuser:
             raise PermissionDenied
         # logging to make sure the reviewers and authors lists are correct.
-        logger = logging.getLogger(__name__)
-        logger.info("authors" + str(authors) + "\n reviewers:" + str(reviewers));
+        #logger = logging.getLogger(__name__)
+        #logger.info("authors" + str(authors) + "\n reviewers:" + str(reviewers));
 
     def _split_lines(self):
         file_data = self.file.data

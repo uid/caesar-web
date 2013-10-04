@@ -54,12 +54,14 @@ def dashboard(request):
     active_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
         .exclude(status='C') \
-        .exclude(status='U')
+        .exclude(status='U') \
+        .order_by('submission__name')
     annotate_tasks_with_counts(active_tasks)
 
     # sort the active tasks before they are sent to the view
-    active_tasks = itertools.ifilter(lambda x: x is not None, active_tasks)
-    active_tasks = sorted(list(active_tasks), key=lambda x: x.sort_key())
+    # active_tasks = itertools.ifilter(lambda x: x is not None, active_tasks)
+    # now done by order_by above active_tasks = sorted(list(active_tasks), key=lambda x: x.sort_key())
+    active_tasks = list(active_tasks)
 
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
