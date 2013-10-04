@@ -182,12 +182,14 @@ $(document).ready(function() {
     {% for task in active_tasks %}
       {% include "dashboard/task.html" %}
     {% empty %}
-       <div class="task-empty">No tasks left. If you haven't already, please fill out 
-       our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>. 
-      {%if open_assignments %} 
-        Or <button id="more_work" type="button">Get more tasks!</button> 
-        <span id="progress"><img src="{{ STATIC_URL }}img/progress.gif"/></span>
-      {% endif%}
+       <div class="task-empty">
+            No tasks left. If you haven't already, please fill out 
+            our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>. 
+            {%if open_assignments %} 
+              Or <button id="more_work" type="button">Get more tasks!</button> 
+              <span id="progress"><img src="{{ STATIC_URL }}img/progress.gif"/></span>
+            {% endif%}
+       </div>
     {% endfor %}
   </div>
 </div>
@@ -205,17 +207,17 @@ $(document).ready(function() {
   </div>
   {% if old_completed_tasks.all %}
       <div class="history"> show previous semesters </div>
-      <div id="historic_content">
-      <div class="task-list">
-        {% for task in old_completed_tasks.all %}
-           {% include "dashboard/task.html" %}
-        {% empty %}
-        	No tasks found.
-        {% endfor %}
+      	<div id="historic_content">
+      		<div class="task-list">
+        	{% for task in old_completed_tasks.all %}
+        	   {% include "dashboard/task.html" %}
+        		{% empty %}
+        			No tasks found.
+        	{% endfor %}
       </div>
       </div>
   {% endif %}
-  </div>
+  	</div>
 </div>
 
 </div>
