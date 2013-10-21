@@ -323,6 +323,7 @@ def reputation_adjustment(request):
 @login_required
 def allusers(request):
     participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile').order_by('last_name')
+    print participants
     return render(request, 'accounts/allusers.html', {
         'participants': participants,
     })
