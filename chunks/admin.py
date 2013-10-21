@@ -7,6 +7,9 @@ class AssignmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'semester')
     search_fields = ('name', 'semester')
 
+class SubmissionAdmin(admin.ModelAdmin):
+    search_fields = ('authors__username',)
+
 class ChunkAdmin(admin.ModelAdmin):
     list_display = ('name', 'file', 'start', 'end', 'class_type', 'staff_portion', 'student_lines', 'chunk_info')
     search_fields = ('name', 'file__path', 'file__submission__name')
@@ -46,7 +49,7 @@ class SubmitMilestoneAdmin(MilestoneAdmin):
 	exclude = ('type',)
 
 admin.site.register(Assignment, AssignmentAdmin)
-admin.site.register(Submission)
+admin.site.register(Submission, SubmissionAdmin)
 admin.site.register(ReviewMilestone, ReviewMilestoneAdmin)
 admin.site.register(SubmitMilestone, SubmitMilestoneAdmin)
 admin.site.register(File)
