@@ -14,3 +14,6 @@ div.grey-container {
 .bigger-selector{
     width: 3em;
 }
+.smaller-selector{
+    width: 1em;
+}

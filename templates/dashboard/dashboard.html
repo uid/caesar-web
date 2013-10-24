@@ -96,14 +96,16 @@ $(document).ready(function() {
   {% for milestone, extension in current_milestone_data %}
   <tr class="assignment-line">
     <td class="black-text"> {{ milestone.full_name }} </td>
-    <td class="grey-text"> Due on: {{ milestone.duedate }} 
+    <td class="grey-text"> Due on: {{ milestone.duedate|date:"D, N d, Y, P" }} 
         {%if extension %}
-          <span class="red-text"> </br> Extended to: {{extension.new_duedate}} </span>
+          <span class="red-text"> </br> Extended to: {{extension.new_duedate|date:"D, N d, Y, P"}} </span>
         {% endif %}
     </td>
+    <td class="=grey-text">
     {% if milestone.max_extension > 0 %}
-      <td class="=grey-text"><a href="{% url accounts.views.request_extension milestone.id %}"> request extension</a></td>
+      <a href="{% url accounts.views.request_extension milestone.id %}"> Request extension</a>
     {% endif %}
+    </td>
   </tr>
   {% empty %}
   {% endfor %}

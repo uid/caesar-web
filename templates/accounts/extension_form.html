@@ -9,25 +9,41 @@
 {% block js %}
 {{ block.super }}
 <script>
-$(document).ready(function(){
+  $(document).ready(function(){
+    var written_dates = [];
+    {% for datetime in written_dates %}
+      written_dates.push("{{ datetime|date:"l, N d, Y, P"}}");
+    {% endfor %}
+    var current_slack_left = {{ total_extension_days }} - {{ current_extension }};
+    $("#currentdeadline").text("Your current deadline for this assignment is " + written_dates[{{ current_extension }}]);
+    {% if current_extension == 1 %}
+      $("#currentslack").text("You are currently using " + {{ current_extension }} + " slack day for this deadline, ");
+    {% else %}
+      $("#currentslack").text("You are currently using " + {{ current_extension }} + " slack days for this deadline, ");
+    {% endif %}
+    if (current_slack_left == 1) {
+      $("#currentslack").append("and you have " + current_slack_left + " slack day left to use on future deadlines.");
+    } else {
+      $("#currentslack").append("and you have " + current_slack_left + " slack days left to use on future deadlines.");
+    }
+    var possible_extensions = {{ possible_extensions }};
+    for (var i=0; i<possible_extensions.length; i++) {
+      $("select").append($("<option>", { value: possible_extensions[i], html: written_dates[possible_extensions[i]] }));
+    }
+    // Default selected index is the first date (so people can undo their extensions).
+    // If current_extension is today, they are probably requesting an extension, so we set 
+    // the default selected value to 1 more slack day.
+    console.log($("select").get(0).length);
+    {% if current_extension == possible_extensions.0 %}
+      if ($("select").get(0).length > 1) {
+        $("select").get(0).selectedIndex = 1;
+      }
+    {% endif %}
     $("select").change(function () {
-          var written_dates = [
-          {% for date in written_dates %}
-           '{{date}}',
-          {% endfor %}
-          ]
-          var str = "";
-          $("select option:selected").each(function () {
-                str = $(this).text();
-              });
-          var extension = parseInt(str);
-          var left = {{total_extension_days}} - extension;
-          $("#duedate").text("After this request, the current assignment will be due on " + written_dates[extension]);
-          if (left == 1)
-            $("#slackleft").text("I will have " + left + " slack day left for the rest of the semester.");
-          else
-            $("#slackleft").text("I will have " + left + " slack days left for the rest of the semester.");
-        }).change();
+      var index = $("select").attr("selectedIndex");
+      var updated_slack_left = {{ total_extension_days }} - possible_extensions[index];
+      $("#slackleft").text("After this change, you will have " + updated_slack_left + " slack days left to use on future deadlines.");
+    }).change();
 });
 </script>
 {% endblock %}
@@ -40,25 +56,18 @@ $(document).ready(function(){
 
 {% block content %}
 <div class="grey-container success">
-<form id="extension-form" method="post">
+  <div id="currentdeadline"></div>
+  <div id="currentslack"></div>
+  </br>
+  <form id="extension-form" method="post">
   {% csrf_token %}
-I would like to use 
-  <select name="dayselect">
-      {%for extension in possible_extensions %}
-        {%if extension == current_extension %}
-          <option value="{{extension}}" class="bigger-selector" selected="selected"> {{extension}} </option>
-        {%else%}
-          <option value="{{extension}}" class="bigger-selector"> {{extension}} </option>
-        {%endif%}
-      {%endfor%}
-  </select> slack day{{ current_extension|pluralize }} on this assignment.
+  You would like your new deadline to be: 
+  <select name="dayselect"></select>
+  </br></br>
+  <div id="slackleft"></div>
   </br>
   <button type="submit">Save</button>
   <button onclick="document.location = '/dashboard';" id="cancel-button" type="button">Cancel</button>
 </form>
-<div id="duedate">
-</div>
-<div id="slackleft">
-</div>
 </div>
 {% endblock %}
