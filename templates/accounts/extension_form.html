@@ -16,33 +16,23 @@
     {% endfor %}
     var current_slack_left = {{ total_extension_days }} - {{ current_extension }};
     $("#currentdeadline").text("Your current deadline for this assignment is " + written_dates[{{ current_extension }}]);
-    {% if current_extension == 1 %}
-      $("#currentslack").text("You are currently using " + {{ current_extension }} + " slack day for this deadline, ");
-    {% else %}
-      $("#currentslack").text("You are currently using " + {{ current_extension }} + " slack days for this deadline, ");
-    {% endif %}
-    if (current_slack_left == 1) {
-      $("#currentslack").append("and you have " + current_slack_left + " slack day left to use on future deadlines.");
-    } else {
-      $("#currentslack").append("and you have " + current_slack_left + " slack days left to use on future deadlines.");
-    }
+    $("#currentslack").text("You are currently using " + {{ current_extension }} + " slack day" + (({{ current_extension }} == 1) ? "" : "s") +
+      " for this deadline, and you have " + current_slack_left + " slack day" + ((current_slack_left == 1) ? "" : "s") +
+      " left to use on future deadlines.");
     var possible_extensions = {{ possible_extensions }};
     for (var i=0; i<possible_extensions.length; i++) {
       $("select").append($("<option>", { value: possible_extensions[i], html: written_dates[possible_extensions[i]] }));
     }
-    // Default selected index is the first date (so people can undo their extensions).
-    // If current_extension is today, they are probably requesting an extension, so we set 
-    // the default selected value to 1 more slack day.
-    console.log($("select").get(0).length);
-    {% if current_extension == possible_extensions.0 %}
-      if ($("select").get(0).length > 1) {
-        $("select").get(0).selectedIndex = 1;
-      }
-    {% endif %}
+    // Default is to add 1 more slack day.
+    // If student has already requested all of their slack days, show the maximum date.
+    var index = possible_extensions.indexOf({{ current_extension }});
+    $("select").get(0).selectedIndex = (index == possible_extensions.length - 1) ? index : index + 1;
+
     $("select").change(function () {
       var index = $("select").attr("selectedIndex");
       var updated_slack_left = {{ total_extension_days }} - possible_extensions[index];
-      $("#slackleft").text("After this change, you will have " + updated_slack_left + " slack days left to use on future deadlines.");
+      $("#slackleft").text("After this change, you will have " + updated_slack_left + " slack day" + ((updated_slack_left == 1) ? "" : "s") +
+        " left to use on future deadlines.");
     }).change();
 });
 </script>
