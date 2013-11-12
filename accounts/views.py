@@ -12,7 +12,7 @@ from limit_registration import check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
 from accounts.models import UserProfile, Member, Extension
 from accounts.forms import ReputationForm
-from chunks.models import Semester, Submission
+from chunks.models import Semester, Submission, Subject
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import datetime
@@ -324,8 +324,12 @@ def reputation_adjustment(request):
 def allusers(request):
     participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile').order_by('last_name')
     print participants
+    subjects = Subject.objects.all()
+    roles = Member.objects.values_list('role', flat=True).distinct();
     return render(request, 'accounts/allusers.html', {
         'participants': participants,
+        'subjects': subjects,
+        'roles': roles
     })
 
 @login_required

@@ -28,30 +28,13 @@
       $("#filter-options").toggle("fast");
     });
 
-    var subjects = new Array();
-    var roles = new Array();
-
-    // Add classes to activity-lines and roles-lines
-    {% for participant in participants %}
-      {% for membership in participant.membership.all %}
-        var subjectstr = "{{membership.semester.subject}}";
-        subjectstr = subjectstr.replace(".", "_");
-        var rolestr = "{{membership.role}}";
-        var activememberships = 0;
-        {% if membership.semester.is_current_semester %}
-          $("#participant-{{participant.username}}").addClass(subjectstr+"-"+rolestr+"-active");
-          $("#participant-{{participant.username}} .roles-list:eq("+activememberships+")").addClass("role-"+subjectstr+"-"+rolestr+"-active");
-          activememberships++;
-        {% else %}
-          $("#participant-{{participant.username}}").addClass(subjectstr+"-"+rolestr+"-inactive");
-        {% endif %}
-        if (subjects.indexOf(subjectstr) == -1) {
-          subjects.push(subjectstr);
-        }
-        if (roles.indexOf(rolestr) == -1) {
-          roles.push(rolestr);
-        }
-      {% endfor %}
+    var subjects = [];
+    var roles = [];
+    {% for subject in subjects %}
+      subjects.push("{{subject}}".replace(".","\\."));
+    {% endfor %}
+    {% for role in roles %}
+      roles.push("{{role}}");
     {% endfor %}
 
     $("#filter-options").html(function() {
@@ -70,7 +53,7 @@
       for (var i=0; i<Math.max(subjectsl, rolesl); i++) {
         str = str.concat("<tr>");
         if (i < subjectsl) {
-          str = str.concat("<td><input type='checkbox' value='"+subjects[i]+"' class='subject'>"+subjects[i].replace("_",".")+"</input></td>");
+          str = str.concat("<td><input type='checkbox' value='"+subjects[i]+"' class='subject'>"+subjects[i].replace("\\","")+"</input></td>");
         }
         else {
           str = str.concat("<td></td>");
@@ -161,7 +144,7 @@
   </tr>
   </thead>
   {% for participant in participants %}
-  <tr id="participant-{{participant.username}}" class="activity-line">
+  <tr id="participant-{{ participant.username }}" class="activity-line {% for membership in participant.membership.all %}{{ membership.semester.subject }}-{{ membership.role }}-{% if membership.semester.is_current_semester %}active{% else %}inactive{% endif %} {% endfor %}" >
     <td class="black-text">
       {{ participant.first_name }} {{ participant.last_name }}
       <span class="grey-text">({{ participant.username }})</span>
@@ -170,7 +153,7 @@
     <td class="black-text">
       {% for membership in participant.membership.all %}
         {% if membership.semester.is_current_semester %}
-          <div class="roles-list">{{ membership.semester.subject }} - {{ membership.role }}</div>
+          <div class="roles-list role-{{ membership.semester.subject }}-{{ membership.role }}-active" >{{ membership.semester.subject }} - {{ membership.role }}</div>
         {% endif %}
       {% endfor %}
     </td>
