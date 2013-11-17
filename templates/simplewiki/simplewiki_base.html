@@ -85,7 +85,7 @@
         var x = window.onload;
         window.onload = function(){
                 var options = {
-                script: "{% url search_related wiki_article.get_url %}/?self={{wiki_article.pk }}&",
+                script: "{% url 'search_related' wiki_article.get_url %}/?self={{wiki_article.pk }}&",
                 json: true,
                 varname: "query",
                 maxresults: 35,
@@ -123,7 +123,7 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-    <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
+    <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
     <a class="breadcrumb" href="/wiki/">Wiki</a>
     {% if wiki_article.slug %}
         <a class="breadcrumb" href="/wiki/{{wiki_article.slug}}/">{{wiki_article.slug}}</a>
@@ -143,7 +143,7 @@
         {% endblock %}
     </td>
     <td width="10%">
-    <form style="display:inline" method="POST" action='{% url wiki_search_articles wiki_article.get_url %}'>{% csrf_token %}
+    <form style="display:inline" method="POST" action='{% url "wiki_search_articles" wiki_article.get_url %}'>{% csrf_token %}
         <input name="value" id="search" class="header inactive-search"></input>
     </form>
     </td></tr></table>

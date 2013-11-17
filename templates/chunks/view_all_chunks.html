@@ -71,7 +71,7 @@ $(document).ready(function() {
 
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
   <span class="breadcrumb">{{ milestone_name }}</span>
 {% endblock %}
 

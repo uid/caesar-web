@@ -36,7 +36,7 @@
       {% if is_staff %}staff{% endif %}
       {% if is_student %}student{% endif %}">
       {% if comment.type == 'U' %}
-        <a onclick=hashtagRedirect("{% url accounts.views.view_profile author.username %}")>
+        <a onclick=hashtagRedirect("{% url 'accounts.views.view_profile' author.username %}")>
         {{ author.get_full_name|default:author.username }}
         ({{author.profile.reputation}})
         </a>

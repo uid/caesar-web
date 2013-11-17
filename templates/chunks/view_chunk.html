@@ -35,7 +35,7 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
   <span class="breadcrumb" href="{{ chunk.get_absolute_url }}">{{ chunk.name }}</span>
   {% if similar_chunks %}
   <div class="dropdown">
@@ -79,7 +79,7 @@ Next
     </div>
     {% if task %}
       {% if task_count > 0 %}
-      <form method="get" action="{% url tasks.views.change_task %}">
+      <form method="get" action="{% url 'tasks.views.change_task' %}">
         <input type="hidden" name="task_id" value="{{ task.id }}"/>
         <input type="hidden" name="status" value="C"/>
         <button id="done-button" type="submit"
@@ -120,7 +120,7 @@ Next
 <}/div>
 {% endcomment %}
 <div id ="view-all-code">
-    <a href="{% url chunks.views.view_all_chunks 'code' chunk.file.submission.id %}">
+    <a href="{% url 'chunks.views.view_all_chunks' 'code' chunk.file.submission.id %}">
       view all code
     </a>
 </div>

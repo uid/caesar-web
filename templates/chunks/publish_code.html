@@ -16,9 +16,9 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
-    <a class="breadcrumb" href="{% url accounts.views.allusers %}">all users</a>
-  <a class="breadcrumb" href="{% url accounts.views.view_profile user %}">{{ user.username }}</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
+    <a class="breadcrumb" href="{% url 'accounts.views.allusers' %}">all users</a>
+  <a class="breadcrumb" href="{% url 'accounts.views.view_profile' user %}">{{ user.username }}</a>
   <span class="breadcrumb">Publish</span>
 {% endblock %}
 
@@ -31,7 +31,7 @@
 
 	  {% for submission in submissions %}
 	    <h4 class="assignment-display">
-	      <a href="{% url chunks.views.view_all_chunks 'code' submission.id %}">{{ submission.name }}</a> 
+	      <a href="{% url 'chunks.views.view_all_chunks' 'code' submission.id %}">{{ submission.name }}</a> 
 	      <span class='muted pull-right'>{{ submission.assignment.semester }}</span>
         {% if not submission.published %}
 	        <div class='btn btn-info publish' data-submission='{{ submission.id }}' data-published='False'>Publish</div>

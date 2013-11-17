@@ -7,8 +7,8 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
-  <a class="breadcrumb" href="{% url accounts.views.manage %}">manage</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
+  <a class="breadcrumb" href="{% url 'accounts.views.manage' %}">manage</a>
   <span class="breadcrumb">adjust reputations</span>
 {% endblock %}
 
@@ -27,7 +27,7 @@
 </p>
 
 <form id="new-comment-form" 
-  action="{% url accounts.views.bulk_add %}" method="post">
+  action="{% url 'accounts.views.bulk_add' %}" method="post">
   {% csrf_token %}
   {{ form.users }}
   <br />

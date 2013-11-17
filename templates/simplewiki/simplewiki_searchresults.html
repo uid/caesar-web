@@ -15,7 +15,7 @@
 {% block wiki_body %}
     {% for article, before, after in results_data %}
             <h4>
-            <a href="{% url wiki_view article.get_url %}">#{{ article.slug }}</a>
+            <a href="{% url 'wiki_view' article.get_url %}">#{{ article.slug }}</a>
             : ...{{ before }}<b>{{ wiki_search_query }}</b>{{ after }}...</h4>
     {% empty %}
         No articles were found matching "{{wiki_search_query}}".

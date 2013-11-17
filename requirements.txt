@@ -1,11 +1,10 @@
-Django
-South
-django-piston
+Django==1.5
+South>=0.8.3
 sorl-thumbnail
 django-extensions
 Pygments
 django-email-templates
-django-debug-toolbar
+django-debug-toolbar>=0.11.0
 pillow
 python-ldap
 MySQL-python

@@ -18,9 +18,9 @@
 
 {% block navigate %}
 <div id="radio" class="ui-buttonset">
-                <input onclick="window.location='{% url wiki_view wiki_article.get_url %}'" type="radio" {% if view == 'read' %}checked="checked"{% endif %}id="radio1" name="radio" class="header ui-helper-hidden-accessible"><label for="radio1" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left"  role="button"><span class="ui-button-text">Read</span></label>
-                <input onclick="window.location='{% url wiki_edit wiki_article.get_url %}'" type="radio" {% if view == 'edit' %}checked="checked"{% endif %} id="radio2" name="radio" class="header ui-helper-hidden-accessible"><label for="radio2" class="header ui-button ui-widget ui-state-default ui-button-text-only"                 role="button" aria-disabled="false"><span class="ui-button-text">Edit</span></label>
-                <input onclick="window.location='{% url wiki_history wiki_article.get_url 1 %}'" type="radio" {% if view == 'history' %}checked="checked"{% endif %} id="radio3" name="radio" class="header ui-helper-hidden-accessible"><label for="radio3" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false"><span class="ui-button-text">History</span></label>
+                <input onclick="window.location='{% url "wiki_view" wiki_article.get_url %}'" type="radio" {% if view == 'read' %}checked="checked"{% endif %}id="radio1" name="radio" class="header ui-helper-hidden-accessible"><label for="radio1" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left"  role="button"><span class="ui-button-text">Read</span></label>
+                <input onclick="window.location='{% url "wiki_edit" wiki_article.get_url %}'" type="radio" {% if view == 'edit' %}checked="checked"{% endif %} id="radio2" name="radio" class="header ui-helper-hidden-accessible"><label for="radio2" class="header ui-button ui-widget ui-state-default ui-button-text-only"                 role="button" aria-disabled="false"><span class="ui-button-text">Edit</span></label>
+                <input onclick="window.location='{% url "wiki_history" wiki_article.get_url 1 %}'" type="radio" {% if view == 'history' %}checked="checked"{% endif %} id="radio3" name="radio" class="header ui-helper-hidden-accessible"><label for="radio3" class="header ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false"><span class="ui-button-text">History</span></label>
             </div>
 {% endblock %}
 
@@ -48,7 +48,7 @@
                             {% endifnotequal %}
                         {% endif %}
                     </label>
-                <td width="18%" style="vertical-align:top"><a href="{% url accounts.views.view_profile revision.get_user %}">{{ revision.get_user}}</a>
+                <td width="18%" style="vertical-align:top"><a href="{% url 'accounts.views.view_profile' revision.get_user %}">{{ revision.get_user}}</a>
                 <br/>
                 {{ revision.revision_date|date}} {{ revision.revision_date|time}}
                 </td>
@@ -62,10 +62,10 @@
             <tr>
                 <td colspan="4">
                     {% if wiki_prev_page %}
-                        <a href="{% url wiki_history wiki_article.get_url wiki_prev_page %}">{% trans "Previous page" %}</a>
+                        <a href="{% url 'wiki_history' wiki_article.get_url wiki_prev_page %}">{% trans "Previous page" %}</a>
                     {% endif %}
                     {% if wiki_next_page %}
-                        <a href="{% url wiki_history wiki_article.get_url wiki_next_page %}">{% trans "Next page" %}</a>
+                        <a href="{% url 'wiki_history' wiki_article.get_url wiki_next_page %}">{% trans "Next page" %}</a>
                     {% endif %}
                 </td>
             </tr>

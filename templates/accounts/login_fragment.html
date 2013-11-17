@@ -4,7 +4,7 @@
 </script>
 
 <div id="login-form">
-  <form method="post" action="{% url accounts.views.login %}">
+  <form method="post" action="{% url 'accounts.views.login' %}">
     {% csrf_token %}
     {{ form.username.label_tag }}: {{ form.username }}
     {{ form.password.label_tag }}: {{ form.password }}

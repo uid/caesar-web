@@ -30,9 +30,9 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
   {% if user != participant %}
-    <a class="breadcrumb" href="{% url accounts.views.allusers %}">all users</a>
+    <a class="breadcrumb" href="{% url 'accounts.views.allusers' %}">all users</a>
   {% endif %}
   <span class="breadcrumb">{{ participant.username }}</span>
 {% endblock %}
@@ -75,11 +75,11 @@ $(document).ready(function() {
       {% endfor %}
       {% if user == participant %}
       <div class='buttons'>
-        <a class='btn btn-small' href="{% url accounts.views.edit_profile user.username %}">Edit profile</a>
+        <a class='btn btn-small' href="{% url 'accounts.views.edit_profile' user.username %}">Edit profile</a>
       </div>
       {% endif %}
       {%if user.profile.is_staff %}
-          <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.student_dashboard participant.username %}"> [{{participant.username}} Dashboard]</a> 
+          <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.student_dashboard' participant.username %}"> [{{participant.username}} Dashboard]</a> 
       {%endif%}
     </div>
   </div>
@@ -97,14 +97,14 @@ $(document).ready(function() {
       {% if submissions %}
         {% for submission in submissions %}
           <h4 class="assignment-display">
-            <a href="{% url chunks.views.view_all_chunks 'code' submission.id %}">{{ submission.name }}</a> 
+            <a href="{% url 'chunks.views.view_all_chunks' 'code' submission.id %}">{{ submission.name }}</a> 
             <span class='muted pull-right'>{{ submission.assignment.semester }}</span>
           </h4>
         {% endfor %}
       {% else %}
         <p>The user has no published code yet.</p>
       {% endif %}
-      <a href='{% url chunks.views.publish_code %}' class='btn btn-small'>Start Publishing Code</a>
+      <a href='{% url "chunks.views.publish_code" %}' class='btn btn-small'>Start Publishing Code</a>
 -->
       <h3>My Review Activity</h3>
       {% for review_milestone, review_data in review_milestone_data %}
@@ -113,7 +113,7 @@ $(document).ready(function() {
             <a name="assignment-display"></a> {{ review_milestone.full_name }} {%if not review_milestone.assignment.is_current_semester %} - {{ review_milestone.assignment.get_semester_display }} {% endif %}
             <div class="view-all-activity">
               {%if review_milestone.assignment.is_current_semester or not user.profile.is_student %}
-              <a href="{% url review.views.all_activity review_milestone.id participant.username %}"> view with code</a>
+              <a href="{% url 'review.views.all_activity' review_milestone.id participant.username %}"> view with code</a>
               {% endif %}
             </div>
           </h4>

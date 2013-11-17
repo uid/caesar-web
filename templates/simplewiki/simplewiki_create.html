@@ -27,7 +27,7 @@
             $("#cancel")
                 .button()
                 .click(function() {
-                    window.location='{% url wiki_view wiki_article.get_url %}';
+                    window.location='{% url "wiki_view" wiki_article.get_url %}';
                 });
         });
         

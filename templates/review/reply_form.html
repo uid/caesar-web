@@ -1,7 +1,7 @@
 <div class="comment comment-reply new-reply">
   <div class="reply-form">
     <form id="reply-comment-form"
-      action="{% url review.views.reply %}" method="post">
+      action="{% url 'review.views.reply' %}" method="post">
       {% csrf_token %}
       {{ form.text }}
       {{ form.parent }}

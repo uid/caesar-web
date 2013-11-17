@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
-from django.views.generic.simple import direct_to_template
+from django.views.generic import TemplateView
+#from django.views.generic.simple import direct_to_template
 
 urlpatterns = patterns('',
     (r'login/', 'django.contrib.auth.views.login', {
@@ -19,8 +20,7 @@ urlpatterns = patterns('',
     (r'^reset/complete/$', 'django.contrib.auth.views.password_reset_complete',
                            {'template_name': 'accounts/reset_complete.html'}),
     (r'registration/$', 'accounts.views.registration_request'),
-    (r'^registration/complete/$', direct_to_template,
-                           {'template': 'accounts/registration_request_complete.html'}),
+    (r'^registration/complete/$', TemplateView.as_view(template_name='accounts/registration_request_complete.html')),
     (r'^enroll/', 'accounts.views.edit_membership'),
     (r'bulk_add/', 'accounts.views.bulk_add'),
     (r'^user/(?P<username>\w+)/edit', 'accounts.views.edit_profile'),

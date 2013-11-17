@@ -76,7 +76,7 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url dashboard.views.dashboard %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
 {% endblock %}
 
 {% block secondary-toolbar %}
@@ -103,7 +103,7 @@ $(document).ready(function() {
     </td>
     <td class="=grey-text">
     {% if milestone.max_extension > 0 %}
-      <a href="{% url accounts.views.request_extension milestone.id %}"> Request extension</a>
+      <a href="{% url 'accounts.views.request_extension' milestone.id %}"> Request extension</a>
     {% endif %}
     </td>
   </tr>

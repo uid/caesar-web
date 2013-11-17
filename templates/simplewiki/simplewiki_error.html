@@ -12,14 +12,14 @@ Oops...
 {% if wiki_url %}
 <p>
 The page you requested could not be found.
-Click <a href="{% url wiki_create wiki_url %}">here</a> to create it.
+Click <a href="{% url 'wiki_create' wiki_url %}">here</a> to create it.
 </p>
 {% else %}
 <p>
 Or maybe rather: Congratulations! It seems that there's no root
 article, which is probably because you just installed simple-wiki
 and your installation is working. Now you can create the root article.
-Click <a href="{% url wiki_create "" %}">here</a> to create it.
+Click <a href="{% url 'wiki_create' "" %}">here</a> to create it.
 </p>
 {% endif %}
 {% else %}
@@ -27,7 +27,7 @@ Click <a href="{% url wiki_create "" %}">here</a> to create it.
 {% if wiki_err_noparent %}
 <p>
 You cannot create this page, because its parent
-does not exist. Click <a href="{% url wiki_create wiki_url_parent %}">here</a>
+does not exist. Click <a href="{% url 'wiki_create' wiki_url_parent %}">here</a>
 to create it.
 </p>
 {% else %}

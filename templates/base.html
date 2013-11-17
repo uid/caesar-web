@@ -28,16 +28,16 @@
     <script type="text/javascript">
         window.caesar = {
             urls: {
-                new_comment: '{% url review.views.new_comment %}',
-                reply: '{% url review.views.reply %}',
-                delete: '{% url review.views.delete_comment %}',
-                vote: '{% url review.views.vote %}',
-                unvote: '{% url review.views.unvote %}',
-                edit_comment: '{% url review.views.edit_comment %}',
-                cancel_assignment: '{% url tasks.views.cancel_assignment %}',
-                more_work: '{%url tasks.views.more_work %}',
-                edit_membership: '{% url accounts.views.edit_membership %}',
-                publish_code: '{% url chunks.views.publish_code %}'
+                new_comment: '{% url "review.views.new_comment" %}',
+                reply: '{% url "review.views.reply" %}',
+                delete: '{% url "review.views.delete_comment" %}',
+                vote: '{% url "review.views.vote" %}',
+                unvote: '{% url "review.views.unvote" %}',
+                edit_comment: '{% url "review.views.edit_comment" %}',
+                cancel_assignment: '{% url "tasks.views.cancel_assignment" %}',
+                more_work: '{% url "tasks.views.more_work" %}',
+                edit_membership: '{% url "accounts.views.edit_membership" %}',
+                publish_code: '{% url "chunks.views.publish_code" %}'
             }
         };
 
@@ -114,7 +114,7 @@
     // TODO: Dynamically generate this
     hashtags = { 
     {% for article in articles %} 
-        '{{article.slug}}':'{% url wiki_view article.get_url %}',
+        '{{article.slug}}':'{% url "wiki_view" article.get_url %}',
     {% endfor %} }
     /*   hashtags = { 
          
@@ -168,13 +168,13 @@
                 <img class="user-photo" src="{{ STATIC_URL }}img/user-silhouette.png"/>
                 {% endthumbnail %}
 
-                <a href="{% url accounts.views.view_profile user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
+                <a href="{% url 'accounts.views.view_profile' user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
                 {% if user.is_staff %}
-                <a href="{% url admin:index %}">Admin</a>|
-                <a href="{% url review.views.search %}">Search </a>|
-                <a href="{% url accounts.views.manage %}">Manage </a>|
+                <a href="{% url 'admin:index' %}">Admin</a>|
+                <a href="{% url 'review.views.search' %}">Search </a>|
+                <a href="{% url 'accounts.views.manage' %}">Manage </a>|
                 {% endif %}
-                <a href="{% url django.contrib.auth.views.logout %}">Logout</a>
+                <a href="{% url 'django.contrib.auth.views.logout' %}">Logout</a>
               </div>
               {% endif %}
           </div>
