@@ -322,10 +322,9 @@ def reputation_adjustment(request):
 
 @login_required
 def allusers(request):
-    participants = User.objects.all().exclude(username = 'checkstyle').select_related('profile').order_by('last_name')
-    print participants
+    participants = User.objects.all().exclude(username = 'checkstyle').prefetch_related('profile', 'membership__semester__subject')
     subjects = Subject.objects.all()
-    roles = Member.objects.values_list('role', flat=True).distinct();
+    roles = Member.objects.values_list('role', flat=True).distinct()
     return render(request, 'accounts/allusers.html', {
         'participants': participants,
         'subjects': subjects,
