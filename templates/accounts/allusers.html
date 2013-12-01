@@ -29,44 +29,36 @@
     });
 
     var subjects = [];
+    var subjectids = [];
     var roles = [];
     {% for subject in subjects %}
-      subjects.push("{{subject}}".replace(".","\\."));
+      subjects.push("{{subject}}");
+      //subjects.push("{{subject}}".replace(".","\\."));
+      subjectids.push("{{subject.id}}");
     {% endfor %}
     {% for role in roles %}
       roles.push("{{role}}");
     {% endfor %}
 
-    $("#filter-options").html(function() {
+    var subjectsl = subjects.length;
+    var rolesl = roles.length;
+    for (var i=0; i<Math.max(subjectsl, rolesl); i++) {
       var str = "";
-      str = str.concat("<form>");
-      str = str.concat("<table>");
-      str = str.concat("<thead>");
       str = str.concat("<tr>");
-      str = str.concat("<td>Subject</td>");
-      str = str.concat("<td>Role</td>");
-      str = str.concat("</tr>");
-      str = str.concat("</thead>");
-
-      var subjectsl = subjects.length;
-      var rolesl = roles.length;
-      for (var i=0; i<Math.max(subjectsl, rolesl); i++) {
-        str = str.concat("<tr>");
-        if (i < subjectsl) {
-          str = str.concat("<td><input type='checkbox' value='"+subjects[i]+"' class='subject'>"+subjects[i].replace("\\","")+"</input></td>");
-        }
-        else {
-          str = str.concat("<td></td>");
-        }
-        if (i < rolesl) {
-          str = str.concat("<td><input type='checkbox' value='"+roles[i]+"' class='role'>"+roles[i]+"</input></td>");
-        }
-        str = str.concat("</tr>");
+      if (i < subjectsl) {
+        str = str.concat("<td><input type='checkbox' value='"+subjectids[i]+"' class='subject'>"+subjects[i]+"</input></td>");
+        //str = str.concat("<td><input type='checkbox' value='"+subjects[i]+"' class='subject'>"+subjects[i].replace("\\","")+"</input></td>");
       }
-      str = str.concat("</table>");
-      str = str.concat("</form>");
-      return str;
-    });
+      else {
+        str = str.concat("<td></td>");
+      }
+      if (i < rolesl) {
+        str = str.concat("<td><input type='checkbox' value='"+roles[i]+"' class='role'>"+roles[i]+"</input></td>");
+      }
+      str = str.concat("</tr>");
+      console.log(str);
+      $("#filter-table tbody").append(str);
+    }
 
     var applied_filters = {"subject": [], "role": []};
 
@@ -90,10 +82,10 @@
       else if (applied_filters["subject"].length == 0) {
         $(".activity-line").hide();
         $(".roles-list").addClass("filtered");
-        for (var s in subjects) {
+        for (var s in subjectids) {
           for (var r in applied_filters["role"]) {
-            $("."+subjects[s]+"-"+applied_filters["role"][r]+"-active").show();
-            $(".role-"+subjects[s]+"-"+applied_filters["role"][r]+"-active").removeClass("filtered");
+            $("."+subjectids[s]+"-"+applied_filters["role"][r]+"-active").show();
+            $(".role-"+subjectids[s]+"-"+applied_filters["role"][r]+"-active").removeClass("filtered");
           }
         }
       }
@@ -133,6 +125,18 @@
 <h2 class="task-header">all users</h2>
 <button type="button" class="btn-default" id="filter-button">Hide filters</button>
 <div id="filter-options">
+  <form>
+    <table id="filter-table">
+      <thead>
+	<tr>
+	  <td>Subject</td>
+	  <td>Role</td>
+	</tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </form>
 </div>
 
 <table id="allusers" class="assignment-stream tablesorter">
@@ -144,7 +148,7 @@
   </tr>
   </thead>
   {% for participant in participants %}
-  <tr id="participant-{{ participant.username }}" class="activity-line {% for membership in participant.membership.all %}{{ membership.semester.subject }}-{{ membership.role }}-{% if membership.semester.is_current_semester %}active{% else %}inactive{% endif %} {% endfor %}" >
+  <tr id="participant-{{ participant.username }}" class="activity-line {% for membership in participant.membership.all %}{{ membership.semester.subject.id }}-{{ membership.role }}-{% if membership.semester.is_current_semester %}active{% else %}inactive{% endif %} {% endfor %}" >
     <td class="black-text">
       {{ participant.first_name }} {{ participant.last_name }}
       <span class="grey-text">({{ participant.username }})</span>
@@ -153,7 +157,7 @@
     <td class="black-text">
       {% for membership in participant.membership.all %}
         {% if membership.semester.is_current_semester %}
-          <div class="roles-list role-{{ membership.semester.subject }}-{{ membership.role }}-active" >{{ membership.semester.subject }} - {{ membership.role }}</div>
+          <div class="roles-list role-{{ membership.semester.subject.id }}-{{ membership.role }}-active" >{{ membership.semester.subject }} - {{ membership.role }}</div>
         {% endif %}
       {% endfor %}
     </td>
