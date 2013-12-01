@@ -33,7 +33,6 @@
     var roles = [];
     {% for subject in subjects %}
       subjects.push("{{subject}}");
-      //subjects.push("{{subject}}".replace(".","\\."));
       subjectids.push("{{subject.id}}");
     {% endfor %}
     {% for role in roles %}
@@ -43,21 +42,18 @@
     var subjectsl = subjects.length;
     var rolesl = roles.length;
     for (var i=0; i<Math.max(subjectsl, rolesl); i++) {
-      var str = "";
-      str = str.concat("<tr>");
+      $("#filter-table tbody").append("<tr id='filtertablerow"+i+"' />");
       if (i < subjectsl) {
-        str = str.concat("<td><input type='checkbox' value='"+subjectids[i]+"' class='subject'>"+subjects[i]+"</input></td>");
-        //str = str.concat("<td><input type='checkbox' value='"+subjects[i]+"' class='subject'>"+subjects[i].replace("\\","")+"</input></td>");
+        $("#filtertablerow"+i).append("<td><input id='filtertablerow"+i+"col0' type='checkbox'>"+subjects[i]+"</input></td>");
+        $("#filtertablerow"+i+"col0").addClass("subject").val(subjectids[i]);
       }
       else {
-        str = str.concat("<td></td>");
+        $("#filtertablerow"+i).append("<td />");
       }
       if (i < rolesl) {
-        str = str.concat("<td><input type='checkbox' value='"+roles[i]+"' class='role'>"+roles[i]+"</input></td>");
+        $("#filtertablerow"+i).append("<td><input id='filtertablerow"+i+"col1' type='checkbox'>"+roles[i]+"</input></td>");
+        $("#filtertablerow"+i+"col1").addClass("role").val(roles[i]);
       }
-      str = str.concat("</tr>");
-      console.log(str);
-      $("#filter-table tbody").append(str);
     }
 
     var applied_filters = {"subject": [], "role": []};
