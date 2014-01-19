@@ -12,4 +12,6 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :puppet
 
+  config.vm.synced_folder "./", "/var/django/caesar"
+
 end
