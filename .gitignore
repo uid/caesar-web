@@ -4,3 +4,4 @@ settings_local.py
 .DS_Store
 /media
 /data
+.vagrant
