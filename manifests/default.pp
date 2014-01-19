@@ -7,7 +7,7 @@ Exec['apt-get update'] -> Package <| |>
 
 # Install packages
 package {
-  [ 'vim', 'python-software-properties', 'git', 'make', 'nodejs' ]:
+  [ 'apache2', 'apache2-dev', 'libldap2-dev', 'libsasl2-dev', 'git', 'libapache2-mod-wsgi', 'python-numpy', 'python-psycopg2', 'postfix' ]:
     ensure => 'installed';
 }
 
