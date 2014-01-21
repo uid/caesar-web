@@ -7,7 +7,7 @@ Exec['apt-get update'] -> Package <| |>
 
 # Install packages
 package {
-  [ 'apache2', 'apache2-dev', 'libldap2-dev', 'libsasl2-dev', 'git', 'libapache2-mod-wsgi', 'python-numpy', 'python-psycopg2', 'postfix' ]:
+  [ 'apache2', 'apache2-dev', 'libldap2-dev', 'libsasl2-dev', 'git', 'libapache2-mod-wsgi', 'python-numpy', 'python-psycopg2', 'postfix', 'python-dev' ]:
     ensure => 'installed';
 }
 
@@ -23,3 +23,10 @@ exec {
     require => File['/etc/timezone'],
     refreshonly => true;
 }
+
+# Update packages list before attempting to install any
+#exec {
+#  'add caesar user':
+#    command => 'useradd caesar';
+#}
+#Exec['apt-get update'] -> Package <| |>

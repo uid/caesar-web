@@ -1,10 +1,13 @@
 Django==1.5
 South>=0.8.3
+django-debug-toolbar==0.11.0  # later versions cause errors
 sorl-thumbnail
 django-extensions
 Pygments
 django-email-templates
-django-debug-toolbar>=0.11.0
 pillow
 python-ldap
 MySQL-python
+markdown
+django-tools
+django-piston
