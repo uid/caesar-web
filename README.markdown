@@ -1,15 +1,80 @@
 Requirements
 ============
-* Ubuntu 11.04 or CSAIL Debian
+* Ubuntu or Debian
 * Python 2.7 with `pip` available
 * Apache 2 with `mod_wsgi` and `mod_ssl`
 
-In addition, all of the configuration files expect the project code to live at 
+All of the configuration files expect the project code to live at 
 `/var/django/caesar`.
 
-The `requirements.txt` file specifies all Python dependencies with the exception
-of LDAP support, which you should install as OS
-packages.
+
+Development
+============
+
+We use Vagrant and VirtualBox to run Caesar in a virtual machine on your laptop.  Here are the steps:
+
+### Clone from github
+
+Clone this repository from github.
+
+    git clone https://github.com/uid/caesar-web.git
+    cd caesar-web
+
+### Configure local settings
+
+If you're working at MIT, set up with an initial settings_local.py file that uses the same database settings as our development server.
+
+    scp caesar-dev.csail.mit.edu:/var/django/caesar/settings_local.py .
+
+If you're not at MIT, copy the template for settings_local.py:
+
+    cp settings_local.py.template settings_local.py
+
+Then edit settings_local.py and change the settings appropriately.
+
+### Use Vagrant to start the virtual machine
+
+Install [Vagrant](http://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org) on your laptop.
+
+Make sure you're in your caesar-web folder, which has the Vagrantfile in it.  Start the VM:
+
+    vagrant up
+
+Log into it:
+
+    vagrant ssh
+
+On the VM, run the setup script:
+
+    cd /var/django/caesar
+    sudo ./setup.sh
+
+The setup script will probably stop to ask you to configure postfix.  Use the defaults (Internet Site, hostname precise32).
+
+Ignore the final warning from apache2: Could not reliably determine the server's fully qualified domain name.
+
+### Test that Caesar is running
+
+Browse to [10.18.6.30](http://10.18.6.30) on your laptop and try to log in with your MIT certificate.  You should see the same data that [caesar-dev.csail.mit.edu](http://caesar-dev.csail.mit.edu) does.
+
+
+### Development tips
+
+To edit code, work with git, and use other dev tools, just work with the caesar-web folder that you checked out to your laptop.  This folder tree is synced automatically with /var/django/caesar in the VM.  You don't have to go inside the VM.
+
+The only thing you *do* have to do from the VM is restart Apache whenever you edit a Python source file.  Here's how:
+
+    vagrant ssh              # if you're not already logged into your VM
+    sudo apachectl graceful    # to restart Apache and force it to reload Caesar
+
+The Django debug toolbar ("DjDt") appears on the right side of Caesar's web pages whenever you have DEBUG=True in settings_local.py.  The toolbar is particularly useful for viewing debug messages. To print messages, use
+
+    import logging
+    logging.debug("hello, world")
+
+Messages like this will appear in the Logging pane of the debug toolbar.
+
+
 
 Deployment
 ==========
@@ -24,6 +89,7 @@ Configuring SSL is a bit trickier, but assuming you already have `mod_ssl`
 installed and your working directory is the project root:
 
     sudo a2enmod ssl
+    cd /var/django/caesar
     sudo cp apache/mitCAclient.pem /etc/ssl/certs/
     cd /etc/apache2/sites-enabled
     sudo ln -s ../sites-available/default-ssl 000-default-ssl 
@@ -174,6 +240,7 @@ list. Verify that its working by running python2.7 and trying to import django_t
 ### Configuring Caesar
 
 To point Caesar to the right database, copy the local settings file:
+
     cd /var/django/caesar
     cp settings_local.py.template settings_local.py
 
