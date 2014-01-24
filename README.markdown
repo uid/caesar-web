@@ -24,13 +24,13 @@ Clone this repository from github.
 
 If you're working at MIT, set up with an initial settings_local.py file that uses the same database settings as our development server.
 
-    scp caesar-dev.csail.mit.edu:/var/django/caesar/settings_local.py .
+    scp YOUR_USERNAME@caesar-dev.csail.mit.edu:/var/django/caesar/settings_local.py .
 
 If you're not at MIT, copy the template for settings_local.py:
 
     cp settings_local.py.template settings_local.py
 
-Then edit settings_local.py and change the settings appropriately.
+If you're not at MIT, then edit settings_local.py and change the settings appropriately (follow the comments in setting_local.py). 
 
 ### Use Vagrant to start the virtual machine
 
