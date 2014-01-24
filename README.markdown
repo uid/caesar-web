@@ -51,23 +51,18 @@ Ignore the final warning from apache2: Could not reliably determine the server's
 
 ### Initialize Caesar
 
-First collect static assets:
-
-    cd /var/django/caesar
-    ./manage.py collectstatic
-
-Now initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in fixtures/, so you can always delete that file and start this part over if things go wrong. 
+Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in fixtures/, so you can always delete that file and start this part over if things go wrong. 
 
     ./manage.py syncdb         # say "no", don't create superuser yet
     ./manage.py migrate
 
-Create a superuser that will allow you to log in to Caesar with admin privileges:
-
-    ./manage.py createsuperuser
-
-Preload the database with test data:
+If you want to preload the database with test data do this:
 
     ./manage.py loaddata fixtures/test_fixtures.json
+
+If you did NOT complete the previous step (preloading the database with test data), create a superuser that will allow you to log in to Caesar with admin privileges:
+
+    ./manage.py createsuperuser
 
 Finally, make sure the Apache server can write to the database:
 
