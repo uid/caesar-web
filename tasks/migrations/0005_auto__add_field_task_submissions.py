@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Adding field 'Task.submission'
-        db.add_column('tasks_task', 'submission', self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='tasks', to=orm['chunks.Submission']), keep_default=False)
+        db.add_column('tasks_task', 'submission', self.gf('django.db.models.fields.related.ForeignKey')(default=None, related_name='tasks', null=True, blank=True, to=orm['chunks.Submission']), keep_default=False)
 
 
     def backwards(self, orm):
@@ -178,7 +178,7 @@ class Migration(SchemaMigration):
             'reviewer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tasks'", 'to': "orm['accounts.UserProfile']"}),
             'started': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '1'}),
-            'submissions': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tasks'", 'to': "orm['chunks.Submission']"})
+            'submission': ('django.db.models.fields.related.ForeignKey', [], {'null': 'True', 'related_name': "'tasks'", 'to': "orm['chunks.Submission']"})
         }
     }
 

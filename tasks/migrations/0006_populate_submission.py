@@ -176,7 +176,7 @@ class Migration(DataMigration):
             'reviewer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tasks'", 'to': "orm['accounts.UserProfile']"}),
             'started': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'status': ('django.db.models.fields.CharField', [], {'default': "'N'", 'max_length': '1'}),
-            'submission': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'tasks'", 'to': "orm['chunks.Submission']"})
+            'submission': ('django.db.models.fields.related.ForeignKey', [], {'null': 'True', 'related_name': "'tasks'", 'to': "orm['chunks.Submission']"})
         }
     }
 
