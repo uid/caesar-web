@@ -13,7 +13,7 @@ DATABASES = {
 
         # by default, use a local SQLite file as the database.
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/var/django/caesar/db.sqlite3',
+        'NAME': '/var/django/caesar/fixtures/test_fixtures.sqlite3',
 
 
         # deployment: use a database server by commenting out the above and uncommenting below.

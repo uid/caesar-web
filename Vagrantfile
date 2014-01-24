@@ -11,8 +11,6 @@ Vagrant.configure("2") do |config|
   config.vm.network :private_network, ip: "10.18.6.30"
 
   config.vm.synced_folder "./", "/var/django/caesar",
-    owner: "caesar",
-    group: "dev",
-    mount_options: ["dmode=775,fmode=775"]
+    group: "www-data"
 
 end
