@@ -15,6 +15,8 @@ from accounts.forms import ReputationForm
 from chunks.models import Semester, Submission, Subject
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.db.models import Q, Max
+from caesar.accounts.models import Extension
 import datetime
 import sys
 import re
@@ -400,4 +402,27 @@ def request_extension(request, milestone_id):
 @staff_member_required
 def manage(request):
     return render(request, 'accounts/manage.html', {
+    })
+
+@staff_member_required
+def all_extensions(request, milestone_id):
+    current_milestone = Milestone.objects.get(id=milestone_id)
+    students = User.objects.filter(membership__role="student", membership__semester=current_milestone.assignment.semester)
+    students_with_no_slack = students.exclude(extensions__milestone=current_milestone)
+    extensions = Extension.objects.filter(milestone=current_milestone).select_related('user__username')
+
+    # find the largest amount of slack requested by a student
+    max_slack_used = extensions.aggregate(Max('slack_used'))['slack_used__max']
+    if max_slack_used == None:
+        max_slack_used = 0
+    # the index of a list of students in student_slack is the number of slack days requested by the students in the list
+    student_slack = [""]*(max_slack_used+1)
+    student_slack[0] = "\\n".join(sorted([str(student) for student in students_with_no_slack]))
+    for slack_days in range(1,max_slack_used+1):
+        usernames = [str(ext.user.username) for ext in extensions.filter(slack_used=slack_days)]
+        student_slack[slack_days] = "\\n".join(sorted(usernames))
+    
+    return render(request, 'accounts/all_extensions.html', {
+        'current_milestone': current_milestone,
+        'student_slack': student_slack
     })

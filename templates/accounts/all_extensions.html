@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/blue/style.css" type="text/css" />
+<style type="text/css">
+  thead tr td {font-weight:bold;}
+  textarea {height:800px; width:100px}
+</style>
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script>
+  $(document).ready(function() {
+    var student_slack = [];
+
+    {% for slack in student_slack %}
+      student_slack.push("{{slack}}");
+    {% endfor %}
+
+    // make a column for every number of slack days a student could have requested
+    for (var i=0; i<student_slack.length; i++){
+      $("#slack-days-table thead tr").append("<td id='slack-days-thead-col-"+i+"'>"+i+" slack days</td> ");
+      $("#slack-days-table tbody tr").append("<td id='usernames-row-"+i+"-slack-days'></td>");
+      $("#usernames-row-"+i+"-slack-days").append("<textarea readonly>"+student_slack[i]+"</textarea>");
+    }
+
+    // select all text in textarea upon focus
+    $("textarea").focus(function() {
+      var $this = $(this);
+      $this.select();
+      // work around Chrome's little mouseup problem
+      $this.mouseup(function() {
+        return false;
+      });
+    }).keyup(function(e) {
+      if(e.which === 9) {
+        this.select();
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
+  <span class="breadcrumb">all extensions</span>
+{% endblock %}
+
+{% block content %}
+<h2 class="task-header">all extensions for {{ current_milestone }}</h2>
+<div>
+  <table id="slack-days-table">
+    <thead>
+      <tr>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %}
