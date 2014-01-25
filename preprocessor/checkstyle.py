@@ -69,6 +69,7 @@ def generate_comments(chunk, checkstyle_user, batch):
     node = to_traverse.pop()
     if node.nodeName == 'error' or node.nodeName == 'warning':
       comments.append(Comment(
+        type='S',
         text=_post_process_comment(node.getAttribute('message')),
         chunk=chunk,
         batch=batch,
