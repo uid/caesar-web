@@ -11,3 +11,4 @@ MySQL-python
 markdown
 django-tools
 django-piston
+openjdk-7-jre
