@@ -411,16 +411,10 @@ def all_extensions(request, milestone_id):
     students_with_no_slack = students.exclude(extensions__milestone=current_milestone)
     extensions = Extension.objects.filter(milestone=current_milestone).select_related('user__username')
 
-    # find the largest amount of slack requested by a student
-    max_slack_used = extensions.aggregate(Max('slack_used'))['slack_used__max']
-    if max_slack_used == None:
-        max_slack_used = 0
     # the index of a list of students in student_slack is the number of slack days requested by the students in the list
-    student_slack = [""]*(max_slack_used+1)
-    student_slack[0] = "\\n".join(sorted([str(student) for student in students_with_no_slack]))
-    for slack_days in range(1,max_slack_used+1):
-        usernames = [str(ext.user.username) for ext in extensions.filter(slack_used=slack_days)]
-        student_slack[slack_days] = "\\n".join(sorted(usernames))
+    student_slack = ["".join(sorted([str(student)+"\\n" for student in students_with_no_slack]))]
+    for slack_days in range(1,current_milestone.max_extension+1):
+        student_slack.append("".join([str(ext.user.username)+"\\n" for ext in extensions.filter(slack_used=slack_days)]))
     
     return render(request, 'accounts/all_extensions.html', {
         'current_milestone': current_milestone,
