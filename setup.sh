@@ -9,7 +9,7 @@ CAESAR_DIR=/var/django/caesar
 
 # Install Linux packages we need.
 /usr/bin/apt-get update
-/usr/bin/apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git libapache2-mod-wsgi python-dev python-numpy python-psycopg2 python-pip postfix 
+/usr/bin/apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git libapache2-mod-wsgi openjdk-7-jre python-dev python-numpy python-psycopg2 python-pip postfix 
 
 # Install Python packages we need.
 cd /tmp
