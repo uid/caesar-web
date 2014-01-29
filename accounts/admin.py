@@ -16,7 +16,7 @@ UserAdmin.list_display += ('date_joined',)
 UserAdmin.list_filter += ('date_joined',)
 
 class MemberAdmin(admin.ModelAdmin):
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'semester__semester', 'semester__subject__name', 'role')
+    search_fields = ('user__username', 'user__first_name', 'user__last_name', 'semester__semester', 'semester__subject__name')
 
 class ExtensionAdmin(admin.ModelAdmin):
     search_fields = ('user__username',)

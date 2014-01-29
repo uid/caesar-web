@@ -127,7 +127,7 @@ def edit_membership(request):
             m = request.user.membership.filter(semester=semester)
             m.delete()
         else:
-            m = Member(user=request.user, role='volunteer', semester=semester)
+            m = Member(user=request.user, role=Member.VOLUNTEER, semester=semester)
             m.save()
 
     return render(request, 'accounts/edit_membership.html', {
@@ -250,7 +250,7 @@ def bulk_add(request):
         created_users += 1
 
       if not user.membership.filter(semester=semester):
-        membership = Member(role='S', user=user, semester=semester)
+        membership = Member(role=Member.STUDENT, user=user, semester=semester)
         membership.save()
         created_memberships += 1
       else:
@@ -326,7 +326,7 @@ def reputation_adjustment(request):
 def allusers(request):
     participants = User.objects.all().exclude(username = 'checkstyle').prefetch_related('profile', 'membership__semester__subject')
     subjects = Subject.objects.all()
-    roles = Member.objects.values_list('role', flat=True).distinct()
+    roles = [role[1] for role in Member.ROLE_CHOICES]
     return render(request, 'accounts/allusers.html', {
         'participants': participants,
         'subjects': subjects,
@@ -407,7 +407,7 @@ def manage(request):
 @staff_member_required
 def all_extensions(request, milestone_id):
     current_milestone = Milestone.objects.get(id=milestone_id)
-    students = User.objects.filter(membership__role="student", membership__semester=current_milestone.assignment.semester)
+    students = User.objects.filter(membership__role=Member.STUDENT, membership__semester=current_milestone.assignment.semester)
     students_with_no_slack = students.exclude(extensions__milestone=current_milestone)
     extensions = Extension.objects.filter(milestone=current_milestone).select_related('user__username')
 

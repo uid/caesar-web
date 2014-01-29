@@ -70,7 +70,7 @@ $(document).ready(function() {
       <h4 class="task header"> reputation: {{participant.profile.reputation}}</h4>
       {% for membership in participant.membership.all %}
         <span class='label current-{{membership.semester.is_current_semester}} class'>
-          {{ membership.semester }} ({{ membership.role }})
+          {{ membership.semester }} ({{ membership.get_role_display }})
         </span>
       {% endfor %}
       {% if user == participant %}

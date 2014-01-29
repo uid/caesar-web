@@ -28,17 +28,18 @@ import logging
 def review_milestone_info(request, review_milestone_id):
     review_milestone = get_object_or_404(ReviewMilestone, pk=review_milestone_id)
     total_chunks = Chunk.objects.filter(file__submission__milestone=review_milestone.submit_milestone).count()
-    alums_participating = User.objects.exclude(profile__role='S').exclude(profile__role='T')\
-                                    .filter(comments__chunk__file__submission__milestone=review_milestone.submit_milestone)\
-                                    .exclude(username='checkstyle').distinct().count()
+    alums_participating = Member.objects.filter(role=Member.VOLUNTEER, user__comments__chunk__file__submission__milestone=review_milestone.submit_milestone).distinct().count()
     total_tasks = Task.objects.filter(milestone=review_milestone).count()
     assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__milestone=review_milestone.submit_milestone).distinct().count()
     total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__milestone=review_milestone.submit_milestone).distinct().count()
-    total_comments = Comment.objects.filter(chunk__file__submission__milestone=review_milestone.submit_milestone).count()
-    total_checkstyle = Comment.objects.filter(chunk__file__submission__milestone=review_milestone.submit_milestone).filter(type='S').count()
-    total_staff_comments = Comment.objects.filter(chunk__file__submission__milestone=review_milestone.submit_milestone).filter(author__profile__role='T').count()
-    total_student_comments = Comment.objects.filter(chunk__file__submission__milestone=review_milestone.submit_milestone).filter(author__profile__role='S').count()
-    total_user_comments = Comment.objects.filter(chunk__file__submission__milestone=review_milestone.submit_milestone).filter(type='U').count()
+    comments = Comment.objects.filter(chunk__file__submission__milestone=review_milestone.submit_milestone)
+    total_comments = comments.count()
+    total_checkstyle = comments.filter(type='S').count()
+    # FIXME need to change this to use member role
+    total_staff_comments = comments.filter(author__profile__role='T').count()
+    # total_staff_comments = comments.filter(author__membership__semester=semester, author__membership__role='T').count()
+    total_student_comments = comments.filter(author__profile__role='S').count()
+    total_user_comments = comments.filter(type='U').count()
     total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
     zero_chunk_users = len(filter(lambda sub: len(sub.chunks()) == 0, review_milestone.submit_milestone.submissions.all()))
 

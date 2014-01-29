@@ -29,17 +29,13 @@ def dashboard(request):
 
     live_review_milestones = ReviewMilestone.objects.filter(assigned_date__lt=datetime.datetime.now(),\
          duedate__gt=datetime.datetime.now(), assignment__semester__members__user=user).all()
-    logging.debug('but')
     for review_milestone in live_review_milestones:
-        logging.debug('wut')
         current_tasks = user.get_profile().tasks.filter(milestone=review_milestone)
         active_sub = Submission.objects.filter(authors=user, milestone=review_milestone.submit_milestone)
         try:
             membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
             #do not give tasks to students who got extensions or already have tasks for this assignment
-            #(TODO) refactor member.role to not be so arbitrary
-            if (not current_tasks.count()) and (active_sub.count() or not 'student' in membership.role):
-                logging.debug('mut')
+            if (not current_tasks.count()) and (active_sub.count() or not Member.STUDENT in membership.role):
                 open_assignments = True
                 new_task_count += assign_tasks(review_milestone, user)
         except ObjectDoesNotExist:
@@ -132,14 +128,11 @@ def dashboard(request):
 
 # => dashboard
 #TODO: consolidate this with dashboard
-@login_required
+@staff_member_required
 def student_dashboard(request, username):
     try:
         participant = User.objects.get(username=username)
     except:
-        raise Http404
-    user = request.user
-    if user.profile.role != 'T':
         raise Http404
     new_task_count = 0
 

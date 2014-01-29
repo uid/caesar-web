@@ -19,7 +19,7 @@ class StaffMarkerAdmin(admin.ModelAdmin):
 
 class MilestoneAdmin(admin.ModelAdmin):
 	def extension_data(self, obj):
-		num_no_extensions = Member.objects.filter(semester=obj.assignment.semester, role='student')\
+		num_no_extensions = Member.objects.filter(semester=obj.assignment.semester, role=Member.STUDENT)\
 			.exclude(user__extensions__milestone=obj).count()
 		extensions = str(num_no_extensions)
 		for num_days in range(1, obj.max_extension+1):

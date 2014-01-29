@@ -3,6 +3,7 @@ import datetime
 import logging
 import textwrap
 import tasks
+import logging
 
 from accounts.fields import MarkdownTextField
 from collections import defaultdict
@@ -115,6 +116,9 @@ class ReviewMilestone(Milestone):
     staff = models.IntegerField(default=15)
     staff_default = models.IntegerField(default=15)
 
+    # WARNING: the user that this method takes is one of the fake User objects
+    # defined in routing.py.
+    # FIXME: get rid of this method entirely.  Move its functionality to routing.py
     def num_tasks_for_user(self, user):
       if user.role == 'student':
         return self.student_count
@@ -146,16 +150,14 @@ def create_current_review_milestone(sender, instance, created, **kwargs):
             instance.alum_count_default = pick.alum_count
             instance.staff_count_default = pick.staff_count
             #set number of students we can expect
-            users = User.objects.filter(profile__tasks__milestone= pick).distinct()
-            students = users.filter(profile__role='S')
-            alums = users.exclude(profile__role='S').exclude(profile__role='T')
-            staff = users.filter(profile__role='T')
-            instance.students_default = students.count()
-            instance.alums_default = alums.count()
-            instance.staff_default = staff.count()
+            members = Member.objects.filter(semester=instance.assignment.semester, user__profile__tasks__milestone=pick).distinct()
+            instance.students_default = members.filter(role=Member.STUDENT).count()
+            instance.alums_default = members.filter(role=Member.VOLUNTEER).count()
+            instance.staff_default = members.filter(role=Member.TEACHER).count()
         else:
-            instance.students_default = User.objects.filter(profile__role = 'S').count()
-            instance.staff_default = User.objects.filter(profile__role = 'T').count()
+            instance.students_default = Member.objects.filter(role=Member.STUDENT, semester=instance.assignment.semester).count()
+            instance.staff_default = Member.objects.filter(role=Member.TEACHER, semester=instance.assignment.semester).count()
+            instance.alum_default = Member.objects.filter(role=Member.VOLUNTEER, semester=instance.assignment.semester).count()
         instance.students = instance.students_default
         instance.alums = instance.alums_default
         instance.staff = instance.staff_default
@@ -417,16 +419,18 @@ class Chunk(models.Model):
     def __unicode__(self):
         return u'%s' % (self.name,)
 
-    def sorted_reviewers(self):
-        students = []; alum = []; staff = []
-        for reviewer in self.reviewers.filter():
-            if reviewer.is_student():
-                students.append(reviewer)
-            elif reviewer.is_staff():
-                staff.append(reviewer)
-            else:
-                alum.append(reviewer)
-        return students + alum + staff
+    # # this is only ever called by reviewer_count()
+    # def sorted_reviewers(self):
+    #     reviewers = User.profile.objects.filter(tasks__submission=self.file.submission)
+    #     students = []; alum = []; staff = []
+    #     for reviewer in reviewers:
+    #         if reviewer.is_student():
+    #             students.append(reviewer)
+    #         elif reviewer.is_staff():
+    #             staff.append(reviewer)
+    #         else:
+    #             alum.append(reviewer)
+    #     return students + alum + staff
 
     def reviewers_comment_strs(self, tasks=None):
       #assert False C F check course policy
@@ -456,8 +460,9 @@ class Chunk(models.Model):
 
       return [checkstyle, students, alum, staff]
 
-    def reviewer_count(self):
-      return len(self.sorted_reviewers())
+    # # this is never called anywhere in the code
+    # def reviewer_count(self):
+    #   return len(self.sorted_reviewers())
 
     def comment_count(self):
       return len(self.comments.filter())
