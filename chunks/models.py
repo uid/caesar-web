@@ -208,11 +208,16 @@ class Submission(models.Model):
         return chunks
 
     def code_review_end_date(self):
-        review_milestones = ReviewMilestone.objects.filter(submit_milestone=self.milestone)
-        if review_milestones:
-            return review_milestones.latest('duedate').duedate
-        else:
+        try:
+            review_milestone = ReviewMilestone.objects.get(submit_milestone=self.milestone)
+            return review_milestone.duedate
+        except ObjectDoesNotExist:
             return self.milestone.duedate + datetime.timedelta(days=7)
+        # this should never happen because submit_milestones should only have one review_milestone
+        # although that's not true on our dev server so I'll leave it this way for now
+        except MultipleObjectsReturned:
+            review_milestones = ReviewMilestone.objects.filter(submit_milestone=self.milestone)
+            return review_milestones.latest('duedate').duedate
 
 class File(models.Model):
     id = models.AutoField(primary_key=True)
