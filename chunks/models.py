@@ -411,7 +411,7 @@ class Chunk(models.Model):
         return ('chunks.views.view_chunk', [str(self.id)])
 
     def __unicode__(self):
-        return u'%s' % (self.name,)
+        return u'%s - %s' % (self.name,self.id)
 
     # # this is never called
     # def sorted_reviewers(self):    

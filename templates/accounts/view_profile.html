@@ -110,7 +110,7 @@ $(document).ready(function() {
       {% for review_milestone, review_data in review_milestone_data %}
         {% if review_data %}
           <h3 class="assignment-display">
-            <a name="assignment-display"></a> {{ review_milestone.full_name }} {%if not review_milestone.assignment.is_current_semester %} - {{ review_milestone.assignment.get_semester_display }} {% endif %}
+            <a name="assignment-display"></a> {% if not review_milestone.assignment.is_current_semester %}{{ review_milestone.assignment.semester }} - {% endif %}{{ review_milestone.full_name }}
             <div class="view-all-activity">
               <!-- you can "view with code" if you are:
                       a django admin (user.is_staff)
