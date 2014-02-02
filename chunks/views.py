@@ -240,14 +240,16 @@ def view_all_chunks(request, viewtype, submission_id):
 
 @login_required
 def view_submission_for_milestone(request, viewtype, milestone_id, username):
+  user = request.user
   try:
     semester = SubmitMilestone.objects.get(id=milestone_id).assignment.semester
-    member = Member.objects.get(semester=semester, user=request.user)
-    if member.role != Member.TEACHER:
+    member = Member.objects.get(semester=semester, user=user)
+    author = User.objects.get(username__exact=username)
+    if not member.is_teacher() and not user==author and not user.is_staff:
       raise Http401
     submission = Submission.objects.get(milestone=milestone_id, authors__username=username)
     return view_all_chunks(request, viewtype, submission.id)
-  except Submission.DoesNotExist:
+  except Submission.DoesNotExist or User.DoesNotExist:
     raise Http404
   except Member.DoesNotExist:
     raise Http401
