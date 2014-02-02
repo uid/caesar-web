@@ -116,17 +116,6 @@ class ReviewMilestone(Milestone):
     staff = models.IntegerField(default=15)
     staff_default = models.IntegerField(default=15)
 
-    # WARNING: the user that this method takes is one of the fake User objects
-    # defined in routing.py.
-    # FIXME: get rid of this method entirely.  Move its functionality to routing.py
-    def num_tasks_for_user(self, user):
-      if user.role == 'student':
-        return self.student_count
-      elif user.role == 'staff':
-        return self.staff_count
-      else:
-        return self.alum_count
-
 @receiver(post_save, sender=ReviewMilestone)
 def create_current_review_milestone(sender, instance, created, **kwargs):
     if created:

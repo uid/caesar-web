@@ -270,6 +270,14 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         else:
             return
 
+def num_tasks_for_user(review_milestone, user):
+    if user.role == 'student':
+      return review_milestone.student_count
+    elif user.role == 'staff':
+      return review_milestone.staff_count
+    else:
+      return review_milestone.alum_count
+
 def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=defaultdict(list), max_tasks=sys.maxint, assign_more=False):
     """
     Returns a list of tasks that should be assigned to the given reviewer.
@@ -287,7 +295,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
     unfinished_task_count = unfinished_tasks.count()
 
     # Should task milestones have num_tasks_for_user?
-    num_tasks_to_assign = review_milestone.num_tasks_for_user(reviewer) - unfinished_task_count
+    num_tasks_to_assign = num_tasks_for_user(review_milestone,reviewer) - unfinished_task_count
     if num_tasks_to_assign <= 0:
       return []
 
