@@ -86,10 +86,13 @@ def view_chunk(request, chunk_id):
     # get the associated task if it exists
     try:
         task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())
+        last_task = task_count==1 and not (task.status == 'U' or task.status == 'C')
         if task.status == 'N':
             task.mark_as('O')
     except Task.DoesNotExist:
         task = None
+        last_task = False
+
     return render(request, 'chunks/view_chunk.html', {
         'chunk': chunk,
         'similar_chunks': chunk.get_similar_chunks(),
@@ -100,6 +103,8 @@ def view_chunk(request, chunk_id):
         'full_view': True,
         'file': chunk.file,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
+        'last_task': last_task,
+        'remaining_task_count': task_count if (task.status=='U' or task.status=='C') else task_count-1,
     })
 
 @login_required

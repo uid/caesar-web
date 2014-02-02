@@ -63,34 +63,40 @@
       <li>Upvote or downvote an existing comment.</li>
       <li>Reply to an existing comment to agree, disagree, or discuss.</li>
     </ul>
-    <p>Please do at least one thing on this code, then click the 
-Next 
-    button to go to the next methods to review.</p>
+    <p>Please do at least one thing on this code, then click the
+      {% if not last_task %} Next button to go to the next methods to review.
+      {% else %} Done button.
+      {% endif %}
+    </p>
   </div>
   {% endif %}
   <div id="chunk-navigation">
     <div id="task-count">
       {% if task %}
-      {{ task_count|default:"No" }} code section{{ task_count|pluralize }}
-      remaining for review
+        {{ remaining_task_count|default:"No" }} 
+        {% if not task.status == 'C' or task.status == 'U' %} additional {% endif %}
+        code section{{ remaining_task_count|pluralize }}
+        remaining for review
       {% else %}
-      You have not been assigned to review this code.
+        You have not been assigned to review this code.
       {% endif %}
     </div>
     {% if task %}
-      {% if task_count > 0 %}
-      <form method="get" action="{% url 'tasks.views.change_task' %}">
-        <input type="hidden" name="task_id" value="{{ task.id }}"/>
-        <input type="hidden" name="status" value="C"/>
-        <button id="done-button" type="submit"
-        {% if task.status == 'O' or task.status == 'N' %}
-          disabled
-        {% endif %}>
-          Next
-        </button>
-      </form>
+      <!-- mark task you're viewing as complete -->
+      {% if remaining_task_count > 0 or last_task %}
+        <form method="get" action="{% url 'tasks.views.change_task' %}">
+          <input type="hidden" name="task_id" value="{{ task.id }}"/>
+          <input type="hidden" name="status" value='C'/>
+          <button id="done-button" type="submit">
+          {% if remaining_task_count > 0 %}
+            Next
+          {% elif last_task %}
+            Done!
+          {% endif %}
+          </button>
+        </form>
       {% else %}
-      <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank"><button>Feedback survey</button></a>
+          <a href='https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ' target="_blank"><button>Fill out the Feedback survey</button></a>
       {% endif %}
     {% endif %}
   </div>
@@ -117,7 +123,7 @@ Next
     {{ chunk.file.submission.name }} :: 
     {{ chunk.file.path }}
     </h3>
-<}/div>
+</div>
 {% endcomment %}
 <div id ="view-all-code">
     <a href="{% url 'chunks.views.view_all_chunks' 'code' chunk.file.submission.id %}">
