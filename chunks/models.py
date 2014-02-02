@@ -419,16 +419,17 @@ class Chunk(models.Model):
     def __unicode__(self):
         return u'%s' % (self.name,)
 
-    # # this is only ever called by reviewer_count()
-    # def sorted_reviewers(self):
-    #     reviewers = User.profile.objects.filter(tasks__submission=self.file.submission)
+    # # this is never called
+    # def sorted_reviewers(self):    
+    #     members = self.file.submission.milestone.assignment.semester.members.all()
     #     students = []; alum = []; staff = []
-    #     for reviewer in reviewers:
-    #         if reviewer.is_student():
+    #     for member in members:
+    #         reviewer = member.user.profile
+    #         if member.is_student():
     #             students.append(reviewer)
-    #         elif reviewer.is_staff():
+    #         elif member.is_teacher():
     #             staff.append(reviewer)
-    #         else:
+    #         elif member.is_volunteer():
     #             alum.append(reviewer)
     #     return students + alum + staff
 
@@ -449,20 +450,20 @@ class Chunk(models.Model):
           'completed': task.completed,
           }
 
-        if task.reviewer.is_student():
+        member = task.reviewer.user.memberships.objects.get(user=task.reviewer.user, semester=task.milestone.assignment.semester)
+        if member.is_student():
           students.append(user_task_dict)
-        elif task.reviewer.is_staff():
+        elif member.is_teacher():
           staff.append(user_task_dict)
+        elif member.is_volunteer():
+          alum.append(user_task_dict)
         elif task.reviewer.is_checkstyle():
           checkstyle.append(user_task_dict)
-        else:
-          alum.append(user_task_dict)
 
       return [checkstyle, students, alum, staff]
 
-    # # this is never called anywhere in the code
-    # def reviewer_count(self):
-    #   return len(self.sorted_reviewers())
+    def reviewer_count(self):
+      return self.file.submission.milestone.assignment.semester.members.exclude(user__username = 'checkstyle').count()
 
     def comment_count(self):
       return len(self.comments.filter())

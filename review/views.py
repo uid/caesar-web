@@ -67,7 +67,8 @@ def new_comment(request):
                 'chunk': chunk,
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
-                'file': chunk.file
+                'file': chunk.file,
+                'member': Member.objects.get(semester=file.submission.milestone.assignment.semester, user=author),
             })
 
 
@@ -104,6 +105,8 @@ def reply(request):
                 'chunk': chunk,
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
+                'file': chunk.file,
+                'member': Member.objects.get(semester=file.submission.milestone.assignment.semester, user=author),
             })
 @login_required
 def edit_comment(request):
@@ -141,6 +144,7 @@ def edit_comment(request):
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
                 'file': chunk.file,
+                'member': Member.objects.get(semester=file.submission.milestone.assignment.semester, user=author),
             })
 
 @login_required
@@ -158,6 +162,7 @@ def delete_comment(request):
         'snippet': chunk.generate_snippet(comment.start, comment.end),
         'full_view': True,
         'file': chunk.file,
+        'member': Member.objects.get(semester=file.submission.milestone.assignment.semester, user=author),
     })
 
 @login_required
@@ -208,8 +213,9 @@ def all_activity(request, review_milestone_id, username):
         raise Http404
     user = request.user
     #get all assignments
-    review_milestone = ReviewMilestone.objects.get(id__exact=review_milestone_id)
-    if user.profile.is_student() and not review_milestone.assignment.is_current_semester():
+    review_milestone = ReviewMilestone.objects.select_related('submit_milestone', 'assignment__semester').get(id__exact=review_milestone_id)
+    user_membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
+    if not user_membership.is_teacher() and not user==participant and not user.is_staff:
         raise Http404
     #get all relevant chunks
     chunks = Chunk.objects \

@@ -26,22 +26,23 @@ import logging
 
 @staff_member_required
 def review_milestone_info(request, review_milestone_id):
-    review_milestone = get_object_or_404(ReviewMilestone, pk=review_milestone_id)
-    total_chunks = Chunk.objects.filter(file__submission__milestone=review_milestone.submit_milestone).count()
-    alums_participating = Member.objects.filter(role=Member.VOLUNTEER, user__comments__chunk__file__submission__milestone=review_milestone.submit_milestone).distinct().count()
+    review_milestone = get_object_or_404(ReviewMilestone.objects.select_related('assignment__semester'), pk=review_milestone_id)
+    submit_milestone = review_milestone.submit_milestone
+    comments = Comment.objects.filter(chunk__file__submission__milestone__review_milestone=review_milestone)
+    semester = review_milestone.assignment.semester
+
+    total_chunks = Chunk.objects.filter(file__submission__milestone__review_milestone=review_milestone).count()
+    alums_participating = Member.objects.filter(role=Member.VOLUNTEER, user__comments__chunk__file__submission__milestone__review_milestone=review_milestone).distinct().count()
     total_tasks = Task.objects.filter(milestone=review_milestone).count()
-    assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__milestone=review_milestone.submit_milestone).distinct().count()
-    total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__milestone=review_milestone.submit_milestone).distinct().count()
-    comments = Comment.objects.filter(chunk__file__submission__milestone=review_milestone.submit_milestone)
+    assigned_chunks = Chunk.objects.filter(tasks__gt=0).filter(file__submission__milestone__review_milestone=review_milestone).distinct().count()
+    total_chunks_with_human = Chunk.objects.filter(comments__type='U').filter(file__submission__milestone__review_milestone=review_milestone).distinct().count()
     total_comments = comments.count()
     total_checkstyle = comments.filter(type='S').count()
-    # FIXME need to change this to use member role
-    total_staff_comments = comments.filter(author__profile__role='T').count()
-    # total_staff_comments = comments.filter(author__membership__semester=semester, author__membership__role='T').count()
-    total_student_comments = comments.filter(author__profile__role='S').count()
+    total_staff_comments = comments.filter(author__membership__role=Member.TEACHER, author__membership__semester=semester).count()
+    total_student_comments = comments.filter(author__membership__role=Member.STUDENT, author__membership__semester=semester).count()
+    total_alum_comments = comments.filter(author__membership__role=Member.VOLUNTEER, author__membership__semester=semester).count()
     total_user_comments = comments.filter(type='U').count()
-    total_alum_comments = total_user_comments - total_staff_comments - total_student_comments
-    zero_chunk_users = len(filter(lambda sub: len(sub.chunks()) == 0, review_milestone.submit_milestone.submissions.all()))
+    zero_chunk_users = len(filter(lambda sub: len(sub.chunks()) == 0, submit_milestone.submissions.all()))
 
     return render(request, 'tasks/review_milestone_info.html', {
         'review_milestone': review_milestone,

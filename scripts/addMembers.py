@@ -40,29 +40,19 @@ def makeuser(username, role, semester, extension_days):
     user.save()
     
     profile, created = UserProfile.objects.get_or_create(user=user)
-    if role == "student":
-        profile.role = 'S'
-    elif role == "staff":
-        profile.role = 'T'
-        if profile.reputation < 100:
-            profile.reputation += 100
-    elif role == "alum":
-        profile.role = 'A'
-        if profile.reputation < 100:
-            profile.reputation += 100
     profile.save()
 
     member, created = Member.objects.get_or_create(user=user, semester=semester, slack_budget=extension_days)
     if not created:
-        print "...already a " + member.get_role_display + " member"
+        print "...already a " + member.get_role_display() + " member"
     else:
         if role == "student":
             member.role = Member.STUDENT
-        elif role == "staff":
+        elif role == "teacher":
             member.role = Member.TEACHER
-        elif role == "alum":
+        elif role == "volunteer":
             member.role = Member.VOLUNTEER
-    member.save();
+    member.save()
 
 def fetch_user_data_from_LDAP(user, ):
     username = user.username
@@ -113,13 +103,13 @@ parser.add_argument('--semester',
 parser.add_argument('--role',
                     nargs=1,
                     type=str,
-                    choices=[role[0] for role in Member.ROLE_CHOICES],
-                    default=Member.STUDENT,
+                    choices=[role[1] for role in Member.ROLE_CHOICES],
+                    default=["student"],
                     help="role of these users in the class")
 parser.add_argument('--slackbudget',
                     nargs=1,
                     type=int,
-                    default=10,
+                    default=[10],
                     help="number of days of slack to give to students")
 parser.add_argument('--file',
                     nargs=1,
@@ -139,17 +129,11 @@ semester = Semester.objects.get(subject=subject, semester=args.semester[0])
 role=args.role[0]
 slackbudget=args.slackbudget[0]
 
-if role!=Member.STUDENT:
+if role!="student":
     slackbudget=0 # only students need slack
 
 if args.file:
     loadusers(args.file[0], role, semester, slackbudget)
 
 for username in args.usernames:
-    if role == Member.STUDENT:
-        user_role = "student"
-    elif role == Member.TEACHER:
-        user_role = "staff"
-    elif role == Member.VOLUNTEER:
-        user_role = "alum"
-    makeuser(username, user_role, semester, slackbudget)
+    makeuser(username, role, semester, slackbudget)

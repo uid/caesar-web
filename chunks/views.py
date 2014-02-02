@@ -1,5 +1,5 @@
 from accounts.models import Member
-from chunks.models import Chunk, File, Assignment, ReviewMilestone, SubmitMilestone, Submission, StaffMarker
+from chunks.models import Chunk, File, Assignment, ReviewMilestone, SubmitMilestone, Submission, StaffMarker, Semester
 from chunks.forms import SimulateRoutingForm
 from review.models import Comment, Vote, Star
 from tasks.models import Task
@@ -30,8 +30,27 @@ import logging
 def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
-    if user.profile.is_student() and not chunk.file.submission.milestone.assignment.is_current_semester() and not chunk.file.submission.has_author(user):
-        raise Http404
+    semester = chunk.file.submission.milestone.assignment.semester
+    is_reviewer = chunk in user.profile.assigned_chunks.all()
+
+    # you get a 404 page if
+    # # you weren't a teacher during the semester
+    # #   and
+    # # you didn't write the code
+    # #   and
+    # # you weren't assigned to review the code
+    # #   and
+    # # you aren't a django admin
+    try:
+        user_membership = Member.objects.get(user=user, semester=semester)
+        if not user_membership.is_teacher() and not chunk.file.submission.has_author(user) and not is_reviewer and not user.is_staff:
+            raise Http401
+    except Member.MultipleObjectsReturned:
+        raise Http404 # you can't be multiple members for a class so this should never get called
+    except Member.DoesNotExist:
+        if not user.is_staff:
+            raise Http401 # you get a 401 page if you aren't a member of the semester
+    
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
 
@@ -86,19 +105,37 @@ def view_chunk(request, chunk_id):
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
     user = request.user
+    submission = Submission.objects.get(id = submission_id)
+    semester = Semester.objects.get(assignments__milestones__submitmilestone__submissions=submission)
+    authors = User.objects.filter(submissions=submission)
 
     # block a user who's crawling
     if user.username=="dekehu":
         raise Http404
 
+    try:
+        user_membership = Member.objects.get(user=user, semester=semester)
+    except MultipleObjectsReturned:
+        raise Http404 # you can't be multiple members for a class so this should never get called
+    except DoesNotExist:
+        if not user.is_staff:
+            raise Http401 # you get a 401 page if you aren't a member of the semester
+    # you get a 404 page ifchrome
+    # # you weren't a teacher during the semester
+    # #   and
+    # # you aren't django staff
+    # #   and
+    # # you aren't an author of the submission
+    if not user_membership.is_teacher() and not user.is_staff and not (user in authors):
+        raise Http401
+        
     files = File.objects.filter(submission=submission_id).select_related('chunks')
-    submission = Submission.objects.get(id = submission_id)
     if not files:
         raise Http404
+
     milestone = files[0].submission.milestone
     milestone_name = milestone.full_name()
-    if user.profile.is_student() and not milestone.assignment.is_current_semester() and not submission.has_author(user):
-        raise Http404
+    
     paths = []
     user_stats = []
     static_stats = []
@@ -373,19 +410,19 @@ def simulate(request, review_milestone_id):
 
 @login_required
 def list_users(request, review_milestone_id):
-  def cmp_user_data(user_data1, user_data2):
-    user1 = user_data1['user']
-    user2 = user_data2['user']
-    # change this to use their member role in the class
-    if user1.profile.role == user2.profile.role:
-      return cmp(user1.first_name, user2.first_name)
-    if user1.profile.is_student():
-      return -1
-    if user1.profile.is_staff():
-      return 1
-    if user2.profile.is_student():
-      return 1
-    return -1
+  # def cmp_user_data(user_data1, user_data2):
+  #   user1 = user_data1['user']
+  #   user2 = user_data2['user']
+  #   # change this to use their member role in the class
+  #   if user1.profile.role == user2.profile.role:
+  #     return cmp(user1.first_name, user2.first_name)
+  #   if user1.profile.is_student():
+  #     return -1
+  #   if user1.profile.is_staff():
+  #     return 1
+  #   if user2.profile.is_student():
+  #     return 1
+  #   return -1
 
   def task_dict(task):
     return {
@@ -415,14 +452,15 @@ def list_users(request, review_milestone_id):
         'completed': task.completed,
         }
 
-      if task.reviewer.is_student():
+      member = task.reviewer.user.memberships.objects.get(user=task.reviewer.user, semester=task.milestone.assignment.semester)
+      if member.is_student():
         students.append(user_task_dict)
-      elif task.reviewer.is_staff():
+      elif member.is_teacher():
         staff.append(user_task_dict)
+      elif member.is_volunteer():
+        alum.append(user_task_dict)
       elif task.reviewer.is_checkstyle():
         checkstyle.append(user_task_dict)
-      else:
-        alum.append(user_task_dict)
 
     return [checkstyle, students, alum, staff]
 

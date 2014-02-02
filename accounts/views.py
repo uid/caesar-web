@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
+from django.http import Http404
 from django.http import HttpResponseRedirect
 from limit_registration import check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
@@ -149,7 +150,7 @@ def view_profile(request, username):
     for review_milestone in review_milestones:
         #get all comments that the user wrote
         comments = Comment.objects.filter(author=participant) \
-                          .filter(chunk__file__submission__milestone= review_milestone.submit_milestone).select_related('chunk')
+                          .filter(chunk__file__submission__milestone=review_milestone.submit_milestone).select_related('chunk')
         review_data = []
         for comment in comments:
             if comment.is_reply():
@@ -169,9 +170,11 @@ def view_profile(request, username):
                 review_data.append(("vote-down", vote.comment, vote.comment.generate_snippet(), True, vote))
         review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
         review_milestone_data.append((review_milestone, review_data))
+        user_memberships = request.user.membership.filter(role=Member.TEACHER)
     return render(request, 'accounts/view_profile.html', {
         'review_milestone_data': review_milestone_data,
         'participant': participant,
+        'semesters_taught': Semester.objects.filter(members__in=user_memberships)
 #        'submissions': submissions,  turn off Publishing until it's ready
     })
 
@@ -340,7 +343,10 @@ def request_extension(request, milestone_id):
     # what semester is this milestone in?
     current_milestone = Milestone.objects.get(id=milestone_id)
     semester = current_milestone.assignment.semester
-    membership = Member.objects.get(semester=semester, user=user)
+    try:
+        membership = Member.objects.get(semester=semester, user=user)
+    except:
+        raise Http404
 
     # calculate how much slack budget user has left for this semester
     slack_budget = membership.slack_budget

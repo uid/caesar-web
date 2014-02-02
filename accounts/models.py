@@ -47,32 +47,24 @@ class Member(models.Model):
       return '%s (%s), %s' % (self.user.username, self.get_role_display(), self.semester)
 
     def is_student(self):
-        return self.role == STUDENT
+        return self.role == Member.STUDENT
 
     def is_teacher(self):
-        return self.role == TEACHER
+        return self.role == Member.TEACHER
 
     def is_volunteer(self):
-        return self.role == VOLUNTEER
+        return self.role == Member.VOLUNTEER
 
 class UserProfile(models.Model):
     def get_photo_path(instance, filename):
         return os.path.join(
                 settings.PROFILE_PHOTO_DIR,
                 instance.user.username)
-
-    ROLE_CHOICES = (
-        ('T', 'Teaching staff'),
-        ('S', 'Student'),
-        ('A', 'Alumni'),
-    )
-    user = models.OneToOneField(User, related_name='profile')
     
+    user = models.OneToOneField(User, related_name='profile')
     assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
         related_name='reviewers')
     reputation = models.IntegerField(default=0, editable=True)
-    role = models.CharField(max_length=1, choices=ROLE_CHOICES,
-                            blank=True, null=True)
 
     photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True,\
         help_text='Use a JPEG or PNG photo.')
@@ -94,30 +86,10 @@ class UserProfile(models.Model):
     def __unicode__(self):
         return self.user.__unicode__()
 
-    def is_staff(self):
-        return self.role == 'T'
-
-    def is_student(self):
-        return self.role == 'S'
-
-    def is_alum(self):
-        return self.role == 'A'
-
-    # def role_str(self):
-    #   if self.is_student():
-    #     return 'Student'
-    #   elif self.is_staff():
-    #     return 'Staff'
-    #   return 'Other'
-
-    def is_checkstyle(self):
-      return self.user.username == 'checkstyle'
-
     def name(self):
       if self.user.first_name and self.user.last_name:
         return self.user.first_name + ' ' + self.user.last_name
       return self.user.username
-
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, raw=False, **kwargs):
