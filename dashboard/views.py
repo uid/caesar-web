@@ -191,7 +191,7 @@ def student_dashboard(request, username):
     #find the current submissions
     current_milestones = Milestone.objects.filter(assignment__semester__members__user=participant)\
         .filter(duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
-        .filter(assigned_date__lt= datetime.datetime.now() - datetime.timedelta(minutes=30))\
+        .filter(assigned_date__lt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
         .order_by('duedate')
 
     current_milestone_data = []

@@ -480,7 +480,7 @@ def list_users(request, review_milestone_id):
   chunk_map = {}
   form = None
 
-  for user in User.objects.select_related("profile").filter(Q(submissions__milestone__id=assignment_id) | Q(profile__tasks__chunk__file__submission__milestone__id=assignment_id)):
+  for user in User.objects.select_related('profile').filter(Q(submissions__milestone__id=assignment_id) | Q(profile__tasks__chunk__file__submission__milestone__id=assignment_id)):
       data[user.id] = {'tasks': [], 'user': user, 'chunks': [], 'has_chunks': False, 'submission': None}
 
   for submission in Submission.objects.select_related('author__profile').filter(milestone__id=assignment_id):
