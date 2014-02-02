@@ -208,15 +208,18 @@ def unvote(request):
 
 @login_required
 def all_activity(request, review_milestone_id, username):
-    participant = User.objects.get(username__exact=username)
-    if not participant:
-        raise Http404
     user = request.user
-    #get all assignments
-    review_milestone = ReviewMilestone.objects.select_related('submit_milestone', 'assignment__semester').get(id__exact=review_milestone_id)
-    user_membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
-    if not user_membership.is_teacher() and not user==participant and not user.is_staff:
-        raise Http404
+    try:
+        participant = User.objects.get(username__exact=username)
+        #get all assignments
+        review_milestone = ReviewMilestone.objects.select_related('submit_milestone', 'assignment__semester').get(id__exact=review_milestone_id)
+        user_membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
+        if not user_membership.is_teacher() and not user==participant and not user.is_staff:
+            raise Http404
+    except Member.DoesNotExist:
+        if not user.is_staff:
+            raise Http404
+    
     #get all relevant chunks
     chunks = Chunk.objects \
         .filter(file__submission__milestone= review_milestone.submit_milestone) \

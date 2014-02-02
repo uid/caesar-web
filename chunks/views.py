@@ -120,19 +120,19 @@ def view_all_chunks(request, viewtype, submission_id):
 
     try:
         user_membership = Member.objects.get(user=user, semester=semester)
+        # you get a 404 page ifchrome
+        # # you weren't a teacher during the semester
+        # #   and
+        # # you aren't django staff
+        # #   and
+        # # you aren't an author of the submission
+        if not user_membership.is_teacher() and not user.is_staff and not (user in authors):
+            raise Http401
     except MultipleObjectsReturned:
         raise Http404 # you can't be multiple members for a class so this should never get called
     except DoesNotExist:
         if not user.is_staff:
             raise Http401 # you get a 401 page if you aren't a member of the semester
-    # you get a 404 page ifchrome
-    # # you weren't a teacher during the semester
-    # #   and
-    # # you aren't django staff
-    # #   and
-    # # you aren't an author of the submission
-    if not user_membership.is_teacher() and not user.is_staff and not (user in authors):
-        raise Http401
         
     files = File.objects.filter(submission=submission_id).select_related('chunks')
     if not files:
