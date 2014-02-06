@@ -36,6 +36,24 @@
   }
 },
 {
+  "pk": 42, 
+  "model": "auth.user", 
+  "fields": {
+    "username": "checkstyle", 
+    "first_name": "", 
+    "last_name": "", 
+    "is_active": true, 
+    "is_superuser": false, 
+    "is_staff": false, 
+    "last_login": "1970-01-01T00:00:00", 
+    "groups": [], 
+    "user_permissions": [], 
+    "password": "", 
+    "email": "", 
+    "date_joined": "1970-01-01T00:00:00"
+  }
+},
+{
   "pk": 95, 
   "model": "auth.user", 
   "fields": {
@@ -10412,6 +10430,24 @@
   }
 },
 {
+  "pk": 75, 
+  "model": "south.migrationhistory", 
+  "fields": {
+    "applied": "2014-02-06T11:36:50.916", 
+    "app_name": "accounts", 
+    "migration": "0019_chg_member_role_choice"
+  }
+},
+{
+  "pk": 76, 
+  "model": "south.migrationhistory", 
+  "fields": {
+    "applied": "2014-02-06T11:36:50.968", 
+    "app_name": "accounts", 
+    "migration": "0020_chg_old_member_role_choice"
+  }
+},
+{
   "pk": "sorl-thumbnail||image||6b118302ebd088f725b2588a13f9e9d2", 
   "model": "thumbnail.kvstore", 
   "fields": {
@@ -10492,7 +10528,7 @@
   "fields": {
     "slack_budget": 5, 
     "semester": 2, 
-    "role": "volunteer", 
+    "role": "V", 
     "user": [
       "polovoco"
     ]
@@ -10504,7 +10540,7 @@
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "gregk"
     ]
@@ -10516,7 +10552,7 @@
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "qsitters"
     ]
@@ -10528,7 +10564,7 @@
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "kathleenhanna"
     ]
@@ -10540,7 +10576,7 @@
   "fields": {
     "slack_budget": 9, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "ernie"
     ]
@@ -10552,7 +10588,7 @@
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "kimdeal"
     ]
@@ -10564,7 +10600,7 @@
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "mikewatt"
     ]
@@ -10576,7 +10612,7 @@
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "davidbowie"
     ]
@@ -10588,7 +10624,7 @@
   "fields": {
     "slack_budget": 0, 
     "semester": 2, 
-    "role": "staff", 
+    "role": "T", 
     "user": [
       "rcm"
     ]
@@ -10600,7 +10636,7 @@
   "fields": {
     "slack_budget": 0, 
     "semester": 2, 
-    "role": "staff", 
+    "role": "T", 
     "user": [
       "pnomario"
     ]
@@ -10612,7 +10648,7 @@
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "iggypop"
     ]
@@ -10624,7 +10660,7 @@
   "fields": {
     "slack_budget": 5, 
     "semester": 2, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "cwfletch"
     ]
@@ -10636,7 +10672,7 @@
   "fields": {
     "slack_budget": 5, 
     "semester": 5, 
-    "role": "staff", 
+    "role": "T", 
     "user": [
       "kleinab"
     ]
@@ -10648,7 +10684,7 @@
   "fields": {
     "slack_budget": 5, 
     "semester": 2, 
-    "role": "staff", 
+    "role": "T", 
     "user": [
       "kleinab"
     ]
@@ -10660,7 +10696,7 @@
   "fields": {
     "slack_budget": 5, 
     "semester": 3, 
-    "role": "student", 
+    "role": "S", 
     "user": [
       "graves"
     ]
@@ -10678,7 +10714,6 @@
     "about_html": "<p>I'm a professor of computer science in Course 6, and I regularly teach 6.005 Software Construction and <a href=\"courses.csail.mit.edu/6.831\">6.813/6.831 User Interface Design and Implementation</a>.</p>\n<p>As a Course 6 undergrad, I took 6.001 with Gerry Sussman and Peter Szolovits, 6.170 with Barbara Liskov and Frans Kaashoek, 6.035, and 6.821 with David Gifford.</p>\n<p>Our 6.170 project was Ataxx, a kind of Othello.</p>\n<p>These days I do research on crowdsourcing and HCI for software development.</p>", 
     "class_year": 1995, 
     "reputation": 117, 
-    "role": "T", 
     "user": [
       "rcm"
     ], 
@@ -10698,7 +10733,6 @@
     "about_html": "", 
     "class_year": 2013, 
     "reputation": 109, 
-    "role": null, 
     "user": [
       "kiranb"
     ], 
@@ -10718,7 +10752,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 127, 
-    "role": null, 
     "user": [
       "graves"
     ], 
@@ -10738,7 +10771,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 116, 
-    "role": "T", 
     "user": [
       "pnomario"
     ], 
@@ -10758,7 +10790,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 2, 
-    "role": "S", 
     "user": [
       "ernie"
     ], 
@@ -10778,7 +10809,6 @@
     "about_html": "<p>I write/support electronic design tools  for Intel CPU design. I've been doing this for almost 20 years and it's been a very enjoyable job.</p>\n<p>In my free time, I enjoy photography, woodworking, and over the last couple years, I built a working CNC wood router.</p>", 
     "class_year": 1993, 
     "reputation": 0, 
-    "role": null, 
     "user": [
       "polovoco"
     ], 
@@ -10798,7 +10828,6 @@
     "about_html": "<p>I'm awesome. I think.</p>", 
     "class_year": null, 
     "reputation": 0, 
-    "role": "S", 
     "user": [
       "gregk"
     ], 
@@ -10818,7 +10847,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": "S", 
     "user": [
       "qsitters"
     ], 
@@ -10838,7 +10866,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": "S", 
     "user": [
       "kathleenhanna"
     ], 
@@ -10858,7 +10885,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": "S", 
     "user": [
       "kimdeal"
     ], 
@@ -10878,7 +10904,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 3, 
-    "role": "S", 
     "user": [
       "mikewatt"
     ], 
@@ -10898,7 +10923,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": "S", 
     "user": [
       "davidbowie"
     ], 
@@ -10918,7 +10942,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 3, 
-    "role": "S", 
     "user": [
       "iggypop"
     ], 
@@ -10938,7 +10961,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": null, 
     "user": [
       "cwfletch"
     ], 
@@ -10958,7 +10980,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": null, 
     "user": [
       "tfk"
     ], 
@@ -10978,7 +10999,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": "T", 
     "user": [
       "kleinab"
     ], 
@@ -10998,7 +11018,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": null, 
     "user": [
       "dxiao"
     ], 
@@ -11018,7 +11037,6 @@
     "about_html": "", 
     "class_year": 1995, 
     "reputation": 0, 
-    "role": "A", 
     "user": [
       "rcm_alum"
     ], 
@@ -11038,7 +11056,6 @@
     "about_html": "", 
     "class_year": null, 
     "reputation": 0, 
-    "role": null, 
     "user": [
       "khobbs"
     ], 
@@ -11116,48 +11133,48 @@
   "pk": 1, 
   "model": "chunks.milestone", 
   "fields": {
-    "name": "beta submission", 
+    "name": "", 
     "assignment": 6, 
     "max_extension": 2, 
     "type": "S", 
-    "duedate": "2013-02-09T17:00:00", 
-    "assigned_date": "2013-02-06T23:24:31"
+    "duedate": null, 
+    "assigned_date": null
   }
 },
 {
   "pk": 2, 
   "model": "chunks.milestone", 
   "fields": {
-    "name": "beta code review", 
+    "name": "", 
     "assignment": 6, 
-    "max_extension": 0, 
+    "max_extension": 2, 
     "type": "R", 
-    "duedate": "2013-02-13T23:59:58", 
-    "assigned_date": "2013-02-09T17:00:00"
+    "duedate": null, 
+    "assigned_date": null
   }
 },
 {
   "pk": 3, 
   "model": "chunks.milestone", 
   "fields": {
-    "name": "beta second review", 
+    "name": "", 
     "assignment": 6, 
     "max_extension": 2, 
     "type": "R", 
-    "duedate": "2013-09-18T20:57:49", 
-    "assigned_date": "2013-09-17T20:57:42"
+    "duedate": null, 
+    "assigned_date": null
   }
 },
 {
   "pk": 4, 
   "model": "chunks.milestone", 
   "fields": {
-    "name": "PS1 Beta Submission", 
+    "name": "", 
     "assignment": 7, 
     "max_extension": 2, 
     "type": "S", 
-    "duedate": "2013-11-21T06:00:00", 
-    "assigned_date": "2013-10-27T06:00:00"
+    "duedate": null, 
+    "assigned_date": null
   }
 },
 {
@@ -11171,7 +11188,7 @@
   "pk": 4, 
   "model": "chunks.submitmilestone", 
   "fields": {
-    "assignment": 7
+    "assignment": 7 
   }
 },
 {
@@ -11180,19 +11197,19 @@
   "fields": {
     "assignment": 6, 
     "min_student_lines": 5, 
-    "students_default": 199, 
+    "students_default": 0, 
     "student_count": 5, 
-    "staff_default": 15, 
-    "students": 199, 
+    "staff_default": 0, 
+    "students": 0, 
     "staff_count": 10, 
-    "alums_default": 1, 
+    "alums_default": 0, 
     "student_count_default": 5, 
     "submit_milestone": 1, 
     "chunks_to_assign": "Turtle 1,Point 1,TurtleSoup 1,LineSegment 1,DrawableTurtle 1,TurtleSoupTest 1,Action 1,TurtleGUI 1,StudentDefinedClasses 1,", 
     "staff_count_default": 10, 
-    "alums": 1, 
+    "alums": 0, 
     "reviewers_per_chunk": 3, 
-    "staff": 15, 
+    "staff": 0, 
     "alum_count_default": 3, 
     "alum_count": 3
   }
@@ -11201,12 +11218,12 @@
   "pk": 3, 
   "model": "chunks.reviewmilestone", 
   "fields": {
-    "assignment": 6, 
+    "assignment": 6,
     "min_student_lines": 30, 
-    "students_default": 5, 
+    "students_default": 0, 
     "student_count": 5, 
-    "staff_default": 1, 
-    "students": 5, 
+    "staff_default": 0, 
+    "students": 0, 
     "staff_count": 10, 
     "alums_default": 0, 
     "student_count_default": 5, 
@@ -11215,7 +11232,7 @@
     "staff_count_default": 10, 
     "alums": 0, 
     "reviewers_per_chunk": 2, 
-    "staff": 1, 
+    "staff": 0, 
     "alum_count_default": 3, 
     "alum_count": 3
   }
@@ -15318,7 +15335,7 @@
     "text": "You should use a cast to do this if possible. The cast is implicit here anyways, so....", 
     "chunk": 732, 
     "created": "2013-02-10T22:01:32", 
-    "modified": "2013-09-11T08:05:26", 
+    "modified": "2014-02-06T11:35:47.834", 
     "batch": null, 
     "start": 32, 
     "thread_id": 1376, 
@@ -15456,7 +15473,7 @@
     "text": "Will work, but it's a good idea to automate repetitive processes. A for loop would be appropriate.", 
     "chunk": 2416, 
     "created": "2013-02-10T22:14:02", 
-    "modified": "2013-09-02T15:44:46", 
+    "modified": "2014-02-06T11:35:47.812", 
     "batch": null, 
     "start": 16, 
     "thread_id": 1398, 
@@ -15663,7 +15680,7 @@
     "text": "If you save the result as the heading, you're actually saving only an increment (relative to the previous position) instead of the absolute heading, which is what the function needs. You can keep a cumulative 'currentHeading' variable by adding the result each time (%360)", 
     "chunk": 820, 
     "created": "2013-02-10T23:49:01", 
-    "modified": "2013-09-02T15:44:46", 
+    "modified": "2014-02-06T11:35:47.823", 
     "batch": null, 
     "start": 131, 
     "thread_id": 1502, 
@@ -15686,7 +15703,7 @@
     "text": "You can use a for loop here and save a few lines of code (for (int i = 0; i<4;i++).", 
     "chunk": 820, 
     "created": "2013-02-10T23:49:40", 
-    "modified": "2013-09-02T15:44:46", 
+    "modified": "2014-02-06T11:35:47.828", 
     "batch": null, 
     "start": 17, 
     "thread_id": 1503, 
@@ -15755,7 +15772,7 @@
     "text": "Great point!", 
     "chunk": 820, 
     "created": "2013-03-17T15:11:08", 
-    "modified": "2013-09-11T08:06:47", 
+    "modified": "2014-02-06T11:35:47.845", 
     "batch": null, 
     "start": 17, 
     "thread_id": 1503, 
@@ -15824,7 +15841,7 @@
     "text": "here is a comment", 
     "chunk": 2410, 
     "created": "2013-09-10T16:25:59", 
-    "modified": "2013-09-11T08:05:36", 
+    "modified": "2014-02-06T11:35:47.840", 
     "batch": null, 
     "start": 10, 
     "thread_id": 2125, 
