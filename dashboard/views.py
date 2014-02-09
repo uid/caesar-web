@@ -100,7 +100,7 @@ def dashboard(request):
                                   user_comments, static_comments))
 
     #find the current submissions
-    current_milestones = Milestone.objects.filter(assignment__semester__members__user=user)\
+    current_milestones = Milestone.objects.filter(assignment__semester__members__user=user, assignment__semester__members__role=Member.STUDENT)\
         .filter(assigned_date__lt= datetime.datetime.now())\
         .order_by('duedate')
 
