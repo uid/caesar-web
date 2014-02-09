@@ -15,7 +15,7 @@ We use Vagrant and VirtualBox to run Caesar in a virtual machine on your laptop.
 
 ### Clone from github
 
-Clone this repository from github.
+Clone this repository from github, if you haven't already.
 
     git clone https://github.com/uid/caesar-web.git
     cd caesar-web
