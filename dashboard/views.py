@@ -51,7 +51,7 @@ def dashboard(request):
         .select_related('chunk__file__submission__milestone') \
         .exclude(status='C') \
         .exclude(status='U') \
-        .order_by('submission__name')
+        .order_by('chunk__name', 'submission__name')
     annotate_tasks_with_counts(active_tasks)
 
     # sort the active tasks before they are sent to the view
@@ -62,7 +62,8 @@ def dashboard(request):
     completed_tasks = user.get_profile().tasks \
         .select_related('chunk__file__submission__milestone') \
         .filter(status='C') \
-        .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
+        .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
+        .order_by('completed').reverse()
     annotate_tasks_with_counts(completed_tasks)
 
     #get all the submissions that the user submitted
