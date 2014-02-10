@@ -68,7 +68,6 @@ def new_comment(request):
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
                 'file': chunk.file,
-                'member': Member.objects.get(semester=file.submission.milestone.assignment.semester, user=author),
             })
 
 
@@ -106,7 +105,6 @@ def reply(request):
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
                 'file': chunk.file,
-                'member': Member.objects.get(semester=file.submission.milestone.assignment.semester, user=author),
             })
 @login_required
 def edit_comment(request):
@@ -144,7 +142,6 @@ def edit_comment(request):
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
                 'full_view': True,
                 'file': chunk.file,
-                'member': Member.objects.get(semester=file.submission.milestone.assignment.semester, user=author),
             })
 
 @login_required
@@ -162,7 +159,6 @@ def delete_comment(request):
         'snippet': chunk.generate_snippet(comment.start, comment.end),
         'full_view': True,
         'file': chunk.file,
-        'member': Member.objects.get(semester=file.submission.milestone.assignment.semester, user=author),
     })
 
 @login_required
