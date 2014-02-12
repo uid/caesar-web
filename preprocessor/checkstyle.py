@@ -82,12 +82,7 @@ def generate_comments(chunk, checkstyle_user, batch):
   return comments
 
 def generate_checkstyle_comments(code_objects, save, batch):
-  checkstyle_user = User.objects.filter(username='checkstyle')
-  if checkstyle_user:
-    checkstyle_user = checkstyle_user[0]
-  else:
-    print "No checkstyle user. Can't upload comments."
-    return
+  checkstyle_user,created = User.objects.get_or_create(username='checkstyle')
 
   i = 0
   for (submission, files, chunks) in code_objects:
