@@ -31,10 +31,8 @@
     automatically generated 
     {% endif %}
     {% if not comment.deleted %}
-    {% with is_staff=author.profile.is_staff is_student=author.profile.is_student %}
     by <span class="comment-author-name
-      {% if is_staff %}staff{% endif %}
-      {% if is_student %}student{% endif %}">
+      {{ member.get_role_display }}">
       {% if comment.type == 'U' %}
         <a onclick=hashtagRedirect("{% url 'accounts.views.view_profile' author.username %}")>
         {{ author.get_full_name|default:author.username }}
@@ -44,7 +42,6 @@
         {{ author.get_full_name|default:author.username }}
     {% endif %}
     </span>
-    {% endwith %}
     {% endif %}
     {% endwith %}
   </div>

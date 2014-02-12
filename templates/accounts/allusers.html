@@ -153,7 +153,7 @@
     <td class="black-text">
       {% for membership in participant.membership.all %}
         {% if membership.semester.is_current_semester %}
-          <div class="roles-list role-{{ membership.semester.subject.id }}-{{ membership.role }}-active" >{{ membership.semester.subject }} - {{ membership.role }}</div>
+          <div class="roles-list role-{{ membership.semester.subject.id }}-{{ membership.role }}-active" >{{ membership.semester.subject }} - {{ membership.get_role_display }}</div>
         {% endif %}
       {% endfor %}
     </td>

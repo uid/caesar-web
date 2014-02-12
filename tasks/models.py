@@ -16,7 +16,7 @@ class Task(models.Model):
         ('U', 'Unfinished'),
     )
     
-    submission = models.ForeignKey(Submission, related_name='tasks')
+    submission = models.ForeignKey(Submission, related_name='tasks', null=True, blank=True)
     chunk = models.ForeignKey(Chunk, related_name='tasks', null=True, blank=True)
     reviewer = models.ForeignKey(UserProfile, related_name='tasks')
     milestone = models.ForeignKey(ReviewMilestone, related_name='tasks')

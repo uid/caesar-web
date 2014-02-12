@@ -1,10 +1,11 @@
 from django.conf import settings
 
-CHUNKS_PER_ROLE = getattr(settings, 'TASKS_CHUNKS_PER_ROLE', {
-    'student': 5,
-    'staff': 10,
-    'other': 5,
-})
+# this is never used
+# CHUNKS_PER_ROLE = getattr(settings, 'TASKS_CHUNKS_PER_ROLE', {
+#     'student': 5,
+#     'staff': 10,
+#     'other': 5,
+# })
 
 REVIEWERS_PER_CHUNK = getattr(settings, 'TASKS_REVIEWERS_PER_CHUNK', 2)
 

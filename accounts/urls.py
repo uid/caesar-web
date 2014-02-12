@@ -28,4 +28,5 @@ urlpatterns = patterns('',
     (r'^request_extension/(?P<milestone_id>\d+)', 'accounts.views.request_extension'),
     (r'^allusers/', 'accounts.views.allusers'),
     (r'^manage/', 'accounts.views.manage'),
+    (r'^all_extensions/(?P<milestone_id>\d+)', 'accounts.views.all_extensions'),
 )

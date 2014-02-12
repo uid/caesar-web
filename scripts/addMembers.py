@@ -40,22 +40,19 @@ def makeuser(username, role, semester, extension_days):
     user.save()
     
     profile, created = UserProfile.objects.get_or_create(user=user)
-    if role == "student":
-        profile.role = 'S'
-    elif role == "staff":
-        profile.role = 'T'
-        if profile.reputation < 100:
-            profile.reputation += 100
-    elif role == "volunteer":
-        profile.role = 'A'
-        if profile.reputation < 100:
-            profile.reputation += 100
     profile.save()
 
-    member, created = Member.objects.get_or_create(user=user, semester=semester, role=role, slack_budget=extension_days)
+    member, created = Member.objects.get_or_create(user=user, semester=semester, slack_budget=extension_days)
     if not created:
-        print "...already a " + role + " member"
-    member.save();
+        print "...already a " + member.get_role_display() + " member"
+    else:
+        if role == "student":
+            member.role = Member.STUDENT
+        elif role == "teacher":
+            member.role = Member.TEACHER
+        elif role == "volunteer":
+            member.role = Member.VOLUNTEER
+    member.save()
 
 def fetch_user_data_from_LDAP(user, ):
     username = user.username
@@ -74,20 +71,19 @@ def fetch_user_data_from_LDAP(user, ):
         raise ValueError, ("Could not find user with username '%s' (filter '%s')"%(username, userfilter))
     return user
 
-
 #gets a list of all student emails, outputs to 'student_emails.txt'
-def student_email():
+def student_email(semester):
     f = open('student_emails.txt', 'w')
-    students = User.objects.filter(profile__role='S')
+    students = Member.objects.filter(role=Member.STUDENT, semester=semester)
     for s in students:
-      f.write(s.email + "\n")
+      f.write(s.user.email + "\n")
     f.close()
 
 #get all student usernames
-def students():
-    students = User.objects.filter(profile__role='S')
+def students(semester):
+    students = Member.objects.filter(role=Member.STUDENT, semester=semester).membership
     for s in students:
-      print s.username
+      print s.user.username
     
 
 parser = argparse.ArgumentParser(description="""
@@ -107,13 +103,13 @@ parser.add_argument('--semester',
 parser.add_argument('--role',
                     nargs=1,
                     type=str,
-                    choices=["student", "staff", "volunteer"],
-                    default="student",
+                    choices=[role[1] for role in Member.ROLE_CHOICES],
+                    default=["student"],
                     help="role of these users in the class")
 parser.add_argument('--slackbudget',
                     nargs=1,
                     type=int,
-                    default=10,
+                    default=[10],
                     help="number of days of slack to give to students")
 parser.add_argument('--file',
                     nargs=1,

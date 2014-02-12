@@ -5,10 +5,11 @@ import itertools
 
 from django.db.models import Count
 from django.contrib import auth
-from django.contrib.auth.models import User as User_django
+from django.contrib.auth.models import User
 
-from chunks import models
 from models import Task
+from chunks.models import Chunk
+from accounts.models import Member
 import random
 import sys
 import app_settings
@@ -18,7 +19,7 @@ __all__ = ['assign_tasks']
 
 # WARNING: These classes shadow the names of the actual model objects
 # that they represent. This is deliberate. I am sorry.
-class User:
+class Reviewer:
     def __init__(self, id, role, reputation):
         self.id = id
         self.role = role
@@ -29,7 +30,7 @@ class User:
         self.clusters = defaultdict(lambda : 0)
 
     def __unicode__(self):
-        return u"User(id=%d, role=%s, reputation=%d)" % \
+        return u"Reviewer(id=%d, role=%s, reputation=%d)" % \
                 (self.id, self.role, self.reputation)
 
     def __str__(self):
@@ -44,18 +45,18 @@ class User:
     def __hash__(self):
         return self.id
 
-class Submission:
+class SubmissionForReview:
     def __init__(self, id, authors, chunks):
         self.id = id
         self.authors = authors
         self.reviewers = set()
-        self.chunks = [Chunk(chunk=chunk, submission=self)
+        self.chunks = [ChunkForReview(chunk=chunk, submission=self)
                 for chunk in chunks]
 
     def __str__(self):
         return unicode(self).encode('utf-8')
 
-class Chunk:
+class ChunkForReview:
     def __init__(self, chunk, submission):
         self.id = chunk['id']
         self.name = chunk['name']
@@ -84,9 +85,6 @@ class Chunk:
             reviewer.other_reviewers.add(user)
         return True
 
-def _convert_role(role):
-    return {'T': 'staff', 'S': 'student'}.get(role, 'other')
-
 def _convert_review_milestone_to_priority(review_milestone):
     to_assign = review_milestone.chunks_to_assign
     priority_dict = dict()
@@ -95,15 +93,15 @@ def _convert_review_milestone_to_priority(review_milestone):
         priority_dict[chunkname] = -int(priority)
     return priority_dict
 
-def load_users():
+def load_members(semester):
     # load all existing users
     user_map = defaultdict(lambda : None)
-    django_users = auth.models.User.objects.select_related('profile').all()
-    for u in django_users:
-        user_map[u.id] = User(
-                id=u.id,
-                role=_convert_role(u.profile.role),
-                reputation=u.profile.reputation)
+    members = Member.objects.filter(semester=semester).select_related('user__profile')
+    for m in members:
+        user_map[m.user_id] = Reviewer(
+                id=m.user_id,
+                role=m.role,
+                reputation=m.user.profile.reputation)
     return user_map
 
 
@@ -113,7 +111,7 @@ def load_chunks(submit_milestone, user_map, django_user):
     submissions = {}
 
     django_submissions = submit_milestone.submissions.exclude(authors=django_user)
-    django_chunks = models.Chunk.objects \
+    django_chunks = Chunk.objects \
             .filter(file__submission__milestone=submit_milestone) \
             .exclude(file__submission__authors=django_user) \
             .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
@@ -128,10 +126,12 @@ def load_chunks(submit_milestone, user_map, django_user):
         django_submission_chunks[chunk['file__submission']].append(chunk)
 
     for django_submission in django_submissions:
-        submission = Submission(
+        submission = SubmissionForReview(
                 id=django_submission.id,
-                authors=[user_map[author.id] for author in django_submission.authors.all()],
+                authors=[user_map[author.id] for author in django_submission.authors.all() if author.id in user_map],
                 chunks=django_submission_chunks[django_submission.id])
+        logging.debug(django_submission.authors.all())
+        logging.debug(submission.authors)
         if not submission.chunks:
             # toss out any submissions without chunks
             continue
@@ -191,10 +191,10 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
 
         role_affinity = 0
         role1, role2 = user1.role, user2.role
-        if role1 == 'student' and role2 == 'staff' or \
-                role1 == 'staff' and role2 == 'student':
+        if role1 == Member.STUDENT and role2 == Member.TEACHER or \
+                role1 == Member.TEACHER and role2 == Member.STUDENT:
             role_affinity = 2
-        elif role1 == 'staff' and role2 == 'staff':
+        elif role1 == Member.TEACHER and role2 == Member.TEACHER:
             role_affinity = -100
         else:
             role_affinity = (role1 != role2)
@@ -220,12 +220,12 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
 
     def make_chunk_sort_key(user):
       def chunk_sort_key(chunk):        
-        num_nonstaff_reviewers = len([u for u in chunk.reviewers if u.role != "staff"])
-        if user.role == 'staff':
+        num_nonstaff_reviewers = len([u for u in chunk.reviewers if u.role != Member.TEACHER])
+        if user.role == Member.TEACHER:
           # prioritize chunks that are approaching their quota of nonstaff reviewers
           review_priority = max(reviewers_per_chunk - num_nonstaff_reviewers, 0)
           # deprioritize chunks that already have staff reviewers
-          review_priority += len([u for u in chunk.reviewers if u.role == "staff"])
+          review_priority += len([u for u in chunk.reviewers if u.role == Member.TEACHER])
         else:
           if num_nonstaff_reviewers < reviewers_per_chunk:
             review_priority = 0 # high priority!  try to finish the quota on this chunk
@@ -270,6 +270,16 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         else:
             return
 
+def num_tasks_for_user(review_milestone, user):
+    if user.role == Member.STUDENT:
+      return review_milestone.student_count
+    elif user.role == Member.TEACHER:
+      return review_milestone.staff_count
+    elif user.role == Member.VOLUNTEER:
+      return review_milestone.alum_count
+    else:
+      return 0
+
 def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=defaultdict(list), max_tasks=sys.maxint, assign_more=False):
     """
     Returns a list of tasks that should be assigned to the given reviewer.
@@ -287,7 +297,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
     unfinished_task_count = unfinished_tasks.count()
 
     # Should task milestones have num_tasks_for_user?
-    num_tasks_to_assign = review_milestone.num_tasks_for_user(reviewer) - unfinished_task_count
+    num_tasks_to_assign = num_tasks_for_user(review_milestone,reviewer) - unfinished_task_count
     if num_tasks_to_assign <= 0:
       return []
 
@@ -302,7 +312,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
     tasks = []
     for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, review_milestone.reviewers_per_chunk, review_milestone.min_student_lines, chunk_type_priorities):
         submission = chunk_map[chunk_id].submission
-        task = Task(reviewer_id=User_django.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone=review_milestone, submission_id=submission.id)
+        task = Task(reviewer_id=User.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone=review_milestone, submission_id=submission.id)
 
         chunk_id_task_map[chunk_id].append(task)
         chunk_map[chunk_id].reviewers.add(reviewer)
@@ -312,7 +322,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
     return tasks
 
 def assign_tasks(review_milestone, reviewer, max_tasks=sys.maxint, assign_more=False):
-  user_map = load_users()
+  user_map = load_members(review_milestone.assignment.semester)
   chunks = load_chunks(review_milestone.submit_milestone, user_map, reviewer)
   chunk_map = {}
   for chunk in chunks:
@@ -325,7 +335,7 @@ def assign_tasks(review_milestone, reviewer, max_tasks=sys.maxint, assign_more=F
   return len(tasks)
 
 def simulate_tasks(review_milestone, num_students, num_staff, num_alum):
-  user_map = load_users()
+  user_map = load_members(review_milestone.assignment.semester)
   chunks = load_chunks(review_milestone.submit_milestone, user_map, None)
   chunk_map = {}
   for chunk in chunks:

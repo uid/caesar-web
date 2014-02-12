@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import redirect, render, get_object_or_404
+from django.http import Http404
 from django.http import HttpResponseRedirect
 from limit_registration import check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
@@ -15,6 +16,8 @@ from accounts.forms import ReputationForm
 from chunks.models import Semester, Submission, Subject
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.db.models import Q, Max
+from caesar.accounts.models import Extension
 import datetime
 import sys
 import re
@@ -125,7 +128,7 @@ def edit_membership(request):
             m = request.user.membership.filter(semester=semester)
             m.delete()
         else:
-            m = Member(user=request.user, role='volunteer', semester=semester)
+            m = Member(user=request.user, role=Member.VOLUNTEER, semester=semester)
             m.save()
 
     return render(request, 'accounts/edit_membership.html', {
@@ -147,7 +150,7 @@ def view_profile(request, username):
     for review_milestone in review_milestones:
         #get all comments that the user wrote
         comments = Comment.objects.filter(author=participant) \
-                          .filter(chunk__file__submission__milestone= review_milestone.submit_milestone).select_related('chunk')
+                          .filter(chunk__file__submission__milestone=review_milestone.submit_milestone).select_related('chunk')
         review_data = []
         for comment in comments:
             if comment.is_reply():
@@ -167,9 +170,11 @@ def view_profile(request, username):
                 review_data.append(("vote-down", vote.comment, vote.comment.generate_snippet(), True, vote))
         review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
         review_milestone_data.append((review_milestone, review_data))
+        user_memberships = request.user.membership.filter(role=Member.TEACHER)
     return render(request, 'accounts/view_profile.html', {
         'review_milestone_data': review_milestone_data,
         'participant': participant,
+        'semesters_taught': Semester.objects.filter(members__in=user_memberships)
 #        'submissions': submissions,  turn off Publishing until it's ready
     })
 
@@ -248,7 +253,7 @@ def bulk_add(request):
         created_users += 1
 
       if not user.membership.filter(semester=semester):
-        membership = Member(role='S', user=user, semester=semester)
+        membership = Member(role=Member.STUDENT, user=user, semester=semester)
         membership.save()
         created_memberships += 1
       else:
@@ -324,7 +329,7 @@ def reputation_adjustment(request):
 def allusers(request):
     participants = User.objects.all().exclude(username = 'checkstyle').prefetch_related('profile', 'membership__semester__subject')
     subjects = Subject.objects.all()
-    roles = Member.objects.values_list('role', flat=True).distinct()
+    roles = [role[1] for role in Member.ROLE_CHOICES]
     return render(request, 'accounts/allusers.html', {
         'participants': participants,
         'subjects': subjects,
@@ -338,7 +343,10 @@ def request_extension(request, milestone_id):
     # what semester is this milestone in?
     current_milestone = Milestone.objects.get(id=milestone_id)
     semester = current_milestone.assignment.semester
-    membership = Member.objects.get(semester=semester, user=user)
+    try:
+        membership = Member.objects.get(semester=semester, user=user)
+    except:
+        raise Http404
 
     # calculate how much slack budget user has left for this semester
     slack_budget = membership.slack_budget
@@ -400,4 +408,21 @@ def request_extension(request, milestone_id):
 @staff_member_required
 def manage(request):
     return render(request, 'accounts/manage.html', {
+    })
+
+@staff_member_required
+def all_extensions(request, milestone_id):
+    current_milestone = Milestone.objects.get(id=milestone_id)
+    students = User.objects.filter(membership__role=Member.STUDENT, membership__semester=current_milestone.assignment.semester)
+    students_with_no_slack = students.exclude(extensions__milestone=current_milestone)
+    extensions = Extension.objects.filter(milestone=current_milestone).select_related('user__username')
+
+    # the index of a list of students in student_slack is the number of slack days requested by the students in the list
+    student_slack = ["".join(sorted([str(student)+"\\n" for student in students_with_no_slack]))]
+    for slack_days in range(1,current_milestone.max_extension+1):
+        student_slack.append("".join([str(ext.user.username)+"\\n" for ext in extensions.filter(slack_used=slack_days)]))
+    
+    return render(request, 'accounts/all_extensions.html', {
+        'current_milestone': current_milestone,
+        'student_slack': student_slack
     })

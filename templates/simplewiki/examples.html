@@ -5,7 +5,7 @@
                           {% else %}votedown-{{comment.id}}-{{comment.chunk.id}}
                           {% endif %}
           {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
-          {% endif %}" class="{%if not user.profile.is_student %}activity-line{%else%}non-activity-line{%endif%}">
+          {% endif %}" class="{%if user.is_staff %}activity-line{%else%}non-activity-line{%endif%}">
     
     <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
     

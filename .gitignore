@@ -6,3 +6,5 @@ settings_local.py
 /data
 /.vagrant
 /build
+*.sqlite3
+

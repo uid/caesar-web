@@ -86,10 +86,9 @@ $(document).ready(function() {
 {% block content %}
 
 <div class='row'>
-{% if user.profile.is_student %}
 <div class='span12 current-assignments'>
 <div class="assignment-header">
-    <h2 class="task-header">current assignments</h2>
+    <h2 class="task-header">upcoming assignments</h2>
 </div>
 
 <table class="current-assignment">
@@ -110,7 +109,6 @@ $(document).ready(function() {
   {% empty %}
   {% endfor %}
 </table>
-{% endif %}
 </div>
 
 {% if submission_data or old_submission_data %}
