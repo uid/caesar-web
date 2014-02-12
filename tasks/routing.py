@@ -191,10 +191,10 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
 
         role_affinity = 0
         role1, role2 = user1.role, user2.role
-        if role1 == 'student' and role2 == 'staff' or \
-                role1 == 'staff' and role2 == 'student':
+        if role1 == Member.STUDENT and role2 == Member.TEACHER or \
+                role1 == Member.TEACHER and role2 == Member.STUDENT:
             role_affinity = 2
-        elif role1 == 'staff' and role2 == 'staff':
+        elif role1 == Member.TEACHER and role2 == Member.TEACHER:
             role_affinity = -100
         else:
             role_affinity = (role1 != role2)
@@ -220,12 +220,12 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
 
     def make_chunk_sort_key(user):
       def chunk_sort_key(chunk):        
-        num_nonstaff_reviewers = len([u for u in chunk.reviewers if u.role != "staff"])
-        if user.role == 'staff':
+        num_nonstaff_reviewers = len([u for u in chunk.reviewers if u.role != Member.TEACHER])
+        if user.role == Member.TEACHER:
           # prioritize chunks that are approaching their quota of nonstaff reviewers
           review_priority = max(reviewers_per_chunk - num_nonstaff_reviewers, 0)
           # deprioritize chunks that already have staff reviewers
-          review_priority += len([u for u in chunk.reviewers if u.role == "staff"])
+          review_priority += len([u for u in chunk.reviewers if u.role == Member.TEACHER])
         else:
           if num_nonstaff_reviewers < reviewers_per_chunk:
             review_priority = 0 # high priority!  try to finish the quota on this chunk
@@ -271,12 +271,14 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             return
 
 def num_tasks_for_user(review_milestone, user):
-    if user.role == 'student':
+    if user.role == Member.STUDENT:
       return review_milestone.student_count
-    elif user.role == 'staff':
+    elif user.role == Member.TEACHER:
       return review_milestone.staff_count
-    else:
+    elif user.role == Member.VOLUNTEER:
       return review_milestone.alum_count
+    else:
+      return 0
 
 def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=defaultdict(list), max_tasks=sys.maxint, assign_more=False):
     """
