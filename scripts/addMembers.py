@@ -34,13 +34,10 @@ def loadusers(filename, role, semester, extension_days):
 # create a single user
 def makeuser(username, role, semester, extension_days):
     print username
-    user, created  = User.objects.get_or_create(username=username, is_active=True)
-    if created:
+    user, user_created  = User.objects.get_or_create(username=username, is_active=True)
+    if user_created:
         fetch_user_data_from_LDAP(user)
-    user.save()
-    
-    profile, created = UserProfile.objects.get_or_create(user=user)
-    profile.save()
+        user.save()
 
     member, created = Member.objects.get_or_create(user=user, semester=semester, slack_budget=extension_days)
     if not created:
@@ -67,6 +64,9 @@ def fetch_user_data_from_LDAP(user, ):
         user.first_name = result[0][1]['givenName'][0]
         user.last_name = result[0][1]['sn'][0]
         user.email = result[0][1]['mail'][0]
+        user.save()
+        user.profile.company = 'MIT'
+        user.profile.save()
     else:
         raise ValueError, ("Could not find user with username '%s' (filter '%s')"%(username, userfilter))
     return user
