@@ -6,6 +6,7 @@ import itertools
 from django.db.models import Count
 from django.contrib import auth
 from django.contrib.auth.models import User
+from django.db.models.query import prefetch_related_objects
 
 from models import Task
 from chunks.models import Chunk
@@ -58,13 +59,13 @@ class SubmissionForReview:
 
 class ChunkForReview:
     def __init__(self, chunk, submission):
-        self.id = chunk['id']
-        self.name = chunk['name']
-        self.cluster_id = chunk['cluster_id']
+        self.id = chunk.id
+        self.name = chunk.name
+        self.cluster_id = chunk.cluster_id
         self.submission = submission
         self.reviewers = set()
-        self.class_type = chunk['class_type']
-        self.student_lines = chunk['student_lines']
+        self.class_type = chunk.class_type
+        self.student_lines = chunk.student_lines
         self.return_count = 0
         self.for_nesting_depth = 0
         self.if_nesting_depth = 0
@@ -110,38 +111,57 @@ def load_chunks(submit_milestone, user_map, django_user):
     chunk_map = {}
     submissions = {}
 
-    django_submissions = submit_milestone.submissions.exclude(authors=django_user)
+    django_submissions = submit_milestone.submissions.exclude(authors=django_user).prefetch_related("authors")
+
+    # the exclude() in the call below failed because of a Django bug.  Try submit_milestone=55, django_user=1016 on the production db.    
+    # django_chunks = Chunk.objects \
+    #         .filter(file__submission__milestone=submit_milestone) \
+    #         .exclude(file__submission__authors=django_user) \
+    #         .prefetch_related('file__submission__authors') \
+    #         .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
+
+    # using a correct raw SQL query instead..
     django_chunks = Chunk.objects \
-            .filter(file__submission__milestone=submit_milestone) \
-            .exclude(file__submission__authors=django_user) \
-            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
+        .raw("""
+SELECT files.submission_id, `chunks`.`id`, `chunks`.`file_id`, `chunks`.`name`, `chunks`.`start`, `chunks`.`end`, `chunks`.`cluster_id`, `chunks`.`created`, `chunks`.`modified`, `chunks`.`class_type`, `chunks`.`staff_portion`, `chunks`.`student_lines`, `chunks`.`chunk_info`
+FROM `chunks` 
+join files on chunks.file_id=files.id
+join submissions on files.submission_id=submissions.id
+join submissions_authors on submissions.id=submissions_authors.submission_id
+where submissions.milestone_id=%s and not(user_id=%s)
+            """, [submit_milestone.id, django_user.id])
+    # preload the file.submission according to http://python.6.x6.nabble.com/Prefetch-related-data-when-using-raw-td4983196.html
+    django_chunks = list(django_chunks)
+    prefetch_related_objects(django_chunks, ['file__submission'])
+
     django_tasks = Task.objects.filter(
             submission__milestone=submit_milestone) \
             .exclude(submission__authors=django_user) \
-                    .select_related('reviewer__user') \
+                    .select_related('reviewer__user', 'chunk') \
 
     # load all submissions and chunks into lightweight internal objects
     django_submission_chunks = defaultdict(list)
     for chunk in django_chunks:
-        django_submission_chunks[chunk['file__submission']].append(chunk)
+        django_submission_chunks[chunk.file.submission_id].append(chunk)
 
     for django_submission in django_submissions:
         submission = SubmissionForReview(
                 id=django_submission.id,
                 authors=[user_map[author.id] for author in django_submission.authors.all() if author.id in user_map],
                 chunks=django_submission_chunks[django_submission.id])
-        logging.debug(django_submission.authors.all())
-        logging.debug(submission.authors)
+        #logging.debug(django_submission.authors.all())
+        #logging.debug(submission.authors)
         if not submission.chunks:
             # toss out any submissions without chunks
             continue
         submissions[submission.id] = submission
         chunks.extend(submission.chunks)
-
+    logging.debug(submissions)
 
     # load existing reviewing assignments
     for chunk in chunks:
         chunk_map[chunk.id] = chunk
+    #logging.debug(chunk_map)
 
     for django_task in django_tasks:
         if django_task.chunk:
