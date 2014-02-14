@@ -3,6 +3,7 @@ import datetime
 import logging
 import textwrap
 import tasks
+import logging
 
 from accounts.fields import MarkdownTextField
 from collections import defaultdict
@@ -98,7 +99,7 @@ def set_submit_type(sender, instance, created, **kwargs):
 class ReviewMilestone(Milestone):
     reviewers_per_chunk = models.IntegerField(default=2)
     min_student_lines = models.IntegerField(default=30)
-    submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestones')
+    submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestone')
     chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
 
     student_count = models.IntegerField(default=5)
@@ -115,16 +116,9 @@ class ReviewMilestone(Milestone):
     staff = models.IntegerField(default=15)
     staff_default = models.IntegerField(default=15)
 
-    def num_tasks_for_user(self, user):
-      if user.role == 'student':
-        return self.student_count
-      elif user.role == 'staff':
-        return self.staff_count
-      else:
-        return self.alum_count
-
 @receiver(post_save, sender=ReviewMilestone)
 def create_current_review_milestone(sender, instance, created, **kwargs):
+    from accounts.models import Member # done here because of circular references between accounts.models and chunks.models 
     if created:
         # This code appears to copy parms from previous assignments in that semester.
         past = ReviewMilestone.objects.filter(assignment__semester = instance.assignment.semester).order_by('-duedate').exclude(id = instance.id)
@@ -146,16 +140,14 @@ def create_current_review_milestone(sender, instance, created, **kwargs):
             instance.alum_count_default = pick.alum_count
             instance.staff_count_default = pick.staff_count
             #set number of students we can expect
-            users = User.objects.filter(profile__tasks__milestone= pick).distinct()
-            students = users.filter(profile__role='S')
-            alums = users.exclude(profile__role='S').exclude(profile__role='T')
-            staff = users.filter(profile__role='T')
-            instance.students_default = students.count()
-            instance.alums_default = alums.count()
-            instance.staff_default = staff.count()
+            members = Member.objects.filter(semester=instance.assignment.semester, user__profile__tasks__milestone=pick).distinct()
+            instance.students_default = members.filter(role=Member.STUDENT).count()
+            instance.alums_default = members.filter(role=Member.VOLUNTEER).count()
+            instance.staff_default = members.filter(role=Member.TEACHER).count()
         else:
-            instance.students_default = User.objects.filter(profile__role = 'S').count()
-            instance.staff_default = User.objects.filter(profile__role = 'T').count()
+            instance.students_default = Member.objects.filter(role=Member.STUDENT, semester=instance.assignment.semester).count()
+            instance.staff_default = Member.objects.filter(role=Member.TEACHER, semester=instance.assignment.semester).count()
+            instance.alum_default = Member.objects.filter(role=Member.VOLUNTEER, semester=instance.assignment.semester).count()
         instance.students = instance.students_default
         instance.alums = instance.alums_default
         instance.staff = instance.staff_default
@@ -217,11 +209,16 @@ class Submission(models.Model):
         return chunks
 
     def code_review_end_date(self):
-        review_milestones = ReviewMilestone.objects.filter(submit_milestone=self.milestone)
-        if review_milestones:
-            return review_milestones.latest('duedate').duedate
-        else:
+        try:
+            review_milestone = ReviewMilestone.objects.get(submit_milestone=self.milestone)
+            return review_milestone.duedate
+        except ObjectDoesNotExist:
             return self.milestone.duedate + datetime.timedelta(days=7)
+        # this should never happen because submit_milestones should only have one review_milestone
+        # although that's not true on our dev server so I'll leave it this way for now
+        except MultipleObjectsReturned:
+            review_milestones = ReviewMilestone.objects.filter(submit_milestone=self.milestone)
+            return review_milestones.latest('duedate').duedate
 
 class File(models.Model):
     id = models.AutoField(primary_key=True)
@@ -415,18 +412,21 @@ class Chunk(models.Model):
         return ('chunks.views.view_chunk', [str(self.id)])
 
     def __unicode__(self):
-        return u'%s' % (self.name,)
+        return u'%s - %s' % (self.name,self.id)
 
-    def sorted_reviewers(self):
-        students = []; alum = []; staff = []
-        for reviewer in self.reviewers.filter():
-            if reviewer.is_student():
-                students.append(reviewer)
-            elif reviewer.is_staff():
-                staff.append(reviewer)
-            else:
-                alum.append(reviewer)
-        return students + alum + staff
+    # # this is never called
+    # def sorted_reviewers(self):    
+    #     members = self.file.submission.milestone.assignment.semester.members.all()
+    #     students = []; alum = []; staff = []
+    #     for member in members:
+    #         reviewer = member.user.profile
+    #         if member.is_student():
+    #             students.append(reviewer)
+    #         elif member.is_teacher():
+    #             staff.append(reviewer)
+    #         elif member.is_volunteer():
+    #             alum.append(reviewer)
+    #     return students + alum + staff
 
     def reviewers_comment_strs(self, tasks=None):
       #assert False C F check course policy
@@ -445,19 +445,20 @@ class Chunk(models.Model):
           'completed': task.completed,
           }
 
-        if task.reviewer.is_student():
+        member = task.reviewer.user.memberships.objects.get(user=task.reviewer.user, semester=task.milestone.assignment.semester)
+        if member.is_student():
           students.append(user_task_dict)
-        elif task.reviewer.is_staff():
+        elif member.is_teacher():
           staff.append(user_task_dict)
+        elif member.is_volunteer():
+          alum.append(user_task_dict)
         elif task.reviewer.is_checkstyle():
           checkstyle.append(user_task_dict)
-        else:
-          alum.append(user_task_dict)
 
       return [checkstyle, students, alum, staff]
 
     def reviewer_count(self):
-      return len(self.sorted_reviewers())
+      return self.file.submission.milestone.assignment.semester.members.exclude(user__username = 'checkstyle').count()
 
     def comment_count(self):
       return len(self.comments.filter())

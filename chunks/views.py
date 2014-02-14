@@ -1,10 +1,12 @@
-from chunks.models import Chunk, File, Assignment, ReviewMilestone, SubmitMilestone, Submission, StaffMarker
+from accounts.models import Member
+from chunks.models import Chunk, File, Assignment, ReviewMilestone, SubmitMilestone, Submission, StaffMarker, Semester
 from chunks.forms import SimulateRoutingForm
 from review.models import Comment, Vote, Star
 from tasks.models import Task
 from tasks.routing import simulate_tasks
 
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
@@ -29,8 +31,27 @@ import logging
 def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
-    if user.profile.is_student() and not chunk.file.submission.milestone.assignment.is_current_semester() and not chunk.file.submission.has_author(user):
-        raise Http404
+    semester = chunk.file.submission.milestone.assignment.semester
+    is_reviewer = chunk in user.profile.assigned_chunks.all()
+
+    # you get a 404 page if
+    # # you weren't a teacher during the semester
+    # #   and
+    # # you didn't write the code
+    # #   and
+    # # you weren't assigned to review the code
+    # #   and
+    # # you aren't a django admin
+    try:
+        user_membership = Member.objects.get(user=user, semester=semester)
+        if not user_membership.is_teacher() and not chunk.file.submission.has_author(user) and not is_reviewer and not user.is_staff:
+            raise PermissionDenied
+    except Member.MultipleObjectsReturned:
+        raise Http404 # you can't be multiple members for a class so this should never get called
+    except Member.DoesNotExist:
+        if not user.is_staff:
+            raise PermissionDenied # you get a 401 page if you aren't a member of the semester
+    
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
 
@@ -63,13 +84,22 @@ def view_chunk(request, chunk_id):
 
     task_count = Task.objects.filter(reviewer=user.get_profile()) \
             .exclude(status='C').exclude(status='U').count()
+    remaining_task_count = task_count
     # get the associated task if it exists
     try:
         task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())
+        last_task = task_count==1 and not (task.status == 'U' or task.status == 'C')
         if task.status == 'N':
             task.mark_as('O')
+        if not (task.status=='U' or task.status=='C'):
+            remaining_task_count -= 1
     except Task.DoesNotExist:
         task = None
+        if user.is_staff:
+            # this is super hacky and it's only here to allow admins to view chunks like a student
+            task = Task.objects.filter(chunk=chunk)[0]
+        last_task = False
+
     return render(request, 'chunks/view_chunk.html', {
         'chunk': chunk,
         'similar_chunks': chunk.get_similar_chunks(),
@@ -80,24 +110,44 @@ def view_chunk(request, chunk_id):
         'full_view': True,
         'file': chunk.file,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
+        'last_task': last_task,
+        'remaining_task_count': remaining_task_count,
     })
 
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
     user = request.user
+    submission = Submission.objects.get(id = submission_id)
+    semester = Semester.objects.get(assignments__milestones__submitmilestone__submissions=submission)
+    authors = User.objects.filter(submissions=submission)
 
     # block a user who's crawling
     if user.username=="dekehu":
         raise Http404
 
+    try:
+        user_membership = Member.objects.get(user=user, semester=semester)
+        # you get a 404 page ifchrome
+        # # you weren't a teacher during the semester
+        # #   and
+        # # you aren't django staff
+        # #   and
+        # # you aren't an author of the submission
+        if not user_membership.is_teacher() and not user.is_staff and not (user in authors):
+            raise PermissionDenied
+    except MultipleObjectsReturned:
+        raise Http404 # you can't be multiple members for a class so this should never get called
+    except DoesNotExist:
+        if not user.is_staff:
+            raise PermissionDenied # you get a 401 page if you aren't a member of the semester
+        
     files = File.objects.filter(submission=submission_id).select_related('chunks')
-    submission = Submission.objects.get(id = submission_id)
     if not files:
         raise Http404
+
     milestone = files[0].submission.milestone
     milestone_name = milestone.full_name()
-    if user.profile.is_student() and not milestone.assignment.is_current_semester() and not submission.has_author(user):
-        raise Http404
+    
     paths = []
     user_stats = []
     static_stats = []
@@ -204,13 +254,19 @@ def view_comment(request, comment_id):
 
 @login_required
 def view_submission_for_milestone(request, viewtype, milestone_id, username):
-  if request.user.profile.role != 'T':
-    raise Http404
+  user = request.user
   try:
+    semester = SubmitMilestone.objects.get(id=milestone_id).assignment.semester
+    member = Member.objects.get(semester=semester, user=user)
+    author = User.objects.get(username__exact=username)
+    if not member.is_teacher() and not user==author and not user.is_staff:
+      raise PermissionDenied
     submission = Submission.objects.get(milestone=milestone_id, authors__username=username)
     return view_all_chunks(request, viewtype, submission.id)
-  except Submission.DoesNotExist:
+  except Submission.DoesNotExist or User.DoesNotExist:
     raise Http404
+  except Member.DoesNotExist:
+    raise PermissionDenied
 
 @login_required
 def simulate(request, review_milestone_id):
@@ -375,18 +431,19 @@ def simulate(request, review_milestone_id):
 
 @login_required
 def list_users(request, review_milestone_id):
-  def cmp_user_data(user_data1, user_data2):
-    user1 = user_data1['user']
-    user2 = user_data2['user']
-    if user1.profile.role == user2.profile.role:
-      return cmp(user1.first_name, user2.first_name)
-    if user1.profile.is_student():
-      return -1
-    if user1.profile.is_staff():
-      return 1
-    if user2.profile.is_student():
-      return 1
-    return -1
+  # def cmp_user_data(user_data1, user_data2):
+  #   user1 = user_data1['user']
+  #   user2 = user_data2['user']
+  #   # change this to use their member role in the class
+  #   if user1.profile.role == user2.profile.role:
+  #     return cmp(user1.first_name, user2.first_name)
+  #   if user1.profile.is_student():
+  #     return -1
+  #   if user1.profile.is_staff():
+  #     return 1
+  #   if user2.profile.is_student():
+  #     return 1
+  #   return -1
 
   def task_dict(task):
     return {
@@ -416,36 +473,38 @@ def list_users(request, review_milestone_id):
         'completed': task.completed,
         }
 
-      if task.reviewer.is_student():
+      member = task.reviewer.user.memberships.objects.get(user=task.reviewer.user, semester=task.milestone.assignment.semester)
+      if member.is_student():
         students.append(user_task_dict)
-      elif task.reviewer.is_staff():
+      elif member.is_teacher():
         staff.append(user_task_dict)
+      elif member.is_volunteer():
+        alum.append(user_task_dict)
       elif task.reviewer.is_checkstyle():
         checkstyle.append(user_task_dict)
-      else:
-        alum.append(user_task_dict)
 
     return [checkstyle, students, alum, staff]
 
   review_milestone = ReviewMilestone.objects.get(id=review_milestone_id)
   submissions = Submission.objects.filter(milestone=review_milestone.submit_milestone)
+  assignment_id = review_milestone.submit_milestone.id
 
   data = {}
   chunk_task_map = defaultdict(list)
   chunk_map = {}
   form = None
 
-  for user in User.objects.select_related("profile").filter(Q(submissions__assignment=assignment_id) | Q(profile__tasks__chunk__file__submission__assignment=assignment_id)):
+  for user in User.objects.select_related('profile').filter(Q(submissions__milestone__id=assignment_id) | Q(profile__tasks__chunk__file__submission__milestone__id=assignment_id)):
       data[user.id] = {'tasks': [], 'user': user, 'chunks': [], 'has_chunks': False, 'submission': None}
 
-  for submission in Submission.objects.select_related('author__profile').filter(assignment=assignment_id):
+  for submission in Submission.objects.select_related('author__profile').filter(milestone__id=assignment_id):
       data[submission.author_id]['submission'] = submission
 
-  for chunk in Chunk.objects.select_related('file__submission').filter(file__submission__assignment=assignment_id):
+  for chunk in Chunk.objects.select_related('file__submission').filter(file__submission__milestone__id=assignment_id):
       chunk_map[chunk.id] = chunk
       authorid = chunk.file.submission.author_id
       data[authorid]['chunks'].append({
-        'reviewer-count': chunk.reviewer_count,
+        'reviewer-count': chunk.reviewer_count(),
         'id': chunk.id,
         'name': chunk.name,
         'reviewers_dicts': None,
@@ -453,7 +512,7 @@ def list_users(request, review_milestone_id):
         })
       data[authorid]['has_chunks'] = True
       
-  for task in Task.objects.select_related('chunk__file__submission__author', 'reviewer__user').filter(chunk__file__submission__assignment=assignment_id):
+  for task in Task.objects.select_related('chunk__file__submission__author', 'reviewer__user').filter(chunk__file__submission__milestone__id=assignment_id):
       authorid = task.chunk.file.submission.author_id
       chunkid = task.chunk_id
       for chunk in data[authorid]['chunks']:

@@ -15,22 +15,18 @@ We use Vagrant and VirtualBox to run Caesar in a virtual machine on your laptop.
 
 ### Clone from github
 
-Clone this repository from github.
+Clone this repository from github, if you haven't already.
 
     git clone https://github.com/uid/caesar-web.git
     cd caesar-web
 
 ### Configure local settings
 
-If you're working at MIT, set up with an initial settings_local.py file that uses the same database settings as our development server.
-
-    scp YOUR_USERNAME@caesar-dev.csail.mit.edu:/var/django/caesar/settings_local.py .
-
-If you're not at MIT, copy the template for settings_local.py:
+Copy the template for settings_local.py:
 
     cp settings_local.py.template settings_local.py
 
-If you're not at MIT, then edit settings_local.py and change the settings appropriately (follow the comments in setting_local.py). 
+The default settings are intended for development: DEBUG is turned on, a local sqlite database file is used for storing data.  For deploying Caesar as a user-facing web app, you should edit settings_local.py and change settings as explained by the comments.
 
 ### Use Vagrant to start the virtual machine
 
@@ -53,9 +49,30 @@ The setup script will probably stop to ask you to configure postfix.  Use the de
 
 Ignore the final warning from apache2: Could not reliably determine the server's fully qualified domain name.
 
+### Initialize Caesar
+
+Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in fixtures/, so you can always delete that file and start this part over if things go wrong. 
+
+    ./manage.py syncdb         # say "no", don't create superuser yet
+    ./manage.py migrate
+
+If you want to preload the database with test data do this:
+
+    ./manage.py loaddata fixtures/test_fixtures.json
+
+If you did NOT complete the previous step (preloading the database with test data), create a superuser that will allow you to log in to Caesar with admin privileges:
+
+    ./manage.py createsuperuser
+
+Finally, make sure the Apache server can write to the database:
+
+    chmod -R g+w fixtures/ 
+    chgrp -R www-data fixtures/
+
 ### Test that Caesar is running
 
-Browse to [10.18.6.30](http://10.18.6.30) on your laptop and try to log in with your MIT certificate.  You should see the same data that [caesar-dev.csail.mit.edu](http://caesar-dev.csail.mit.edu) does.
+Browse to [10.18.6.30](http://10.18.6.30) on your laptop and try to log in, either using the superuser
+account you created above, or (if you're at MIT) with your MIT certificate.  If login is successful, clicking on the "view all users" link at the top of the page should show you all the users in the test database.
 
 
 ### Development tips
@@ -65,7 +82,7 @@ To edit code, work with git, and use other dev tools, just work with the caesar-
 The only thing you *do* have to do from the VM is restart Apache whenever you edit a Python source file.  Here's how:
 
     vagrant ssh              # if you're not already logged into your VM
-    sudo apachectl graceful    # to restart Apache and force it to reload Caesar
+    sudo apachectl graceful  # to restart Apache and force it to reload Caesar
 
 The Django debug toolbar ("DjDt") appears on the right side of Caesar's web pages whenever you have DEBUG=True in settings_local.py.  The toolbar is particularly useful for viewing debug messages. To print messages, use
 

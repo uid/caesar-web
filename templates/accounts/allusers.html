@@ -144,7 +144,7 @@
   </tr>
   </thead>
   {% for participant in participants %}
-  <tr id="participant-{{ participant.username }}" class="activity-line {% for membership in participant.membership.all %}{{ membership.semester.subject.id }}-{{ membership.role }}-{% if membership.semester.is_current_semester %}active{% else %}inactive{% endif %} {% endfor %}" >
+  <tr id="participant-{{ participant.username }}" class="activity-line {% for membership in participant.membership.all %}{{ membership.semester.subject.id }}-{{ membership.get_role_display }}-{% if membership.semester.is_current_semester %}active{% else %}inactive{% endif %} {% endfor %}" >
     <td class="black-text">
       {{ participant.first_name }} {{ participant.last_name }}
       <span class="grey-text">({{ participant.username }})</span>
@@ -153,7 +153,7 @@
     <td class="black-text">
       {% for membership in participant.membership.all %}
         {% if membership.semester.is_current_semester %}
-          <div class="roles-list role-{{ membership.semester.subject.id }}-{{ membership.role }}-active" >{{ membership.semester.subject }} - {{ membership.role }}</div>
+          <div class="roles-list role-{{ membership.semester.subject.id }}-{{ membership.get_role_display }}-active" >{{ membership.semester.subject }} - {{ membership.get_role_display }}</div>
         {% endif %}
       {% endfor %}
     </td>
