@@ -83,12 +83,15 @@ def view_chunk(request, chunk_id):
 
     task_count = Task.objects.filter(reviewer=user.get_profile()) \
             .exclude(status='C').exclude(status='U').count()
+    remaining_task_count = task_count
     # get the associated task if it exists
     try:
         task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())
         last_task = task_count==1 and not (task.status == 'U' or task.status == 'C')
         if task.status == 'N':
             task.mark_as('O')
+        if not (task.status=='U' or task.status=='C'):
+            remaining_task_count -= 1
     except Task.DoesNotExist:
         task = None
         if user.is_staff:
@@ -107,7 +110,7 @@ def view_chunk(request, chunk_id):
         'file': chunk.file,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
         'last_task': last_task,
-        'remaining_task_count': task_count if (task.status=='U' or task.status=='C') else task_count-1,
+        'remaining_task_count': remaining_task_count,
     })
 
 @login_required
