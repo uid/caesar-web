@@ -8,7 +8,7 @@ from subprocess import Popen, PIPE
 
 checkstyle_settings = {
     'settings': '/var/django/caesar/preprocessor/checks.xml',
-    'jar': '/var/django/caesar/preprocessor/checkstyle-5.6-all.jar',
+    'jar': '/var/django/caesar/preprocessor/checkstyle-5.7-all.jar',
     }
 
 comment_regexs = {

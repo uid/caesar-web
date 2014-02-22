@@ -76,22 +76,49 @@
         
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
-        <module name="JavadocMethod"/>
+        <module name="JavadocMethod">
+            <message key="javadoc.unusedTag"
+                     value="NEEDS FIXED Unused {0} tag for ''{1}''. #javadoc"
+             />
+        </module>
+
         <module name="JavadocVariable"/>
+        </module>
+        
         <module name="JavadocStyle"/>
+        </module>
+        
         
         
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
         <module name="ConstantName"/>
+        </module>
+        
         <module name="LocalFinalVariableName"/>
+        </module>
+        
         <module name="LocalVariableName"/>
+        </module>
+        
         <module name="MemberName"/>
+        </module>
+        
         <module name="MethodName"/>
+        </module>
+        
         <module name="PackageName"/>
+        </module>
+        
         <module name="ParameterName"/>
+        </module>
+        
         <module name="StaticVariableName"/>
+        </module>
+        
         <module name="TypeName"/>
+        </module>
+        
         
         
         <!-- Checks for Headers                                -->
@@ -115,9 +142,18 @@
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_import.html -->
         <module name="AvoidStarImport"/>
-        <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
+        </module>
+        
+        <module name="IllegalImport"/>
+         <!-- defaults to sun.* packages -->
+        </module>
+        
         <module name="RedundantImport"/>
+        </module>
+        
         <module name="UnusedImports"/>
+        </module>
+        
         
         
         <!-- Checks for Size Violations.                    -->
