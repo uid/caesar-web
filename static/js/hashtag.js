@@ -46,7 +46,7 @@ function getFormattedHashtagText(text) {
     output = output.replace(/(#braces[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-142311.html#430")>$1</a>');
     output = output.replace(/(#modifierorder[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_modifier.html")>$1</a>');
     output = output.replace(/(#size[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_sizes.html")>$1</a>');
-    output = output.replace(/(#innerassignment[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_coding.html")>$1</a>');
+    output = output.replace(/(#innerassignment[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_coding.html#InnerAssignment")>$1</a>');
     output = output.replace(/(#hashcode[^\w])/ig, '<a onclick=hashtagRedirect("http://www.technofundo.com/tech/java/equalhash.html")>$1</a>');
     output = output.replace(/(#tab[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Files")>$1</a>');
     output = output.replace(/(#scope[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Variables")>$1</a>');
