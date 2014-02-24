@@ -61,3 +61,16 @@ button[disabled]:hover, button[disabled]:focus {
     border-bottom: 1px solid #bbb;
 }
 
+.hashtag-important {
+    color:black; 
+    background:#FFBEBE; 
+    padding: 1px 2px 1px 2px; 
+    border-radius:3px; 
+    text-decoration: none;
+}
+/*
+.hashtag-important:hover {
+    background:none;
+    cursor:pointer;
+}
+*/

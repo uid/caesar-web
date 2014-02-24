@@ -51,8 +51,10 @@
     
     <!-- Checks that property files contain the same keys.         -->
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
+    <!--
     <module name="Translation"/>
-    
+    -->
+
     <!-- Checks for Size Violations.                    -->
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="FileLength"/>
@@ -72,51 +74,76 @@
      </module>
      -->
     
+    <!--
+            <message key=""
+                     value=""/>
+    -->
     <module name="TreeWalker">
         
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
         <module name="JavadocMethod">
+            <message key="javadoc.missing"
+                     value="Missing a #javadoc comment. #important"/>
             <message key="javadoc.unusedTag"
-                     value="NEEDS FIXED Unused {0} tag for ''{1}''. #javadoc"
-             />
+                     value="The #javadoc comment has a {0} tag for ''{1}'', but it is not mentioned in the code."/>
+            <message key="javadoc.expectedTag"
+                     value="The #javadoc comment is missing a {0} tag for ''{1}'', which is mentioned in the code."/>
+            <message key="javadoc.return.expected"
+                     value="The #javadoc comment is missing an @return tag for a method that has a return value."/>
         </module>
-
+        
+        <!--
         <module name="JavadocVariable"/>
-        </module>
-        
         <module name="JavadocStyle"/>
-        </module>
-        
+        -->        
         
         
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
-        <module name="ConstantName"/>
+        <module name="ConstantName">
+            <message key="name.invalidPattern"
+                     value="Constants like {0} should be all capital letters, separated by underscores, according to Java #namingconvention.  #important"/>
         </module>
         
-        <module name="LocalFinalVariableName"/>
+        <module name="LocalFinalVariableName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
         </module>
         
-        <module name="LocalVariableName"/>
+        <module name="LocalVariableName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
         </module>
         
-        <module name="MemberName"/>
+        <module name="MemberName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
         </module>
         
-        <module name="MethodName"/>
+        <module name="MethodName">
+            <message key="name.invalidPattern"
+                     value="Method names like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
         </module>
         
-        <module name="PackageName"/>
+        <module name="PackageName">
+            <message key="name.invalidPattern"
+                     value="Package names like {0} should be all lowercase, separated by underscores, according to Java #namingconvention.  #important"/>
         </module>
         
-        <module name="ParameterName"/>
+        <module name="ParameterName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
         </module>
         
-        <module name="StaticVariableName"/>
+        <module name="StaticVariableName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
         </module>
         
-        <module name="TypeName"/>
+        <module name="TypeName">
+            <message key="name.invalidPattern"
+                     value="Class names like {0} should start with a capital letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
         </module>
         
         
@@ -141,17 +168,17 @@
         
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_import.html -->
-        <module name="AvoidStarImport"/>
+        <module name="AvoidStarImport">
         </module>
         
-        <module name="IllegalImport"/>
+        <module name="IllegalImport">
          <!-- defaults to sun.* packages -->
         </module>
         
-        <module name="RedundantImport"/>
+        <module name="RedundantImport">
         </module>
         
-        <module name="UnusedImports"/>
+        <module name="UnusedImports">
         </module>
         
         
@@ -189,17 +216,27 @@
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock"/>
+        <!--
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
-        
+        -->
         
         <!-- Checks for common coding problems               -->
         <!-- See http://checkstyle.sf.net/config_coding.html -->
         <module name="EmptyStatement"/>
-        <module name="EqualsHashCode"/>
+        <module name="EqualsHashCode">
+            <message key="equals.noHashCode"
+                     value="Definition of ''equals()'' without corresponding definition of ''hashCode()''. #important"/>
+        </module>
         <module name="IllegalInstantiation"/>
-        <module name="InnerAssignment"/>
-        <module name="MagicNumber"/>
+        <module name="InnerAssignment">
+            <message key="assignment.inner.avoid"
+                     value="Avoid putting an assignment expression inside another expression (an #innerassignment).  Pull the assignment out into its own statement instead. #important"/>
+        </module>
+        <module name="MagicNumber">
+            <message key="magic.number"
+                     value="{0} is a #magicnumber, which should be a named constant instead. #important"/>
+        </module>
         <module name="MissingSwitchDefault"/>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
@@ -221,7 +258,9 @@
         
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
+        <!--
         <module name="ArrayTypeStyle"/>
+        -->
         <module name="TodoComment"/>
         <module name="UpperEll"/>
         
