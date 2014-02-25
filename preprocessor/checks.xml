@@ -68,7 +68,6 @@
                      value="File contains #tab characters. This is the first instance, but you need to replace them all. Configure your editor to replace use only space characters for indentation. #important"/>
     </module>
 
-    File contains tab characters (this is the first instance).
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
     <!--
