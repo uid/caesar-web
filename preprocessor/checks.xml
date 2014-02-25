@@ -47,8 +47,10 @@
     
     <!-- Checks whether files end with a new line.                        -->
     <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
+    <!--
     <module name="NewlineAtEndOfFile"/>
-    
+    -->
+
     <!-- Checks that property files contain the same keys.         -->
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
     <!--
@@ -208,7 +210,11 @@
         
         <!-- Modifier Checks                                    -->
         <!-- See http://checkstyle.sf.net/config_modifiers.html -->
-        <module name="ModifierOrder"/>
+        <module name="ModifierOrder">
+            <message key="mod.order"
+                     value="''{0}'' modifier is not in the conventional Java #modifierorder. #important"/>
+        </module>
+
         <module name="RedundantModifier"/>
         
         
@@ -223,7 +229,11 @@
         
         <!-- Checks for common coding problems               -->
         <!-- See http://checkstyle.sf.net/config_coding.html -->
-        <module name="EmptyStatement"/>
+        <module name="EmptyStatement">
+            <message key="empty.statement"
+                     value="Avoid #emptystatement in the body of an if, while, or for statement. #important"/>
+        </module>
+
         <module name="EqualsHashCode">
             <message key="equals.noHashCode"
                      value="Definition of ''equals()'' without corresponding definition of ''hashCode()''. #important"/>
@@ -235,20 +245,34 @@
         </module>
         <module name="MagicNumber">
             <message key="magic.number"
-                     value="{0} is a #magicnumber, which should be a named constant instead. #important"/>
+                     value="{0} is a #magicnumber, which should be a named constant instead. #important unless this is a test case."/>
         </module>
-        <module name="MissingSwitchDefault"/>
-        <module name="SimplifyBooleanExpression"/>
-        <module name="SimplifyBooleanReturn"/>
+
+        <module name="MissingSwitchDefault">
+            <message key="missing.switch.default"
+                     value="switch statement without #defaultclause. #important"/>
+	</module>
+
+        <module name="SimplifyBooleanExpression">
+            <message key="simplify.expression"
+                     value="This boolean expression can be simplifie.  You don't need to test a boolean value against true or false. Just use the boolean value directly. #important"/>
+	</module> 
+
+       <module name="SimplifyBooleanReturn"/>
+
+	<!--
         <module name="ReturnCount">
-    		<property name="max" value="1"/>
-		</module>
-		<module name="NestedIfDepth">
-    		<property name="max" value="1"/>
-		</module>
-		<module name="NestedForDepth">
-    		<property name="max" value="1"/>
-		</module>
+    	  <property name="max" value="1"/>
+	</module>
+	-->
+
+	<module name="NestedIfDepth">
+    	  <property name="max" value="2"/>
+	</module>
+
+	<module name="NestedForDepth">
+    	  <property name="max" value="2"/>
+	</module>
         
         <!-- Checks for class design                         -->
         <!-- See http://checkstyle.sf.net/config_design.html -->
@@ -261,7 +285,11 @@
         <!--
         <module name="ArrayTypeStyle"/>
         -->
-        <module name="TodoComment"/>
+        <module name="TodoComment">
+            <message key="todo.match"
+                     value="Remove all TO-DO comments that are done. #important"/>
+	</module>
+
         <module name="UpperEll"/>
         
     </module>
