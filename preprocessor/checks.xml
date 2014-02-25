@@ -281,7 +281,11 @@
         <!-- Checks for class design                         -->
         <!-- See http://checkstyle.sf.net/config_design.html -->
         <module name="InterfaceIsType"/>
-        <module name="VisibilityModifier"/>
+        <module name="VisibilityModifier">
+            <message key="variable.notPrivate"
+                     value="Variable ''{0}'' must be private and have accessor methods. You should #minimizescope. #important"/>
+
+        </module>
         
         
         <!-- Miscellaneous other checks.                   -->
