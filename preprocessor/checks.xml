@@ -63,8 +63,12 @@
     
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-    <module name="FileTabCharacter"/>
-    
+    <module name="FileTabCharacter">
+            <message key="file.containsTab"
+                     value="File contains #tab characters. This is the first instance, but you need to replace them all. Configure your editor to replace use only space characters for indentation. #important"/>
+    </module>
+
+    File contains tab characters (this is the first instance).
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
     <!--
@@ -86,7 +90,7 @@
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
         <module name="JavadocMethod">
             <message key="javadoc.missing"
-                     value="Missing a #javadoc comment. #important"/>
+                     value="Missing a #javadoc comment. #important unless this is a test case"/>
             <message key="javadoc.unusedTag"
                      value="The #javadoc comment has a {0} tag for ''{1}'', but it is not mentioned in the code."/>
             <message key="javadoc.expectedTag"
@@ -255,7 +259,7 @@
 
         <module name="SimplifyBooleanExpression">
             <message key="simplify.expression"
-                     value="This boolean expression can be simplifie.  You don't need to test a boolean value against true or false. Just use the boolean value directly. #important"/>
+                     value="This boolean expression can be simplified.  You don't need to test a boolean value against true or false. Just use the boolean value directly. #important"/>
 	</module> 
 
        <module name="SimplifyBooleanReturn"/>
