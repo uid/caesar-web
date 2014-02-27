@@ -14,9 +14,11 @@
     <span class="comment-count" title="Comments">
       {{ task.chunk.comment_count }} 
     </span>
+    <!-- bring this back once reviewer_count() is correct and runs fast
     <span class="reviewer-count" title="Reviewers">
-      {{ task.chunk.reviewer_count }}
+      UNCOMMENT THIS {# {{ task.chunk.reviewer_count }} #}
     </span>
+    -->
   </span>
   <span class="task-snippet">
     {#  this is useless and expensive {{ task.chunk.generate_snippet }} #}

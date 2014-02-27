@@ -42,13 +42,13 @@ def dashboard(request):
             pass
 
     old_completed_tasks = user.get_profile().tasks \
-        .select_related('chunk__file__submission__milestone') \
+        .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .filter(status='C') \
         .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
     annotate_tasks_with_counts(old_completed_tasks)
 
     active_tasks = user.get_profile().tasks \
-        .select_related('chunk__file__submission__milestone') \
+        .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .exclude(status='C') \
         .exclude(status='U') \
         .order_by('chunk__name', 'submission__name')
@@ -60,7 +60,7 @@ def dashboard(request):
     active_tasks = list(active_tasks)
 
     completed_tasks = user.get_profile().tasks \
-        .select_related('chunk__file__submission__milestone') \
+        .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .filter(status='C') \
         .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
         .order_by('completed').reverse()
