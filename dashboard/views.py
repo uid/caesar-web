@@ -101,7 +101,7 @@ def dashboard(request):
                                   user_comments, static_comments))
 
     #find the current submissions
-    current_milestones = Milestone.objects.filter(assignment__semester__members__user=user, assignment__semester__members__role=Member.STUDENT)\
+    current_milestones = SubmitMilestone.objects.filter(assignment__semester__members__user=user, assignment__semester__members__role=Member.STUDENT)\
         .filter(assigned_date__lt= datetime.datetime.now())\
         .order_by('duedate')
 
@@ -190,7 +190,7 @@ def student_dashboard(request, username):
                                   user_comments, static_comments))
 
     #find the current submissions
-    current_milestones = Milestone.objects.filter(assignment__semester__members__user=participant)\
+    current_milestones = SubmitMilestone.objects.filter(assignment__semester__members__user=participant)\
         .filter(duedate__gt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
         .filter(assigned_date__lt=datetime.datetime.now() - datetime.timedelta(minutes=30))\
         .order_by('duedate')
