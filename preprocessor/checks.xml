@@ -173,8 +173,10 @@
         
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_import.html -->
+        <!--
         <module name="AvoidStarImport">
         </module>
+        -->
         
         <module name="IllegalImport">
          <!-- defaults to sun.* packages -->
