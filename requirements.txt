@@ -10,4 +10,3 @@ python-ldap
 MySQL-python
 markdown
 django-tools
-django-piston
