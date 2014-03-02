@@ -185,7 +185,7 @@ $(document).ready(function() {
        <div class="task-empty">
             No tasks left. If you haven't already, please fill out 
             our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>. 
-            {%if open_assignments %} 
+            {%if allow_requesting_more_tasks %} 
               Or <button id="more_work" type="button">Get more tasks!</button> 
               <span id="progress"><img src="{{ STATIC_URL }}img/progress.gif"/></span>
             {% endif%}
