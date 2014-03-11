@@ -193,8 +193,11 @@
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
         <!-- <module name="LineLength"/> -->
-        <module name="MethodLength"/>
-        <module name="ParameterNumber"/>
+        <module name="MethodLength">
+        </module>
+
+        <module name="ParameterNumber">
+        </module>
         
         
         <!-- Checks for whitespace                               -->
@@ -226,8 +229,12 @@
         
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
-        <module name="AvoidNestedBlocks"/>
-        <module name="EmptyBlock"/>
+        <module name="AvoidNestedBlocks">
+        </module>
+
+        <module name="EmptyBlock">
+        </module>
+
         <!--
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
@@ -244,11 +251,14 @@
             <message key="equals.noHashCode"
                      value="Definition of ''equals()'' without corresponding definition of ''hashCode()''. #important"/>
         </module>
+
         <module name="IllegalInstantiation"/>
+
         <module name="InnerAssignment">
             <message key="assignment.inner.avoid"
                      value="Avoid putting an assignment expression inside another expression (an #innerassignment).  Pull the assignment out into its own statement instead. #important"/>
         </module>
+
         <module name="MagicNumber">
             <message key="magic.number"
                      value="{0} is a #magicnumber, which should be a named constant instead. #important unless this is a test case."/>
@@ -257,28 +267,31 @@
         <module name="MissingSwitchDefault">
             <message key="missing.switch.default"
                      value="switch statement without #defaultclause. #important"/>
-	</module>
+        </module>
 
         <module name="SimplifyBooleanExpression">
             <message key="simplify.expression"
                      value="This boolean expression can be simplified.  You don't need to test a boolean value against true or false. Just use the boolean value directly. #important"/>
-	</module> 
+        </module> 
 
-       <module name="SimplifyBooleanReturn"/>
+       <module name="SimplifyBooleanReturn">
+            <message key="simplify.boolreturn"
+                     value="This statement can be simplified.  You don't need to use an if statement to decide whether to return true or false. Just return the conditional expression directly. #important"/>
+        </module> 
 
-	<!--
+    <!--
         <module name="ReturnCount">
-    	  <property name="max" value="1"/>
-	</module>
-	-->
+          <property name="max" value="1"/>
+    </module>
+    -->
 
-	<module name="NestedIfDepth">
-    	  <property name="max" value="2"/>
-	</module>
+        <module name="NestedIfDepth">
+              <property name="max" value="2"/>
+        </module>
 
-	<module name="NestedForDepth">
-    	  <property name="max" value="2"/>
-	</module>
+        <module name="NestedForDepth">
+              <property name="max" value="2"/>
+        </module>
         
         <!-- Checks for class design                         -->
         <!-- See http://checkstyle.sf.net/config_design.html -->
@@ -298,9 +311,10 @@
         <module name="TodoComment">
             <message key="todo.match"
                      value="Remove all TO-DO comments that are done. #important"/>
-	</module>
+        </module>
 
-        <module name="UpperEll"/>
+        <module name="UpperEll">
+        </module>
         
     </module>
     
