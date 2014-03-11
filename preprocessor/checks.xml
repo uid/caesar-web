@@ -89,7 +89,7 @@
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
         <module name="JavadocMethod">
             <message key="javadoc.missing"
-                     value="Missing a #javadoc comment. #important unless this is a test case"/>
+                     value="Missing a #javadoc comment. #important"/>
             <message key="javadoc.unusedTag"
                      value="The #javadoc comment has a {0} tag for ''{1}'', but it is not mentioned in the code."/>
             <message key="javadoc.expectedTag"
@@ -261,7 +261,7 @@
 
         <module name="MagicNumber">
             <message key="magic.number"
-                     value="{0} is a #magicnumber, which should be a named constant instead. #important unless this is a test case."/>
+                     value="{0} is a #magicnumber, which should be a named constant instead. #important"/>
         </module>
 
         <module name="MissingSwitchDefault">

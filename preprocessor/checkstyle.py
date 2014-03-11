@@ -14,7 +14,7 @@ checkstyle_settings = {
 # to a set of checkstyle modules whose warnings should be discarded
 # in classes of that type.  The modules should be described by full Java classname.
 ignored_warnings = defaultdict(set, {
-    'TEST': set([ 'com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck', 
+    'test': set([ 'com.puppycrawl.tools.checkstyle.checks.javadoc.JavadocMethodCheck', 
                   'com.puppycrawl.tools.checkstyle.checks.coding.MagicNumberCheck' ])
 })
 
@@ -33,8 +33,9 @@ def generate_comments(chunk, checkstyle_user, batch):
   xml = run_checkstyle(chunk.file.path)
   comment_nodes = find_comment_nodes(xml)
   ignored = 0
+  comments = []
   for node in comment_nodes:
-    if node.source in ignored_warnings[chunk.class_type]:
+    if node.getAttribute('source') in ignored_warnings[chunk.class_type]:
       ignored += 1
     else:
       comments.append(Comment(
@@ -45,7 +46,7 @@ def generate_comments(chunk, checkstyle_user, batch):
         author=checkstyle_user,
         start=node.getAttribute('line'),
         end=node.getAttribute('line')))
-  print chunk.name, 'made', len(comments), 'and ignored', ignored
+  print "checkstyle: on", chunk.name, 'I made', len(comments), 'comments and ignored', ignored, 'minor problems'
   return comments
 
 def find_comment_nodes(xml):
