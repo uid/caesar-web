@@ -267,13 +267,14 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         return (
             user in chunk.reviewers,
             user in chunk.submission.authors,
-            review_priority,
-            type_priority,
--total_affinity(user, chunk.submission.reviewers),
-            -total_affinity(user, chunk.reviewers),
-            len(chunk.submission.reviewers),
+#            review_priority,
+#            type_priority,
+#            -total_affinity(user, chunk.submission.reviewers),
+#            -total_affinity(user, chunk.reviewers),
+#            len(chunk.submission.reviewers),
 #                    -1*(chunk.return_count + chunk.for_nesting_depth + chunk.if_nesting_depth),
             -(chunk.student_lines if chunk.student_lines != None else 0),
+            random.random()
         )
       return chunk_sort_key
     
@@ -283,7 +284,6 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         return
     for _ in itertools.repeat(None, count):
         # TODO consider using a priority queue here
-        #random.shuffle(chunks)
         chunk_to_assign = min(chunks, key=key)
         if chunk_to_assign.assign_reviewer(user):
             yield chunk_to_assign.id
