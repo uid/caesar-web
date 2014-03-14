@@ -65,12 +65,13 @@ def find_comment_nodes(xml):
   return comment_nodes
 
 def generate_checkstyle_comments(code_objects, save, batch):
+  
   checkstyle_user,created = User.objects.get_or_create(username='checkstyle')
 
   i = 0
   for (submission, files, chunks) in code_objects:
     i += 1
-    print "%s of %s. %s chunks for this submission." % (i, len(code_objects), len(chunks))
+    print "%s: %s chunks for this submission." % (submission, len(chunks))
     for chunk in chunks:
       if chunk.student_lines == 0:
         continue  # don't run checkstyle on code that student hasn't touched

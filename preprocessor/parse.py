@@ -43,7 +43,17 @@ def split_into_usernames(folderName):
     return folderName.split("-")
 
 def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code, restricted):
-  return [parse_student_files(split_into_usernames(rootFolderName), files, batch, submit_milestone, save, student_base_dir, staff_code, restricted) for (rootFolderName, files) in student_code.iteritems()]
+  code_objects = [
+     parse_student_files(split_into_usernames(rootFolderName),
+                         files,
+                         batch,
+                         submit_milestone,
+                         save,
+                         student_base_dir,
+                         staff_code,
+                         restricted)
+    for (rootFolderName, files) in student_code.iteritems()]
+  return [code_object for code_object in code_objects if code_object != None]
 
 def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code, restricted):
   # staff_code is a dictionary from filename to staff code
