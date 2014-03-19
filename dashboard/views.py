@@ -29,19 +29,19 @@ def dashboard(request):
     live_review_milestones = ReviewMilestone.objects.filter(assigned_date__lt=datetime.datetime.now(),\
          duedate__gt=datetime.datetime.now(), assignment__semester__members__user=user).all()
     for review_milestone in live_review_milestones:
-        logging.debug("live reviewing milestone: " + review_milestone)
+        #logging.debug("live reviewing milestone: " + review_milestone)
         current_tasks = user.tasks.filter(milestone=review_milestone)
         active_sub = Submission.objects.filter(authors=user, milestone=review_milestone.submit_milestone)
         try:
             membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
             if active_sub.count() or not Member.STUDENT in membership.role:
-                logging.debug("I can have assignments")
+                #logging.debug("I can have assignments")
                 # user is a student with an existing submission, or isn't a student
                 # allow user to request more tasks manually
                 allow_requesting_more_tasks = True
                 if not current_tasks.count(): 
                     # automatically assign new tasks to student ONLY if they don't already have tasks
-                    logging.debug("assigning tasks")
+                    #logging.debug("assigning tasks")
                     new_task_count += assign_tasks(review_milestone, user)
         except ObjectDoesNotExist:
             pass
