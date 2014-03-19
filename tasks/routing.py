@@ -166,7 +166,7 @@ where submissions.milestone_id=%s and not(user_id=%s)
     for django_task in django_tasks:
         if django_task.chunk:
             chunk = chunk_map[django_task.chunk_id] # looks like dead code
-            reviewer = user_map[django_task.reviewer.user_id]
+            reviewer = user_map[django_task.reviewer_id]
             chunk_map[django_task.chunk_id].assign_reviewer(reviewer)
 
     return chunks
@@ -332,7 +332,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
     tasks = []
     for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, review_milestone.reviewers_per_chunk, review_milestone.min_student_lines, chunk_type_priorities):
         submission = chunk_map[chunk_id].submission
-        task = Task(reviewer_id=User.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone=review_milestone, submission_id=submission.id)
+        task = Task(reviewer_id=reviewer.id, chunk_id=chunk_id, milestone=review_milestone, submission_id=submission.id)
 
         chunk_id_task_map[chunk_id].append(task)
         chunk_map[chunk_id].reviewers.add(reviewer)

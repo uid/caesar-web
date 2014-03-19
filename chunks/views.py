@@ -32,7 +32,7 @@ def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
     semester = chunk.file.submission.milestone.assignment.semester
-    is_reviewer = chunk in user.profile.assigned_chunks.all()
+    is_reviewer = Task.objects.filter(chunk=chunk, reviewer=user).exists()
 
     # you get a 404 page if
     # # you weren't a teacher during the semester
@@ -82,12 +82,12 @@ def view_chunk(request, chunk_id):
         else:
             highlighted_lines.append((number, line, False))
 
-    task_count = Task.objects.filter(reviewer=user.get_profile()) \
+    task_count = Task.objects.filter(reviewer=user) \
             .exclude(status='C').exclude(status='U').count()
     remaining_task_count = task_count
     # get the associated task if it exists
     try:
-        task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())
+        task = Task.objects.get(chunk=chunk, reviewer=user)
         last_task = task_count==1 and not (task.status == 'U' or task.status == 'C')
         if task.status == 'N':
             task.mark_as('O')
@@ -487,7 +487,7 @@ def list_users(request, review_milestone_id):
   chunk_map = {}
   form = None
 
-  for user in User.objects.select_related('profile').filter(Q(submissions__milestone__id=assignment_id) | Q(profile__tasks__chunk__file__submission__milestone__id=assignment_id)):
+  for user in User.objects.select_related('profile').filter(Q(submissions__milestone__id=assignment_id) | Q(tasks__chunk__file__submission__milestone__id=assignment_id)):
       data[user.id] = {'tasks': [], 'user': user, 'chunks': [], 'has_chunks': False, 'submission': None}
 
   for submission in Submission.objects.select_related('author__profile').filter(milestone__id=assignment_id):
