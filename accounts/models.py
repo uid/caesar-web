@@ -62,8 +62,6 @@ class UserProfile(models.Model):
                 instance.user.username)
     
     user = models.OneToOneField(User, related_name='profile')
-    assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
-        related_name='reviewers')
     reputation = models.IntegerField(default=0, editable=True)
 
     photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True,\

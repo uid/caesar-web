@@ -140,7 +140,7 @@ def create_current_review_milestone(sender, instance, created, **kwargs):
             instance.alum_count_default = pick.alum_count
             instance.staff_count_default = pick.staff_count
             #set number of students we can expect
-            members = Member.objects.filter(semester=instance.assignment.semester, user__profile__tasks__milestone=pick).distinct()
+            members = Member.objects.filter(semester=instance.assignment.semester, user__tasks__milestone=pick).distinct()
             instance.students_default = members.filter(role=Member.STUDENT).count()
             instance.alums_default = members.filter(role=Member.VOLUNTEER).count()
             instance.staff_default = members.filter(role=Member.TEACHER).count()
@@ -307,7 +307,7 @@ class Chunk(models.Model):
         # get the authors.
         authors = [str(u.username) for u in self.file.submission.authors.filter()]
         # get the assigned reviewers.
-        assigned_reviewers = User.objects.filter(profile__tasks__submission=self.file.submission)
+        assigned_reviewers = User.objects.filter(tasks__submission=self.file.submission)
         reviewers = [str(u.username) for u in assigned_reviewers]
 
         allowed_users = authors + reviewers
@@ -428,34 +428,35 @@ class Chunk(models.Model):
     #             alum.append(reviewer)
     #     return students + alum + staff
 
-    def reviewers_comment_strs(self, tasks=None):
-      #assert False C F check course policy
-      comment_count = defaultdict(int)
-      for comment in self.comments.all():
-        comment_count[comment.author.profile] += 1
-
-      if not tasks:
-        tasks = self.tasks.all()
-
-      checkstyle = []; students = []; alum = []; staff = []
-      for task in tasks:
-        user_task_dict = {
-          'username': task.reviewer.user.username,
-          'count': comment_count[task.reviewer],
-          'completed': task.completed,
-          }
-
-        member = task.reviewer.user.memberships.objects.get(user=task.reviewer.user, semester=task.milestone.assignment.semester)
-        if member.is_student():
-          students.append(user_task_dict)
-        elif member.is_teacher():
-          staff.append(user_task_dict)
-        elif member.is_volunteer():
-          alum.append(user_task_dict)
-        elif task.reviewer.is_checkstyle():
-          checkstyle.append(user_task_dict)
-
-      return [checkstyle, students, alum, staff]
+    # dead code, never called
+    # def reviewers_comment_strs(self, tasks=None):
+    #   #assert False C F check course policy
+    #   comment_count = defaultdict(int)
+    #   for comment in self.comments.all():
+    #     comment_count[comment.author] += 1
+    #
+    #   if not tasks:
+    #     tasks = self.tasks.all()
+    #
+    #   checkstyle = []; students = []; alum = []; staff = []
+    #   for task in tasks:
+    #     user_task_dict = {
+    #       'username': task.reviewer.username,
+    #       'count': comment_count[task.reviewer],
+    #       'completed': task.completed,
+    #       }
+    #
+    #     member = task.reviewer.user.memberships.objects.get(user=task.reviewer.user, semester=task.milestone.assignment.semester)
+    #     if member.is_student():
+    #       students.append(user_task_dict)
+    #     elif member.is_teacher():
+    #       staff.append(user_task_dict)
+    #     elif member.is_volunteer():
+    #       alum.append(user_task_dict)
+    #     elif task.reviewer.is_checkstyle():
+    #       checkstyle.append(user_task_dict)
+    #
+    #   return [checkstyle, students, alum, staff]
 
     def reviewer_count(self):
       return self.file.submission.milestone.assignment.semester.members.exclude(user__username = 'checkstyle').count()

@@ -29,16 +29,19 @@ def dashboard(request):
     live_review_milestones = ReviewMilestone.objects.filter(assigned_date__lt=datetime.datetime.now(),\
          duedate__gt=datetime.datetime.now(), assignment__semester__members__user=user).all()
     for review_milestone in live_review_milestones:
-        current_tasks = user.get_profile().tasks.filter(milestone=review_milestone)
+        #logging.debug("live reviewing milestone: " + review_milestone)
+        current_tasks = user.tasks.filter(milestone=review_milestone)
         active_sub = Submission.objects.filter(authors=user, milestone=review_milestone.submit_milestone)
         try:
             membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
             if active_sub.count() or not Member.STUDENT in membership.role:
+                #logging.debug("I can have assignments")
                 # user is a student with an existing submission, or isn't a student
                 # allow user to request more tasks manually
                 allow_requesting_more_tasks = True
                 if not current_tasks.count(): 
                     # automatically assign new tasks to student ONLY if they don't already have tasks
+                    #logging.debug("assigning tasks")
                     new_task_count += assign_tasks(review_milestone, user)
         except ObjectDoesNotExist:
             pass
@@ -58,20 +61,20 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
         tasks.annotate(comment_count=Count('chunk__comments', distinct=True),
                        reviewer_count=Count('chunk__tasks', distinct=True))
 
-    active_tasks = dashboard_user.get_profile().tasks \
+    active_tasks = dashboard_user.tasks \
         .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .exclude(status='C') \
         .exclude(status='U') \
         .order_by('chunk__name', 'submission__name')
     annotate_tasks_with_counts(active_tasks)
 
-    old_completed_tasks = dashboard_user.get_profile().tasks \
+    old_completed_tasks = dashboard_user.tasks \
         .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .filter(status='C') \
         .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
     annotate_tasks_with_counts(old_completed_tasks)
 
-    completed_tasks = dashboard_user.get_profile().tasks \
+    completed_tasks = dashboard_user.tasks \
         .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .filter(status='C') \
         .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
@@ -83,7 +86,7 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
         for submission in submissions:
             user_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='U').count()
             static_comments = Comment.objects.filter(chunk__file__submission=submission).filter(type='S').count()
-            reviewer_count = UserProfile.objects.filter(tasks__chunk__file__submission = submission).count()
+            reviewer_count = User.objects.filter(tasks__chunk__file__submission = submission).count()
             data.append((submission, reviewer_count, submission.last_modified,
                                       user_comments, static_comments))
         return data
