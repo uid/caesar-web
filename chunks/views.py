@@ -208,7 +208,7 @@ def view_all_chunks(request, viewtype, submission_id):
                     snippet = chunk.generate_snippet(comment.start, comment.end)
                     return (comment, snippet)
 
-                comments = chunk.comments.select_related('chunk', 'author__profile')
+                comments = chunk.comments.select_related('chunk', 'authors__profile')
                 comment_data = map(get_comment_data, comments)
 
                 user_comments += comments.filter(type='U').count()
@@ -453,7 +453,7 @@ def list_users(request, review_milestone_id):
     comment_count = defaultdict(int)
     if chunk and (not tasks or len(tasks) == 0):
       for comment in chunk.comments.all():
-        comment_count[comment.author.profile] += 1
+        comment_count[comment.author] += 1
 
     #if chunk and (not tasks or len(tasks) == 0):
     #  tasks = chunk.tasks.all()
@@ -461,12 +461,12 @@ def list_users(request, review_milestone_id):
     checkstyle = []; students = []; alum = []; staff = []
     for task in tasks:
       user_task_dict = {
-        'username': task.reviewer.user.username,
+        'username': task.reviewer.username,
         'count': comment_count[task.reviewer],
         'completed': task.completed,
         }
 
-      member = task.reviewer.user.memberships.objects.get(user=task.reviewer.user, semester=task.milestone.assignment.semester)
+      member = task.reviewer.memberships.objects.get(user=task.reviewer, semester=task.milestone.assignment.semester)
       if member.is_student():
         students.append(user_task_dict)
       elif member.is_teacher():
@@ -490,27 +490,28 @@ def list_users(request, review_milestone_id):
   for user in User.objects.select_related('profile').filter(Q(submissions__milestone__id=assignment_id) | Q(tasks__chunk__file__submission__milestone__id=assignment_id)):
       data[user.id] = {'tasks': [], 'user': user, 'chunks': [], 'has_chunks': False, 'submission': None}
 
-  for submission in Submission.objects.select_related('author__profile').filter(milestone__id=assignment_id):
-      data[submission.author_id]['submission'] = submission
+  for submission in Submission.objects.prefetch_related('authors').filter(milestone__id=assignment_id):
+      for author in submission.authors.all():
+          data[author.id]['submission'] = submission
 
-  for chunk in Chunk.objects.select_related('file__submission').filter(file__submission__milestone__id=assignment_id):
+  for chunk in Chunk.objects.prefetch_related('file__submission__authors').filter(file__submission__milestone__id=assignment_id):
       chunk_map[chunk.id] = chunk
-      authorid = chunk.file.submission.author_id
-      data[authorid]['chunks'].append({
-        'reviewer-count': chunk.reviewer_count(),
-        'id': chunk.id,
-        'name': chunk.name,
-        'reviewers_dicts': None,
-        'tasks': [],
-        })
-      data[authorid]['has_chunks'] = True
+      for author in chunk.file.submission.authors.all():
+          data[author.id]['chunks'].append({
+            'reviewer-count': chunk.reviewer_count(),
+            'id': chunk.id,
+            'name': chunk.name,
+            'reviewers_dicts': None,
+            'tasks': [],
+            })
+          data[author.id]['has_chunks'] = True
       
-  for task in Task.objects.select_related('chunk__file__submission__author', 'reviewer__user').filter(chunk__file__submission__milestone__id=assignment_id):
-      authorid = task.chunk.file.submission.author_id
+  for task in Task.objects.prefetch_related('chunk__file__submission__authors', 'reviewer').filter(chunk__file__submission__milestone__id=assignment_id):
       chunkid = task.chunk_id
-      for chunk in data[authorid]['chunks']:
-          if chunk["id"] == chunkid:
-              chunk["tasks"].append(task)
+      for author in task.chunk.file.submission.authors.all():
+          for chunk in data[author.id]['chunks']:
+              if chunk["id"] == chunkid:
+                  chunk["tasks"].append(task)
 
   if request.method == 'POST':
     form = SimulateRoutingForm(request.POST)
@@ -522,9 +523,9 @@ def list_users(request, review_milestone_id):
     for (chunk_id, tasks) in chunk_task_map.iteritems():
       for task in tasks:
         if task.reviewer.userid not in data:
-          data[task.reviewer.user_id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
+          data[task.reviewer.id] = {'tasks': [task_dict(task)], 'user': task.reviewer.user, 'chunks': [], 'submission': None}
         else:
-          data[task.reviewer.user_id]['tasks'].append(task_dict(task))
+          data[task.reviewer.id]['tasks'].append(task_dict(task))
 
   else:
 
