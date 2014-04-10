@@ -108,7 +108,7 @@ def more_work(request):
                 #do not give tasks to students who got extensions or already have tasks for this assignment
                 if (not current_tasks.count()) and active_sub.count():
                     open_assignments = True
-                    total += assign_tasks(milestone, user, max_tasks=2, assign_more=True)
+                    total += assign_tasks(milestone, user, tasks_to_assign=2)
 
             active_tasks = user.tasks \
                 .select_related('chunk__file__submission__milestone__assignment') \

@@ -101,6 +101,7 @@ class ReviewMilestone(Milestone):
     min_student_lines = models.IntegerField(default=30)
     submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestone')
     chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
+    chunks_to_exclude = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
 
     student_count = models.IntegerField(default=5)
     student_count_default = models.IntegerField(default=5)
