@@ -463,7 +463,7 @@ class Chunk(models.Model):
       return self.file.submission.milestone.assignment.semester.members.exclude(user__username = 'checkstyle').count()
 
     def comment_count(self):
-      return len(self.comments.filter())
+      return self.comments.count()
 
 class StaffMarker(models.Model):
     chunk = models.ForeignKey(Chunk, related_name='staffmarkers')

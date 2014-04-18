@@ -58,28 +58,29 @@ def student_dashboard(request, username):
 
 def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_more_tasks = False):
     def annotate_tasks_with_counts(tasks):
-        tasks.annotate(comment_count=Count('chunk__comments', distinct=True),
+        return tasks.annotate(comment_count=Count('chunk__comments', distinct=True),
                        reviewer_count=Count('chunk__tasks', distinct=True))
+        #logging.log(tasks.all()[0].comment_count)
 
     active_tasks = dashboard_user.tasks \
         .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .exclude(status='C') \
         .exclude(status='U') \
         .order_by('chunk__name', 'submission__name')
-    annotate_tasks_with_counts(active_tasks)
+    active_tasks = annotate_tasks_with_counts(active_tasks)
 
     old_completed_tasks = dashboard_user.tasks \
         .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .filter(status='C') \
         .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
-    annotate_tasks_with_counts(old_completed_tasks)
+    old_completed_tasks = annotate_tasks_with_counts(old_completed_tasks)
 
     completed_tasks = dashboard_user.tasks \
         .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
         .filter(status='C') \
         .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
         .order_by('completed').reverse()
-    annotate_tasks_with_counts(completed_tasks)
+    completed_tasks = annotate_tasks_with_counts(completed_tasks)
 
     def collect_submission_data(submissions):
         data = []
