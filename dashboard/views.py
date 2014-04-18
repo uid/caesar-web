@@ -62,21 +62,20 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
                        reviewer_count=Count('chunk__tasks', distinct=True))
         #logging.log(tasks.all()[0].comment_count)
 
-    active_tasks = dashboard_user.tasks \
-        .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
+    all_tasks = dashboard_user.tasks \
+        .select_related('submission', 'chunk__file__submission__milestone', 'milestone__assignment__semester__subject')
+    active_tasks = all_tasks \
         .exclude(status='C') \
         .exclude(status='U') \
         .order_by('chunk__name', 'submission__name')
     active_tasks = annotate_tasks_with_counts(active_tasks)
 
-    old_completed_tasks = dashboard_user.tasks \
-        .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
+    old_completed_tasks = all_tasks \
         .filter(status='C') \
         .exclude(chunk__file__submission__milestone__assignment__semester__is_current_semester=True)
     old_completed_tasks = annotate_tasks_with_counts(old_completed_tasks)
 
-    completed_tasks = dashboard_user.tasks \
-        .select_related('chunk__file__submission__milestone', 'milestone__assignment__semester__subject') \
+    completed_tasks = all_tasks \
         .filter(status='C') \
         .filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True) \
         .order_by('completed').reverse()
