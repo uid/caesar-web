@@ -135,9 +135,9 @@ def view_all_chunks(request, viewtype, submission_id):
         # # you aren't an author of the submission
         if not user_membership.is_teacher() and not user.is_staff and not (user in authors):
             raise PermissionDenied
-    except MultipleObjectsReturned:
+    except Member.MultipleObjectsReturned:
         raise Http404 # you can't be multiple members for a class so this should never get called
-    except DoesNotExist:
+    except Member.DoesNotExist:
         if not user.is_staff:
             raise PermissionDenied # you get a 401 page if you aren't a member of the semester
         
