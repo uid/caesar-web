@@ -34,7 +34,7 @@
     by <span class="comment-author-name
       {{ member.get_role_display }}">
       {% if comment.type == 'U' %}
-        <a onclick=hashtagRedirect("{% url 'accounts.views.view_profile' author.username %}")>
+        <a href="{% url 'accounts.views.view_profile' author.username %}">
         {{ author.get_full_name|default:author.username }}
         ({{author.profile.reputation}})
         </a>
@@ -48,11 +48,11 @@
   
   {% if activity_view and highlight_comment.id == comment.id %}
   <p id="highlight-comment-text-{{comment.id}}" class="comment-text">
-    {{ comment.text }}
+    {{ comment.text | urlize }}
   </p>
   {% else %}
   <p id="comment-text-{{comment.id}}" class="comment-text">
-    {%if comment.deleted %}[deleted]{% else %}{{ comment.text }}{%endif%}
+    {%if comment.deleted %}[deleted]{% else %}{{ comment.text | urlize }}{%endif%}
   </p>
   {% endif %}
   <div class="comment-author">
