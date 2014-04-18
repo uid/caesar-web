@@ -4,10 +4,9 @@ from django.contrib.auth.models import User
 import os
 from diff_match_patch import diff_match_patch, patch_obj
 from crawler import crawl_submissions
-from sets import Set
 
 # :( global variables
-failed_users = Set()
+failed_users = set()
 diff_object = diff_match_patch()
 
 def parse_staff_code(staff_dir):
@@ -60,8 +59,8 @@ def parse_student_files(usernames, files, batch, submit_milestone, save, student
   # Trying to find the user(s) who wrote this submission. Bail if they don't all exist in the DB.
   users = User.objects.filter(username__in=usernames)
   
-  if users.count() != len(Set(usernames)):
-    missing_users = Set(usernames).difference([user.username for user in users])
+  if users.count() != len(set(usernames)):
+    missing_users = set(usernames).difference([user.username for user in users])
     for username in missing_users:
       print "user %s doesn't exist in the database." % username
     failed_users += missing_users
