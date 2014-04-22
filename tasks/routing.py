@@ -341,14 +341,14 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
 
     return tasks
 
-def assign_tasks(review_milestone, reviewer, max_tasks=sys.maxint, assign_more=False):
+def assign_tasks(review_milestone, reviewer, tasks_to_assign=sys.maxint, assign_more=False):
   user_map = load_members(review_milestone.assignment.semester)
   chunks = load_chunks(review_milestone.submit_milestone, user_map, reviewer)
   chunk_map = {}
   for chunk in chunks:
     chunk_map[chunk.id] = chunk
 
-  tasks = _generate_tasks(review_milestone, user_map[reviewer.id], chunk_map, max_tasks=max_tasks, assign_more=assign_more)
+  tasks = _generate_tasks(review_milestone, user_map[reviewer.id], chunk_map, max_tasks=tasks_to_assign, assign_more=assign_more)
 
   [task.save() for task in tasks]
 
