@@ -6,6 +6,7 @@ import itertools
 from django.db.models import Count
 from django.contrib import auth
 from django.contrib.auth.models import User
+from django.db.models.query import prefetch_related_objects
 
 from models import Task
 from chunks.models import Chunk
@@ -58,13 +59,13 @@ class SubmissionForReview:
 
 class ChunkForReview:
     def __init__(self, chunk, submission):
-        self.id = chunk['id']
-        self.name = chunk['name']
-        self.cluster_id = chunk['cluster_id']
+        self.id = chunk.id
+        self.name = chunk.name
+        self.cluster_id = chunk.cluster_id
         self.submission = submission
         self.reviewers = set()
-        self.class_type = chunk['class_type']
-        self.student_lines = chunk['student_lines']
+        self.class_type = chunk.class_type
+        self.student_lines = chunk.student_lines
         self.return_count = 0
         self.for_nesting_depth = 0
         self.if_nesting_depth = 0
@@ -110,43 +111,62 @@ def load_chunks(submit_milestone, user_map, django_user):
     chunk_map = {}
     submissions = {}
 
-    django_submissions = submit_milestone.submissions.exclude(authors=django_user)
+    django_submissions = submit_milestone.submissions.exclude(authors=django_user).prefetch_related("authors")
+
+    # the exclude() in the call below failed because of a Django bug.  Try submit_milestone=55, django_user=1016 on the production db.    
+    # django_chunks = Chunk.objects \
+    #         .filter(file__submission__milestone=submit_milestone) \
+    #         .exclude(file__submission__authors=django_user) \
+    #         .prefetch_related('file__submission__authors') \
+    #         .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
+
+    # using a correct raw SQL query instead..
     django_chunks = Chunk.objects \
-            .filter(file__submission__milestone=submit_milestone) \
-            .exclude(file__submission__authors=django_user) \
-            .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')
+        .raw("""
+SELECT files.submission_id, `chunks`.`id`, `chunks`.`file_id`, `chunks`.`name`, `chunks`.`start`, `chunks`.`end`, `chunks`.`cluster_id`, `chunks`.`created`, `chunks`.`modified`, `chunks`.`class_type`, `chunks`.`staff_portion`, `chunks`.`student_lines`, `chunks`.`chunk_info`
+FROM `chunks` 
+join files on chunks.file_id=files.id
+join submissions on files.submission_id=submissions.id
+join submissions_authors on submissions.id=submissions_authors.submission_id
+where submissions.milestone_id=%s and not(user_id=%s)
+            """, [submit_milestone.id, django_user.id])
+    # preload the file.submission according to http://python.6.x6.nabble.com/Prefetch-related-data-when-using-raw-td4983196.html
+    django_chunks = list(django_chunks)
+    prefetch_related_objects(django_chunks, ['file__submission'])
+
     django_tasks = Task.objects.filter(
             submission__milestone=submit_milestone) \
             .exclude(submission__authors=django_user) \
-                    .select_related('reviewer__user') \
+                    .select_related('reviewer__user', 'chunk') \
 
     # load all submissions and chunks into lightweight internal objects
     django_submission_chunks = defaultdict(list)
     for chunk in django_chunks:
-        django_submission_chunks[chunk['file__submission']].append(chunk)
+        django_submission_chunks[chunk.file.submission_id].append(chunk)
 
     for django_submission in django_submissions:
         submission = SubmissionForReview(
                 id=django_submission.id,
                 authors=[user_map[author.id] for author in django_submission.authors.all() if author.id in user_map],
                 chunks=django_submission_chunks[django_submission.id])
-        logging.debug(django_submission.authors.all())
-        logging.debug(submission.authors)
+        #logging.debug(django_submission.authors.all())
+        #logging.debug(submission.authors)
         if not submission.chunks:
             # toss out any submissions without chunks
             continue
         submissions[submission.id] = submission
         chunks.extend(submission.chunks)
-
+    logging.debug(submissions)
 
     # load existing reviewing assignments
     for chunk in chunks:
         chunk_map[chunk.id] = chunk
+    #logging.debug(chunk_map)
 
     for django_task in django_tasks:
         if django_task.chunk:
             chunk = chunk_map[django_task.chunk_id] # looks like dead code
-            reviewer = user_map[django_task.reviewer.user_id]
+            reviewer = user_map[django_task.reviewer_id]
             chunk_map[django_task.chunk_id].assign_reviewer(reviewer)
 
     return chunks
@@ -248,12 +268,13 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             user in chunk.reviewers,
             user in chunk.submission.authors,
             review_priority,
-            type_priority,
--total_affinity(user, chunk.submission.reviewers),
-            -total_affinity(user, chunk.reviewers),
+#            type_priority,
+#            -total_affinity(user, chunk.submission.reviewers),
+#            -total_affinity(user, chunk.reviewers),
             len(chunk.submission.reviewers),
 #                    -1*(chunk.return_count + chunk.for_nesting_depth + chunk.if_nesting_depth),
             -(chunk.student_lines if chunk.student_lines != None else 0),
+            random.random()
         )
       return chunk_sort_key
     
@@ -263,7 +284,6 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
         return
     for _ in itertools.repeat(None, count):
         # TODO consider using a priority queue here
-        #random.shuffle(chunks)
         chunk_to_assign = min(chunks, key=key)
         if chunk_to_assign.assign_reviewer(user):
             yield chunk_to_assign.id
@@ -312,7 +332,7 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
     tasks = []
     for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, review_milestone.reviewers_per_chunk, review_milestone.min_student_lines, chunk_type_priorities):
         submission = chunk_map[chunk_id].submission
-        task = Task(reviewer_id=User.objects.get(id=reviewer.id).profile.id, chunk_id=chunk_id, milestone=review_milestone, submission_id=submission.id)
+        task = Task(reviewer_id=reviewer.id, chunk_id=chunk_id, milestone=review_milestone, submission_id=submission.id)
 
         chunk_id_task_map[chunk_id].append(task)
         chunk_map[chunk_id].reviewers.add(reviewer)
@@ -321,14 +341,14 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
 
     return tasks
 
-def assign_tasks(review_milestone, reviewer, max_tasks=sys.maxint, assign_more=False):
+def assign_tasks(review_milestone, reviewer, tasks_to_assign=sys.maxint, assign_more=False):
   user_map = load_members(review_milestone.assignment.semester)
   chunks = load_chunks(review_milestone.submit_milestone, user_map, reviewer)
   chunk_map = {}
   for chunk in chunks:
     chunk_map[chunk.id] = chunk
 
-  tasks = _generate_tasks(review_milestone, user_map[reviewer.id], chunk_map, max_tasks=max_tasks, assign_more=assign_more)
+  tasks = _generate_tasks(review_milestone, user_map[reviewer.id], chunk_map, max_tasks=tasks_to_assign, assign_more=assign_more)
 
   [task.save() for task in tasks]
 

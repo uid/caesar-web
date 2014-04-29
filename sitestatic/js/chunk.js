@@ -417,7 +417,6 @@ function attachCommentHandlers(comment) {
         } else {
             scrollCodeTo(comment);
             checkIfSpecial(comment)
-            return false;
         }
     });
 

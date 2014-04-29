@@ -47,20 +47,27 @@
     
     <!-- Checks whether files end with a new line.                        -->
     <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
+    <!--
     <module name="NewlineAtEndOfFile"/>
-    
+    -->
+
     <!-- Checks that property files contain the same keys.         -->
     <!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
+    <!--
     <module name="Translation"/>
-    
+    -->
+
     <!-- Checks for Size Violations.                    -->
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
     <module name="FileLength"/>
     
     <!-- Checks for whitespace                               -->
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
-    <module name="FileTabCharacter"/>
-    
+    <module name="FileTabCharacter">
+            <message key="file.containsTab"
+                     value="File contains #tab characters. This is the first instance, but you need to replace them all. Configure your editor to replace use only space characters for indentation. #important"/>
+    </module>
+
     <!-- Miscellaneous other checks.                   -->
     <!-- See http://checkstyle.sf.net/config_misc.html -->
     <!--
@@ -72,26 +79,78 @@
      </module>
      -->
     
+    <!--
+            <message key=""
+                     value=""/>
+    -->
     <module name="TreeWalker">
         
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
-        <module name="JavadocMethod"/>
+        <module name="JavadocMethod">
+            <message key="javadoc.missing"
+                     value="Missing a #javadoc comment. #important"/>
+            <message key="javadoc.unusedTag"
+                     value="The #javadoc comment has a {0} tag for ''{1}'', but it is not mentioned in the code."/>
+            <message key="javadoc.expectedTag"
+                     value="The #javadoc comment is missing a {0} tag for ''{1}'', which is mentioned in the code."/>
+            <message key="javadoc.return.expected"
+                     value="The #javadoc comment is missing an @return tag for a method that has a return value."/>
+        </module>
+        
+        <!--
         <module name="JavadocVariable"/>
         <module name="JavadocStyle"/>
+        -->        
         
         
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
-        <module name="ConstantName"/>
-        <module name="LocalFinalVariableName"/>
-        <module name="LocalVariableName"/>
-        <module name="MemberName"/>
-        <module name="MethodName"/>
-        <module name="PackageName"/>
-        <module name="ParameterName"/>
-        <module name="StaticVariableName"/>
-        <module name="TypeName"/>
+        <module name="ConstantName">
+            <message key="name.invalidPattern"
+                     value="Constants like {0} should be all capital letters, separated by underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
+        <module name="LocalFinalVariableName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
+        <module name="LocalVariableName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
+        <module name="MemberName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
+        <module name="MethodName">
+            <message key="name.invalidPattern"
+                     value="Method names like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
+        <module name="PackageName">
+            <message key="name.invalidPattern"
+                     value="Package names like {0} should be all lowercase, separated by underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
+        <module name="ParameterName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
+        <module name="StaticVariableName">
+            <message key="name.invalidPattern"
+                     value="Variables like {0} should start with a lowercase letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
+        <module name="TypeName">
+            <message key="name.invalidPattern"
+                     value="Class names like {0} should start with a capital letter and use camelCase capitalization, not underscores, according to Java #namingconvention.  #important"/>
+        </module>
+        
         
         
         <!-- Checks for Headers                                -->
@@ -114,17 +173,31 @@
         
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_import.html -->
-        <module name="AvoidStarImport"/>
-        <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
-        <module name="RedundantImport"/>
-        <module name="UnusedImports"/>
+        <!--
+        <module name="AvoidStarImport">
+        </module>
+        -->
+        
+        <module name="IllegalImport">
+         <!-- defaults to sun.* packages -->
+        </module>
+        
+        <module name="RedundantImport">
+        </module>
+        
+        <module name="UnusedImports">
+        </module>
+        
         
         
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
         <!-- <module name="LineLength"/> -->
-        <module name="MethodLength"/>
-        <module name="ParameterNumber"/>
+        <module name="MethodLength">
+        </module>
+
+        <module name="ParameterNumber">
+        </module>
         
         
         <!-- Checks for whitespace                               -->
@@ -145,49 +218,103 @@
         
         <!-- Modifier Checks                                    -->
         <!-- See http://checkstyle.sf.net/config_modifiers.html -->
-        <module name="ModifierOrder"/>
+        <module name="ModifierOrder">
+            <message key="mod.order"
+                     value="''{0}'' modifier is not in the conventional Java #modifierorder. #important"/>
+        </module>
+
+        <!--
         <module name="RedundantModifier"/>
-        
+        -->
         
         <!-- Checks for blocks. You know, those {}'s         -->
         <!-- See http://checkstyle.sf.net/config_blocks.html -->
-        <module name="AvoidNestedBlocks"/>
-        <module name="EmptyBlock"/>
+        <module name="AvoidNestedBlocks">
+        </module>
+
+        <module name="EmptyBlock">
+        </module>
+
+        <!--
         <module name="LeftCurly"/>
         <module name="NeedBraces"/>
-        
+        -->
         
         <!-- Checks for common coding problems               -->
         <!-- See http://checkstyle.sf.net/config_coding.html -->
-        <module name="EmptyStatement"/>
-        <module name="EqualsHashCode"/>
+        <module name="EmptyStatement">
+            <message key="empty.statement"
+                     value="Avoid #emptystatement in the body of an if, while, or for statement. #important"/>
+        </module>
+
+        <module name="EqualsHashCode">
+            <message key="equals.noHashCode"
+                     value="Definition of ''equals()'' without corresponding definition of ''hashCode()''. #important"/>
+        </module>
+
         <module name="IllegalInstantiation"/>
-        <module name="InnerAssignment"/>
-        <module name="MagicNumber"/>
-        <module name="MissingSwitchDefault"/>
-        <module name="SimplifyBooleanExpression"/>
-        <module name="SimplifyBooleanReturn"/>
+
+        <module name="InnerAssignment">
+            <message key="assignment.inner.avoid"
+                     value="Avoid putting an assignment expression inside another expression (an #innerassignment).  Pull the assignment out into its own statement instead. #important"/>
+        </module>
+
+        <module name="MagicNumber">
+            <message key="magic.number"
+                     value="{0} is a #magicnumber, which should be a named constant instead. #important"/>
+        </module>
+
+        <module name="MissingSwitchDefault">
+            <message key="missing.switch.default"
+                     value="switch statement without #defaultclause. #important"/>
+        </module>
+
+        <module name="SimplifyBooleanExpression">
+            <message key="simplify.expression"
+                     value="This boolean expression can be simplified.  You don't need to test a boolean value against true or false. Just use the boolean value directly. #important"/>
+        </module> 
+
+       <module name="SimplifyBooleanReturn">
+            <message key="simplify.boolreturn"
+                     value="This statement can be simplified.  You don't need to use an if statement to decide whether to return true or false. Just return the conditional expression directly. #important"/>
+        </module> 
+
+    <!--
         <module name="ReturnCount">
-    		<property name="max" value="1"/>
-		</module>
-		<module name="NestedIfDepth">
-    		<property name="max" value="1"/>
-		</module>
-		<module name="NestedForDepth">
-    		<property name="max" value="1"/>
-		</module>
+          <property name="max" value="1"/>
+    </module>
+    -->
+
+        <module name="NestedIfDepth">
+              <property name="max" value="2"/>
+        </module>
+
+        <module name="NestedForDepth">
+              <property name="max" value="2"/>
+        </module>
         
         <!-- Checks for class design                         -->
         <!-- See http://checkstyle.sf.net/config_design.html -->
         <module name="InterfaceIsType"/>
-        <module name="VisibilityModifier"/>
+        <module name="VisibilityModifier">
+            <message key="variable.notPrivate"
+                     value="Variable ''{0}'' must be private and have accessor methods. You should #minimizescope. #important"/>
+
+        </module>
         
         
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
+        <!--
         <module name="ArrayTypeStyle"/>
-        <module name="TodoComment"/>
-        <module name="UpperEll"/>
+        -->
+        <module name="TodoComment">
+            <message key="todo.match"
+                     value="Remove all TO-DO comments that are done. #important"/>
+        </module>
+
+        <module name="UpperEll">
+        </module>
         
     </module>
     

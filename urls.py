@@ -22,5 +22,4 @@ urlpatterns = patterns('',
     (r'^dashboard/', include('dashboard.urls')),
     (r'^tasks/', include('tasks.urls')),
 
-    (r'^api/', include('api.urls')),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

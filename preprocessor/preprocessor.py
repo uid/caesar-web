@@ -37,7 +37,8 @@ parser.add_argument('-n', '--dry-run',
                     help="just do a test run -- don't save anything into the Caesar database")
 parser.add_argument('--starting',
                     metavar="PATH",
-                    required=True,
+                    required=False,
+                    default=None,
                     help="folder containing starting code for the assignment.  Should contain one subfolder, under which is the starting code.")
 parser.add_argument('--submissions',
                     metavar="PATH",
@@ -50,7 +51,7 @@ parser.add_argument('--restrict',
 args = parser.parse_args()
 #print args
 
-stripTrailingSlash = lambda folder: folder[0:-1] if folder[-1]=='/' else folder
+stripTrailingSlash = lambda folder: folder[0:-1] if folder is not None and folder[-1]=='/' else folder
 
 settings = {
     'submit_milestone_id': args.milestone,
@@ -72,7 +73,7 @@ starting_time = time.time()
 submit_milestone = SubmitMilestone.objects.get(id=settings['submit_milestone_id'])
 print "Found existing submit milestone. Adding code to %s." % (submit_milestone.full_name())
 
-staff_code = parse_staff_code(settings['staff_dir'])
+staff_code = parse_staff_code(settings['staff_dir']) if settings['staff_dir'] is not None else {}
 #print staff_code.keys()
 
 batch = Batch(name=submit_milestone.full_name())

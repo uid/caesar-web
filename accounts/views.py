@@ -375,7 +375,7 @@ def request_extension(request, milestone_id):
         possible_extensions = range(late_days, min(total_extension_days_left+current_extension+1, current_milestone.max_extension+1))
 
         written_dates = []
-        for day in range(possible_extensions[-1]+1):
+        for day in range(max([current_extension]+possible_extensions)+1):
             extension = day * datetime.timedelta(days=1)
             written_dates.append(current_milestone.duedate + extension)
 
@@ -389,10 +389,10 @@ def request_extension(request, milestone_id):
     else: # user just submitted an extension request
         days = request.POST.get('dayselect', None)
         try:
-            extension_days = int(days)
             current_extension = (user_duedate - current_milestone.duedate).days
             total_extension_days = total_extension_days_left + current_extension
 
+            extension_days = int(days) if days != None else current_extension
             if extension_days > total_extension_days or extension_days < 0 or extension_days > current_milestone.max_extension:
                 return redirect('dashboard.views.dashboard')
             extension,created = Extension.objects.get_or_create(user=user, milestone=current_milestone)
@@ -413,12 +413,12 @@ def manage(request):
 @staff_member_required
 def all_extensions(request, milestone_id):
     current_milestone = Milestone.objects.get(id=milestone_id)
-    students = User.objects.filter(membership__role=Member.STUDENT, membership__semester=current_milestone.assignment.semester)
+    students = User.objects.filter(membership__role=Member.STUDENT, membership__semester=current_milestone.assignment.semester).order_by('username')
     students_with_no_slack = students.exclude(extensions__milestone=current_milestone)
-    extensions = Extension.objects.filter(milestone=current_milestone).select_related('user__username')
+    extensions = Extension.objects.filter(milestone=current_milestone).order_by('user__username').select_related('user__username')
 
     # the index of a list of students in student_slack is the number of slack days requested by the students in the list
-    student_slack = ["".join(sorted([str(student)+"\\n" for student in students_with_no_slack]))]
+    student_slack = ["".join([str(student)+"\\n" for student in students_with_no_slack])]
     for slack_days in range(1,current_milestone.max_extension+1):
         student_slack.append("".join([str(ext.user.username)+"\\n" for ext in extensions.filter(slack_used=slack_days)]))
     

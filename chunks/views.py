@@ -6,6 +6,7 @@ from tasks.models import Task
 from tasks.routing import simulate_tasks
 
 from django.http import Http404
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
@@ -31,7 +32,7 @@ def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
     semester = chunk.file.submission.milestone.assignment.semester
-    is_reviewer = chunk in user.profile.assigned_chunks.all()
+    is_reviewer = Task.objects.filter(chunk=chunk, reviewer=user).exists()
 
     # you get a 404 page if
     # # you weren't a teacher during the semester
@@ -44,12 +45,12 @@ def view_chunk(request, chunk_id):
     try:
         user_membership = Member.objects.get(user=user, semester=semester)
         if not user_membership.is_teacher() and not chunk.file.submission.has_author(user) and not is_reviewer and not user.is_staff:
-            raise Http401
+            raise PermissionDenied
     except Member.MultipleObjectsReturned:
         raise Http404 # you can't be multiple members for a class so this should never get called
     except Member.DoesNotExist:
         if not user.is_staff:
-            raise Http401 # you get a 401 page if you aren't a member of the semester
+            raise PermissionDenied # you get a 401 page if you aren't a member of the semester
     
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
@@ -81,14 +82,17 @@ def view_chunk(request, chunk_id):
         else:
             highlighted_lines.append((number, line, False))
 
-    task_count = Task.objects.filter(reviewer=user.get_profile()) \
+    task_count = Task.objects.filter(reviewer=user) \
             .exclude(status='C').exclude(status='U').count()
+    remaining_task_count = task_count
     # get the associated task if it exists
     try:
-        task = Task.objects.get(chunk=chunk, reviewer=user.get_profile())
+        task = Task.objects.get(chunk=chunk, reviewer=user)
         last_task = task_count==1 and not (task.status == 'U' or task.status == 'C')
         if task.status == 'N':
             task.mark_as('O')
+        if not (task.status=='U' or task.status=='C'):
+            remaining_task_count -= 1
     except Task.DoesNotExist:
         task = None
         if user.is_staff:
@@ -107,7 +111,7 @@ def view_chunk(request, chunk_id):
         'file': chunk.file,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
         'last_task': last_task,
-        'remaining_task_count': task_count if (task.status=='U' or task.status=='C') else task_count-1,
+        'remaining_task_count': remaining_task_count,
     })
 
 @login_required
@@ -130,12 +134,12 @@ def view_all_chunks(request, viewtype, submission_id):
         # #   and
         # # you aren't an author of the submission
         if not user_membership.is_teacher() and not user.is_staff and not (user in authors):
-            raise Http401
-    except MultipleObjectsReturned:
+            raise PermissionDenied
+    except Member.MultipleObjectsReturned:
         raise Http404 # you can't be multiple members for a class so this should never get called
-    except DoesNotExist:
+    except Member.DoesNotExist:
         if not user.is_staff:
-            raise Http401 # you get a 401 page if you aren't a member of the semester
+            raise PermissionDenied # you get a 401 page if you aren't a member of the semester
         
     files = File.objects.filter(submission=submission_id).select_related('chunks')
     if not files:
@@ -256,13 +260,13 @@ def view_submission_for_milestone(request, viewtype, milestone_id, username):
     member = Member.objects.get(semester=semester, user=user)
     author = User.objects.get(username__exact=username)
     if not member.is_teacher() and not user==author and not user.is_staff:
-      raise Http401
+      raise PermissionDenied
     submission = Submission.objects.get(milestone=milestone_id, authors__username=username)
     return view_all_chunks(request, viewtype, submission.id)
   except Submission.DoesNotExist or User.DoesNotExist:
     raise Http404
   except Member.DoesNotExist:
-    raise Http401
+    raise PermissionDenied
 
 @login_required
 def simulate(request, review_milestone_id):
@@ -490,7 +494,7 @@ def list_users(request, review_milestone_id):
   chunk_map = {}
   form = None
 
-  for user in User.objects.select_related('profile').filter(Q(submissions__milestone__id=assignment_id) | Q(profile__tasks__chunk__file__submission__milestone__id=assignment_id)):
+  for user in User.objects.select_related('profile').filter(Q(submissions__milestone__id=assignment_id) | Q(tasks__chunk__file__submission__milestone__id=assignment_id)):
       data[user.id] = {'tasks': [], 'user': user, 'chunks': [], 'has_chunks': False, 'submission': None}
 
   for submission in Submission.objects.select_related('author__profile').filter(milestone__id=assignment_id):

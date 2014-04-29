@@ -62,15 +62,13 @@ class UserProfile(models.Model):
                 instance.user.username)
     
     user = models.OneToOneField(User, related_name='profile')
-    assigned_chunks = models.ManyToManyField(Chunk, through='tasks.Task',
-        related_name='reviewers')
     reputation = models.IntegerField(default=0, editable=True)
 
     photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True,\
         help_text='Use a JPEG or PNG photo.')
     about = MarkdownTextField(allow_html=False, blank=True, \
         help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
-    company = models.CharField(max_length=100, default='MIT', blank=True)
+    company = models.CharField(max_length=100, default='', blank=True)
     class_year = models.IntegerField(validators=[MinValueValidator(1920), MaxValueValidator(2050)], null=True, blank=True)
 
     # social network links

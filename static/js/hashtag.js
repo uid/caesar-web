@@ -46,10 +46,14 @@ function getFormattedHashtagText(text) {
     output = output.replace(/(#braces[^\w])/ig, '<a onclick=hashtagRedirect("http://www.oracle.com/technetwork/java/javase/documentation/codeconventions-142311.html#430")>$1</a>');
     output = output.replace(/(#modifierorder[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_modifier.html")>$1</a>');
     output = output.replace(/(#size[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_sizes.html")>$1</a>');
-    output = output.replace(/(#innerassignment[^\w])/ig, '<a onclick=hashtagRedirect("http://checkstyle.sourceforge.net/config_coding.html")>$1</a>');
+    output = output.replace(/(#innerassignment[^\w])/ig, '<a onclick=hashtagRedirect("http://stackoverflow.com/questions/11222121/is-it-bad-to-do-inner-assignments")>$1</a>');
     output = output.replace(/(#hashcode[^\w])/ig, '<a onclick=hashtagRedirect("http://www.technofundo.com/tech/java/equalhash.html")>$1</a>');
-    output = output.replace(/(#tab[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Files")>$1</a>');
-    output = output.replace(/(#scope[^\w])/ig, '<a onclick=hashtagRedirect("http://geosoft.no/development/javastyle.html#Variables")>$1</a>');
+    output = output.replace(/(#minimizescope[^\w])/ig, '<a onclick=hashtagRedirect("http://www.refactoring.com/catalog/reduceScopeOfVariable.html")>$1</a>');
+    output = output.replace(/(#defaultclause[^\w])/ig, '<a onclick=hashtagRedirect("http://stackoverflow.com/questions/4649423/should-switch-statements-always-contain-a-default-clause")>$1</a>');
+    output = output.replace(/(#emptystatement[^\w])/ig, '<a onclick=hashtagRedirect("http://stackoverflow.com/questions/14112515/semicolon-at-end-of-if-statement")>$1</a>');
+    output = output.replace(/(#modifierorder[^\w])/ig, '<a onclick=hashtagRedirect("http://stackoverflow.com/questions/16731240/what-is-a-reasonable-order-of-java-modifiers-abstract-final-public-static-e")>$1</a>');
+    output = output.replace(/(#tab[^\w])/ig, '<a onclick=hashtagRedirect("http://www.jwz.org/doc/tabs-vs-spaces.html")>$1</a>');
+
     return output;
 }
 

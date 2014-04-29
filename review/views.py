@@ -57,7 +57,7 @@ def new_comment(request):
             chunk = comment.chunk
             try:
                 task = Task.objects.get(
-                    chunk=chunk, reviewer=user.get_profile())
+                    chunk=chunk, reviewer=user)
                 if task.status == 'N' or task.status == 'O':
                     task.mark_as('S')
             except Task.DoesNotExist:
@@ -94,7 +94,7 @@ def reply(request):
             comment.save()
             try:
                 task = Task.objects.get(chunk=comment.chunk,
-                        reviewer=request.user.get_profile())
+                        reviewer=request.user)
                 if task.status == 'N' or task.status == 'O':
                     task.mark_as('S')
             except Task.DoesNotExist:
@@ -176,7 +176,7 @@ def vote(request):
     comment = Comment.objects.get(pk=comment_id)
     try:
         task = Task.objects.get(chunk=comment.chunk,
-                reviewer=request.user.get_profile())
+                reviewer=request.user)
         if task.status == 'N' or task.status == 'O':
             task.mark_as('S')
     except Task.DoesNotExist:

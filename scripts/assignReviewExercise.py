@@ -88,7 +88,7 @@ for student in students:
     chunk = Chunk(file=file, name=get_name(file), start=0, end=len(file.data), class_type='none', staff_portion=0, student_lines=len(file.data.split('\n')))
     if not args.dry_run:
       chunk.save()
-    task = Task(chunk=chunk, milestone=reviewMilestone, reviewer=student.profile, submission=submission)
+    task = Task(chunk=chunk, milestone=reviewMilestone, reviewer=student, submission=submission)
     tasksCreated += 1
     if not args.dry_run:
       task.save()

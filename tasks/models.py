@@ -3,6 +3,7 @@ from datetime import datetime
 from django.db import models
 from django.db.models import Count
 
+from django.contrib.auth.models import User
 from accounts.models import UserProfile
 from chunks.models import Chunk, ReviewMilestone, Submission
 import app_settings
@@ -18,7 +19,7 @@ class Task(models.Model):
     
     submission = models.ForeignKey(Submission, related_name='tasks', null=True, blank=True)
     chunk = models.ForeignKey(Chunk, related_name='tasks', null=True, blank=True)
-    reviewer = models.ForeignKey(UserProfile, related_name='tasks')
+    reviewer = models.ForeignKey(User, related_name='tasks', null=True)
     milestone = models.ForeignKey(ReviewMilestone, related_name='tasks')
     status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='N')
     # TODO switch to a more robust model history tracking (e.g. versioning)
@@ -38,7 +39,7 @@ class Task(models.Model):
         unique_together = ('chunk', 'reviewer',)
 
     def __unicode__(self):
-        return "Task: %s - %s" % (self.reviewer.user, self.chunk)
+        return "Task: %s - %s" % (self.reviewer, self.chunk)
 
     def mark_as(self, status):
         if status not in zip(*Task.STATUS_CHOICES)[0]:

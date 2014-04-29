@@ -84,7 +84,7 @@ def change_task(request):
     task = get_object_or_404(Task, pk=task_id)
     task.mark_as(status)
     try:
-        next_task = request.user.get_profile().tasks.exclude(status='C').exclude(status='U') \
+        next_task = request.user.tasks.exclude(status='C').exclude(status='U') \
                                               .order_by('created')[0:1].get()
         return redirect('chunks.views.view_chunk', next_task.chunk_id) if next_task.chunk else redirect('chunks.views.view_all_chunks', 'all', next_task.submission_id)
     except Task.DoesNotExist:
@@ -96,21 +96,21 @@ def more_work(request):
     if request.method == 'POST':
         user = request.user
         new_task_count = 0
-        current_tasks = user.get_profile().tasks.exclude(status='C').exclude(status='U')
+        current_tasks = user.tasks.exclude(status='C').exclude(status='U')
         total = 0
         if not current_tasks.count():
             live_review_milestones = ReviewMilestone.objects.filter(assigned_date__lt=datetime.datetime.now(),\
                 duedate__gt=datetime.datetime.now(), assignment__semester__members_user=user).all()
 
             for milestone in live_review_milestones:
-                current_tasks = user.get_profile().tasks.filter(milestone=milestone)
+                current_tasks = user.tasks.filter(milestone=milestone)
                 active_sub = Submission.objects.filter(name=user.username, milestone=milestone.reviewmilestone.submit_milestone)
                 #do not give tasks to students who got extensions or already have tasks for this assignment
                 if (not current_tasks.count()) and active_sub.count():
                     open_assignments = True
-                    total += assign_tasks(milestone, user, max_tasks=2, assign_more=True)
+                    total += assign_tasks(milestone, user, tasks_to_assign=2)
 
-            active_tasks = user.get_profile().tasks \
+            active_tasks = user.tasks \
                 .select_related('chunk__file__submission__milestone__assignment') \
                 .exclude(status='C') \
                 .exclude(status='U') \
