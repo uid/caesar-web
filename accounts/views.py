@@ -375,7 +375,7 @@ def request_extension(request, milestone_id):
         possible_extensions = range(late_days, min(total_extension_days_left+current_extension+1, current_milestone.max_extension+1))
 
         written_dates = []
-        for day in range(possible_extensions[-1]+1):
+        for day in range(max([current_extension]+possible_extensions)+1):
             extension = day * datetime.timedelta(days=1)
             written_dates.append(current_milestone.duedate + extension)
 
@@ -389,10 +389,10 @@ def request_extension(request, milestone_id):
     else: # user just submitted an extension request
         days = request.POST.get('dayselect', None)
         try:
-            extension_days = int(days)
             current_extension = (user_duedate - current_milestone.duedate).days
             total_extension_days = total_extension_days_left + current_extension
 
+            extension_days = int(days) if days != None else current_extension
             if extension_days > total_extension_days or extension_days < 0 or extension_days > current_milestone.max_extension:
                 return redirect('dashboard.views.dashboard')
             extension,created = Extension.objects.get_or_create(user=user, milestone=current_milestone)
