@@ -40,12 +40,15 @@ def new_comment(request):
             'chunk': chunk_id
         })
         chunk = Chunk.objects.get(pk=chunk_id)
+        oldComments = Comment.objects.filter(author=request.user)
+
         return render(request, 'review/comment_form.html', {
             'form': form,
             'start': start,
             'end': end,
             'snippet': chunk.generate_snippet(start, end),
             'chunk': chunk,
+            'oldComments': oldComments,
         })
     else:
         form = CommentForm(request.POST)

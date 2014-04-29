@@ -9,7 +9,7 @@ class CommentForm(ModelForm):
         model = Comment
         fields = ('text', 'start', 'end', 'chunk')
         widgets = {
-            'text': Textarea(attrs={'cols': 10, 'rows': 5}), 
+            'text': Textarea(attrs={'cols': 10, 'rows': 5, 'id': 'textentry', 'style': 'display: block'}), 
             'start': HiddenInput(),
             'end': HiddenInput(),
             'chunk': HiddenInput(),

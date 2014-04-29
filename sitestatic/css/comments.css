@@ -18,6 +18,10 @@
     background-color: #eee;
 }
 
+.comment.reuse-comment:hover {
+    cursor: text;
+}
+
 .collapsed.comment {
     height: 16px;
     overflow: hidden;
@@ -27,7 +31,7 @@
     border: 0px;
 }
 
-.comment.comment-reply {
+.comment.comment-reply, .comment.reuse-comment {
     border-top: 0px;
     margin-top: -10px;
     margin-left: 20px;
@@ -246,11 +250,11 @@
     height: 16px;
 }
 
-.new-comment, .new-reply, .new-comment:hover, .new-reply:hover {
+.new-comment, .new-reply, .reuse-comment, .new-comment:hover, .new-reply:hover, .reuse-comment:hover {
     background-color: #ffff88;
 }
 
-.new-comment textarea, .reply-form textarea {
+.new-comment textarea, .reply-form textarea, .reuse-comment-text textarea {
     width: 100%;
     overflow: auto;
     box-sizing: border-box;
@@ -264,3 +268,6 @@
     padding: 5px;
 }
 
+.reuse-comment-text {
+    padding: 0px 5px;
+}
