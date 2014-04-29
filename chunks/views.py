@@ -245,13 +245,6 @@ def view_all_chunks(request, viewtype, submission_id):
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
 
-def view_comment(request, comment_id):
-  comment = Comment.objects.get(pk=comment_id)
-  logging.debug(comment)
-  chunk_id = comment.chunk.id
-  logging.debug(chunk_id)
-  return redirect('https://10.18.6.30/chunks/view/'+str(chunk_id)+'#comment-'+str(comment_id))
-
 @login_required
 def view_submission_for_milestone(request, viewtype, milestone_id, username):
   user = request.user
