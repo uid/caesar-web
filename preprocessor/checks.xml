@@ -93,9 +93,9 @@
             <message key="javadoc.unusedTag"
                      value="The #javadoc comment has a {0} tag for ''{1}'', but it is not mentioned in the code."/>
             <message key="javadoc.expectedTag"
-                     value="The #javadoc comment is missing a {0} tag for ''{1}'', which is mentioned in the code."/>
+                     value="The #javadoc comment is missing a {0} tag that explains ''{1}'', which is mentioned in the code."/>
             <message key="javadoc.return.expected"
-                     value="The #javadoc comment is missing an @return tag for a method that has a return value."/>
+                     value="The #javadoc comment is missing an @return tag that explains the return value of this method."/>
         </module>
         
         <!--
