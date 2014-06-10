@@ -2,10 +2,10 @@
 <!--<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.textcomplete.css" type="text/css">-->
 <!--<script type="text/javascript" src = "{{ STATIC_URL }}/js/jquery.textcomplete.min.js"></script>-->
 {% load extra_tags %}
-<script type="text/javascript" src="{{ STATIC_URL }}/js/fullproof-all.js"></script>
+<!--<script type="text/javascript" src="{{ STATIC_URL }}/js/fullproof-all.js"></script>-->
 <script type="text/javascript">
 
-  var common_english_words = ["the", "name", "of", "very", "to", "through", "and", "just", "a", "form", "in", "much", "is", "great", "it", "think", "you", "say", "that", "help", "he", "low", "was", "line", "for", "before", "on", "turn", "are", "cause", "with", "same", "as", "mean", "I", "differ", "his", "move", "they", "right", "be", "boy", "at", "old", "one", "too", "have", "does", "this", "tell", "from", "sentence", "or", "set", "had", "three", "by", "want", "hot", "air", "but", "well", "some", "also", "what", "play", "there", "small", "we", "end", "can", "put", "out", "home", "other", "read", "were", "hand", "all", "port", "your", "large", "when", "spell", "up", "add", "use", "even", "word", "land", "how", "here", "said", "must", "an", "big", "each", "high", "she", "such", "which", "follow", "do", "act", "their", "why", "time", "ask", "if", "men", "will", "change", "way", "went", "about", "light", "many", "kind", "then", "off", "them", "need", "would", "house", "write", "picture", "like", "try", "so", "us", "these", "again", "her", "animal", "long", "point", "make", "mother", "thing", "world", "see", "near", "him", "build", "two", "self", "has", "earth", "look", "father", "more", "head", "day", "stand", "could", "own", "go", "page", "come", "should", "did", "country", "my", "found", "sound", "answer", "no", "school", "most", "grow", "number", "study", "who", "still", "over", "learn", "know", "plant", "water", "cover", "than", "food", "call", "sun", "first", "four", "people", "thought", "may", "let", "down", "keep", "side", "eye", "been", "never", "now", "last", "find", "door", "any", "between", "new", "city", "work", "tree", "part", "cross", "take", "since", "get", "hard", "place", "start", "made", "might", "live", "story", "where", "saw", "after", "far", "back", "sea", "little", "draw", "only", "left", "round", "late", "man", "run", "year", "don't", "came", "while", "show", "press", "every", "close", "good", "night", "me", "real", "give", "life", "our", "few", "under", "stop", "open", "ten", "seem", "simple", "together", "several", "next", "vowel", "white", "toward", "children", "war", "begin", "lay", "got", "against", "walk", "pattern", "example", "slow", "ease", "center", "paper", "love", "often", "person", "always", "money", "music", "serve", "those", "appear", "both", "road", "mark", "map", "book", "science", "letter", "rule", "until", "govern", "mile", "pull", "river", "cold", "car", "notice", "feet", "voice", "care", "fall", "second", "power", "group", "town", "carry", "fine", "took", "certain", "rain", "fly", "eat", "unit", "room", "lead", "friend", "cry", "began", "dark", "idea", "machine", "fish", "note", "mountain", "wait", "north", "plan", "once", "figure", "base", "star", "hear", "box", "horse", "noun", "cut", "field", "sure", "rest", "watch", "correct", "color", "able", "face", "pound", "wood", "done", "main", "beauty", "enough", "drive", "plain", "stood", "girl", "contain", "usual", "front", "young", "teach", "ready", "week", "above", "final", "ever", "gave", "red", "green", "list", "oh", "though", "quick", "feel", "develop", "talk", "sleep", "bird", "warm", "soon", "free", "body", "minute", "dog", "strong", "family", "special", "direct", "mind", "pose", "behind", "leave", "clear", "song", "tail", "measure", "produce", "state", "fact", "product", "street", "black", "inch", "short", "lot", "numeral", "nothing", "class", "course", "wind", "stay", "question", "wheel", "happen", "full", "complete", "force", "ship", "blue", "area", "object", "half", "decide", "rock", "surface", "order", "deep", "fire", "moon", "south", "island", "problem", "foot", "piece", "yet", "told", "busy", "knew", "test", "pass", "record", "farm", "boat", "top", "common", "whole", "gold", "king", "possible", "size", "plane", "heard", "age", "best", "dry", "hour", "wonder", "better", "laugh", "true", "thousand", "during", "ago", "hundred", "ran", "am", "check", "remember", "game", "step", "shape", "early", "yes", "hold", "hot", "west", "miss", "ground", "brought", "interest", "heat", "reach", "snow", "fast", "bed", "five", "bring", "sing", "sit", "listen", "perhaps", "six", "fill", "table", "east", "travel", "weight", "less", "language", "morning", "among"];
+  //var common_english_words = ["the", "name", "of", "very", "to", "through", "and", "just", "a", "form", "in", "much", "is", "great", "it", "think", "you", "say", "that", "help", "he", "low", "was", "line", "for", "before", "on", "turn", "are", "cause", "with", "same", "as", "mean", "I", "differ", "his", "move", "they", "right", "be", "boy", "at", "old", "one", "too", "have", "does", "this", "tell", "from", "sentence", "or", "set", "had", "three", "by", "want", "hot", "air", "but", "well", "some", "also", "what", "play", "there", "small", "we", "end", "can", "put", "out", "home", "other", "read", "were", "hand", "all", "port", "your", "large", "when", "spell", "up", "add", "use", "even", "word", "land", "how", "here", "said", "must", "an", "big", "each", "high", "she", "such", "which", "follow", "do", "act", "their", "why", "time", "ask", "if", "men", "will", "change", "way", "went", "about", "light", "many", "kind", "then", "off", "them", "need", "would", "house", "write", "picture", "like", "try", "so", "us", "these", "again", "her", "animal", "long", "point", "make", "mother", "thing", "world", "see", "near", "him", "build", "two", "self", "has", "earth", "look", "father", "more", "head", "day", "stand", "could", "own", "go", "page", "come", "should", "did", "country", "my", "found", "sound", "answer", "no", "school", "most", "grow", "number", "study", "who", "still", "over", "learn", "know", "plant", "water", "cover", "than", "food", "call", "sun", "first", "four", "people", "thought", "may", "let", "down", "keep", "side", "eye", "been", "never", "now", "last", "find", "door", "any", "between", "new", "city", "work", "tree", "part", "cross", "take", "since", "get", "hard", "place", "start", "made", "might", "live", "story", "where", "saw", "after", "far", "back", "sea", "little", "draw", "only", "left", "round", "late", "man", "run", "year", "don't", "came", "while", "show", "press", "every", "close", "good", "night", "me", "real", "give", "life", "our", "few", "under", "stop", "open", "ten", "seem", "simple", "together", "several", "next", "vowel", "white", "toward", "children", "war", "begin", "lay", "got", "against", "walk", "pattern", "example", "slow", "ease", "center", "paper", "love", "often", "person", "always", "money", "music", "serve", "those", "appear", "both", "road", "mark", "map", "book", "science", "letter", "rule", "until", "govern", "mile", "pull", "river", "cold", "car", "notice", "feet", "voice", "care", "fall", "second", "power", "group", "town", "carry", "fine", "took", "certain", "rain", "fly", "eat", "unit", "room", "lead", "friend", "cry", "began", "dark", "idea", "machine", "fish", "note", "mountain", "wait", "north", "plan", "once", "figure", "base", "star", "hear", "box", "horse", "noun", "cut", "field", "sure", "rest", "watch", "correct", "color", "able", "face", "pound", "wood", "done", "main", "beauty", "enough", "drive", "plain", "stood", "girl", "contain", "usual", "front", "young", "teach", "ready", "week", "above", "final", "ever", "gave", "red", "green", "list", "oh", "though", "quick", "feel", "develop", "talk", "sleep", "bird", "warm", "soon", "free", "body", "minute", "dog", "strong", "family", "special", "direct", "mind", "pose", "behind", "leave", "clear", "song", "tail", "measure", "produce", "state", "fact", "product", "street", "black", "inch", "short", "lot", "numeral", "nothing", "class", "course", "wind", "stay", "question", "wheel", "happen", "full", "complete", "force", "ship", "blue", "area", "object", "half", "decide", "rock", "surface", "order", "deep", "fire", "moon", "south", "island", "problem", "foot", "piece", "yet", "told", "busy", "knew", "test", "pass", "record", "farm", "boat", "top", "common", "whole", "gold", "king", "possible", "size", "plane", "heard", "age", "best", "dry", "hour", "wonder", "better", "laugh", "true", "thousand", "during", "ago", "hundred", "ran", "am", "check", "remember", "game", "step", "shape", "early", "yes", "hold", "hot", "west", "miss", "ground", "brought", "interest", "heat", "reach", "snow", "fast", "bed", "five", "bring", "sing", "sit", "listen", "perhaps", "six", "fill", "table", "east", "travel", "weight", "less", "language", "morning", "among"];
 
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -86,46 +86,195 @@
 // Scoring Engine
 /////////////////////////////////////////////////////////////////////////////////
 
+$(document).ready(function() {
+
+/*  var MameSearch = (function(){
+  
+  var engine = new fullproof.ScoringEngine();
+  var dbName = "mamelist";
+
+  var data = [];
+  {% for comment in oldComments %}
+    data.push("{{comment.text}}");
+  {% endfor %}
+  
+  function makeInitializer(progressCallback) {
+    return function(injector, callback) {
+      var synchro = fullproof.make_synchro_point(callback, data.length-1);
+            console.log("INITIALIZER starting");
+      var values = [];
+      for (var i=0;i<data.length; ++i) {
+        values.push(i);
+      }
+      console.log(values);
+            console.log("INITIALIZER injecting");
+            injector.injectBulk(data, values, callback, progressCallback);
+    }
+  }
+
+
+    /**
+     * Starts the MameSearch search engine
+     * @param callback called when the search engine is ready
+     * @param progress if the indexes need to be initialized, this function is called with the progress value, ranging from 0 to 1.
+     */
+/*    this.start = function(callback, progress) {
+
+        //var loader = new fullproof.DataLoader();
+    //loader.setQueue("mamegames.txt");
+    //loader.start(function() {
+            console.log("this.start");
+
+            var index1 = new fullproof.IndexUnit("normalindex",
+                new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
+                new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.normalizer.remove_duplicate_letters),
+                makeInitializer(function(val) { progress(val/2); }));
+
+            var index2 = new fullproof.IndexUnit("stemmedindex",
+                new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
+                new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.english.metaphone),
+                makeInitializer(function(val){progress(val/2 + 0.5);}));
+              console.log(index1);
+            console.log("before opening engine");
+            engine.open([index1, index2], fullproof.make_callback(callback, true), fullproof.make_callback(callback, false));
+            console.log(engine);
+    //}, function(txt, file) { data = txt.split("\n"); }, 
+    // function() { console.log("ERROR");});
+    
+  }
+
+  this.lookup = function(txt, callback) {
+    console.log("this.lookup");
+    engine.lookup(txt, function(resultset) {
+      console.log(engine);
+
+      if (!resultset) {
+        return "no match.";
+      }
+      
+      resultset.setComparatorObject({
+        lower_than: function(a,b) {
+          return a.score > b.score;
+        },
+        equals: function(a,b) {
+          return a.score === b.score;
+        }
+      });
+      
+      var result = "";
+      if (resultset.getSize() == 0) {
+        result += "<div style='font-weight:bold;'>No result found for query '" + txt + '"</div>';
+      } else {
+        result += "<div>" + resultset.getSize() + " entr" + (resultset.getSize()>1?"ies were":"y was") + " found</div>";
+      }
+      result += "<table><tr><th>ROM</th><th>Name</th><th>Search score</th></tr>";
+      resultset.forEach(function(entry) {
+        if (entry instanceof fullproof.ScoredElement) {
+          console.log(data);
+          console.log(entry);
+          //var line = data[entry.value];
+          //var split = line.split(";");
+          //result += "<tr><td>" + (split[0]?split[0]:"-") +"</td><td>" + (split[1]?split[1]:"-") + "</td><td>"+entry.score.toFixed(3)+"</td></tr>";
+        } else {
+          //var split = data[line].split(";");
+          //result += "<tr><td>" + (split[0]?split[0]:"-") +"</td><td>" + (split[1]?split[1]:"-") + "</td></tr>"; 
+        }
+      });
+      result += "</table>";
+      
+      callback(result);
+    });
+  };
+  
+  this.reloadDatabase = function(callback) {
+    engine.clear(callback);
+  };
+  
+  
+  return this;
+  
+})();
+
+  MameSearch.start(function(i) {
+    if (i) {
+      $("#loading").hide();
+      $("#application").show();
+    }
+  }, function(progress) {
+    $("#progress").html(parseInt(progress*100));
+  });
+
+  var now = (function() {
+    var perf = window.performance || {};
+    var fn = perf.now || perf.mozNow || perf.webkitNow || perf.msNow || perf.oNow;
+    // fn.bind will be available in all the browsers that support the advanced window.performance... ;-)
+    return fn ? fn.bind(perf) : function() { return new Date().getTime(); };
+    })();
+
+  function search() {
+    //var value = $("#typehere").val();
+    var value = $("#textentry").val();
+    
+    var startTime = now();
+    
+    MameSearch.lookup(value, function(result) {
+      var time = now() - startTime;
+      time = time.toFixed(3);
+      result = "<div>Request processed in " + time + " ms</div>" + result;
+      $("#results").html(result);
+    });
+  }
+
+  $("#search").click(search);
+  $("#typehere").change(search);
+  $("#reload").click(function() {
+    MameSearch.reloadDatabase(function() {
+      window.location.reload(true);
+    }); 
+  });
+*/
+
+  /////////////////////////////////////////////////////////////////////////////////
+
+  console.log("ABBY IS A FOOL");
+
+  var db = openDatabase('reusedComments', '1.0', 'reusedComments', 2 * 1024 * 1024);
+
+  db.transaction(function (tx) {
+    tx.executeSql('DROP TABLE fullproofmetadata');
+    tx.executeSql('DROP TABLE normalindex');
+    tx.executeSql('DROP TABLE stemmedindex');
+  });
+
   var commentsData = [];
   {% for comment in oldComments %}
     commentsData.push("{{comment.text}}");
   {% endfor %}
+  commentsData.push("hello world");
 
-  function loadData(callbackWhenDone) {
-    var loader = new fullproof.DataLoader();
-    loader.setQueue("colors.csv");
-    loader.start(fullproof.make_callback(callbackWhenDone, true),
-            function(txt) {
-                colorsData = txt.split("\n");
-            }, fullproof.make_callback(callbackWhenDone, false));
-  }
+  //CommentSearch.init(commentsData);
 
   var dbName = "reusedComments";
   var commentsSearchEngine = new fullproof.ScoringEngine();
 
   function initializer(injector, callback) {
-      console.log("hi");
       var synchro = fullproof.make_synchro_point(callback, commentsData.length-1);
       var values = [];
       for (var i=0;i<commentsData.length; ++i) {
-        values.push(fullproof.ScoredEntry(commentsData[i], i, 1.0));
-        //values.push(i);
-        //injector.inject(commentsData[i], fullproof.ScoredElement(i, 1.0), synchro);
-        //injector.inject(commentsData[i], i, synchro);
+        values.push(i);
       }
-
-      injector.injectBulk(commentsData, values, synchro);
+      injector.injectBulk(commentsData, values, callback);
   }
 
   var index1 = new fullproof.IndexUnit(
       "normalindex",
-      new fullproof.Capabilities().setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject),
+      new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
       new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.normalizer.remove_duplicate_letters),
       initializer
   );
   var index2 = new fullproof.IndexUnit(
       "stemmedindex",
-      new fullproof.Capabilities().setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject),
+      new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
       new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.english.metaphone),
       initializer
   );
@@ -136,15 +285,20 @@
       }
   }
 
-  commentsSearchEngine.open([index1, index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
+  console.log("before opening engine");
+  commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
+  console.log(commentsSearchEngine);
   
   function search() {
       var value = $("#textentry").val();
-              console.log(commentsSearchEngine);
+      //console.log(commentsSearchEngine);
+      console.log(index1);
+      console.log(index2);
       // Request a search to the comments engine, then displays the results, if any.
       commentsSearchEngine.lookup(value, function(resultset) {
         console.log("comparing");
-        resultset.setComparatorObject({
+        console.log(commentsSearchEngine);
+        /*resultset.setComparatorObject({
           lower_than: function(a,b) {
             console.log("a: " + a);
             console.log("b: " + b);
@@ -154,13 +308,13 @@
             console.log("here");
             return a.score === b.score;
           }
-        });
+        });*/
         var result = [];
         if (resultset && resultset.getSize()) {
             var rsize = resultset.getSize();
             console.log(resultset);
             resultset.forEach(function(e) {
-                //var c = commentsData[e];
+                //var c = commentsData[e.value];
                 //result.push(c);
                 console.log(e);
             });
@@ -175,12 +329,13 @@
     // Test whether user has finished typing a word
     ///////////////////////////////////////////////
     if (event.which == 32) {
+      //CommentSearch.search($("#textentry").val());
       search();
     }
 
 
   });
-
+});
 
 /////////////////////////////////////////////////////////////////////////////////
 // Textentry autocomplete
