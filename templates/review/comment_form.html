@@ -88,171 +88,20 @@
 
 $(document).ready(function() {
 
-/*  var MameSearch = (function(){
-  
-  var engine = new fullproof.ScoringEngine();
-  var dbName = "mamelist";
-
-  var data = [];
-  {% for comment in oldComments %}
-    data.push("{{comment.text}}");
-  {% endfor %}
-  
-  function makeInitializer(progressCallback) {
-    return function(injector, callback) {
-      var synchro = fullproof.make_synchro_point(callback, data.length-1);
-            console.log("INITIALIZER starting");
-      var values = [];
-      for (var i=0;i<data.length; ++i) {
-        values.push(i);
-      }
-      console.log(values);
-            console.log("INITIALIZER injecting");
-            injector.injectBulk(data, values, callback, progressCallback);
-    }
-  }
-
-
-    /**
-     * Starts the MameSearch search engine
-     * @param callback called when the search engine is ready
-     * @param progress if the indexes need to be initialized, this function is called with the progress value, ranging from 0 to 1.
-     */
-/*    this.start = function(callback, progress) {
-
-        //var loader = new fullproof.DataLoader();
-    //loader.setQueue("mamegames.txt");
-    //loader.start(function() {
-            console.log("this.start");
-
-            var index1 = new fullproof.IndexUnit("normalindex",
-                new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
-                new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.normalizer.remove_duplicate_letters),
-                makeInitializer(function(val) { progress(val/2); }));
-
-            var index2 = new fullproof.IndexUnit("stemmedindex",
-                new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
-                new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.english.metaphone),
-                makeInitializer(function(val){progress(val/2 + 0.5);}));
-              console.log(index1);
-            console.log("before opening engine");
-            engine.open([index1, index2], fullproof.make_callback(callback, true), fullproof.make_callback(callback, false));
-            console.log(engine);
-    //}, function(txt, file) { data = txt.split("\n"); }, 
-    // function() { console.log("ERROR");});
-    
-  }
-
-  this.lookup = function(txt, callback) {
-    console.log("this.lookup");
-    engine.lookup(txt, function(resultset) {
-      console.log(engine);
-
-      if (!resultset) {
-        return "no match.";
-      }
-      
-      resultset.setComparatorObject({
-        lower_than: function(a,b) {
-          return a.score > b.score;
-        },
-        equals: function(a,b) {
-          return a.score === b.score;
-        }
-      });
-      
-      var result = "";
-      if (resultset.getSize() == 0) {
-        result += "<div style='font-weight:bold;'>No result found for query '" + txt + '"</div>';
-      } else {
-        result += "<div>" + resultset.getSize() + " entr" + (resultset.getSize()>1?"ies were":"y was") + " found</div>";
-      }
-      result += "<table><tr><th>ROM</th><th>Name</th><th>Search score</th></tr>";
-      resultset.forEach(function(entry) {
-        if (entry instanceof fullproof.ScoredElement) {
-          console.log(data);
-          console.log(entry);
-          //var line = data[entry.value];
-          //var split = line.split(";");
-          //result += "<tr><td>" + (split[0]?split[0]:"-") +"</td><td>" + (split[1]?split[1]:"-") + "</td><td>"+entry.score.toFixed(3)+"</td></tr>";
-        } else {
-          //var split = data[line].split(";");
-          //result += "<tr><td>" + (split[0]?split[0]:"-") +"</td><td>" + (split[1]?split[1]:"-") + "</td></tr>"; 
-        }
-      });
-      result += "</table>";
-      
-      callback(result);
-    });
-  };
-  
-  this.reloadDatabase = function(callback) {
-    engine.clear(callback);
-  };
-  
-  
-  return this;
-  
-})();
-
-  MameSearch.start(function(i) {
-    if (i) {
-      $("#loading").hide();
-      $("#application").show();
-    }
-  }, function(progress) {
-    $("#progress").html(parseInt(progress*100));
-  });
-
-  var now = (function() {
-    var perf = window.performance || {};
-    var fn = perf.now || perf.mozNow || perf.webkitNow || perf.msNow || perf.oNow;
-    // fn.bind will be available in all the browsers that support the advanced window.performance... ;-)
-    return fn ? fn.bind(perf) : function() { return new Date().getTime(); };
-    })();
-
-  function search() {
-    //var value = $("#typehere").val();
-    var value = $("#textentry").val();
-    
-    var startTime = now();
-    
-    MameSearch.lookup(value, function(result) {
-      var time = now() - startTime;
-      time = time.toFixed(3);
-      result = "<div>Request processed in " + time + " ms</div>" + result;
-      $("#results").html(result);
-    });
-  }
-
-  $("#search").click(search);
-  $("#typehere").change(search);
-  $("#reload").click(function() {
-    MameSearch.reloadDatabase(function() {
-      window.location.reload(true);
-    }); 
-  });
-*/
-
-  /////////////////////////////////////////////////////////////////////////////////
-
-  console.log("ABBY IS A FOOL");
-
+  // Clear reusedComments database !important
   var db = openDatabase('reusedComments', '1.0', 'reusedComments', 2 * 1024 * 1024);
-
   db.transaction(function (tx) {
     tx.executeSql('DROP TABLE fullproofmetadata');
     tx.executeSql('DROP TABLE normalindex');
     tx.executeSql('DROP TABLE stemmedindex');
   });
 
+  // Add comments to database
   var commentsData = [];
   {% for comment in oldComments %}
     commentsData.push("{{comment.text}}");
   {% endfor %}
   commentsData.push("hello world");
-
-  //CommentSearch.init(commentsData);
 
   var dbName = "reusedComments";
   var commentsSearchEngine = new fullproof.ScoringEngine();
@@ -285,43 +134,43 @@ $(document).ready(function() {
       }
   }
 
-  console.log("before opening engine");
   commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
-  console.log(commentsSearchEngine);
   
   function search() {
+      $(".reuse-comment").remove();
       var value = $("#textentry").val();
-      //console.log(commentsSearchEngine);
-      console.log(index1);
-      console.log(index2);
       // Request a search to the comments engine, then displays the results, if any.
       commentsSearchEngine.lookup(value, function(resultset) {
-        console.log("comparing");
-        console.log(commentsSearchEngine);
         /*resultset.setComparatorObject({
           lower_than: function(a,b) {
-            console.log("a: " + a);
-            console.log("b: " + b);
             return a.score > b.score;
           },
           equals: function(a,b) {
-            console.log("here");
             return a.score === b.score;
           }
         });*/
-        var result = [];
+        var results = [];
+        //var dates = [];
         if (resultset && resultset.getSize()) {
-            var rsize = resultset.getSize();
-            console.log(resultset);
-            resultset.forEach(function(e) {
-                //var c = commentsData[e.value];
-                //result.push(c);
-                console.log(e);
-            });
-        } else {
+          var rsize = resultset.getSize();
+          resultset.forEach(function(e) {
+            results.push(commentsData[e.value]);
+            //dates.push(commentsDates[e]);
+          });
+        }
+        for (var i=0; i<Math.min(results.length, 3); i++) {
+          var comment_div = $("<div class='comment reuse-comment expanded'></div>");
+          //comment_div.append("<div class='comment-header'>"+dates[i]+" ago you wrote a similar comment:</div>");
+          //comment_div.append("<div class='comment-author'>"+dates[i]+" ago</div>");
+          comment_div.append("<div class='reuse-comment-text'><textarea readOnly='true' onclick='select()' onselect='' cols='10' rows='5'>"+results[i]+"</textarea></div>");
+          $(".new-comment").after(comment_div);
         }
       });
   }
+
+  $(".new-comment").on("remove", function() {
+    $(".reuse-comment").remove();
+  });
 
   $("#textentry").keypress(function(event) {
     ///////////////////////////////////////////////
@@ -329,7 +178,6 @@ $(document).ready(function() {
     // Test whether user has finished typing a word
     ///////////////////////////////////////////////
     if (event.which == 32) {
-      //CommentSearch.search($("#textentry").val());
       search();
     }
 
