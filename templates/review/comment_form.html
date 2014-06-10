@@ -5,9 +5,6 @@
 <!--<script type="text/javascript" src="{{ STATIC_URL }}/js/fullproof-all.js"></script>-->
 <script type="text/javascript">
 
-  //var common_english_words = ["the", "name", "of", "very", "to", "through", "and", "just", "a", "form", "in", "much", "is", "great", "it", "think", "you", "say", "that", "help", "he", "low", "was", "line", "for", "before", "on", "turn", "are", "cause", "with", "same", "as", "mean", "I", "differ", "his", "move", "they", "right", "be", "boy", "at", "old", "one", "too", "have", "does", "this", "tell", "from", "sentence", "or", "set", "had", "three", "by", "want", "hot", "air", "but", "well", "some", "also", "what", "play", "there", "small", "we", "end", "can", "put", "out", "home", "other", "read", "were", "hand", "all", "port", "your", "large", "when", "spell", "up", "add", "use", "even", "word", "land", "how", "here", "said", "must", "an", "big", "each", "high", "she", "such", "which", "follow", "do", "act", "their", "why", "time", "ask", "if", "men", "will", "change", "way", "went", "about", "light", "many", "kind", "then", "off", "them", "need", "would", "house", "write", "picture", "like", "try", "so", "us", "these", "again", "her", "animal", "long", "point", "make", "mother", "thing", "world", "see", "near", "him", "build", "two", "self", "has", "earth", "look", "father", "more", "head", "day", "stand", "could", "own", "go", "page", "come", "should", "did", "country", "my", "found", "sound", "answer", "no", "school", "most", "grow", "number", "study", "who", "still", "over", "learn", "know", "plant", "water", "cover", "than", "food", "call", "sun", "first", "four", "people", "thought", "may", "let", "down", "keep", "side", "eye", "been", "never", "now", "last", "find", "door", "any", "between", "new", "city", "work", "tree", "part", "cross", "take", "since", "get", "hard", "place", "start", "made", "might", "live", "story", "where", "saw", "after", "far", "back", "sea", "little", "draw", "only", "left", "round", "late", "man", "run", "year", "don't", "came", "while", "show", "press", "every", "close", "good", "night", "me", "real", "give", "life", "our", "few", "under", "stop", "open", "ten", "seem", "simple", "together", "several", "next", "vowel", "white", "toward", "children", "war", "begin", "lay", "got", "against", "walk", "pattern", "example", "slow", "ease", "center", "paper", "love", "often", "person", "always", "money", "music", "serve", "those", "appear", "both", "road", "mark", "map", "book", "science", "letter", "rule", "until", "govern", "mile", "pull", "river", "cold", "car", "notice", "feet", "voice", "care", "fall", "second", "power", "group", "town", "carry", "fine", "took", "certain", "rain", "fly", "eat", "unit", "room", "lead", "friend", "cry", "began", "dark", "idea", "machine", "fish", "note", "mountain", "wait", "north", "plan", "once", "figure", "base", "star", "hear", "box", "horse", "noun", "cut", "field", "sure", "rest", "watch", "correct", "color", "able", "face", "pound", "wood", "done", "main", "beauty", "enough", "drive", "plain", "stood", "girl", "contain", "usual", "front", "young", "teach", "ready", "week", "above", "final", "ever", "gave", "red", "green", "list", "oh", "though", "quick", "feel", "develop", "talk", "sleep", "bird", "warm", "soon", "free", "body", "minute", "dog", "strong", "family", "special", "direct", "mind", "pose", "behind", "leave", "clear", "song", "tail", "measure", "produce", "state", "fact", "product", "street", "black", "inch", "short", "lot", "numeral", "nothing", "class", "course", "wind", "stay", "question", "wheel", "happen", "full", "complete", "force", "ship", "blue", "area", "object", "half", "decide", "rock", "surface", "order", "deep", "fire", "moon", "south", "island", "problem", "foot", "piece", "yet", "told", "busy", "knew", "test", "pass", "record", "farm", "boat", "top", "common", "whole", "gold", "king", "possible", "size", "plane", "heard", "age", "best", "dry", "hour", "wonder", "better", "laugh", "true", "thousand", "during", "ago", "hundred", "ran", "am", "check", "remember", "game", "step", "shape", "early", "yes", "hold", "hot", "west", "miss", "ground", "brought", "interest", "heat", "reach", "snow", "fast", "bed", "five", "bring", "sing", "sit", "listen", "perhaps", "six", "fill", "table", "east", "travel", "weight", "less", "language", "morning", "among"];
-
-
 /////////////////////////////////////////////////////////////////////////////////
 // Boolean Engine
 /////////////////////////////////////////////////////////////////////////////////
@@ -98,10 +95,11 @@ $(document).ready(function() {
 
   // Add comments to database
   var commentsData = [];
+  var commentsDates = [];
   {% for comment in oldComments %}
     commentsData.push("{{comment.text}}");
+    commentsDates.push("{{comment.created|timesince_human}}");
   {% endfor %}
-  commentsData.push("hello world");
 
   var dbName = "reusedComments";
   var commentsSearchEngine = new fullproof.ScoringEngine();
@@ -150,17 +148,17 @@ $(document).ready(function() {
           }
         });*/
         var results = [];
-        //var dates = [];
+        var dates = [];
         if (resultset && resultset.getSize()) {
           var rsize = resultset.getSize();
           resultset.forEach(function(e) {
             results.push(commentsData[e.value]);
-            //dates.push(commentsDates[e]);
+            dates.push(commentsDates[e.value]);
           });
         }
         for (var i=0; i<Math.min(results.length, 3); i++) {
           var comment_div = $("<div class='comment reuse-comment expanded'></div>");
-          //comment_div.append("<div class='comment-header'>"+dates[i]+" ago you wrote a similar comment:</div>");
+          comment_div.append("<div class='comment-header'>"+dates[i]+" ago you wrote a similar comment:</div>");
           //comment_div.append("<div class='comment-author'>"+dates[i]+" ago</div>");
           comment_div.append("<div class='reuse-comment-text'><textarea readOnly='true' onclick='select()' onselect='' cols='10' rows='5'>"+results[i]+"</textarea></div>");
           $(".new-comment").after(comment_div);
@@ -184,234 +182,6 @@ $(document).ready(function() {
 
   });
 });
-
-/////////////////////////////////////////////////////////////////////////////////
-// Textentry autocomplete
-/////////////////////////////////////////////////////////////////////////////////
-
-  // Generate a short snippet which contains the given substrings
-  /*function generate_relevant_snippet(comment, substrings) {
-    var snippet_length = 30;
-    // To do comparisons, make comments and substrings lowercase.
-    var lowercase_comment = comment.toLowerCase();
-    var lowercase_substrings = [];
-    for (var i in substrings) {
-      lowercase_substrings.push(substrings[i].toLowerCase());
-    }
-
-    // Check to make sure all of the substrings are in the comment
-    for (var i in lowercase_substrings) {
-      var index = lowercase_comment.indexOf(lowercase_substrings[i]);
-      if (index == -1) {
-        return null;
-      }
-    }
-
-    // If the comment length is shorter than the snippet length, no need to make a snippet!
-    if (lowercase_comment.length < snippet_length) {
-      return comment;
-    }
-
-    // Include buffer characters before and after the last keyword (most recently typed)
-    var last = lowercase_substrings.length - 1;
-    index = lowercase_comment.indexOf(lowercase_substrings[last]);
-    var bufferchars = (snippet_length - lowercase_substrings[last].length) / 2;
-    if (index < bufferchars) { // Substring found very close to beginning of text
-      return comment.slice(0,snippet_length) + "...";
-    }
-    if (index + lowercase_substrings[last].length + bufferchars > lowercase_comment.length) { // Substring found very close to end of text
-      return "..." + comment.slice(-snippet_length);
-    }
-    return "..." + comment.slice(index-bufferchars, index+snippet_length-bufferchars) + "...";
-  }
-
-  var oldCommentsArray = [];
-  {% for comment in oldComments %}
-    oldCommentsArray.push("{{comment.text}}");
-  {% endfor %}
-
-  // Textcomplete
-  $("#textentry").textcomplete([{
-    match: /((\w+)(\W+))+$/,
-    search: function (term, callback) {
-        var words_in_textentry = term.split(' ');
-
-        // Remove all blacklisted words (common English words)
-        var keywords = [];
-        for (var i in words_in_textentry) {
-          var lowercase_word = words_in_textentry[i].toLowerCase();
-          if (common_english_words.indexOf(lowercase_word) == -1 && lowercase_word != "") {
-            keywords.push(words_in_textentry[i]);
-          }
-        }
-        if (keywords.length == 0) {
-          return null;
-        }
-        callback($.map(oldCommentsArray, function (comment) {
-          // Generate comment snippets
-          var relevant_snippet = generate_relevant_snippet(comment, keywords);
-          if (relevant_snippet != null) {
-            var value = {0: relevant_snippet, 1: comment};
-            return value;
-          }
-          return null;
-
-        }));
-    },
-    template: function(value) {
-        return value[0];
-    },
-    replace: function (value) {
-        return value[1];
-    },
-    index: 1,
-    maxCount: 5
-  }]);*/
-
-  /*$("#textentry").keypress(function(event) {
-    ///////////////////////////////////////////////
-    // TODO: This needs to be changed!
-    // Test whether user has finished typing a word
-    ///////////////////////////////////////////////
-    if (
-          //event.which == 8 || // Backspace
-          event.which == 32 || // Space
-          event.which == 33 || // !
-          event.which == 63 || // ?
-          event.which == 44 || // ,
-          event.which == 46 // .
-          //event.which == 127 // Delete
-        ) {
-
-      // Create regex pattern to format words in textentry into keywords
-      // These keywords should be in their unmodified form (lowercase, unpluralized, removes punctuation)
-      var pattern2 = /(\w+)/g;
-      var str = $("#textentry").val();
-      var match;
-      var keywords = [];
-      while ((match = pattern2.exec(str)) != null) {
-        var lowercase_match = match[0].toLowerCase();
-        if (common_english_words.indexOf(lowercase_match) == -1) {
-          keywords.push(lowercase_match);
-        }
-      }
-
-      // Regex pattern to check keywords with old comments
-      {% for comment in oldComments %}
-        var pattern3 = new RegExp('\\b' + '{{comment.text}}' + '(?:es|s)?\\b', 'gi');
-        while ((match = pattern3.exec(str)) != null) {
-
-        }
-      {% endfor %}
-
-      // Get all words in text entry
-      var words_in_textentry = $("#textentry").val().split(' ');
-
-      // Format words (remove pluralization, make lowercase, remove extra punctuation)
-      // Remove all blacklisted words (common English words)
-      var keywords = [];
-      for (var i in words_in_textentry) {
-        var lowercase_keyword = words_in_textentry[i].toLowerCase();
-
-        if (common_english_words.indexOf(lowercase_keyword) == -1) {
-          keywords.push(lowercase_keyword);
-        }
-      }*/
-
-      /*if (keywords.length != 0) {
-        // Find matching comments
-        var matches = [];
-        {% for comment in oldComments %}
-          // To do comparisons, make comments and substrings lowercase
-          var comment_text = '{{comment.text}}';
-          var lowercase_comment = comment_text.toLowerCase();
-
-          // Check to make sure all of the substrings are in the comment
-          var match = true;
-          for (var i in keywords) {
-            var index = lowercase_comment.indexOf(keywords[i]);
-            if (index == -1) {
-              match = false;
-            }
-          }
-          if (match == true) {
-            matches.push('{{comment.text}}');
-          }
-        {% endfor %}
-        if (matches.length != 0) {
-          console.log(matches);
-        }
-      }
-    }
-  });*/
-
-/////////////////////////////////////////////////////////////////////////////////
-// Dropdown bar
-/////////////////////////////////////////////////////////////////////////////////
-
-  /*$("#comments-dropdown").hide();
-
-  $("#textentry").keypress(function(event) {
-    ///////////////////////////////////////////////
-    // TODO: This needs to be changed!
-    // Test whether user has finished typing a word
-    ///////////////////////////////////////////////
-    if (
-          //event.which == 8 || // Backspace
-          event.which == 32 || // Space
-          event.which == 33 || // ?
-          event.which == 44 || // ,
-          event.which == 46 // .
-          //event.which == 127 // Delete
-        ) {
-      // Get all words in text entry
-      var words_in_textentry = $("#textentry").val().split(' ');
-
-      // Remove all blacklisted words (common English words)
-      var keywords = [];
-      for (var i in words_in_textentry) {
-        if (common_english_words.indexOf(words_in_textentry[i]) == -1) {
-          keywords.push(words_in_textentry[i]);
-        }
-      }
-      if (keywords.length == 0) {
-        $("#comments-dropdown").hide();
-        return;
-      }
-
-      // Generate comment snippets
-      var comment_snippets = [];
-      var full_comments = [];
-      {% for comment in oldComments %}
-        var relevant_snippet = generate_relevant_snippet('{{comment.text}}', keywords);
-        if (relevant_snippet != null) {
-          comment_snippets.push(relevant_snippet);
-          full_comments.push('{{comment}}');
-        }
-      {% endfor %}
-
-      // Add snippets to select
-      $("#comments-dropdown").show();
-      $("#comments-dropdown select").empty();
-      $("#comments-dropdown select").append("<option value='default'>These comments might be similar:</option>");
-      for (var i in comment_snippets) {
-        $("#comments-dropdown select").append("<option id='dropdownoption"+i+"'>" + comment_snippets[i] + "</option>");
-        $("#dropdownoption"+i).val(full_comments[i]);
-      }
-    }
-  });
-
-  // When a student clicks on a comment snippet from the dropdown, the full comment appears in the textarea.
-  $("#comments-dropdown select").change(function() {
-    if ($("#comments-dropdown select").val() == 'default') {
-      $("#textentry").val('');
-      $("#comments-dropdown").hide();
-      $("#textentry").focus();
-    }
-    else {
-      $("#textentry").val($("#comments-dropdown select").val());
-    }
-  });*/
 
 </script>
 
