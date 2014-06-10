@@ -129,7 +129,6 @@ function showCommentForm(startLine, endLine, chunkId, fileId) {
             }
             // construct a fake "comment" boundary object to pass in
             var commentElt = elt.filter('.comment').get(0);
-            console.log(elt.filter('script').get(0));
             scrollCodeTo({
                 start: startLine, 
                 end: endLine, 
@@ -595,7 +594,6 @@ if (caesar.state.fullView) {
 }
 
 $('#new-comment-form').live('submit', function() {
-    console.log("yup");
     var dataString = $(this).serialize();
     $.post(caesar.urls.new_comment, dataString, function(data) {
         var newNode = $(data);

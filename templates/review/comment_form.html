@@ -139,28 +139,28 @@ $(document).ready(function() {
       var value = $("#textentry").val();
       // Request a search to the comments engine, then displays the results, if any.
       commentsSearchEngine.lookup(value, function(resultset) {
-        /*resultset.setComparatorObject({
-          lower_than: function(a,b) {
-            return a.score > b.score;
-          },
-          equals: function(a,b) {
-            return a.score === b.score;
-          }
-        });*/
         var results = [];
-        var dates = [];
         if (resultset && resultset.getSize()) {
           var rsize = resultset.getSize();
           resultset.forEach(function(e) {
-            results.push(commentsData[e.value]);
-            dates.push(commentsDates[e.value]);
+            results.push({
+              "text": commentsData[e.value],
+              "date": commentsDates[e.value],
+              "score": e.score
+            });
           });
         }
-        for (var i=0; i<Math.min(results.length, 3); i++) {
+
+        console.log(results);
+        // Sort results from highest score to lowest score
+        results.sort(function(a,b) { return b.score - a.score; });
+
+        // Display only the top 3 results. Insert them backwards so that they are displayed in the correct order.
+        for (var i=Math.min(results.length-1, 2); i>=0; i--) {
           var comment_div = $("<div class='comment reuse-comment expanded'></div>");
-          comment_div.append("<div class='comment-header'>"+dates[i]+" ago you wrote a similar comment:</div>");
-          //comment_div.append("<div class='comment-author'>"+dates[i]+" ago</div>");
-          comment_div.append("<div class='reuse-comment-text'><textarea readOnly='true' onclick='select()' onselect='' cols='10' rows='5'>"+results[i]+"</textarea></div>");
+          comment_div.append("<div class='comment-header'>"+results[i].date+" ago you wrote a similar comment:</div>");
+          //comment_div.append("<div class='comment-author'>"+results[i].date+" ago</div>");
+          comment_div.append("<div class='reuse-comment-text'><textarea readOnly='true' onclick='select()' onselect='' cols='10' rows='5'>"+results[i].text+"</textarea></div>");
           $(".new-comment").after(comment_div);
         }
       });
