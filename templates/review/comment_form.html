@@ -113,14 +113,13 @@ $(document).ready(function() {
   });
 
   $("#textentry").keypress(function(event) {
-    ///////////////////////////////////////////////
-    // TODO: This needs to be changed!
-    // Test whether user has finished typing a word
-    ///////////////////////////////////////////////
-    if (event.which == 32) {
+    // Keys
+    // 13  carriage return
+    // 32  space
+    var keys = [13, 32];
+    if (keys.indexOf(event.which) != -1) {
       search();
     }
-
 
   });
 });
