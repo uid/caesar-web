@@ -553,7 +553,7 @@ $('.comment').each(function() {
 
 // Clear the selected lines if the user clicks anywhere except the comment form
 $('body').mousedown(function(e) {
-    if ($(e.target).is('.new-comment *') || $(e.target).is('.new-reply *')) {
+    if ($(e.target).is('.new-comment *') || $(e.target).is('.new-reply *') || $(e.target).is('.reuse-comment *')) {
         return true;
     }
     if ($('.new-comment textarea').val() || $('.new-reply textarea').val()) {

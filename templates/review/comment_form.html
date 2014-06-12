@@ -1,8 +1,5 @@
 <!--<link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" type="text/css">-->
-<!--<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery.textcomplete.css" type="text/css">-->
-<!--<script type="text/javascript" src = "{{ STATIC_URL }}/js/jquery.textcomplete.min.js"></script>-->
 {% load extra_tags %}
-<!--<script type="text/javascript" src="{{ STATIC_URL }}/js/fullproof-all.js"></script>-->
 <script type="text/javascript">
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -146,11 +143,14 @@ $(document).ready(function() {
 
           // resultset is a fullproof object that has its own forEach method
           resultset.forEach(function(e) {
-            results.push({
-              "text": commentsData[e.value],
-              "date": commentsDates[e.value],
-              "score": e.score
-            });
+            // Only choose scores that are "good enough"
+            if (e.score >= 2.5) {
+              results.push({
+                "text": commentsData[e.value],
+                "date": commentsDates[e.value],
+                "score": e.score
+              });
+            }
           });
         }
 
@@ -164,7 +164,7 @@ $(document).ready(function() {
           var comment_header = $("<div class='comment-header'></div>").html(results[i].date+" ago you wrote a similar comment.");
           //var comment_header = $("<div class='comment-author'></div>").html(results[i].date+" ago);
           var comment_innerdiv = $("<div class='reuse-comment-text'></div>");
-          var comment_textarea = $("<textarea readOnly='true' onclick='select()' onselect='' cols='10' rows='5'></textarea>").html(results[i].text);
+          var comment_textarea = $("<textarea cols='10' rows='5'></textarea>").html(results[i].text).attr("readonly", "readonly");
           comment_innerdiv.append(comment_textarea);
           comment_div.append(comment_header, comment_innerdiv);
           $(".new-comment").after(comment_div);
