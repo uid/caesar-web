@@ -2,83 +2,9 @@
 {% load extra_tags %}
 <script type="text/javascript">
 
-/////////////////////////////////////////////////////////////////////////////////
-// Boolean Engine
-/////////////////////////////////////////////////////////////////////////////////
-
-/*  var commentsData = [];
-  var commentsDates = [];
-  {% for comment in oldComments %}
-    {% if not comment.deleted %}
-      commentsData.push("{{comment.text}}");
-      commentsDates.push("{{comment.created|timesince_human}}");
-    {% endif %}
-  {% endfor %}
-
-  var dbName = "reusedComments";
-  var commentsSearchEngine = new fullproof.BooleanEngine();
-
-  var index1 = {
-      name: "normalindex",
-      analyzer: new fullproof.StandardAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.normalizer.remove_duplicate_letters),
-      capabilities: new fullproof.Capabilities().setUseScores(false).setDbName(dbName),
-      initializer: initializer
-  };
-  var index2 = {
-      name: "stemmedindex",
-      analyzer: new fullproof.StandardAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.english.metaphone),
-      capabilities: new fullproof.Capabilities().setUseScores(false).setDbName(dbName),
-      initializer: initializer
-  };
-  
-  function initializer(injector, callback) {
-      var synchro = fullproof.make_synchro_point(callback, commentsData.length);
-      var values = [];
-      for (var i=0;i<commentsData.length; ++i) {
-        values.push(i);
-      }
-      injector.injectBulk(commentsData, values, callback);
-  }
-  function engineReady(b) {
-      if (!b) {
-          alert("Can't load the search engine!");
-      }
-  }
-  commentsSearchEngine.open([index1, index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
-  
-  function search() {
-      $(".reuse-comment").remove();
-      var value = $("#textentry").val();
-      // Request a search to the comments engine, then displays the results, if any.
-      commentsSearchEngine.lookup(value, function(resultset) {
-        var results = [];
-        var dates = [];
-        if (resultset && resultset.getSize()) {
-          var rsize = resultset.getSize();
-          resultset.forEach(function(e) {
-            results.push(commentsData[e]);
-            dates.push(commentsDates[e]);
-          });
-        }
-        for (var i=0; i<Math.min(results.length, 3); i++) {
-          var comment_div = $("<div class='comment reuse-comment expanded'></div>");
-          comment_div.append("<div class='comment-header'>"+dates[i]+" ago you wrote a similar comment:</div>");
-          //comment_div.append("<div class='comment-author'>"+dates[i]+" ago</div>");
-          comment_div.append("<div class='reuse-comment-text'><textarea readOnly='true' onclick='select()' onselect='' cols='10' rows='5'>"+results[i]+"</textarea></div>");
-          $(".new-comment").after(comment_div);
-        }
-        //$(".reuse-comment").hide();
-        //$(".reuse-comment").show("blind");
-      });
-  }
-
-  $(".new-comment").on("remove", function() {
-    $(".reuse-comment").remove();
-  });*/
-
-/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Scoring Engine
-/////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 $(document).ready(function() {
 
