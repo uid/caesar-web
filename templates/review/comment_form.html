@@ -101,8 +101,7 @@ $(document).ready(function() {
           comment_chunkdiv.append(comment_chunk_link);
 
           var comment_form = $("<div class='comment-form'></div>");
-          var comment_textdiv = $("<div class='reuse-comment-text'></div>").html(commentsData[results[i].index]);
-          //var comment_textarea = $("<textarea cols='10' rows='5'></textarea>").html(commentsData[results[i].index]).attr("readonly", "readonly");
+          var comment_textdiv = $("<div class='reuse-comment-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
           comment_form.append(comment_textdiv);
 
           comment_div.append(comment_header, comment_chunkdiv, comment_form);
