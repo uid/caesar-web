@@ -106,6 +106,9 @@ $(document).ready(function() {
 
           comment_div.append(comment_header, comment_chunkdiv, comment_form);
           $(".new-comment").after(comment_div);
+          $(comment_div).hide();
+
+          $(comment_div).show("blind");
         }
       });
   }
