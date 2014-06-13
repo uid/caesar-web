@@ -254,7 +254,7 @@
     background-color: #ffff88;
 }
 
-.new-comment textarea, .reply-form textarea, .reuse-comment-text textarea {
+.new-comment textarea, .reply-form textarea, .reuse-comment-text {
     width: 100%;
     overflow: auto;
     box-sizing: border-box;
@@ -269,5 +269,9 @@
 }
 
 .reuse-comment-text {
-    padding: 0px 5px;
+    padding: 5px;
+    background-color: #ffffff;
+    border: 1px solid #666666;
+    line-height: 1.25em;
+    height: 6em;
 }

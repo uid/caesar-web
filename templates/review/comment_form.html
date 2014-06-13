@@ -64,6 +64,8 @@ $(document).ready(function() {
   function search() {
       $(".reuse-comment").remove();
       var value = $("#textentry").val();
+      var pattern = value.replace(/\s|\n|\r/g, "|");
+      var regex = new RegExp(pattern, "ig");
 
       // Request a search to the comments engine, then displays the results, if any.
       commentsSearchEngine.lookup(value, function(resultset) {
@@ -77,7 +79,8 @@ $(document).ready(function() {
             if (e.score >= 2.5) {
               results.push({
                 "index": e.value,
-                "score": e.score
+                "score": e.score,
+                "bag_of_words": regex.exec(commentsData[e.value])
               });
             }
           });
@@ -97,11 +100,12 @@ $(document).ready(function() {
           var comment_chunk_link = $("<a href='"+commentsExtraData[results[i].index].chunk_url+"' target='_blank'></div>").html(commentsExtraData[results[i].index].chunk_name);
           comment_chunkdiv.append(comment_chunk_link);
 
-          var comment_textdiv = $("<div class='reuse-comment-text'></div>");
-          var comment_textarea = $("<textarea cols='10' rows='5'></textarea>").html(commentsData[results[i].index]).attr("readonly", "readonly");
-          comment_textdiv.append(comment_textarea);
+          var comment_form = $("<div class='comment-form'></div>");
+          var comment_textdiv = $("<div class='reuse-comment-text'></div>").html(commentsData[results[i].index]);
+          //var comment_textarea = $("<textarea cols='10' rows='5'></textarea>").html(commentsData[results[i].index]).attr("readonly", "readonly");
+          comment_form.append(comment_textdiv);
 
-          comment_div.append(comment_header, comment_chunkdiv, comment_textdiv);
+          comment_div.append(comment_header, comment_chunkdiv, comment_form);
           $(".new-comment").after(comment_div);
         }
       });
