@@ -105,28 +105,27 @@ $(document).ready(function() {
         for (var i=Math.min(results.length-1, 2); i>=0; i--) {
           var comment_div = $("<div class='comment reuse-comment expanded'></div>");
 
-          var comment_header = $("<div class='comment-header'></div>");
-          if (commentsExtraData[results[i].index].author == "") {
-            comment_header.html(commentsExtraData[results[i].index].date+" ago you wrote a similar comment.");
-          }
-          else {
-            var author_link = $("<a target='_blank'></a>");
-            author_link.attr("href", commentsExtraData[results[i].index].author_url);
-            author_link.html(commentsExtraData[results[i].index].author);
-            comment_header.append(commentsExtraData[results[i].index].date+" ago ", author_link, " wrote a similar comment.");
-          }
-
-          var comment_chunkdiv = $("<div class='comment-author'></div>");
+          var comment_chunkdiv = $("<div class='comment-header'></div>");
           var comment_chunk_link = $("<a target='_blank'></a>");
           comment_chunk_link.attr("href", commentsExtraData[results[i].index].chunk_url);
           comment_chunk_link.html(commentsExtraData[results[i].index].chunk_name);
           comment_chunkdiv.append(comment_chunk_link);
 
+          var comment_author = $("<div class='comment-author'></div>");
+          comment_author.html(commentsExtraData[results[i].index].date+" ago");
+          if (commentsExtraData[results[i].index].author != "") {
+            var author_link = $("<a target='_blank'></a>");
+            author_link.attr("href", commentsExtraData[results[i].index].author_url);
+            author_link.html(commentsExtraData[results[i].index].author);
+            comment_author.append(" by ", author_link);
+          }
+
+
           var comment_form = $("<div class='comment-form'></div>");
           var comment_textdiv = $("<div class='reuse-comment-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
           comment_form.append(comment_textdiv);
 
-          comment_div.append(comment_header, comment_chunkdiv, comment_form);
+          comment_div.append(comment_chunkdiv, comment_author, comment_form);
           $(".new-comment").after(comment_div);
           
           // Animate showing comment div
