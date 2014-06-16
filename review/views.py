@@ -47,10 +47,10 @@ def new_comment(request):
         role = membership[0].role
 
         if role == 'S':
-            oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject)
+            oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct()
         else:
             q = Q(author__membership__role = 'T') | Q(author__membership__role = 'V')
-            oldComments = Comment.objects.filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject)
+            oldComments = Comment.objects.filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct()
 
         return render(request, 'review/comment_form.html', {
             'form': form,
