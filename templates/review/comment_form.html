@@ -100,9 +100,11 @@ $(document).ready(function() {
         // Sort results from highest score to lowest score
         results.sort(function(a,b) { return b.score - a.score; });
 
-        // Display only the top 3 results. Insert them below the new-comment div. Insert them backwards so that they are displayed in the correct order (because .after() appends directly after the new-comment div so we want to append the highest score last).
+        var reuse_comment_wrapper = $("<div></div>");
+
+        // Display only the top 3 results.
         // Use .html() rather than .text() to deal with special characters.
-        for (var i=Math.min(results.length-1, 2); i>=0; i--) {
+        for (var i=0; i<Math.min(results.length, 3); i++) {
           var comment_div = $("<div class='comment reuse-comment expanded'></div>");
 
           // Link to comment in context
@@ -122,18 +124,20 @@ $(document).ready(function() {
             comment_author.append(" by ", author_link);
           }
 
-          // Display the comment in a div
+          // Print the comment in a div
           var comment_form = $("<div class='comment-form'></div>");
           var comment_textdiv = $("<div class='reuse-comment-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
           comment_form.append(comment_textdiv);
 
           comment_div.append(comment_chunkdiv, comment_author, comment_form);
-          $(".new-comment").after(comment_div);
+          reuse_comment_wrapper.append(comment_div);
           
-          // Animate showing comment div
-          $(comment_div).hide();
-          $(comment_div).show("blind");
         }
+        $(".new-comment").after(reuse_comment_wrapper);
+
+        // Animate showing reused comments
+        $(reuse_comment_wrapper).hide();
+        $(reuse_comment_wrapper).show("blind");
       });
   }
 
