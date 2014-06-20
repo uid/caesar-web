@@ -3,142 +3,9 @@
 
 $(document).ready(function() {
 
-  // Clear reusedComments database !important
-  var db = openDatabase('reusedComments', '1.0', 'reusedComments', 2 * 1024 * 1024);
-  db.transaction(function (tx) {
-    tx.executeSql('DROP TABLE fullproofmetadata');
-    tx.executeSql('DROP TABLE normalindex');
-    tx.executeSql('DROP TABLE stemmedindex');
-  });
-
-  // Add comments to database
-  var commentsData = [];
-  var commentsExtraData = [];
-  {% for comment in oldComments %}
-    // Need to use escapejs filter to escape newline characters coming from the textarea
-    commentsData.push("{{comment.text|escapejs}}");
-
-    // Need to save extra information about each comment. Only save the author and the link to the author's profile page if the author is not the current user.
-    var author = "";
-    var author_url = "";
-    {% if role != 'S' and comment.author.username != user.username %}
-      author = "{{comment.author.get_full_name|default:comment.author.username}} ({{comment.author.profile.reputation}})";
-      author_url = "{% url 'accounts.views.view_profile' comment.author.username %}"
-    {% endif %}
-    commentsExtraData.push({
-      "date": "{{comment.created|timesince_human}}",
-      "chunk_name": "{{comment.chunk.name}}",
-      "chunk_url": "{% url 'chunks.views.view_comment' comment.id %}",
-      "author": author,
-      "author_url": author_url,
-    });
-  {% endfor %}
-
-  var dbName = "reusedComments";
-  var commentsSearchEngine = new fullproof.ScoringEngine();
-
-  function initializer(injector, callback) {
-      var synchro = fullproof.make_synchro_point(callback, commentsData.length-1);
-      var values = [];
-      for (var i=0;i<commentsData.length; ++i) {
-        values.push(i);
-      }
-      injector.injectBulk(commentsData, values, callback);
-  }
-
-  var index1 = new fullproof.IndexUnit(
-      "normalindex",
-      new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
-      new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.normalizer.remove_duplicate_letters),
-      initializer
-  );
-  var index2 = new fullproof.IndexUnit(
-      "stemmedindex",
-      new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
-      new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.english.metaphone),
-      initializer
-  );
-  
-  function engineReady(b) {
-      if (!b) {
-          alert("Can't load the search engine!");
-      }
-  }
-
-  commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
-  
-  function search() {
-      $(".reuse-comment").remove();
-      var value = $("#textentry").val();
-      var pattern = value.replace(/\s|\n|\r/g, "|");
-      var regex = new RegExp(pattern, "ig");
-
-      // Request a search to the comments engine, then displays the results, if any.
-      commentsSearchEngine.lookup(value, function(resultset) {
-        var results = [];
-        if (resultset && resultset.getSize()) {
-          var rsize = resultset.getSize();
-
-          // resultset is a fullproof object that has its own forEach method
-          resultset.forEach(function(e) {
-            // Only choose scores that are "good enough"
-            if (e.score >= 2.5) {
-              results.push({
-                "index": e.value,
-                "score": e.score,
-                "bag_of_words": regex.exec(commentsData[e.value])
-              });
-            }
-          });
-        }
-
-        // Sort results from highest score to lowest score
-        results.sort(function(a,b) { return b.score - a.score; });
-
-        var reuse_comment_wrapper = $("<div></div>");
-
-        // Display only the top 3 results.
-        // Use .html() rather than .text() to deal with special characters.
-        for (var i=0; i<Math.min(results.length, 3); i++) {
-          var comment_div = $("<div class='comment reuse-comment expanded'></div>");
-
-          // Link to comment in context
-          var comment_chunkdiv = $("<div class='comment-header'></div>");
-          var comment_chunk_link = $("<a target='_blank'></a>");
-          comment_chunk_link.attr("href", commentsExtraData[results[i].index].chunk_url);
-          comment_chunk_link.html(commentsExtraData[results[i].index].chunk_name);
-          comment_chunkdiv.append(comment_chunk_link);
-
-          // Who wrote this comment and when?
-          var comment_author = $("<div class='comment-author'></div>");
-          comment_author.html(commentsExtraData[results[i].index].date+" ago");
-          if (commentsExtraData[results[i].index].author != "") {
-            var author_link = $("<a target='_blank'></a>");
-            author_link.attr("href", commentsExtraData[results[i].index].author_url);
-            author_link.html(commentsExtraData[results[i].index].author);
-            comment_author.append(" by ", author_link);
-          }
-
-          // Print the comment in a div
-          var comment_form = $("<div class='comment-form'></div>");
-          var comment_textdiv = $("<div class='reuse-comment-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
-          comment_form.append(comment_textdiv);
-
-          comment_div.append(comment_chunkdiv, comment_author, comment_form);
-          reuse_comment_wrapper.append(comment_div);
-          
-        }
-        $(".new-comment").after(reuse_comment_wrapper);
-
-        // Animate showing reused comments
-        $(reuse_comment_wrapper).hide();
-        $(reuse_comment_wrapper).show("blind");
-      });
-  }
-
-  // Remove all reuse-comment divs whenever the user closes a new comment entry box.
+  // Remove all similar-comment divs whenever the user closes a new comment entry box.
   $(".new-comment").on("remove", function() {
-    $(".reuse-comment").remove();
+    $(".similar-comment").remove();
   });
 
   $("#textentry").keypress(function(event) {
@@ -147,7 +14,7 @@ $(document).ready(function() {
     // 32  space
     var keys = [13, 32];
     if (keys.indexOf(event.which) != -1) {
-      search();
+      commentSearch.search($("#textentry").val(), "new-comment", "similar-comment");
     }
 
   });

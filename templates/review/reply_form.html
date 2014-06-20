@@ -1,3 +1,26 @@
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  // Remove all similar-reply divs whenever the user closes a new comment entry box.
+  $(".new-reply").on("remove", function() {
+    $(".similar-reply").remove();
+  });
+
+  $("#textentry").keypress(function(event) {
+    // Keys
+    // 13  carriage return
+    // 32  space
+    var keys = [13, 32];
+    if (keys.indexOf(event.which) != -1) {
+      commentSearch.search($("#textentry").val(), "new-reply", "similar-reply");
+    }
+
+  });
+});
+
+</script>
+
 <div class="comment comment-reply new-reply">
   <div class="reply-form">
     <form id="reply-comment-form"

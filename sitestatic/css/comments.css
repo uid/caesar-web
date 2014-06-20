@@ -18,9 +18,9 @@
     background-color: #eee;
 }
 
-.comment.reuse-comment:hover {
+/*.comment.similar-comment:hover, .comment.similar-reply:hover {
     cursor: text;
-}
+}*/
 
 .collapsed.comment {
     height: 16px;
@@ -31,7 +31,7 @@
     border: 0px;
 }
 
-.comment.comment-reply, .comment.reuse-comment {
+.comment.comment-reply, .comment.similar-comment, .comment.similar-reply {
     border-top: 0px;
     margin-top: 0px;
     margin-left: 20px;
@@ -41,6 +41,10 @@
     border-top-right-radius: 0px;
     -moz-border-top-right-radius: 0px;
     -webkit-border-top-right-radius: 0px;
+}
+
+.comment.similar-reply {
+    margin-left: 40px;
 }
 
 .comment.comment-auto {
@@ -250,11 +254,12 @@
     height: 16px;
 }
 
-.new-comment, .new-reply, .reuse-comment, .new-comment:hover, .new-reply:hover, .reuse-comment:hover {
+.new-comment, .new-reply, .similar-comment, .similar-reply, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover {
     background-color: #ffff88;
+    cursor: text;
 }
 
-.new-comment textarea, .reply-form textarea, .reuse-comment-text {
+.new-comment textarea, .reply-form textarea, .similar-comment-text, .similar-reply-text {
     width: 100%;
     overflow: auto;
     box-sizing: border-box;
@@ -268,7 +273,7 @@
     padding: 5px;
 }
 
-.reuse-comment-text {
+.similar-comment-text, .similar-reply-text {
     padding: 5px;
     background-color: #ffffff;
     border: 1px solid #666666;

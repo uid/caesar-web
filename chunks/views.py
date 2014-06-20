@@ -100,6 +100,16 @@ def view_chunk(request, chunk_id):
             task = Task.objects.filter(chunk=chunk)[0]
         last_task = False
 
+    subject = semester.subject
+    membership = Member.objects.filter(user=request.user).filter(semester=semester)
+    role = membership[0].role
+
+    if role == 'S':
+        oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct()
+    else:
+        q = Q(author__membership__role = 'T') | Q(author__membership__role = 'V')
+        oldComments = Comment.objects.filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct()
+
     return render(request, 'chunks/view_chunk.html', {
         'chunk': chunk,
         'similar_chunks': chunk.get_similar_chunks(),
@@ -112,6 +122,7 @@ def view_chunk(request, chunk_id):
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
         'last_task': last_task,
         'remaining_task_count': remaining_task_count,
+        'oldComments': oldComments,
     })
 
 @login_required
