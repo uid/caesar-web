@@ -23,7 +23,7 @@
     overflow: hidden;
 }
 .collapsed.comment.comment-reply {
-    height: 0px; 
+    height: 0px;
     border: 0px;
 }
 
@@ -113,6 +113,14 @@
     content: "[S] ";
 }
 
+.comment-author-name.volunteer {
+    color: #ff3636;
+}
+
+.comment-author-name.volunteer:before {
+    content: "[V] ";
+}
+
 .collapsed .comment-author {
     display: none;
 }
@@ -193,8 +201,8 @@
 }
 
 .vote-buttons .vote.up {
-    background-image: url('../img/thumb-up.png'); 
-    background-repeat: no-repeat; 
+    background-image: url('../img/thumb-up.png');
+    background-repeat: no-repeat;
     background-position: 2px 2px;
     -webkit-border-top-right-radius: 0px;
     -webkit-border-bottom-right-radius: 0px;
