@@ -80,13 +80,13 @@ var commentSearch = new function() {
       results.sort(function(a,b) { return b.score - a.score; });
 
       var similar_comment_wrapper = $("<div class='collapsable-wrapper expanded'></div>");
-      var visibility = $("<span class='comment-visibility'></span>");
-      similar_comment_wrapper.append(visibility);
+      var header = $("<div class='wrapper-header'><span class='comment-visibility'></span></div>");
+      similar_comment_wrapper.append(header);
 
       // Display only the top 3 results.
       // Use .html() rather than .text() to deal with special characters.
       for (var i=0; i<Math.min(results.length, 3); i++) {
-        var comment_div = $("<div class='comment "+similarCommentClass+" expanded'></div>");
+        var comment_div = $("<div class='comment "+similarCommentClass+"'></div>");
 
         // Link to comment in context
         var comment_chunkdiv = $("<div class='comment-header'></div>");

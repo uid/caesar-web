@@ -226,6 +226,16 @@ function expandAllAutoComments() {
     $('.comment-auto').stop(true, true).switchClass('collapsed', 'expanded', 'fast');
 };
 
+function collapseSimilarComments() {
+    $('.similar-comment-wrapper').stop(true, true)
+            .switchClass('expanded', 'collapsed', 'fast');
+}
+
+function expandSimilarComments() {
+    $('.similar-comment-wrapper').stop(true, true)
+            .switchClass('collapsed', 'expanded', 'fast')
+}
+
 function scrollCodeTo(comment, doScroll, callback) {
 
     history.replaceState(history.state, "", "#comment-" + comment.id)

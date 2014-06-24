@@ -82,7 +82,7 @@
     right: 0px;
 }
 
-.comment:hover .comment-visibility, .collapsable-wrapper:hover .comment-visibility {
+.comment:hover .comment-visibility, .similar-comment-wrapper:hover .comment-visibility {
     display: block;
 }
 
@@ -252,7 +252,7 @@
 
 .new-comment, .new-reply, .similar-comment, .similar-reply, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover {
     background-color: #ffff88;
-    cursor: text;
+    cursor: default;
 }
 
 .new-comment textarea, .reply-form textarea, .similar-comment-text, .similar-reply-text {
@@ -263,6 +263,7 @@
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     height: auto;
+    cursor: text;
 }
 
 .comment-form, .reply-form {

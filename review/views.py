@@ -44,7 +44,7 @@ def new_comment(request):
 #        semester = chunk.file.submission.milestone.assignment.semester
 #        subject = semester.subject
 #        membership = Member.objects.filter(user=request.user).filter(semester=semester)
-#        role = membership[0].role#
+#        role = membership[0].role
 
 #        if role == 'S':
 #            oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct()
