@@ -57,7 +57,7 @@ def new_comment(request):
             'start': start,
             'end': end,
             'snippet': chunk.generate_snippet(start, end),
-            'chunk': chunk,
+            'chunk': chunk, 
 #            'oldComments': oldComments,
         })
     else:

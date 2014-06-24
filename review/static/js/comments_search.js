@@ -39,6 +39,9 @@ var commentSearch = new function() {
       initializer
     );
 
+    //console.log(fullproof.english.metaphone("Absolutly"));
+    //console.log(fullproof.french.stopword_remover("JOHN"));
+
     commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
     // Clear similarCommentsDB database !important
     var db = openDatabase('similarCommentsDB', '1.0', 'similarCommentsDB', 2 * 1024 * 1024);
@@ -76,7 +79,9 @@ var commentSearch = new function() {
       // Sort results from highest score to lowest score
       results.sort(function(a,b) { return b.score - a.score; });
 
-      var similar_comment_wrapper = $("<div></div>");
+      var similar_comment_wrapper = $("<div class='collapsable-wrapper expanded'></div>");
+      var visibility = $("<span class='comment-visibility'></span>");
+      similar_comment_wrapper.append(visibility);
 
       // Display only the top 3 results.
       // Use .html() rather than .text() to deal with special characters.

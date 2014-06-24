@@ -193,7 +193,7 @@ function highlightCommentLines(comment) {
 };
 
 function unhighlightCommentLines() {
-    $('.line').removeClass('highlighted');            
+    $('.line').removeClass('highlighted');
 };
 
 function collapseComment(comment) {
