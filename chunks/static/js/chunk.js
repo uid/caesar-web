@@ -305,6 +305,7 @@ window.clearSelection = function() {
 };
 
 function drawCommentMarker(comment) {
+    //if no marker currently exists in this part.
     if (!$('#chunk-' + comment.chunk +'-line-' + comment.start).has('.comment-marker').size()) {
         $('<span></span>')
           .prependTo('#chunk-' + comment.chunk + '-line-' + comment.start)
@@ -313,7 +314,7 @@ function drawCommentMarker(comment) {
           .click(function(e) {
               scrollCodeTo(comment);
               checkIfSpecial(comment);
-              $.each(model.comments, function(index, innerComment) {
+              $.each(model.comments, function(index, innerComment) { //innerComment is a comment contained within the marker.
                   if (innerComment.start == comment.start) {
                       expandComment(innerComment); //expands all comments related to the marker upon click.
                       $(innerComment.elt).effect('highlight', {}, 2000);

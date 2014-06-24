@@ -113,7 +113,7 @@ def load_chunks(submit_milestone, user_map, django_user):
 
     django_submissions = submit_milestone.submissions.exclude(authors=django_user).prefetch_related("authors")
 
-    # the exclude() in the call below failed because of a Django bug.  Try submit_milestone=55, django_user=1016 on the production db.    
+    # the exclude() in the call below failed because of a Django bug.  Try submit_milestone=55, django_user=1016 on the production db.
     # django_chunks = Chunk.objects \
     #         .filter(file__submission__milestone=submit_milestone) \
     #         .exclude(file__submission__authors=django_user) \
@@ -124,7 +124,7 @@ def load_chunks(submit_milestone, user_map, django_user):
     django_chunks = Chunk.objects \
         .raw("""
 SELECT files.submission_id, `chunks`.`id`, `chunks`.`file_id`, `chunks`.`name`, `chunks`.`start`, `chunks`.`end`, `chunks`.`cluster_id`, `chunks`.`created`, `chunks`.`modified`, `chunks`.`class_type`, `chunks`.`staff_portion`, `chunks`.`student_lines`, `chunks`.`chunk_info`
-FROM `chunks` 
+FROM `chunks`
 join files on chunks.file_id=files.id
 join submissions on files.submission_id=submissions.id
 join submissions_authors on submissions.id=submissions_authors.submission_id
@@ -156,7 +156,7 @@ where submissions.milestone_id=%s and not(user_id=%s)
             continue
         submissions[submission.id] = submission
         chunks.extend(submission.chunks)
-    logging.debug(submissions)
+#    logging.debug(submissions)
 
     # load existing reviewing assignments
     for chunk in chunks:
@@ -239,7 +239,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
 
 
     def make_chunk_sort_key(user):
-      def chunk_sort_key(chunk):        
+      def chunk_sort_key(chunk):
         num_nonstaff_reviewers = len([u for u in chunk.reviewers if u.role != Member.TEACHER])
         if user.role == Member.TEACHER:
           # prioritize chunks that are approaching their quota of nonstaff reviewers
@@ -251,10 +251,10 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             review_priority = 0 # high priority!  try to finish the quota on this chunk
           else:
             review_priority = num_nonstaff_reviewers # prioritize chunks with fewer reviewers
-        
+
         if chunk.student_lines <= min_student_lines:
             review_priority = 100000 # deprioritize really short chunks
-        
+
         type_priority = 0
         if chunk.name in priority_dict:
             type_priority = priority_dict[chunk.name]
@@ -277,9 +277,9 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             random.random()
         )
       return chunk_sort_key
-    
+
     key = make_chunk_sort_key(user)
-    
+
     if not chunks:
         return
     for _ in itertools.repeat(None, count):
