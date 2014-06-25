@@ -79,9 +79,7 @@ var commentSearch = new function() {
       // Sort results from highest score to lowest score
       results.sort(function(a,b) { return b.score - a.score; });
 
-      var similar_comment_wrapper = $("<div class='similar-comment-wrapper expanded'></div>");
-      var header = $("<div class='wrapper-header'><span class='comment-visibility'></span></div>");
-      similar_comment_wrapper.append(header);
+      var similar_comment_wrapper = $("<div id='similar-comments-wrapper'></div>");
 
       // Display only the top 3 results.
       // Use .html() rather than .text() to deal with special characters.
@@ -115,9 +113,13 @@ var commentSearch = new function() {
           
       }
       $("."+targetClass).after(similar_comment_wrapper);
-
-      // Animate showing similar comments
       $(similar_comment_wrapper).hide();
+
+      var similarCommentsState = $.cookie('similarCommentsState') || 'visible';
+      if (similarCommentsState === 'hidden') {
+        return;
+      }
+      // Animate showing similar comments
       $(similar_comment_wrapper).show("blind");
     });
   };

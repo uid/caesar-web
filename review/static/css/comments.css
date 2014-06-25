@@ -82,7 +82,7 @@
     right: 0px;
 }
 
-.comment:hover .comment-visibility, .similar-comment-wrapper:hover .comment-visibility {
+.comment:hover .comment-visibility {
     display: block;
 }
 

@@ -226,16 +226,6 @@ function expandAllAutoComments() {
     $('.comment-auto').stop(true, true).switchClass('collapsed', 'expanded', 'fast');
 };
 
-function collapseSimilarComments() {
-    $('.similar-comment-wrapper').stop(true, true)
-            .switchClass('expanded', 'collapsed', 'fast');
-}
-
-function expandSimilarComments() {
-    $('.similar-comment-wrapper').stop(true, true)
-            .switchClass('collapsed', 'expanded', 'fast')
-}
-
 function scrollCodeTo(comment, doScroll, callback) {
 
     history.replaceState(history.state, "", "#comment-" + comment.id)
@@ -699,6 +689,32 @@ $('#toggle-auto-comments-button').click(function() {
         state = 'collapse';
     }
     $(this).text(toggleAutoCommentsText[state]).data('state', state);
+});
+
+var toggleSimilarCommentsText = {
+    visible: 'Hide similar comments', 
+    hidden: 'Show similar comments'
+};
+var similarCommentsState = $.cookie('similarCommentsState') || 'visible';
+
+if (similarCommentsState === 'visible') {
+    $('#similar-comments-wrapper').show('blind');
+} else {
+    $('#similar-comments-wrapper').hide('blind');
+}
+$('#toggle-similar-comments-button')
+        .text(toggleSimilarCommentsText[similarCommentsState]);
+
+$('#toggle-similar-comments-button').click(function() {
+    if (similarCommentsState === 'visible') {
+        $('#similar-comments-wrapper').hide('blind');
+        similarCommentsState = 'hidden';
+    } else {
+        $('#similar-comments-wrapper').show('blind');
+        similarCommentsState = 'visible';
+    }
+    $.cookie('similarCommentsState', similarCommentsState);
+    $(this).text(toggleSimilarCommentsText[similarCommentsState]);
 });
 
 var toggleInstructionsText = {
