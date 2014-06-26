@@ -1,3 +1,4 @@
+* binary
 *.html text eol=lf
 *.js   text eol=lf
 *.css  text eol=lf
@@ -9,4 +10,3 @@
 *.xml  text eol=lf
 *.wsgi text eol=lf
 *.json text eol=lf
-* binary
