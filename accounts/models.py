@@ -28,7 +28,6 @@ class Extension(models.Model):
     def __str__(self):
       return '%s (%s) %s days' % (self.user.username, self.milestone.full_name(), self.slack_used)
 
-#b = Member.objects.filter(user=a) where a = User.objects.filter(username='kleinab')
 class Member(models.Model):
     STUDENT = 'S'
     TEACHER = 'T'
@@ -61,7 +60,7 @@ class UserProfile(models.Model):
         return os.path.join(
                 settings.PROFILE_PHOTO_DIR,
                 instance.user.username)
-
+    
     user = models.OneToOneField(User, related_name='profile')
     reputation = models.IntegerField(default=0, editable=True)
 
