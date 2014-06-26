@@ -6,6 +6,7 @@ $(document).ready(function() {
   // Remove all similar-comment divs whenever the user closes a new comment entry box.
   $(".new-comment").on("remove", function() {
     $(".similar-comment").remove();
+    $("#similar-comments-wrapper").remove();
   });
 
   $("#textentry").keypress(function(event) {
@@ -46,3 +47,4 @@ $(document).ready(function() {
     </form>
   </div>
 </div>
+<div id='similar-comments-wrapper'></div>

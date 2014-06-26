@@ -79,8 +79,6 @@ var commentSearch = new function() {
       // Sort results from highest score to lowest score
       results.sort(function(a,b) { return b.score - a.score; });
 
-      var similar_comment_wrapper = $("<div id='similar-comments-wrapper'></div>");
-
       // Display only the top 3 results.
       // Use .html() rather than .text() to deal with special characters.
       for (var i=0; i<Math.min(results.length, 3); i++) {
@@ -109,18 +107,17 @@ var commentSearch = new function() {
         comment_form.append(comment_textdiv);
 
         comment_div.append(comment_chunkdiv, comment_author, comment_form);
-        similar_comment_wrapper.append(comment_div);
+        $('#similar-comments-wrapper').append(comment_div);
           
       }
-      $("."+targetClass).after(similar_comment_wrapper);
-      $(similar_comment_wrapper).hide();
+      $('#similar-comments-wrapper').hide();
 
       var similarCommentsState = $.cookie('similarCommentsState') || 'visible';
       if (similarCommentsState === 'hidden') {
         return;
       }
       // Animate showing similar comments
-      $(similar_comment_wrapper).show("blind");
+      $('#similar-comments-wrapper').show("blind");
     });
   };
 

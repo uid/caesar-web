@@ -39,10 +39,8 @@ var commentSearch = new function() {
       initializer
     );
 
-    //console.log(fullproof.english.metaphone("Absolutly"));
-    //console.log(fullproof.french.stopword_remover("JOHN"));
-
     commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
+
     // Clear similarCommentsDB database !important
     var db = openDatabase('similarCommentsDB', '1.0', 'similarCommentsDB', 2 * 1024 * 1024);
     db.transaction(function (tx) {
@@ -79,12 +77,10 @@ var commentSearch = new function() {
       // Sort results from highest score to lowest score
       results.sort(function(a,b) { return b.score - a.score; });
 
-      var similar_comment_wrapper = $("<div id='similar-comments-wrapper'></div>");
-
       // Display only the top 3 results.
       // Use .html() rather than .text() to deal with special characters.
       for (var i=0; i<Math.min(results.length, 3); i++) {
-        var comment_div = $("<div class='comment "+similarCommentClass+"'></div>");
+        var comment_div = $("<div class='comment "+similarCommentClass+" "+similarCommentClass+"'></div>");
 
         // Link to comment in context
         var comment_chunkdiv = $("<div class='comment-header'></div>");
@@ -109,18 +105,17 @@ var commentSearch = new function() {
         comment_form.append(comment_textdiv);
 
         comment_div.append(comment_chunkdiv, comment_author, comment_form);
-        similar_comment_wrapper.append(comment_div);
+        $('#similar-comments-wrapper').append(comment_div);
           
       }
-      $("."+targetClass).after(similar_comment_wrapper);
-      $(similar_comment_wrapper).hide();
+      $('#similar-comments-wrapper').hide();
 
       var similarCommentsState = $.cookie('similarCommentsState') || 'visible';
       if (similarCommentsState === 'hidden') {
         return;
       }
       // Animate showing similar comments
-      $(similar_comment_wrapper).show("blind");
+      $('#similar-comments-wrapper').show("blind");
     });
   };
 
