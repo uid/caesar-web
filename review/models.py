@@ -6,7 +6,7 @@ from django.db.models.signals import pre_save, post_save,\
 from django.dispatch import receiver
 from django.conf import settings
 
-from accounts.models import UserProfile, Member
+from accounts.models import UserProfile
 from chunks.models import Chunk, Batch
 
 import sys
@@ -53,10 +53,6 @@ class Comment(models.Model):
         if self.edited is not None and self.edited > self.created:
             return True
         return False
-
-    #Member.objects.filter(user=User.objects.filter(username=author.username))[0].get_role_display()
-    def get_role_from_username(self, username): #username is type ForeignKey[id]
-        return Member.objects.filter(user=username)[0].get_role_display()
 
     def get_comment_vote(self):
         try:
