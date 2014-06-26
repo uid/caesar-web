@@ -1,7 +1,7 @@
 var model = new function() {
     var self = this;
     var listeners = {};
-
+    
     self.addListener = function(eventName, listener) {
         if (!listeners[eventName]) {
             listeners[eventName] = [];
@@ -12,7 +12,7 @@ var model = new function() {
     var fireEvent = function(eventName) {
         var args = Array.prototype.slice.call(arguments);
         args.shift();
-
+    
         if (listeners[eventName]) {
             $.each(listeners[eventName], function(index, listener) {
                 listener.apply(self, args);
@@ -22,7 +22,7 @@ var model = new function() {
 
     self.comments = [];
     self.task = {
-        status: caesar.state.taskStatus
+        status: caesar.state.taskStatus 
     };
 
     var startTask = function() {
@@ -60,7 +60,7 @@ var model = new function() {
     };
 
     self.addComment = function(comment) {
-        var target = self.computeIndex(comment.start, comment.end,
+        var target = self.computeIndex(comment.start, comment.end, 
                                        comment.isReply, comment.parentId);
         self.comments.splice(target, 0, comment);
         fireEvent('commentAdded', comment);
@@ -68,17 +68,17 @@ var model = new function() {
 
     self.addCommentFromDOM = function(elt) {
         var idSplit = elt.id.split('-');
-        var isReply = $(elt).hasClass('comment-reply')
-        var comment =  {
-            id: parseInt(idSplit[1]),
-            start: parseInt(idSplit[2]),
+        var isReply = $(elt).hasClass('comment-reply') 
+        var comment =  { 
+            id: parseInt(idSplit[1]), 
+            start: parseInt(idSplit[2]), 
             end: parseInt(idSplit[3]),
             chunk: parseInt(idSplit[4]),
             file: parseInt(idSplit[5]),
             isReply: isReply,
             parentId: isReply ? parseInt(
                     $(elt).attr('class').match(/parent-(\d+)/)[1]) : null,
-            elt: elt
+            elt: elt 
         };
         self.addComment(comment);
         return comment;
@@ -88,7 +88,7 @@ var model = new function() {
         var index = self.comments.indexOf(comment);
         if (index != -1) {
             self.comments.splice(index, 1);
-            fireEvent('commentRemoved', comment);
+            fireEvent('commentRemoved', comment);    
         }
     };
 
@@ -107,7 +107,7 @@ window.isSelecting = false;
 
 function showCommentForm(startLine, endLine, chunkId, fileId) {
     clearSpecial();
-    $.get(caesar.urls.new_comment,
+    $.get(caesar.urls.new_comment, 
         { start: startLine, end: endLine, chunk: chunkId},
         function(data) {
             $('.new-comment').remove();
@@ -119,7 +119,7 @@ function showCommentForm(startLine, endLine, chunkId, fileId) {
             $.each(model.comments, function(index, comment) {
                 if (comment.chunk == chunkId && ((startLine == comment.start && endLine > comment.end)
                     || startLine < comment.start)) {
-                    $(comment.elt).before(elt);
+                    $(comment.elt).before(elt);                        
                     added = true;
                     return false;
                 }
@@ -130,23 +130,23 @@ function showCommentForm(startLine, endLine, chunkId, fileId) {
             // construct a fake "comment" boundary object to pass in
             var commentElt = elt.filter('.comment').get(0);
             scrollCodeTo({
-                start: startLine,
-                end: endLine,
+                start: startLine, 
+                end: endLine, 
                 elt: commentElt,
                 chunk: chunkId,
                 file: fileId
             }, true, function() {
                 $('textarea').focus();
-            });
+            }); 
         }
     );
 };
 
 function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
-    $.get(caesar.urls.edit_comment,
+    $.get(caesar.urls.edit_comment, 
         { comment_id: commentId},
         function(data) {
-            $(comment.elt).hide();
+            $(comment.elt).hide(); 
             $('.reply-form').parent().remove();
             //if reply
             var isReply = $(comment.elt).hasClass('comment-reply')
@@ -161,7 +161,7 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
                 $.each(model.comments, function(index, comment) {
                     if (comment.chunk == chunkId && ((startLine == comment.start && endLine > comment.end)
                         || startLine < comment.start)) {
-                        $(comment.elt).before(elt);
+                        $(comment.elt).before(elt);                        
                         added = true;
                         return false;
                     }
@@ -173,14 +173,14 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
                 commentElt = elt.filter('.comment').get(0);
             }
             scrollCodeTo({
-                start: startLine,
-                end: endLine,
+                start: startLine, 
+                end: endLine, 
                 elt: commentElt,
                 chunk: chunkId,
                 file: fileId
             }, true, function() {
                 $('textarea').focus();
-            });
+            }); 
         }
     );
 };
@@ -188,16 +188,15 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
 function highlightCommentLines(comment) {
     // highlight corresponding code lines
     for (var i = comment.start; i <= comment.end; i++) {
-        $('#line-' + comment.chunk + '-' + i + '-' + comment.file).addClass('highlighted');
+        $('#line-' + comment.chunk + '-' + i + '-' + comment.file).addClass('highlighted');            
     }
 };
 
 function unhighlightCommentLines() {
-    $('.line').removeClass('highlighted');
+    $('.line').removeClass('highlighted');            
 };
 
 function collapseComment(comment) {
-    //Note: comment is an id tag given to the comment.
     $(comment.elt).stop(true, true)
             .switchClass('expanded', 'collapsed', 'fast');
     $('.parent-' + comment.id).stop(true, true)
@@ -246,7 +245,7 @@ function scrollCodeTo(comment, doScroll, callback) {
         // Wraps the callback so it is only executed the nth time it is called
         // This guarantees that the callback is called exactly once and after all
         // animations have run.
-        // FIXME Because of the way this code is structured, it is extremely
+        // FIXME Because of the way this code is structured, it is extremely 
         // easy to forget to call the callback in all cases to guarantee execution.
         function wrapCallback(f, n) {
             var i = 0;
@@ -273,15 +272,15 @@ function scrollCodeTo(comment, doScroll, callback) {
         if (commentTop + yDelta + commentHeight >
                 windowHeight + $(window).scrollTop()) {
             $('html,body').animate({
-                scrollTop: commentTop - windowHeight +
+                scrollTop: commentTop - windowHeight + 
                     commentHeight + yDelta + SCROLL_THRESHOLD
             }, { duration: 500, queue: false, easing: 'easeInOutQuad',
-                 complete: cb });
+                 complete: cb }); 
         } else if (commentTop + yDelta < $(window).scrollTop()) {
             $('html,body').animate({
                 scrollTop: commentTop + yDelta - SCROLL_THRESHOLD
-            }, { duration: 500, queue: false, easing: 'easeInOutQuad',
-                 complete: cb });
+            }, { duration: 500, queue: false, easing: 'easeInOutQuad', 
+                 complete: cb }); 
         } else {
             cb(); cb();
         }
@@ -310,12 +309,11 @@ function drawCommentMarker(comment) {
           .prependTo('#chunk-' + comment.chunk + '-line-' + comment.start)
           .addClass('comment-marker')
           .data('count', 1)
-          .click(function(e) {
+          .click(function(e) { 
               scrollCodeTo(comment);
               checkIfSpecial(comment);
               $.each(model.comments, function(index, innerComment) {
                   if (innerComment.start == comment.start) {
-                      expandComment(innerComment);
                       $(innerComment.elt).effect('highlight', {}, 2000);
                   }
               });
@@ -358,21 +356,21 @@ function drawCommentButtons(comment) {
 function clearSpecial() {
     $('.comment-text').removeClass('highlight');
     $('#voteup').removeClass('highlight');
-    $('#votedown').removeClass('highlight');
-    $('.line').removeClass('highlight');
+    $('#votedown').removeClass('highlight');    
+    $('.line').removeClass('highlight');    
 }
 
-function checkIfSpecial(comment) {
+function checkIfSpecial(comment) {  
     var myFile = document.location.toString();
     if (myFile.match('#')) { // the URL contains an anchor
       var myAnchor = myFile.split('#')[1];
       var highlight_type = myAnchor.split('-')[0];
       var highlight_id = myAnchor.split('-')[1];
+      
 
-
-
+      
       // highlight actually special one
-      if (comment.id == highlight_id){
+      if (comment.id == highlight_id){     
             // clear previous special guys
               clearSpecial(comment);
           if (highlight_type == "comment"){
@@ -426,7 +424,7 @@ function attachCommentHandlers(comment) {
         //reply button
         $('.reply-button', comment.elt).click(function() {
             clearSpecial();
-            $.get(caesar.urls.reply,
+            $.get(caesar.urls.reply, 
                 { parent: comment.id }    ,
                 function(data) {
                     $('.reply-form').parent().remove();
@@ -442,12 +440,12 @@ function attachCommentHandlers(comment) {
 
                     var replyElt = $(data).insertAfter(previousComment);
                     scrollCodeTo({
-                        start: comment.start,
-                        end: comment.end,
+                        start: comment.start, 
+                        end: comment.end, 
                         chunk: comment.chunk,
                         file: comment.file,
-                        elt: replyElt.get(0)
-                    }, true, function() {
+                        elt: replyElt.get(0) 
+                    }, true, function() { 
                         $('textarea').focus();
                     });
                 }
@@ -465,13 +463,13 @@ function attachCommentHandlers(comment) {
             });
             return false;
         });
-
+        
         // edit button
         $('.edit-button', comment.elt).click(function() {
             clearSpecial();
                 showEditForm(comment.id, comment.start, comment.end, comment.chunk, comment.file, comment);
         });
-
+        
         $('.vote-buttons.enabled .vote', comment.elt).click(function(e) {
             var button = this;
             var isUp = $(this).hasClass('up');
@@ -535,9 +533,9 @@ model.addListener('commentAdded', function(comment) {
 });
 
 model.addListener('commentRemoved', function(comment) {
-    $(comment.elt).remove();
+    $(comment.elt).remove();        
     $('.parent-' + comment.id).remove();
-    $('.line').removeClass('highlighted');
+    $('.line').removeClass('highlighted');            
     removeCommentMarker(comment);
     resetScroll();
 });
@@ -548,7 +546,7 @@ model.addListener('taskStarted', function() {
 
 $(document).ready(function() {
 
-$('.comment').each(function() {
+$('.comment').each(function() { 
     model.addCommentFromDOM(this);
 });
 
@@ -588,7 +586,7 @@ if (caesar.state.fullView) {
             });
             if (chunkId == null) {
                 return; // no lines selected, don't show the form
-        }
+	    }
             showCommentForm(startLine, endLine, chunkId, fileId);
         }
     });
@@ -659,7 +657,7 @@ $('#cancel-reply-button').live('click', function() {
 });
 
 var toggleCommentsText = {
-    collapse: 'Collapse all comments',
+    collapse: 'Collapse all comments', 
     expand: 'Expand all comments'
 };
 $('#toggle-comments-button').data('state', 'collapse');
@@ -676,7 +674,7 @@ $('#toggle-comments-button').click(function() {
 });
 
 var toggleAutoCommentsText = {
-    collapse: 'Collapse all checkstyle comments',
+    collapse: 'Collapse all checkstyle comments', 
     expand: 'Expand all checkstyle comments'
 };
 $('#toggle-auto-comments-button').data('state', 'collapse');
@@ -693,8 +691,8 @@ $('#toggle-auto-comments-button').click(function() {
 });
 
 var toggleInstructionsText = {
-    visible: 'Hide instructions',
-    hidden: 'Show instructions'
+    visible: 'Hide instructions', 
+    hidden: 'Show instructions' 
 };
 var instructionsState = $.cookie('instructionsState') || 'visible';
 
@@ -728,7 +726,7 @@ $('.dropdown-link').click(function() {
 });
 
 $('body').click(function() {
-    $('.dropdown-menu').slideUp(400);
+    $('.dropdown-menu').slideUp(400); 
 });
 
 $('pre.line-code').each(function(i,e){$(this).prepend($(this).prev());$(this).prev().remove();})
