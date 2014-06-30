@@ -91,106 +91,23 @@ The Django debug toolbar ("DjDt") appears on the right side of Caesar's web page
 
 Messages like this will appear in the Logging pane of the debug toolbar.
 
+To run Caesar in debug mode, use the following command:
+    python -m pdb manage.py runserver localhost:8888
+
+This will cause Django to automatically reload all altered code. Additionally, by using:
+    import pdb; pdb.set_trace()
+you can drop down into a PDB session, which is incredibly useful for debugging crashes & bugs.
 
 
 Deployment
 ==========
 
-Ubuntu
-------
-Before doing anything, make sure you have a few packages installed:
-
-    sudo aptitude install libldap2-dev python-numpy python-psycopg2 postfix
-
-Configuring SSL is a bit trickier, but assuming you already have `mod_ssl` 
-installed and your working directory is the project root:
-
-    sudo a2enmod ssl
-    cd /var/django/caesar
-    sudo cp apache/mitCAclient.pem /etc/ssl/certs/
-    cd /etc/apache2/sites-enabled
-    sudo ln -s ../sites-available/default-ssl 000-default-ssl 
-
-The fabfile should take care of the rest, in theory.
-
-Enable JPEG and PNG support for photos:
-
-    pip uninstall PIL
-    sudo apt-get install libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev
-    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
-    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
-    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
-    pip install PIL
-
-The install script should now display at the end:
-
-    --------------------------------------------------------------------
-    *** TKINTER support not available
-    --- JPEG support available
-    --- ZLIB (PNG/ZIP) support available
-    --- FREETYPE2 support available
-    *** LITTLECMS support not available
-    --------------------------------------------------------------------
-
-
-CSAIL Debian Lenny
-------------------
-
 ### Installing build dependencies
 Before we get started, you will need a few things:
 
-    sudo aptitude install apache2 apache2-dev libldap2-dev libsasl2-dev git
-
-### Building Python 2.7
-CSAIL's distribution of Debian includes only Python 2.6, which isn't going to 
-be good enough for our purposes, so we'll have to install Python 2.7 from 
-source alongside the existing Python installation.
-
-    wget http://www.python.org/ftp/python/2.7.2/Python-2.7.2.tgz
-    tar xvzf Python-2.7.2.tgz
-    cd Python-2.7.2
-    ./configure --with-threads --enable-shared
-    make
-    sudo make altinstall
-    sudo ln -s /usr/local/lib/libpython2.7.so.1.0 /usr/lib/
-    sudo ln -s /usr/local/lib/libpython2.7.so /usr/
-
-Next, we also need to install `setuptools` and `pip` for our shiny new Python.
-
-    wget http://pypi.python.org/packages/2.7/s/setuptools/setuptools-0.6c11-py2.7.egg
-    sudo sh setuptools-0.6c11-py2.7.egg
-    sudo easy_install-2.7 pip
-
-### Building mod_wsgi
-To actually run Caesar on `mod_wsgi` with Python 2.7 instead of 2.5, we need to
-compile our own binary for the module against our new Python binary. We will
-also hand-install the compiled binary alongside any existing files from the
-packaged version of `mod_wsgi`.
-
-    sudo aptitude install libapache2-mod-wsgi
-    wget http://modwsgi.googlecode.com/files/mod_wsgi-3.3.tar.gz
-    tar xvzf mod_wsgi-3.3.tar.gz
-    cd mod_wsgi-3.3
-    ./configure --with-python=/usr/local/bin/python2.7
-    make
-    sudo cp .libs/mod_wsgi.so /usr/lib/apache2/modules/mod_wsgi.so-2.7
-    cd /usr/lib/apache2/modules
-    sudo ln -sf mod_wsgi.so-2.7 mod_wsgi.so
+    sudo apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git
 
 ### Configuring Apache
-To make sure that `mod_wsgi` is pointed to the right Python installation, you
-will need to add one line to `/etc/apache2/mods-available/wsgi.conf`.
-
-    <IfModule mod_wsgi.c>
-        ...
-        WSGIPythonHome /usr/local
-        ...
-    </IfModule> 
-
-Finally make sure the module is enabled:
-
-    sudo a2enmod wsgi
-
 The default configuration included with Caesar assumes that the WSGI daemon will
 run under the `caesar` user, which you will probably need to create. It will
 also help to create a user group with the newly created `caesar` user, the 
@@ -207,13 +124,11 @@ Now, checkout the code (creating any necessary directories). Caesar assumes that
 it will live at `/var/django/caesar`:
 
     sudo mkdir -p /var/django/caesar
-    cd /var/django/caesar
-    sudo chgrp dev .
-    sudo chown $USER .
-    sudo chmod g+w .
-    sudo chmod g+s .
-    cd ..
-    git clone git://github.com/uid/caesar-web.git caesar
+    sudo chgrp -R dev /var/django/caesar
+    sudo chown -R $USER /var/django/caesar
+    sudo chmod -R g+w /var/django/caesar
+    sudo chmod -R g+s /var/django/caesar
+    git clone git://github.com/uid/caesar-web.git /var/django/caesar
 
 ### Enable SSL
 Next, set up `mod_ssl` and add the appropriate MIT certificate authority:
@@ -240,19 +155,7 @@ add to the file:
 To install Caesar's Python dependencies, just run:
 
     cd /var/django/caesar
-    sudo pip-2.7 install -r requirements.txt
-    
-Note: This may not install ldap correctly if you're running OS X. If importing ldap causes errors, run:
-
-    pip-2.7 install python-ldap==2.3.13
-    easy_install-2.7 ElementTree
-    easy_install-2.7 Markdown 
-
-You also need to install django_tools.middlewares by placing the django_tools
-folder (obtainable from https://github.com/jedie/django-tools/tree/master/django_tools)
-into a python2.7 path folder. To find a python2.7 path folder run python2.7, import sys,
-and then print sys.path. Put the django_tools folder in one of the folders in the sys.path
-list. Verify that its working by running python2.7 and trying to import django_tools.middlewares.ThreadLocal
+    sudo pip install -r requirements.txt
 
 ### Configuring Caesar
 
@@ -275,14 +178,14 @@ Note: when running ./manage.py syncdb, Django may ask if you want to create a ne
     ./manage.py migrate
     ./manage.py createsuperuser --username=admin --email=example@mit.edu
     ./manage.py collectstatic
-    sudo ln -sf /var/django/caesar/apache/caesar /etc/apache2/sites-available
+    sudo ln -sf /var/django/caesar/apache/caesar.conf /etc/apache2/sites-available
     sudo a2ensite caesar
-    sudo /etc/init.d/apache2 restart
+    sudo apachectl graceful
 
 ### Enable JPEG and PNG support for photos:
 
     pip uninstall PIL
-    sudo apt-get install libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev
+    sudo apt-get install -y libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev
     sudo ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
     sudo ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
     sudo ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
@@ -298,9 +201,3 @@ The install script should now display at the end:
     *** LITTLECMS support not available
     --------------------------------------------------------------------
 
-To run Caesar in debug mode, use the following command:
-    python -m pdb manage.py runserver localhost:8888
-
-This will cause Django to automatically reload all altered code. Additionally, by using:
-    import pdb; pdb.set_trace()
-you can drop down into a PBD session (incredibly useful for debugging crashes & bugs)

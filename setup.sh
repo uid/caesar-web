@@ -8,8 +8,8 @@ CAESAR_DIR=/var/django/caesar
 #/usr/sbin/dpkg-reconfigure tzdata
 
 # Install Linux packages we need.
-/usr/bin/apt-get update
-/usr/bin/apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git libapache2-mod-wsgi openjdk-7-jre python-dev python-numpy python-psycopg2 python-pip postfix 
+apt-get update
+apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git libapache2-mod-wsgi openjdk-7-jre python-dev python-numpy python-psycopg2 python-pip postfix 
 
 # Install Python packages we need.
 cd /tmp
@@ -32,6 +32,6 @@ ln -sf /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/000-d
 a2enmod ssl
 
 # Install Caesar into Apache and start or restart Apache.
-ln -sf $CAESAR_DIR/apache/caesar /etc/apache2/sites-available
+ln -sf $CAESAR_DIR/apache/caesar.conf /etc/apache2/sites-available
 a2ensite caesar
-sudo /etc/init.d/apache2 restart
+apachectl graceful
