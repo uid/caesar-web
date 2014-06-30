@@ -39,10 +39,8 @@ var commentSearch = new function() {
       initializer
     );
 
-    //console.log(fullproof.english.metaphone("Absolutly"));
-    //console.log(fullproof.french.stopword_remover("JOHN"));
-
     commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
+
     // Clear similarCommentsDB database !important
     var db = openDatabase('similarCommentsDB', '1.0', 'similarCommentsDB', 2 * 1024 * 1024);
     db.transaction(function (tx) {
@@ -54,15 +52,24 @@ var commentSearch = new function() {
   };
 
   this.search = function(value, targetClass, similarCommentClass) {
-    $("."+similarCommentClass).remove();
-    var pattern = value.replace(/\s|\n|\r/g, "|");
+    //$("."+similarCommentClass).remove();
+
+    // Create regular expression for highlighting query words]
+    var wordset = value.replace(/\n|\r/g, " ").split(" ");
+    var patternset = [];
+    for (var i in wordset) {
+      // stopwords is a list of stopwords from stopwords.js. This is a copy of the stopwords used by fullproof.
+      if (stopwords.indexOf(wordset[i]) == -1) {
+        patternset.push(wordset[i]);
+      }
+    }
+    var pattern = patternset.join("|");
     var regex = new RegExp(pattern, "ig");
 
     // Request a search to the comments engine, then displays the results, if any.
     commentsSearchEngine.lookup(value, function(resultset) {
       var results = [];
       if (resultset && resultset.getSize()) {
-
         // resultset is a fullproof object that has its own forEach method
         resultset.forEach(function(e) {
           // Only choose scores that are "good enough"
@@ -70,7 +77,7 @@ var commentSearch = new function() {
             results.push({
               "index": e.value,
               "score": e.score,
-              "bag_of_words": regex.exec(commentsData[e.value])
+              "bag_of_words": regex.exec(commentsData[e.value]),
             });
           }
         });
@@ -78,11 +85,30 @@ var commentSearch = new function() {
 
       // Sort results from highest score to lowest score
       results.sort(function(a,b) { return b.score - a.score; });
+      console.log(results);
+
+      var ids = [];
 
       // Display only the top 3 results.
       // Use .html() rather than .text() to deal with special characters.
       for (var i=0; i<Math.min(results.length, 3); i++) {
-        var comment_div = $("<div class='comment "+similarCommentClass+"'></div>");
+
+        ids.push('#'+similarCommentClass+'-'+results[i].index);
+
+         // Check whether this result is already displayed
+        if ($('#'+similarCommentClass+'-'+results[i].index).length != 0) {
+          var comment_div = $('#'+similarCommentClass+'-'+results[i].index);
+          if (comment_div.index() != i) {
+            $('#similar-comments-wrapper > div:nth-child('+i+')').after(comment_div);
+            var text = $(comment_div).find(".comment-form .similar-comment-text").html();
+            $(comment_div).find(".comment-form .similar-comment-text").html(text.replace(regex, '<i><b>$&</b></i>'));
+            $(comment_div).hide();
+            $(comment_div).show("blind");
+          }
+          continue;
+        }
+
+        var comment_div = $("<div class='comment "+similarCommentClass+"' id='"+similarCommentClass+"-"+results[i].index+"'></div>");
 
         // Link to comment in context
         var comment_chunkdiv = $("<div class='comment-header'></div>");
@@ -107,17 +133,34 @@ var commentSearch = new function() {
         comment_form.append(comment_textdiv);
 
         comment_div.append(comment_chunkdiv, comment_author, comment_form);
-        $('#similar-comments-wrapper').append(comment_div);
-          
+
+        // Add new similar comment to after the previous result, in the correct order
+        if (i == 0) { // This is the first result to be displayed
+          $('#similar-comments-wrapper').prepend(comment_div);
+        }
+        else {
+          // jQuery is stupid and 1-indexes its selectors, thus using i rather i-1
+          $('#similar-comments-wrapper > div:nth-child('+i+')').after(comment_div);
+        }
+        $(comment_div).hide();
+        $(comment_div).show("blind");
       }
-      $('#similar-comments-wrapper').hide();
+
+      // Remove results that weren't in the top 3
+      var selectorString = ".".concat(similarCommentClass)
+                              .concat(":not(")
+                              .concat(ids.join())
+                              .concat(")");
+      $(selectorString).remove();
+
+      /*$('#similar-comments-wrapper').hide();
 
       var similarCommentsState = $.cookie('similarCommentsState') || 'visible';
       if (similarCommentsState === 'hidden') {
         return;
       }
       // Animate showing similar comments
-      $('#similar-comments-wrapper').show("blind");
+      $('#similar-comments-wrapper').show("blind");*/
     });
   };
 
