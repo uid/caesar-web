@@ -1,7 +1,7 @@
 Django==1.5
 South>=0.8.3
 django-debug-toolbar==0.11.0  # later versions cause errors
-sorl-thumbnail
+sorl-thumbnail==11.09 # 11.12.1b has a bug https://github.com/mariocesar/sorl-thumbnail/issues/269
 django-extensions
 Pygments
 django-email-templates
