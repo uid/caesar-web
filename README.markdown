@@ -49,7 +49,7 @@ The setup script will probably stop to ask you to configure postfix.  Use the de
 
 Ignore the final warning from apache2: Could not reliably determine the server's fully qualified domain name.
 
-### Initialize Caesar
+### Initialize the database
 
 Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in fixtures/, so you can always delete that file and start this part over if things go wrong. 
 
@@ -102,102 +102,43 @@ you can drop down into a PDB session, which is incredibly useful for debugging c
 Deployment
 ==========
 
-### Installing build dependencies
-Before we get started, you will need a few things:
-
-    sudo apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git
-
-### Configuring Apache
-The default configuration included with Caesar assumes that the WSGI daemon will
-run under the `caesar` user, which you will probably need to create. It will
-also help to create a user group with the newly created `caesar` user, the 
-Apache user, and yourself:
-
-    sudo useradd -r caesar
-    sudo groupadd dev
-    sudo adduser caesar dev
-    sudo adduser $USER dev
-    sudo adduser www-data dev
+These instructions were written for deployment on Ubuntu 12 with Apache 2.2.
 
 ### Check out Caesar
-Now, checkout the code (creating any necessary directories). Caesar assumes that
+First, checkout the code, creating any necessary directories. Caesar assumes that
 it will live at `/var/django/caesar`:
 
+    sudo apt-get install -y git
     sudo mkdir -p /var/django/caesar
-    sudo chgrp -R dev /var/django/caesar
-    sudo chown -R $USER /var/django/caesar
-    sudo chmod -R g+w /var/django/caesar
-    sudo chmod -R g+s /var/django/caesar
-    git clone git://github.com/uid/caesar-web.git /var/django/caesar
-
-### Enable SSL
-Next, set up `mod_ssl` and add the appropriate MIT certificate authority:
-
-    sudo a2enmod ssl
-    sudo cp /var/django/caesar/apache/mitCAclient.pem /etc/ssl/certs/
-    cd /etc/apache2/sites-enabled
-    sudo ln -s ../sites-available/default-ssl 000-default-ssl 
-
-Make sure that Apache actually listens to the SSL port, too
-
-    grep Listen /etc/apache2/ports.conf
-    
-If you don't see both "Listen: 80" and "Listen: 443" in the output of this command, then
-you need to edit /etc/apache2/ports.conf to include Listen: 443.  Here's a suggested block to
-add to the file:
-
-    <IfModule mod_ssl.c>
-        Listen 443
-    </IfModule>
+    sudo git clone git://github.com/uid/caesar-web.git /var/django/caesar
 
 
-### Installing Python dependencies
-To install Caesar's Python dependencies, just run:
+### Install it 
+
+Now run the setup script:
 
     cd /var/django/caesar
-    sudo pip install -r requirements.txt
+    sudo ./setup.sh
+    exec su -l $USER    # refreshes your group membership, so you have permission to the caesar folder
+
 
 ### Configuring Caesar
 
 To point Caesar to the right database, copy the local settings file:
 
+    exec su -l $USER    # refresh your group membership, so you have permission to the caesar folder
     cd /var/django/caesar
     cp settings_local.py.template settings_local.py
 
 Then edit settings_local.py and change the settings appropriately.
 
 
-### Initializing the application
+### Initializing the database
 
-Finally, Caesar itself needs some setup:
-Note: when running ./manage.py syncdb, Django may ask if you want to create a new superuser for it's auth system. Select 'no' - the users table doesn't exist until migrate, so this will cause an error.
+Finally, if you are starting a new database, the database needs some setup:
 
     cd /var/django/caesar
-    mkdir media && chmod g+w media
-    ./manage.py syncdb
+    ./manage.py syncdb         # say "no", don't create superuser yet
     ./manage.py migrate
-    ./manage.py createsuperuser --username=admin --email=example@mit.edu
-    ./manage.py collectstatic
-    sudo ln -sf /var/django/caesar/apache/caesar.conf /etc/apache2/sites-available
-    sudo a2ensite caesar
+    ./manage.py createsuperuser
     sudo apachectl graceful
-
-### Enable JPEG and PNG support for photos:
-
-    pip uninstall PIL
-    sudo apt-get install -y libjpeg-dev libfreetype6 libfreetype6-dev zlib1g-dev
-    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libfreetype.so /usr/lib/
-    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libjpeg.so /usr/lib/
-    sudo ln -s /usr/lib/`uname -i`-linux-gnu/libz.so /usr/lib/
-    pip install PIL
-
-The install script should now display at the end:
-
-    --------------------------------------------------------------------
-    *** TKINTER support not available
-    --- JPEG support available
-    --- ZLIB (PNG/ZIP) support available
-    --- FREETYPE2 support available
-    *** LITTLECMS support not available
-    --------------------------------------------------------------------
-
