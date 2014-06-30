@@ -18,8 +18,9 @@ pip install -r $CAESAR_DIR/requirements.txt
 # Make caesar user account.
 useradd -r -m caesar
 
-# Add yourself to the caesar group
+# Add yourself to the caesar and www-data groups
 adduser $SUDO_USER caesar
+adduser $SUDO_USER www-data
 
 # Make the media folder
 mkdir $CAESAR_DIR/media

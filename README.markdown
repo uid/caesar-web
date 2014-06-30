@@ -110,7 +110,7 @@ it will live at `/var/django/caesar`:
 
     sudo apt-get install -y git
     sudo mkdir -p /var/django/caesar
-    sudo git clone git://github.com/uid/caesar-web.git /var/django/caesar
+    sudo git clone https://github.com/uid/caesar-web.git /var/django/caesar
 
 
 ### Install it 
