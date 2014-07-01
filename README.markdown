@@ -102,12 +102,16 @@ These instructions were written for deployment on Ubuntu 12 with Apache 2.2.
 
 ### Check out Caesar
 
-First, check out the code, creating any necessary directories. Caesar assumes that
-it will live at `/var/django/caesar`:
+Caesar assumes that it will live at `/var/django/caesar`, so create that folder and give yourself ownership of it:
 
-    sudo apt-get install -y git
     sudo mkdir -p /var/django/caesar
-    sudo git clone https://github.com/uid/caesar-web.git /var/django/caesar
+    sudo chown $USER /var/django/caesar
+    sudo chgrp $USER /var/django/caesar
+
+Now check out the code:
+
+    sudo apt-get install -y git  # make sure git is installed
+    git clone https://github.com/uid/caesar-web.git /var/django/caesar
 
 
 ### Install Django and other dependencies
