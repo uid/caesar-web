@@ -18,17 +18,15 @@ We use Vagrant and VirtualBox to run Caesar in a virtual machine on your laptop.
 Clone this repository from github, if you haven't already.
 
     git clone https://github.com/uid/caesar-web.git
-    cd caesar-web
 
-### Use Vagrant to start the virtual machine
+### Create and start the virtual machine
 
 Install [Vagrant](http://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org) on your laptop.
 
 Make sure you're in your caesar-web folder, which has the Vagrantfile in it.  Start the VM:
 
+    cd caesar-web
     vagrant up
-
-The setup script will probably stop to ask you to configure postfix.  Use the defaults (Internet Site, hostname precise32).
 
 Ignore the final warning from apache2: Could not reliably determine the server's fully qualified domain name.
 
@@ -70,8 +68,7 @@ Restart the Apache webserver:
 
     sudo apachectl graceful  # to restart Apache and force it to reload Caesar
 
-Browse to [10.18.6.30](http://10.18.6.30) on your laptop and try to log in, either using the superuser
-account you created above, or (if you're at MIT) with your MIT certificate.  If login is successful, clicking on the "view all users" link at the top of the page should show you all the users in the test database.
+Browse to [10.18.6.30](http://10.18.6.30) on your laptop and try to log in, either using the superuser account you created above, or (if you're at MIT) with your MIT certificate.  If login is successful, clicking on the "view all users" link at the top of the page should show you all the users in the test database.
 
 
 ### Development tips
@@ -104,7 +101,8 @@ Deployment
 These instructions were written for deployment on Ubuntu 12 with Apache 2.2.
 
 ### Check out Caesar
-First, checkout the code, creating any necessary directories. Caesar assumes that
+
+First, check out the code, creating any necessary directories. Caesar assumes that
 it will live at `/var/django/caesar`:
 
     sudo apt-get install -y git
@@ -112,27 +110,24 @@ it will live at `/var/django/caesar`:
     sudo git clone https://github.com/uid/caesar-web.git /var/django/caesar
 
 
-### Install it 
+### Install Django and other dependencies
 
 Now run the setup script:
 
-    cd /var/django/caesar
-    sudo ./setup.sh
-    exec su -l $USER    # refreshes your group membership, so you have permission to the caesar folder
+    sudo /var/django/caesar/setup.sh
 
 
-### Configuring Caesar
+### Configure Caesar
 
 To point Caesar to the right database, copy the local settings file:
 
-    exec su -l $USER    # refresh your group membership, so you have permission to the caesar folder
     cd /var/django/caesar
     cp settings_local.py.template settings_local.py
 
 Then edit settings_local.py and change the settings appropriately.
 
 
-### Initializing the database
+### Initialize the database
 
 Finally, if you are starting a new database, the database needs some setup:
 
@@ -140,4 +135,8 @@ Finally, if you are starting a new database, the database needs some setup:
     ./manage.py syncdb         # say "no", don't create superuser yet
     ./manage.py migrate
     ./manage.py createsuperuser
-    sudo apachectl graceful
+    sudo apachectl graceful    # restart Apache
+
+Finally browse to your web server and try to log in.
+
+
