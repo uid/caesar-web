@@ -1,3 +1,4 @@
+// Store a cookie of the user's preference for hiding or showing similar comment suggestions
 var showSimilarCommentsState = $.cookie('showSimilarCommentsState') || 'expanded';
 
 function createSimilarCommentsDiv(comment_type) {
@@ -141,7 +142,7 @@ var commentSearch = new function() {
           continue;
         }
 
-        var comment_div = $("<div class='comment "+similarCommentClass+"' id='"+similarCommentClass+"-"+results[i].index+"'></div>");
+        var comment_div = $("<div class='comment "+similarCommentClass+" collapsed' id='"+similarCommentClass+"-"+results[i].index+"'></div>");
 
         // Link to comment in context
         var comment_chunkdiv = $("<div class='comment-header'></div>");
@@ -178,6 +179,13 @@ var commentSearch = new function() {
         }
         $(comment_div).hide();
         $(comment_div).show("blind");
+
+        // Add listener to comment to expand it when hovered over
+        $(comment_div).on("hover", function() {
+          $(this).toggleClass("collapsed");
+          $(this).toggleClass("expanded");
+        });
+
       }
 
       // Remove results that weren't in the top 3
