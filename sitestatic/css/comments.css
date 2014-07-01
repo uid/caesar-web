@@ -4,7 +4,7 @@
     min-height: 5px;
 }
 
-.comment {
+.comment, .reply {
     border: 1px solid #ddd;
     margin: 10px 0px 0px 0px;
     border-radius: 5px;
@@ -28,10 +28,9 @@
     border: 0px;
 }
 
-.comment.comment-reply , .comment.similar-comment, .comment.similar-reply {
+.comment.comment-reply , .comment.similar-comment, .comment.similar-reply, .similar-comments-display {
     border-top: 0px;
     margin-top: 0px;
-    margin-left: 20px;
     border-top-left-radius: 0px;
     -moz-border-top-left-radius: 0px;
     -webkit-border-top-left-radius: 0px;
@@ -40,8 +39,16 @@
     -webkit-border-top-right-radius: 0px;
 }
 
-.comment.similar-reply {
+.comment.comment-reply, .similar-comments-display.comment {
+    margin-left: 20px;
+}
+
+.similar-comments-display.reply {
     margin-left: 40px;
+}
+
+.similar-comments-display.comment .comment, .similar-comments-display.reply .comment {
+    margin-left: 0px;
 }
 
 .comment.comment-auto {
@@ -66,9 +73,12 @@
     text-overflow: ellipsis;
     font-family: 'andale mono', 'lucida console', monospace;
 }
-
 .collapsed .comment-header {
     border-bottom: 0px;
+}
+
+.similar-comments-display > .comment-header {
+    border-bottom: 1px solid #ddd;
 }
 
 .collapsed .comment-snippet {
@@ -257,7 +267,7 @@
     height: 16px;    
 }
 
-.new-comment, .new-reply, .similar-comment, .similar-reply, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover {
+.new-comment, .new-reply, .similar-comment, .similar-reply, .similar-comments-display, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover, .similar-comments-display:hover {
     background-color: #ffff88;
     cursor: default;
 }
