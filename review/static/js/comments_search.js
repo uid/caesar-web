@@ -2,7 +2,7 @@ function createSimilarCommentsDiv(comment_type) {
   var comment_header = $("<div class='comment-header'></span>");
   var comment_visibility = $("<span class='comment-visibility'></span>");
   comment_header.append("0 matching comments", comment_visibility);
-  var similar_comments_wrapper = $("<div id='similar-comments-wrapper'></div>");
+  var similar_comments_wrapper = $("<div class='similar-comments-wrapper'></div>");
   var similar_comments_display = $("<div class='similar-comments-display "+comment_type+"'>");
   similar_comments_display.append(comment_header, similar_comments_wrapper);
   $(".new-"+comment_type).after(similar_comments_display);
@@ -112,7 +112,7 @@ var commentSearch = new function() {
         if ($('#'+similarCommentClass+'-'+results[i].index).length != 0) {
           var comment_div = $('#'+similarCommentClass+'-'+results[i].index);
           if (comment_div.index() != i) {
-            $('#similar-comments-wrapper > div:nth-child('+i+')').after(comment_div);
+            $('.similar-comments-wrapper > div:nth-child('+i+')').after(comment_div);
             var text = $(comment_div).find(".comment-form .similar-comment-text").html();
             $(comment_div).find(".comment-form .similar-comment-text").html(text.replace(regex, '<i><b>$&</b></i>'));
             $(comment_div).hide();
@@ -150,11 +150,11 @@ var commentSearch = new function() {
 
         // Add new similar comment to after the previous result, in the correct order
         if (i == 0) { // This is the first result to be displayed
-          $('#similar-comments-wrapper').prepend(comment_div);
+          $('.similar-comments-wrapper').prepend(comment_div);
         }
         else {
           // jQuery is stupid and 1-indexes its selectors, thus using i rather i-1
-          $('#similar-comments-wrapper > div:nth-child('+i+')').after(comment_div);
+          $('.similar-comments-wrapper > div:nth-child('+i+')').after(comment_div);
         }
         $(comment_div).hide();
         $(comment_div).show("blind");
