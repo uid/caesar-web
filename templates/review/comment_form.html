@@ -1,3 +1,28 @@
+{% load extra_tags %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  // Remove all similar-comment divs whenever the user closes a new comment entry box.
+  $(".new-comment").on("remove", function() {
+    $(".similar-comment").remove();
+    $("#similar-comments-wrapper").remove();
+  });
+
+  $("#textentry").keypress(function(event) {
+    // Keys
+    // 13  carriage return
+    // 32  space
+    var keys = [13, 32];
+    if (keys.indexOf(event.which) != -1) {
+      commentSearch.search($("#textentry").val(), "similar-comment");
+    }
+
+  });
+});
+
+</script>
+
 <div class="comment new-comment" title="Add a comment">
   <div class="comment-header">
     <span class="comment-line-numbers">
@@ -20,5 +45,12 @@
       <button type="submit">Save</button>
       <button id="cancel-button" type="button">Cancel</button>
     </form>
+  </div>
+</div>
+<div id='similar-comments-wrapper'>
+  <!--<div id='comment-header'>
+    0 matching comments
+    <span class="comment-visibility">
+    </span>-->
   </div>
 </div>

@@ -70,6 +70,23 @@ class Comment(models.Model):
             return self.text
         return self.text[0:snippet_length] + "..."
 
+    # Generate a short snippet which contains the given substrings
+#    def generate_relevant_snippet(self, substring):
+#        snippet_length = 30
+#        index = self.text.find(substring)
+#        if index == -1:
+#            return ''
+#        if len(self.text) < snippet_length:
+#            return self.text
+#        # Include buffer characters before and after the keyword
+#        bufferchars = (snippet_length - len(substring)) / 2
+#        if index < bufferchars: # Substring found very close to beginning of text
+#            return self.text[0:snippet_length] + "..."
+#        elif index + len(substring) + bufferchars > len(self.text): # Substring found very close to end of text
+#            return "..." + self.text[-snippet_length:]
+#        else:
+#            return "..." + self.text[index-bufferchars:index+snippet_length-bufferchars] + "..."
+
     def is_checkstyle(self):
       return self.author.username is 'checkstyle'
 

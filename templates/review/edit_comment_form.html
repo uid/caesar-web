@@ -1,3 +1,35 @@
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+  var targetClass;
+  var similarCommentsClass;
+  {% if reply %}
+  similarCommentsClass = "similar-reply";
+  {% else %}
+  similarCommentsClass = "similar-comment";
+  {% endif %}
+
+  // Remove all similar-comment divs whenever the user closes a new comment entry box.
+  $("."+targetClass).on("remove", function() {
+    $("."+similarCommentsClass).remove();
+    $("#similar-comments-wrapper").remove();
+  });
+
+  $("#textentry").keypress(function(event) {
+    // Keys
+    // 13  carriage return
+    // 32  space
+    var keys = [13, 32];
+    if (keys.indexOf(event.which) != -1) {
+      commentSearch.search($("#textentry").val(), similarCommentsClass);
+    }
+
+  });
+});
+
+</script>
+
 {% if not reply %}
 <div class="comment new-comment" title="Edit a comment">
   <div class="comment-header">
@@ -35,3 +67,4 @@
   </div>
 </div>
 {% endif %}
+<div id='similar-comments-wrapper'></div>

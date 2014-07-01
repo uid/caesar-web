@@ -9,7 +9,7 @@ class CommentForm(ModelForm):
         model = Comment
         fields = ('text', 'start', 'end', 'chunk')
         widgets = {
-            'text': Textarea(attrs={'cols': 10, 'rows': 5}), 
+            'text': Textarea(attrs={'cols': 10, 'rows': 5, 'id': 'textentry'}), 
             'start': HiddenInput(),
             'end': HiddenInput(),
             'chunk': HiddenInput(),
@@ -20,10 +20,10 @@ class ReplyForm(ModelForm):
         model = Comment
         fields = ('text', 'parent')
         widgets = {
-            'text': Textarea(attrs={'cols': 10, 'rows': 5}), 
+            'text': Textarea(attrs={'cols': 10, 'rows': 5, 'id': 'textentry'}), 
             'parent': HiddenInput(),
         }
 
 class EditCommentForm(Form):
-    text = CharField(widget=Textarea(attrs={'cols': 10, 'rows': 5}))
+    text = CharField(widget=Textarea(attrs={'cols': 10, 'rows': 5, 'id': 'textentry'}))
     comment_id = CharField(widget=HiddenInput())

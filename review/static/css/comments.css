@@ -6,7 +6,7 @@
 
 .comment {
     border: 1px solid #ddd;
-    margin: 0px 0px 10px 0px;
+    margin: 10px 0px 0px 0px;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -22,14 +22,15 @@
     height: 16px;
     overflow: hidden;
 }
+
 .collapsed.comment.comment-reply {
     height: 0px; 
     border: 0px;
 }
 
-.comment.comment-reply {
+.comment.comment-reply, .comment.similar-comment, .comment.similar-reply {
     border-top: 0px;
-    margin-top: -10px;
+    margin-top: 0px;
     margin-left: 20px;
     border-top-left-radius: 0px;
     -moz-border-top-left-radius: 0px;
@@ -37,6 +38,10 @@
     border-top-right-radius: 0px;
     -moz-border-top-right-radius: 0px;
     -webkit-border-top-right-radius: 0px;
+}
+
+.comment.similar-reply {
+    margin-left: 40px;
 }
 
 .comment.comment-auto {
@@ -86,7 +91,7 @@
     background-image: url('../img/toggle-small.png');
 }
 
-.collapsed .comment-visibility {
+.comment.collapsed .comment-visibility {
     background-image: url('../img/toggle-small-expand.png');
 }
 
@@ -246,8 +251,15 @@
     height: 16px;
 }
 
-.new-comment, .new-reply, .new-comment:hover, .new-reply:hover {
+.ui-button .ui-icon-clippy {
+    background-image: url('../img/clippy.png');
+    width: 16px;
+    height: 16px;    
+}
+
+.new-comment, .new-reply, .similar-comment, .similar-reply, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover {
     background-color: #ffff88;
+    cursor: default;
 }
 
 .new-comment textarea, .reply-form textarea {
@@ -258,9 +270,11 @@
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     height: auto;
+    cursor: text;
 }
 
 .comment-form, .reply-form {
     padding: 5px;
 }
+
 
