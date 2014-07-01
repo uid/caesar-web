@@ -1,11 +1,27 @@
 function createSimilarCommentsDiv(comment_type) {
   var comment_header = $("<div class='comment-header'></span>");
+  var comment_header_text = $("<span class='comment-header-text'>0 matching comments</span>")
   var comment_visibility = $("<span class='comment-visibility'></span>");
-  comment_header.append("0 matching comments", comment_visibility);
+  comment_header.append(comment_visibility, comment_header_text);
   var similar_comments_wrapper = $("<div class='similar-comments-wrapper'></div>");
-  var similar_comments_display = $("<div class='similar-comments-display "+comment_type+"'>");
+  var similar_comments_display = $("<div class='similar-comments-display expanded "+comment_type+"'>");
   similar_comments_display.append(comment_header, similar_comments_wrapper);
   $(".new-"+comment_type).after(similar_comments_display);
+
+  // Add listener to header, so user can collapse comment display
+  $(comment_header).on("click", function() {
+    if ($(similar_comments_display).hasClass("expanded")) {
+      $(similar_comments_wrapper).hide(effect="blind", complete=function() {
+        $(similar_comments_display).toggleClass("expanded");
+        $(similar_comments_display).toggleClass("collapsed");
+      });
+    }
+    else {
+      $(similar_comments_display).toggleClass("expanded");
+      $(similar_comments_display).toggleClass("collapsed");
+      $(similar_comments_wrapper).show(effect="blind");
+    }
+  });
 }
 
 // Remove all similar-comment divs whenever the user closes a new comment entry box.
@@ -166,6 +182,9 @@ var commentSearch = new function() {
                               .concat(ids.join())
                               .concat(")");
       $(selectorString).remove();
+
+      // Update the number of matching comments, displayed in the header
+      $(".comment-header-text").text(ids.length+" matching comments");
 
     });
   };

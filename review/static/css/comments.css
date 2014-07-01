@@ -97,11 +97,11 @@
     display: block;
 }
 
-.comment.expanded .comment-visibility {
+.comment.expanded .comment-visibility, .similar-comments-display.expanded .comment-header:hover .comment-visibility {
     background-image: url('../img/toggle-small.png');
 }
 
-.comment.collapsed .comment-visibility {
+.comment.collapsed .comment-visibility, .similar-comments-display.collapsed .comment-header:hover .comment-visibility {
     background-image: url('../img/toggle-small-expand.png');
 }
 
