@@ -10,7 +10,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.network :private_network, ip: "10.18.6.30"
 
-  config.vm.synced_folder "./", "/var/django/caesar",
-    group: "www-data"
+  config.vm.synced_folder "./", "/var/django/caesar"
 
+  config.vm.provision :shell, :path => "./setup.sh"
 end

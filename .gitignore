@@ -2,7 +2,8 @@ settings_local.py
 *~
 *.pyc
 .DS_Store
-/media
+/media/cache
+/media/photos
 /data
 /.vagrant
 /build

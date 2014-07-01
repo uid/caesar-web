@@ -20,14 +20,6 @@ Clone this repository from github, if you haven't already.
     git clone https://github.com/uid/caesar-web.git
     cd caesar-web
 
-### Configure local settings
-
-Copy the template for settings_local.py:
-
-    cp settings_local.py.template settings_local.py
-
-The default settings are intended for development: DEBUG is turned on, a local sqlite database file is used for storing data.  For deploying Caesar as a user-facing web app, you should edit settings_local.py and change settings as explained by the comments.
-
 ### Use Vagrant to start the virtual machine
 
 Install [Vagrant](http://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org) on your laptop.
@@ -36,23 +28,30 @@ Make sure you're in your caesar-web folder, which has the Vagrantfile in it.  St
 
     vagrant up
 
+The setup script will probably stop to ask you to configure postfix.  Use the defaults (Internet Site, hostname precise32).
+
+Ignore the final warning from apache2: Could not reliably determine the server's fully qualified domain name.
+
 Log into it:
 
     vagrant ssh
 
-On the VM, run the setup script:
+
+### Configure local settings
+
+Copy the template for settings_local.py:
 
     cd /var/django/caesar
-    sudo ./setup.sh
+    cp settings_local.py.template settings_local.py
 
-The setup script will probably stop to ask you to configure postfix.  Use the defaults (Internet Site, hostname precise32).
+The default settings are intended for development: DEBUG is turned on, a local sqlite database file is used for storing data.  For deploying Caesar as a user-facing web app, you should edit settings_local.py and change settings as explained by the comments.
 
-Ignore the final warning from apache2: Could not reliably determine the server's fully qualified domain name.
 
 ### Initialize the database
 
 Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in fixtures/, so you can always delete that file and start this part over if things go wrong. 
 
+    cd /var/django/caesar
     ./manage.py syncdb         # say "no", don't create superuser yet
     ./manage.py migrate
 
@@ -64,12 +63,12 @@ If you did NOT complete the previous step (preloading the database with test dat
 
     ./manage.py createsuperuser
 
-Finally, make sure the Apache server can write to the database:
-
-    chmod -R g+w fixtures/ 
-    chgrp -R www-data fixtures/
 
 ### Test that Caesar is running
+
+Restart the Apache webserver:
+
+    sudo apachectl graceful  # to restart Apache and force it to reload Caesar
 
 Browse to [10.18.6.30](http://10.18.6.30) on your laptop and try to log in, either using the superuser
 account you created above, or (if you're at MIT) with your MIT certificate.  If login is successful, clicking on the "view all users" link at the top of the page should show you all the users in the test database.

@@ -9,27 +9,15 @@ CAESAR_DIR=/var/django/caesar
 
 # Install Linux packages we need.
 apt-get update
-apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git libapache2-mod-wsgi openjdk-7-jre python-dev python-numpy python-psycopg2 python-pip postfix 
+apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git libapache2-mod-wsgi openjdk-7-jre python-dev python-numpy python-psycopg2 python-pip
 
 # Install Python packages we need.
 cd /tmp
 pip install -r $CAESAR_DIR/requirements.txt
 
-# Make caesar user account.
-useradd -r -m caesar
-
-# Add yourself to the caesar and www-data groups
-adduser $SUDO_USER caesar
-adduser $SUDO_USER www-data
-
-# Make the media folder
-mkdir $CAESAR_DIR/media
-
 # Set permissions on Caesar folder tree
-chown -R caesar $CAESAR_DIR
-chgrp -R caesar $CAESAR_DIR
-chmod -R g+ws $CAESAR_DIR
 chgrp -R www-data $CAESAR_DIR/fixtures $CAESAR_DIR/media
+chmod -R g+ws $CAESAR_DIR/fixtures $CAESAR_DIR/media
 
 # Set up SSL, with MIT certificate authority for checking certificates presented by users.
 cp $CAESAR_DIR/apache/mitCAclient.pem /etc/ssl/certs/

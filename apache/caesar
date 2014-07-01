@@ -1,6 +1,3 @@
-WSGIDaemonProcess caesar user=caesar group=caesar threads=10
-WSGIProcessGroup caesar
-
 SSLVerifyClient require
 SSLVerifyDepth 1
 SSLCACertificateFile /etc/ssl/certs/mitCAclient.pem
