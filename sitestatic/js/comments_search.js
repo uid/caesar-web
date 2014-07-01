@@ -131,11 +131,6 @@ var commentSearch = new function() {
         var comment_textdiv = $("<div class='"+similarCommentClass+"-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
         comment_form.append(clipboard_button, comment_textdiv);
 
-        $(clipboard_button).zclip({
-          path:'../media/ZeroClipboard.swf',
-          copy:$(comment_textdiv).text(),
-        });
-
         comment_div.append(comment_chunkdiv, comment_author, comment_form);
 
         // Add new similar comment to after the previous result, in the correct order
