@@ -34,6 +34,7 @@ Log into it:
 
     vagrant ssh
 
+If it asks you for a password, the password for the vagrant account is just "vagrant".
 
 ### Configure local settings
 
@@ -47,7 +48,7 @@ The default settings are intended for development: DEBUG is turned on, a local s
 
 ### Initialize the database
 
-Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in fixtures/, so you can always delete that file and start this part over if things go wrong. 
+Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in /home/vagrant, so you can always delete that file and start this part over if things go wrong. 
 
     cd /var/django/caesar
     ./manage.py syncdb         # say "no", don't create superuser yet
