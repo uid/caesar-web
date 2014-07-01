@@ -3,10 +3,11 @@
 
 $(document).ready(function() {
 
-  // Remove all similar-comment divs whenever the user closes a new comment entry box.
-  $(".new-comment").on("remove", function() {
-    $(".similar-comment").remove();
-    $("#similar-comments-wrapper").remove();
+  createSimilarCommentsDiv("comment");
+
+  // Remove similar-comment wrapper whenever the user closes a new comment entry box.
+  $(".new-comment").on("remove", function(e) {
+    $(".similar-comments-display").remove();
   });
 
   $("#textentry").keypress(function(event) {
@@ -45,12 +46,5 @@ $(document).ready(function() {
       <button type="submit">Save</button>
       <button id="cancel-button" type="button">Cancel</button>
     </form>
-  </div>
-</div>
-<div id='similar-comments-wrapper'>
-  <!--<div id='comment-header'>
-    0 matching comments
-    <span class="comment-visibility">
-    </span>-->
   </div>
 </div>

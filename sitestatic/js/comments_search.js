@@ -1,3 +1,18 @@
+function createSimilarCommentsDiv(comment_type) {
+  var comment_header = $("<div class='comment-header'></span>");
+  var comment_visibility = $("<span class='comment-visibility'></span>");
+  comment_header.append("0 matching comments", comment_visibility);
+  var similar_comments_wrapper = $("<div id='similar-comments-wrapper'></div>");
+  var similar_comments_display = $("<div class='similar-comments-display "+comment_type+"'>");
+  similar_comments_display.append(comment_header, similar_comments_wrapper);
+  $(".new-"+comment_type).after(similar_comments_display);
+}
+
+// Remove all similar-comment divs whenever the user closes a new comment entry box.
+function removeSimilarCommentsDiv(comment_type) {
+  $(".similar-comments-display").remove();
+}
+
 var commentSearch = new function() {
 
   var dbName = "similarCommentsDB";

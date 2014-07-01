@@ -28,7 +28,7 @@
     border: 0px;
 }
 
-.comment.comment-reply, .comment.similar-comment, .comment.similar-reply {
+.comment.comment-reply , .comment.similar-comment, .comment.similar-reply {
     border-top: 0px;
     margin-top: 0px;
     margin-left: 20px;

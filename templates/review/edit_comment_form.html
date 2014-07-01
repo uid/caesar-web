@@ -2,18 +2,18 @@
 
 $(document).ready(function() {
 
-  var targetClass;
-  var similarCommentsClass;
+  var comment_type;
   {% if reply %}
-  similarCommentsClass = "similar-reply";
+  comment_type = "reply";
   {% else %}
-  similarCommentsClass = "similar-comment";
+  comment_type = "comment";
   {% endif %}
 
-  // Remove all similar-comment divs whenever the user closes a new comment entry box.
-  $("."+targetClass).on("remove", function() {
-    $("."+similarCommentsClass).remove();
-    $("#similar-comments-wrapper").remove();
+  createSimilarCommentsDiv(comment_type);
+
+  // Remove similar-comment wrapper whenever the user closes a new comment entry box.
+  $(".new-"+comment_type).on("remove", function(e) {
+    $(".similar-comments-display").remove();
   });
 
   $("#textentry").keypress(function(event) {
@@ -22,7 +22,7 @@ $(document).ready(function() {
     // 32  space
     var keys = [13, 32];
     if (keys.indexOf(event.which) != -1) {
-      commentSearch.search($("#textentry").val(), similarCommentsClass);
+      commentSearch.search($("#textentry").val(), "similar-"+comment_type);
     }
 
   });
@@ -67,4 +67,3 @@ $(document).ready(function() {
   </div>
 </div>
 {% endif %}
-<div id='similar-comments-wrapper'></div>
