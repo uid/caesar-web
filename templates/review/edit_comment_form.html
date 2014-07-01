@@ -5,10 +5,8 @@ $(document).ready(function() {
   var targetClass;
   var similarCommentsClass;
   {% if reply %}
-  targetClass = "new-reply";
   similarCommentsClass = "similar-reply";
   {% else %}
-  targetClass = "new-comment";
   similarCommentsClass = "similar-comment";
   {% endif %}
 
@@ -24,7 +22,7 @@ $(document).ready(function() {
     // 32  space
     var keys = [13, 32];
     if (keys.indexOf(event.which) != -1) {
-      commentSearch.search($("#textentry").val(), targetClass, similarCommentsClass);
+      commentSearch.search($("#textentry").val(), similarCommentsClass);
     }
 
   });

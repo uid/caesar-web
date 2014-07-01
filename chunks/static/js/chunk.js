@@ -691,32 +691,6 @@ $('#toggle-auto-comments-button').click(function() {
     $(this).text(toggleAutoCommentsText[state]).data('state', state);
 });
 
-var toggleSimilarCommentsText = {
-    visible: 'Hide similar comments', 
-    hidden: 'Show similar comments'
-};
-var similarCommentsState = $.cookie('similarCommentsState') || 'visible';
-
-if (similarCommentsState === 'visible') {
-    $('#similar-comments-wrapper').show('blind');
-} else {
-    $('#similar-comments-wrapper').hide('blind');
-}
-$('#toggle-similar-comments-button')
-        .text(toggleSimilarCommentsText[similarCommentsState]);
-
-$('#toggle-similar-comments-button').click(function() {
-    if (similarCommentsState === 'visible') {
-        $('#similar-comments-wrapper').hide('blind');
-        similarCommentsState = 'hidden';
-    } else {
-        $('#similar-comments-wrapper').show('blind');
-        similarCommentsState = 'visible';
-    }
-    $.cookie('similarCommentsState', similarCommentsState);
-    $(this).text(toggleSimilarCommentsText[similarCommentsState]);
-});
-
 var toggleInstructionsText = {
     visible: 'Hide instructions', 
     hidden: 'Show instructions' 

@@ -15,7 +15,7 @@ $(document).ready(function() {
     // 32  space
     var keys = [13, 32];
     if (keys.indexOf(event.which) != -1) {
-      commentSearch.search($("#textentry").val(), "new-comment", "similar-comment");
+      commentSearch.search($("#textentry").val(), "similar-comment");
     }
 
   });
@@ -47,4 +47,10 @@ $(document).ready(function() {
     </form>
   </div>
 </div>
-<div id='similar-comments-wrapper'></div>
+<div id='similar-comments-wrapper'>
+  <!--<div id='comment-header'>
+    0 matching comments
+    <span class="comment-visibility">
+    </span>-->
+  </div>
+</div>

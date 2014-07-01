@@ -22,6 +22,7 @@
     height: 16px;
     overflow: hidden;
 }
+
 .collapsed.comment.comment-reply {
     height: 0px; 
     border: 0px;
@@ -86,11 +87,11 @@
     display: block;
 }
 
-.expanded .comment-visibility {
+.comment.expanded .comment-visibility {
     background-image: url('../img/toggle-small.png');
 }
 
-.collapsed .comment-visibility {
+.comment.collapsed .comment-visibility {
     background-image: url('../img/toggle-small-expand.png');
 }
 
@@ -250,12 +251,18 @@
     height: 16px;
 }
 
+.ui-button .ui-icon-clippy {
+    background-image: url('../img/clippy.png');
+    width: 16px;
+    height: 16px;    
+}
+
 .new-comment, .new-reply, .similar-comment, .similar-reply, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover {
     background-color: #ffff88;
     cursor: default;
 }
 
-.new-comment textarea, .reply-form textarea, .similar-comment-text, .similar-reply-text {
+.new-comment textarea, .reply-form textarea {
     width: 100%;
     overflow: auto;
     box-sizing: border-box;
@@ -270,10 +277,4 @@
     padding: 5px;
 }
 
-.similar-comment-text, .similar-reply-text {
-    padding: 5px;
-    background-color: #ffffff;
-    border: 1px solid #666666;
-    line-height: 1.25em;
-    height: 6em;
-}
+

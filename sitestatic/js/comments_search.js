@@ -51,8 +51,7 @@ var commentSearch = new function() {
 
   };
 
-  this.search = function(value, targetClass, similarCommentClass) {
-    //$("."+similarCommentClass).remove();
+  this.search = function(value, similarCommentClass) {
 
     // Create regular expression for highlighting query words]
     var wordset = value.replace(/\n|\r/g, " ").split(" ");
@@ -85,7 +84,6 @@ var commentSearch = new function() {
 
       // Sort results from highest score to lowest score
       results.sort(function(a,b) { return b.score - a.score; });
-      console.log(results);
 
       var ids = [];
 
@@ -129,8 +127,14 @@ var commentSearch = new function() {
 
         // Print the comment in a div
         var comment_form = $("<div class='comment-form'></div>");
+        var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
         var comment_textdiv = $("<div class='"+similarCommentClass+"-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
-        comment_form.append(comment_textdiv);
+        comment_form.append(clipboard_button, comment_textdiv);
+
+        $(clipboard_button).zclip({
+          path:'../media/ZeroClipboard.swf',
+          copy:$(comment_textdiv).text(),
+        });
 
         comment_div.append(comment_chunkdiv, comment_author, comment_form);
 
@@ -153,14 +157,6 @@ var commentSearch = new function() {
                               .concat(")");
       $(selectorString).remove();
 
-      /*$('#similar-comments-wrapper').hide();
-
-      var similarCommentsState = $.cookie('similarCommentsState') || 'visible';
-      if (similarCommentsState === 'hidden') {
-        return;
-      }
-      // Animate showing similar comments
-      $('#similar-comments-wrapper').show("blind");*/
     });
   };
 

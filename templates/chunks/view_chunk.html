@@ -17,7 +17,6 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/syntax.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/fullchunks.css" type="text/css" />
 
-
 {% endblock %}
 
 {% block js %}
@@ -32,9 +31,11 @@
 </script>
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js?v=1"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}/js/fullproof-all.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}/js/stopwords.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}/js/comments_search.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/fullproof-all.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/stopwords.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.zclip.min.js"></script>
+<!--<script type="text/javascript" src="{{ STATIC_URL }}js/ZeroClipboard.min.js"></script>-->
+<script type="text/javascript" src="{{ STATIC_URL }}js/comments_search.js"></script>
 
 <script type="text/javascript">
   $(document).ready(function() {
@@ -155,9 +156,6 @@
   </button>
   <button id="toggle-auto-comments-button" type="button">
     Collapse all checkstyle comments
-  </button>
-  <button id="toggle-similar-comments-button" type="button">
-    Hide similar comments
   </button>
   {% if task %}
   <button id="toggle-instructions-button" type="button">
