@@ -173,6 +173,7 @@ var commentSearch = new function() {
         // Link to comment in context
         var comment_footer = $("<div class='comment-footer'></div>");
         var chunk_link_button = $("<button class='comment-chunk-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='See context'><span class='ui-button-icon-primary ui-icon ui-icon-right-arrow'></span><span class='ui-button-text'>See context</span></button>");
+        chunk_link_button.attr("onclick", "window.open('"+commentsExtraData[results[i].index].chunk_url+"')");
         comment_footer.append(chunk_link_button);
 
         comment_div.append(comment_chunkdiv, comment_author, comment_form, comment_footer);
