@@ -132,6 +132,10 @@
     display: none;
 }
 
+.collapsed .comment-form {
+    display: none;
+}
+
 .comment-text {
     padding: 5px;
     margin: 0px;
@@ -154,6 +158,11 @@
     height: 28px;
     padding: 0px 5px;
     position: relative;
+}
+
+.similar-comments-wrapper .comment-footer {
+    height: 20px;
+    padding-bottom: 5px;
 }
 
 .comment.collapsed .comment-footer {
@@ -265,9 +274,31 @@
     background-image: url('../img/clippy.png');
     width: 16px;
     height: 16px;
+}
+
+.clippy-button {
+    float: left;
+}
+
+.ui-button .ui-icon-right-arrow {
+    background-image: url('../img/arrow-curve-180-right.png');
+    width: 16px;
+    height: 16px;
+}
+
+.comment-chunk-button {
+    float: right;
+    height: 20px;
+}
+
+/*.comment-chunk-link {
+    background-image: url('../img/arrow-curve-180-right.png');
+    width: 16px;
+    height: 16px;
     position: absolute;
     right: 0px;
-}
+    display: block;
+}*/
 
 .new-comment, .new-reply, .similar-comment, .similar-reply, .similar-comments-display, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover, .similar-comments-display:hover {
     background-color: #ffff88;
@@ -289,5 +320,9 @@
     padding: 5px;
 }
 
-
+.similar-comments-wrapper .comment-form, .similar-comments-wrapper .reply-form {
+    padding: 0px 5px;
+    cursor: text;
+    clear: both;
+}
 

@@ -166,9 +166,16 @@ var commentSearch = new function() {
         // Print the comment in a div
         var comment_form = $("<div class='comment-form'></div>");
         var comment_textdiv = $("<div class='"+similarCommentClass+"-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
+        //var comment_chunk_link = $("<a class='comment-chunk-link' target='_blank' title='See context'></a>");
+        //comment_chunk_link.attr("href", commentsExtraData[results[i].index].chunk_url);
         comment_form.append(comment_textdiv);
 
-        comment_div.append(comment_chunkdiv, comment_author, comment_form);
+        // Link to comment in context
+        var comment_footer = $("<div class='comment-footer'></div>");
+        var chunk_link_button = $("<button class='comment-chunk-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='See context'><span class='ui-button-icon-primary ui-icon ui-icon-right-arrow'></span><span class='ui-button-text'>See context</span></button>");
+        comment_footer.append(chunk_link_button);
+
+        comment_div.append(comment_chunkdiv, comment_author, comment_form, comment_footer);
 
         // Add new similar comment to after the previous result, in the correct order
         if (i == 0) { // This is the first result to be displayed
@@ -185,18 +192,19 @@ var commentSearch = new function() {
 
         // Listeners to appropriately expand and collapse comments when you hover or click on them
         // When you hover over a comment, it should expand
-        // When you click on a comment, it should stay expanded
-        $(comment_div).on("click", function() {
-          var wasClicked = $(this).data("wasClicked");
-          if (wasClicked && $(this).hasClass("expanded")) {
-            $(this).removeClass("expanded");
-            $(this).addClass("collapsed");
+        // When you click on a comment header, it should stay expanded
+        $("#"+similarCommentClass+"-"+results[i].index+" .comment-header").on("click", function() {
+          var this_comment = $(this).parent();
+          var wasClicked = this_comment.data("wasClicked");
+          if (wasClicked && this_comment.hasClass("expanded")) {
+            this_comment.removeClass("expanded");
+            this_comment.addClass("collapsed");
           }
           else if (!wasClicked) {
-            $(this).addClass("expanded");
-            $(this).removeClass("collapsed");
+            this_comment.addClass("expanded");
+            this_comment.removeClass("collapsed");
           }
-          $(this).data("wasClicked", !wasClicked);
+          this_comment.data("wasClicked", !wasClicked);
         });
 
         $(comment_div).on("mouseenter", function() {
