@@ -153,7 +153,9 @@ var commentSearch = new function() {
 
         // Who wrote this comment and when?
         var comment_author = $("<div class='comment-author'></div>");
-        comment_author.html(commentsExtraData[results[i].index].date+" ago");
+        var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
+        comment_author.append(clipboard_button);
+        comment_author.append(commentsExtraData[results[i].index].date+" ago");
         if (commentsExtraData[results[i].index].author != "") {
           var author_link = $("<a target='_blank'></a>");
           author_link.attr("href", commentsExtraData[results[i].index].author_url);
@@ -163,9 +165,8 @@ var commentSearch = new function() {
 
         // Print the comment in a div
         var comment_form = $("<div class='comment-form'></div>");
-        var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
         var comment_textdiv = $("<div class='"+similarCommentClass+"-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
-        comment_form.append(clipboard_button, comment_textdiv);
+        comment_form.append(comment_textdiv);
 
         comment_div.append(comment_chunkdiv, comment_author, comment_form);
 
@@ -180,10 +181,38 @@ var commentSearch = new function() {
         $(comment_div).hide();
         $(comment_div).show("blind");
 
-        // Add listener to comment to expand it when hovered over
-        $(comment_div).on("hover", function() {
-          $(this).toggleClass("collapsed");
-          $(this).toggleClass("expanded");
+        $(comment_div).data("wasClicked", false);
+
+        // Listeners to appropriately expand and collapse comments when you hover or click on them
+        // When you hover over a comment, it should expand
+        // When you click on a comment, it should stay expanded
+        $(comment_div).on("click", function() {
+          var wasClicked = $(this).data("wasClicked");
+          if (wasClicked && $(this).hasClass("expanded")) {
+            $(this).removeClass("expanded");
+            $(this).addClass("collapsed");
+          }
+          else if (!wasClicked) {
+            $(this).addClass("expanded");
+            $(this).removeClass("collapsed");
+          }
+          $(this).data("wasClicked", !wasClicked);
+        });
+
+        $(comment_div).on("mouseenter", function() {
+          var wasClicked = $(this).data("wasClicked");
+          if (!wasClicked && $(this).hasClass("collapsed")) {
+            $(this).addClass("expanded");
+            $(this).removeClass("collapsed");
+          }
+        });
+
+        $(comment_div).on("mouseleave", function() {
+          var wasClicked = $(this).data("wasClicked");
+          if (!wasClicked && $(this).hasClass("expanded")) {
+            $(this).removeClass("expanded");
+            $(this).addClass("collapsed");
+          }
         });
 
       }

@@ -93,7 +93,7 @@
     right: 0px;
 }
 
-.comment:hover .comment-visibility {
+.comment:hover .comment-visibility, .reply:hover .comment-visibility {
     display: block;
 }
 
@@ -264,7 +264,9 @@
 .ui-button .ui-icon-clippy {
     background-image: url('../img/clippy.png');
     width: 16px;
-    height: 16px;    
+    height: 16px;
+    position: absolute;
+    right: 0px;
 }
 
 .new-comment, .new-reply, .similar-comment, .similar-reply, .similar-comments-display, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover, .similar-comments-display:hover {
