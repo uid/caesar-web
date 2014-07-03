@@ -34,6 +34,16 @@ function removeSimilarCommentsDiv(comment_type) {
   $(".similar-comments-display").remove();
 }
 
+// Clear similarCommentsDB database !important
+function clearDatabase() {
+  var db = openDatabase('similarCommentsDB', '1.0', 'similarCommentsDB', 2 * 1024 * 1024);
+  db.transaction(function (tx) {
+    tx.executeSql('DROP TABLE fullproofmetadata');
+    tx.executeSql('DROP TABLE normalindex');
+    tx.executeSql('DROP TABLE stemmedindex');
+  });
+}
+
 var commentSearch = new function() {
 
   var dbName = "similarCommentsDB";
@@ -76,14 +86,6 @@ var commentSearch = new function() {
     );
 
     commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
-
-    // Clear similarCommentsDB database !important
-    var db = openDatabase('similarCommentsDB', '1.0', 'similarCommentsDB', 2 * 1024 * 1024);
-    db.transaction(function (tx) {
-      tx.executeSql('DROP TABLE fullproofmetadata');
-      tx.executeSql('DROP TABLE normalindex');
-      tx.executeSql('DROP TABLE stemmedindex');
-    });
 
   };
 
@@ -146,14 +148,30 @@ var commentSearch = new function() {
 
         // Link to comment in context
         var comment_chunkdiv = $("<div class='comment-header'></div>");
+
+        // TODO
+        var matches = [];
+        var found;
+        while (found = regex.exec(commentsData[results[i].index])) {
+          matches.push(found);
+        }
         var comment_chunk_link = $("<a target='_blank'></a>");
+
         comment_chunk_link.attr("href", commentsExtraData[results[i].index].chunk_url);
         comment_chunk_link.html(commentsExtraData[results[i].index].chunk_name);
         comment_chunkdiv.append(comment_chunk_link);
 
+        // Print the comment in a div
+        var comment_form = $("<div class='comment-form'></div>");
+        var comment_textdiv = $("<div class='"+similarCommentClass+"-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
+        comment_form.append(comment_textdiv);
+
         // Who wrote this comment and when?
         var comment_author = $("<div class='comment-author'></div>");
         var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
+        clipboard_button.attr("onclick", function() {
+          $(comment_textdiv).select();
+        });
         comment_author.append(clipboard_button);
         comment_author.append(commentsExtraData[results[i].index].date+" ago");
         if (commentsExtraData[results[i].index].author != "") {
@@ -162,13 +180,6 @@ var commentSearch = new function() {
           author_link.html(commentsExtraData[results[i].index].author);
           comment_author.append(" by ", author_link);
         }
-
-        // Print the comment in a div
-        var comment_form = $("<div class='comment-form'></div>");
-        var comment_textdiv = $("<div class='"+similarCommentClass+"-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
-        //var comment_chunk_link = $("<a class='comment-chunk-link' target='_blank' title='See context'></a>");
-        //comment_chunk_link.attr("href", commentsExtraData[results[i].index].chunk_url);
-        comment_form.append(comment_textdiv);
 
         // Link to comment in context
         var comment_footer = $("<div class='comment-footer'></div>");

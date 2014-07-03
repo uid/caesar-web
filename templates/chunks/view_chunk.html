@@ -36,21 +36,15 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/comments_search.js"></script>
 
 <script type="text/javascript">
-  $(document).ready(function() {
-
-    /////////////////////////////////////////////////////////////////////////////////
-    // Load previous comments written by the user to use as hints for comment writing
-    /////////////////////////////////////////////////////////////////////////////////
-
-    // Clear similarCommentsDB database !important
-    
-    var db = openDatabase('similarCommentsDB', '1.0', 'similarCommentsDB', 2 * 1024 * 1024);
-    db.transaction(function (tx) {
-      tx.executeSql('DROP TABLE fullproofmetadata');
-      tx.executeSql('DROP TABLE normalindex');
-      tx.executeSql('DROP TABLE stemmedindex');
+    // on unload this page, clear database
+    $(window).on("unload", function() {
+      clearDatabase();
     });
 
+  $(document).ready(function() {
+
+    // on load, clear database
+    clearDatabase();
 
     // Add comments to database
     var commentsData = [];
