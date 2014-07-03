@@ -35,8 +35,8 @@ function removeSimilarCommentsDiv(comment_type) {
 }
 
 // Clear similarCommentsDB database !important
-function clearDatabase() {
-  var db = openDatabase('similarCommentsDB', '1.0', 'similarCommentsDB', 2 * 1024 * 1024);
+function clearDatabase(chunk_id) {
+  var db = openDatabase('similarCommentsDB-'+chunk_id, '1.0', 'similarCommentsDB-'+chunk_id, 2 * 1024 * 1024);
   db.transaction(function (tx) {
     tx.executeSql('DROP TABLE fullproofmetadata');
     tx.executeSql('DROP TABLE normalindex');
@@ -46,10 +46,7 @@ function clearDatabase() {
 
 var commentSearch = new function() {
 
-  var dbName = "similarCommentsDB";
-  var commentsSearchEngine = new fullproof.ScoringEngine();
-  var commentsData = []
-  var commentsExtraData = []
+  var dbName, commentsSearchEngine, commentsData, commentsExtraData;
 
   var initializer = function(injector, callback) {
     var commentsData_copy = commentsData.slice(0);
@@ -67,8 +64,10 @@ var commentSearch = new function() {
     }
   }
 
-  this.init = function(commentsData_, commentsExtraData_) {
+  this.init = function(commentsData_, commentsExtraData_, chunk_id) {
 
+    dbName = "similarCommentsDB-"+chunk_id;
+    commentsSearchEngine = new fullproof.ScoringEngine();
     commentsData = commentsData_;
     commentsExtraData = commentsExtraData_;
     var index1 = new fullproof.IndexUnit(

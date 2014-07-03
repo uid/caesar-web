@@ -38,13 +38,13 @@
 <script type="text/javascript">
     // on unload this page, clear database
     $(window).on("unload", function() {
-      clearDatabase();
+      clearDatabase("{{chunk.id}}");
     });
 
   $(document).ready(function() {
 
     // on load, clear database
-    clearDatabase();
+    clearDatabase("{{chunk.id}}");
 
     // Add comments to database
     var commentsData = [];
@@ -69,7 +69,7 @@
       });
     {% endfor %}
 
-    commentSearch.init(commentsData, commentsExtraData);
+    commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");
 
   });
 
