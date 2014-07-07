@@ -36,10 +36,10 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/comments_search.js"></script>
 
 <script type="text/javascript">
-    // on unload this page, clear database
-    $(window).on("unload", function() {
-      clearDatabase("{{chunk.id}}");
-    });
+  // on unload this page, clear database
+  $(window).on("unload", function() {
+    clearDatabase("{{chunk.id}}");
+  });
 
   $(document).ready(function() {
 

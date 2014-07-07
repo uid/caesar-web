@@ -171,6 +171,7 @@ var commentSearch = new function() {
         clipboard_button.attr("onclick", function() {
           $(comment_textdiv).select();
         });
+
         comment_author.append(clipboard_button);
         comment_author.append(commentsExtraData[results[i].index].date+" ago");
         if (commentsExtraData[results[i].index].author != "") {
