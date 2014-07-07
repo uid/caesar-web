@@ -109,14 +109,11 @@ var commentSearch = new function() {
         if (resultset && resultset.getSize()) {
           // resultset is a fullproof object that has its own forEach method
           resultset.forEach(function(e) {
-            // Only choose scores that are "good enough"
-            if (e.score >= 2.5) {
-              results.push({
-                "index": e.value,
-                "score": e.score,
-                "bag_of_words": regex.exec(commentsData[e.value]),
-              });
-            }
+            results.push({
+              "index": e.value,
+              "score": e.score,
+              "bag_of_words": regex.exec(commentsData[e.value]),
+            });
           });
         }
 
@@ -134,10 +131,13 @@ var commentSearch = new function() {
            // Check whether this result is already displayed
           if ($('#'+similarCommentClass+'-'+results[i].index).length != 0) {
             var comment_div = $('#'+similarCommentClass+'-'+results[i].index);
+            var text = $(comment_div).find(".comment-form .similar-comment-text").html();
+            $(comment_div).find(".comment-form .similar-comment-text").html(text.replace(regex, '<i><b>$&</b></i>'));
+            var matches = commentsData[results[i].index].match(regex);
+            $(comment_div).find(".comment-header .comment-title").text(matches.join());
+
             if (comment_div.index() != i) {
               $('.similar-comments-wrapper > div:nth-child('+i+')').after(comment_div);
-              var text = $(comment_div).find(".comment-form .similar-comment-text").html();
-              $(comment_div).find(".comment-form .similar-comment-text").html(text.replace(regex, '<i><b>$&</b></i>'));
               $(comment_div).hide();
               $(comment_div).show("blind");
             }
@@ -147,19 +147,11 @@ var commentSearch = new function() {
           var comment_div = $("<div class='comment "+similarCommentClass+" collapsed' id='"+similarCommentClass+"-"+results[i].index+"'></div>");
 
           // Link to comment in context
-          var comment_chunkdiv = $("<div class='comment-header'></div>");
-
-          // TODO
-          var matches = [];
-          var found;
-          while (found = regex.exec(commentsData[results[i].index])) {
-            matches.push(found);
-          }
-          var comment_chunk_link = $("<a target='_blank'></a>");
-
-          comment_chunk_link.attr("href", commentsExtraData[results[i].index].chunk_url);
-          comment_chunk_link.html(commentsExtraData[results[i].index].chunk_name);
-          comment_chunkdiv.append(comment_chunk_link);
+          var comment_header = $("<div class='comment-header'></div>");
+          var matches = commentsData[results[i].index].match(regex);
+          var title = $("<div class='comment-title'></div>");
+          title.text(matches.join());
+          comment_header.append(title);
 
           // Print the comment in a div
           var comment_form = $("<div class='comment-form'></div>");
@@ -188,7 +180,7 @@ var commentSearch = new function() {
           chunk_link_button.attr("onclick", "window.open('"+commentsExtraData[results[i].index].chunk_url+"')");
           comment_footer.append(chunk_link_button);
 
-          comment_div.append(comment_chunkdiv, comment_author, comment_form, comment_footer);
+          comment_div.append(comment_header, comment_author, comment_form, comment_footer);
 
           // Add new similar comment to after the previous result, in the correct order
           if (i == 0) { // This is the first result to be displayed
