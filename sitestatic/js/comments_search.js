@@ -109,14 +109,11 @@ var commentSearch = new function() {
         if (resultset && resultset.getSize()) {
           // resultset is a fullproof object that has its own forEach method
           resultset.forEach(function(e) {
-            // Only choose scores that are "good enough"
-            //if (e.score >= 2.5) {
-              results.push({
-                "index": e.value,
-                "score": e.score,
-                "bag_of_words": regex.exec(commentsData[e.value]),
-              });
-            //}
+            results.push({
+              "index": e.value,
+              "score": e.score,
+              "bag_of_words": regex.exec(commentsData[e.value]),
+            });
           });
         }
 
@@ -151,19 +148,10 @@ var commentSearch = new function() {
 
           // Link to comment in context
           var comment_header = $("<div class='comment-header'></div>");
-
-          // TODO
-          console.log(commentsData[results[i].index]);
           var matches = commentsData[results[i].index].match(regex);
           var title = $("<div class='comment-title'></div>");
           title.text(matches.join());
           comment_header.append(title);
-
-          //var comment_chunk_link = $("<a target='_blank'></a>");
-
-          //comment_chunk_link.attr("href", commentsExtraData[results[i].index].chunk_url);
-          //comment_chunk_link.html(commentsExtraData[results[i].index].chunk_name);
-          //comment_header.append(comment_chunk_link);
 
           // Print the comment in a div
           var comment_form = $("<div class='comment-form'></div>");
