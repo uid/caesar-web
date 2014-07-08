@@ -74,7 +74,7 @@
 
     // Configure ZeroClipboard
     ZeroClipboard.config( { swfPath: "{{ STATIC_URL }}media/ZeroClipboard.swf" } );
-          var client = new ZeroClipboard( document.getElementById("copy-button-1") );
+/*          var client = new ZeroClipboard( document.getElementById("copy-button-1") );
           console.log(client);
 
           client.on( "ready", function( readyEvent ) {
@@ -89,7 +89,7 @@
 
     $("#copy-button-1").on("click", function() {
       console.log("copy button clicked!");
-    });
+    });*/
 
   });
 
@@ -194,8 +194,8 @@
     </a>
 </div>
 <br/>
-<div id="comment-text-1">This is the first text I wish to copy.</div>
-<button id="copy-button-1" data-clipboard-target="comment-text-1" title="Click to copy me.">Copy 1 to Clipboard</button>
+<!--<div id="comment-text-1">This is the first text I wish to copy.</div>
+<button id="copy-button-1" data-clipboard-target="comment-text-1" title="Click to copy me.">Copy 1 to Clipboard</button>-->
 <div id="comment-display" class="span-6">
   <div style="mid-width:30em" id="comment-display-inner" class="file-{{file.id}} files">
      {% for comment, vote, snippet in comment_data %}

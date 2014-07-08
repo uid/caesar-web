@@ -161,7 +161,7 @@ var commentSearch = new function() {
           // Who wrote this comment and when?
           var comment_author = $("<div class='comment-author'></div>");
           //var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard' id='clipboard-button-"+results[i].index+"' data-clipboard-target='comment-text-"+results[i].index+"'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
-          var clipboard_button = $("<button class='clippy-button' title='Copy to clipboard' id='clipboard-button-2' data-clipboard-text='Copied'>Copy to clipboard</button>");
+          var clipboard_button = $("<button class='clippy-button' title='Copy to clipboard' id='clipboard-button-"+results[i].index+"'>Copy to clipboard</button>");
 
           comment_author.append(clipboard_button);
           comment_author.append(commentsExtraData[results[i].index].date+" ago");
@@ -225,6 +225,26 @@ var commentSearch = new function() {
               $(this).addClass("collapsed");
             }
           });
+
+          var client = new ZeroClipboard(document.getElementById("clipboard-button-"+results[i].index));
+
+        client.on("ready", function(readyEvent) {
+
+          this.on("copy", function(event) {
+            console.log(event);
+            console.log(event.data);
+            event.clipboardData.setData("text/plain", commentsData[results[i].index]);
+          });
+
+          this.on("aftercopy", function(event) {
+            console.log("Copied text to clipboard: " + event.data["text/plain"]);
+          });
+        });
+
+        $("#clipboard-button-"+results[i].index).on("click", function() {
+          console.log("clipboard_button clicked");
+        });
+
         }
 
         // Remove results that weren't in the top 3
@@ -236,22 +256,6 @@ var commentSearch = new function() {
 
         // Update the number of matching comments, displayed in the header
         $(".comment-header-text").text(ids.length+" matching comments");
-
-        var client = new ZeroClipboard(document.getElementById("clipboard-button-2"));
-
-        client.on("ready", function(readyEvent) {
-          console.log("ZeroClipboard SWF is ready!");
-          console.log(readyEvent);
-          console.log(this.elements());
-
-          this.on("aftercopy", function(event) {
-            console.log("Copied text to clipboard: " + event.data["text/plain"]);
-          });
-        });
-
-        $("#clipboard-button-2").on("click", function() {
-          console.log("clipboard_button clicked");
-        });
 
       });
     } catch(err) {

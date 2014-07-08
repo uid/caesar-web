@@ -556,6 +556,7 @@ $('body').mousedown(function(e) {
         console.log("here");
         return true;
     }
+    if ($(e.target).is(''))
     if ($('.new-comment textarea').val() || $('.new-reply textarea').val()) {
         console.log("sad");
         return false;
