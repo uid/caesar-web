@@ -155,15 +155,13 @@ var commentSearch = new function() {
 
           // Print the comment in a div
           var comment_form = $("<div class='comment-form'></div>");
-          var comment_textdiv = $("<div class='"+similarCommentClass+"-text'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
+          var comment_textdiv = $("<div class='"+similarCommentClass+"-text' id='comment-text-"+results[i].index+"'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
           comment_form.append(comment_textdiv);
 
           // Who wrote this comment and when?
           var comment_author = $("<div class='comment-author'></div>");
-          var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
-          clipboard_button.attr("onclick", function() {
-            $(comment_textdiv).select();
-          });
+          //var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard' id='clipboard-button-"+results[i].index+"' data-clipboard-target='comment-text-"+results[i].index+"'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
+          var clipboard_button = $("<button class='clippy-button' title='Copy to clipboard' id='clipboard-button-2' data-clipboard-text='Copied'>Copy to clipboard</button>");
 
           comment_author.append(clipboard_button);
           comment_author.append(commentsExtraData[results[i].index].date+" ago");
@@ -227,7 +225,6 @@ var commentSearch = new function() {
               $(this).addClass("collapsed");
             }
           });
-
         }
 
         // Remove results that weren't in the top 3
@@ -239,6 +236,22 @@ var commentSearch = new function() {
 
         // Update the number of matching comments, displayed in the header
         $(".comment-header-text").text(ids.length+" matching comments");
+
+        var client = new ZeroClipboard(document.getElementById("clipboard-button-2"));
+
+        client.on("ready", function(readyEvent) {
+          console.log("ZeroClipboard SWF is ready!");
+          console.log(readyEvent);
+          console.log(this.elements());
+
+          this.on("aftercopy", function(event) {
+            console.log("Copied text to clipboard: " + event.data["text/plain"]);
+          });
+        });
+
+        $("#clipboard-button-2").on("click", function() {
+          console.log("clipboard_button clicked");
+        });
 
       });
     } catch(err) {

@@ -416,7 +416,7 @@ function attachCommentHandlers(comment) {
             expandComment(comment);
         } else {
             scrollCodeTo(comment);
-            checkIfSpecial(comment);
+            checkIfSpecial(comment)
         }
     });
 
@@ -553,11 +553,15 @@ $('.comment').each(function() {
 // Clear the selected lines if the user clicks anywhere except the comment form
 $('body').mousedown(function(e) {
     if ($(e.target).is('.new-comment *') || $(e.target).is('.new-reply *') || $(e.target).is('.similar-comment *') || $(e.target).is('.similar-reply *')) {
+        console.log("here");
         return true;
     }
+    if ($(e.target).is(''))
     if ($('.new-comment textarea').val() || $('.new-reply textarea').val()) {
+        console.log("sad");
         return false;
     }
+    console.log("here?");
     clearSelection();
     if (!$(e.target).is('.comment *, .chunk-line *')) {
         resetScroll();
