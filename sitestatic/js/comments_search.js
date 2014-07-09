@@ -109,11 +109,13 @@ var commentSearch = new function() {
         if (resultset && resultset.getSize()) {
           // resultset is a fullproof object that has its own forEach method
           resultset.forEach(function(e) {
-            results.push({
-              "index": e.value,
-              "score": e.score,
-              "bag_of_words": regex.exec(commentsData[e.value]),
-            });
+            if (e.score >= 2.5) {
+              results.push({
+                "index": e.value,
+                "score": e.score,
+                "bag_of_words": regex.exec(commentsData[e.value]),
+              });              
+            }
           });
         }
 
@@ -144,7 +146,9 @@ var commentSearch = new function() {
             continue;
           }
 
-          var comment_div = $("<div class='comment "+similarCommentClass+" collapsed' id='"+similarCommentClass+"-"+results[i].index+"'></div>");
+          var comment_div = $("<div class='comment collapsed'></div>");
+          comment_div.addClass(similarCommentClass);
+          comment_div.attr("id", similarCommentClass+"-"+results[i].index);
 
           // Link to comment in context
           var comment_header = $("<div class='comment-header'></div>");
@@ -155,14 +159,16 @@ var commentSearch = new function() {
 
           // Print the comment in a div
           var comment_form = $("<div class='comment-form'></div>");
-          var comment_textdiv = $("<div class='"+similarCommentClass+"-text' id='comment-text-"+results[i].index+"'></div>").html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
+          var comment_textdiv = $("<div></div>");
+          comment_textdiv.addClass(similarCommentClass+"-text");
+          comment_textdiv.html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
           comment_form.append(comment_textdiv);
 
           // Who wrote this comment and when?
           var comment_author = $("<div class='comment-author'></div>");
-          //var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard' id='clipboard-button-"+results[i].index+"' data-clipboard-target='comment-text-"+results[i].index+"'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
-          var clipboard_button = $("<button class='clippy-button' title='Copy to clipboard' id='clipboard-button-"+results[i].index+"'>Copy to clipboard</button>");
-
+          var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
+          clipboard_button.attr("id", "clipboard-button-"+results[i].index);
+          clipboard_button.attr("data-clipboard-text", commentsData[results[i].index]);
           comment_author.append(clipboard_button);
           comment_author.append(commentsExtraData[results[i].index].date+" ago");
           if (commentsExtraData[results[i].index].author != "") {
@@ -226,24 +232,9 @@ var commentSearch = new function() {
             }
           });
 
-          var client = new ZeroClipboard(document.getElementById("clipboard-button-"+results[i].index));
-
-        client.on("ready", function(readyEvent) {
-
-          this.on("copy", function(event) {
-            console.log(event);
-            console.log(event.data);
-            event.clipboardData.setData("text/plain", commentsData[results[i].index]);
-          });
-
-          this.on("aftercopy", function(event) {
-            console.log("Copied text to clipboard: " + event.data["text/plain"]);
-          });
-        });
-
-        $("#clipboard-button-"+results[i].index).on("click", function() {
-          console.log("clipboard_button clicked");
-        });
+          // When user clicks clipboard_button, text in text div is copied.
+          // This line MUST be after the clipboard_button has been added to the DOM (read: after after $('similar-comments-wrapper').prepend(comment_div))
+          var client = new ZeroClipboard(clipboard_button);
 
         }
 
