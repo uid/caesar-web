@@ -169,7 +169,15 @@ var commentSearch = new function() {
           var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
           clipboard_button.attr("id", "clipboard-button-"+results[i].index);
           clipboard_button.attr("data-clipboard-text", commentsData[results[i].index]);
+          // Set up ZeroClipboard which copies the text in comment_textdiv to the clipboard when user clicks on clipboard_button.
+          var client = new ZeroClipboard(clipboard_button);
+          client.on("ready", function() {
+            this.on("aftercopy", function(event) {
+              $(event.target).attr("title", "Copied!");
+            });
+          });
           comment_author.append(clipboard_button);
+
           comment_author.append(commentsExtraData[results[i].index].date+" ago");
           if (commentsExtraData[results[i].index].author != "") {
             var author_link = $("<a target='_blank'></a>");
@@ -231,10 +239,6 @@ var commentSearch = new function() {
               $(this).addClass("collapsed");
             }
           });
-
-          // When user clicks clipboard_button, text in text div is copied.
-          // This line MUST be after the clipboard_button has been added to the DOM (read: after after $('similar-comments-wrapper').prepend(comment_div))
-          var client = new ZeroClipboard(clipboard_button);
 
         }
 
