@@ -320,3 +320,7 @@
     cursor: text;
     clear: both;
 }
+
+.similar-comment .comment-header:hover, .similar-reply .comment-header:hover, .similar-comments-display:hover {
+    cursor: pointer;
+}
