@@ -284,8 +284,8 @@
     float: left;
 }
 
-.ui-button .ui-icon-right-arrow {
-    background-image: url('../img/arrow-curve-180-right.png');
+.ui-button .ui-icon-robot {
+    background-image: url('../img/robot.png');
     width: 16px;
     height: 16px;
 }
@@ -294,15 +294,6 @@
     float: right;
     height: 20px;
 }
-
-/*.comment-chunk-link {
-    background-image: url('../img/arrow-curve-180-right.png');
-    width: 16px;
-    height: 16px;
-    position: absolute;
-    right: 0px;
-    display: block;
-}*/
 
 .new-comment, .new-reply, .similar-comment, .similar-reply, .similar-comments-display, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover, .similar-comments-display:hover {
     background-color: #ffff88;
