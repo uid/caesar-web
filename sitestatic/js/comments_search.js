@@ -225,41 +225,12 @@ var commentSearch = new function() {
           $(comment_div).hide();
           $(comment_div).show("blind");
 
-          $(comment_div).data("wasClicked", false);
-
-          // Listeners to appropriately expand and collapse comments when you hover or click on them
-          // When you hover over a comment, it should expand
-          // When you click on a comment header, it should stay expanded
+          // Listeners to appropriately expand and collapse comments when you click on them
           $("#"+similarCommentClass+"-"+results[i].index+" .comment-header").on("click", function() {
             var this_comment = $(this).parent();
-            var wasClicked = this_comment.data("wasClicked");
-            if (wasClicked && this_comment.hasClass("expanded")) {
-              this_comment.removeClass("expanded");
-              this_comment.addClass("collapsed");
-            }
-            else if (!wasClicked) {
-              this_comment.addClass("expanded");
-              this_comment.removeClass("collapsed");
-            }
-            this_comment.data("wasClicked", !wasClicked);
+            this_comment.toggleClass("expanded");
+            this_comment.toggleClass("collapsed");
           });
-
-          $(comment_div).on("mouseenter", function() {
-            var wasClicked = $(this).data("wasClicked");
-            if (!wasClicked && $(this).hasClass("collapsed")) {
-              $(this).addClass("expanded");
-              $(this).removeClass("collapsed");
-            }
-          });
-
-          $(comment_div).on("mouseleave", function() {
-            var wasClicked = $(this).data("wasClicked");
-            if (!wasClicked && $(this).hasClass("expanded")) {
-              $(this).removeClass("expanded");
-              $(this).addClass("collapsed");
-            }
-          });
-
         }
 
         // Remove results that weren't in the top 3
