@@ -36,12 +36,32 @@ function removeSimilarCommentsDiv(comment_type) {
 
 // Clear similarCommentsDB database !important
 function clearDatabase(chunk_id) {
-  var db = openDatabase('similarCommentsDB-'+chunk_id, '1.0', 'similarCommentsDB-'+chunk_id, 2 * 1024 * 1024);
-  db.transaction(function (tx) {
-    tx.executeSql('DROP TABLE fullproofmetadata');
-    tx.executeSql('DROP TABLE normalindex');
-    tx.executeSql('DROP TABLE stemmedindex');
-  });
+  var db;
+  if ($.browser.mozilla) {
+    /*var request = indexedDB.open('similarCommentsDB-'+chunk_id);
+    request.onerror = function(event) {
+      alert("Why didn't you allow my web app to use IndexedDB?!");
+    };
+    request.onsuccess = function(event) {
+      db = request.result;
+      function clearStore(store_name) {
+        var tx = db.transaction(store_name, 'readwrite');
+        var store = tx.objectStore(store_name);
+        store.clear();
+      }
+      clearStore('fullproofmetadata');
+      clearStore('normalindex');
+      clearStore('stemmedindex');
+    };*/
+  }
+  else {
+    db = openDatabase('similarCommentsDB-'+chunk_id, '1.0', 'similarCommentsDB-'+chunk_id, 2 * 1024 * 1024);
+    db.transaction(function (tx) {
+      tx.executeSql('DROP TABLE fullproofmetadata');
+      tx.executeSql('DROP TABLE normalindex');
+      tx.executeSql('DROP TABLE stemmedindex');
+    });
+  }
 }
 
 var commentSearch = new function() {
