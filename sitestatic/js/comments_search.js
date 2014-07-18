@@ -127,7 +127,7 @@ var commentSearch = new function() {
            // Check whether this result is already displayed
           if ($('#similar-comment-'+results[i].index).length != 0) {
             var comment_div = $('#similar-comment-'+results[i].index);
-            var text = $(comment_div).find(".similar-comment-text").html();
+            var text = $(comment_div).find(".similar-comment-text").text();
             $(comment_div).find(".similar-comment-text").html(text.replace(regex, '<i><b>$&</b></i>'));
 
             if (comment_div.index() != i) {
