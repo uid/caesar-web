@@ -28,7 +28,7 @@
     border: 0px;
 }
 
-.comment.comment-reply , .comment.similar-comment, .comment.similar-reply, .similar-comments-display {
+.comment.comment-reply, .comment.similar-comment {
     border-top: 0px;
     margin-top: 0px;
     border-top-left-radius: 0px;
@@ -39,16 +39,12 @@
     -webkit-border-top-right-radius: 0px;
 }
 
-.comment.comment-reply, .similar-comments-display.comment {
+.comment.comment-reply, .similar-comment-wrapper {
     margin-left: 20px;
 }
 
-.similar-comments-display.reply {
+.similar-reply-wrapper {
     margin-left: 40px;
-}
-
-.similar-comments-display.comment .comment, .similar-comments-display.reply .comment {
-    margin-left: 0px;
 }
 
 .comment.comment-auto {
@@ -77,10 +73,6 @@
     border-bottom: 0px;
 }
 
-.similar-comments-display > .comment-header {
-    border-bottom: 1px solid #ddd;
-}
-
 .comment-title {
     overflow: hidden;
 }
@@ -101,11 +93,11 @@
     display: block;
 }
 
-.comment.expanded .comment-visibility, .similar-comments-display.expanded .comment-header:hover .comment-visibility {
+.comment.expanded .comment-visibility {
     background-image: url('../img/toggle-small.png');
 }
 
-.comment.collapsed .comment-visibility, .similar-comments-display.collapsed .comment-header:hover .comment-visibility {
+.comment.collapsed .comment-visibility {
     background-image: url('../img/toggle-small-expand.png');
 }
 
@@ -162,11 +154,6 @@
     height: 28px;
     padding: 0px 5px;
     position: relative;
-}
-
-.similar-comments-wrapper .comment-footer {
-    height: 20px;
-    padding-bottom: 5px;
 }
 
 .comment.collapsed .comment-footer {
@@ -274,28 +261,7 @@
     height: 16px;
 }
 
-.ui-button .ui-icon-clippy {
-    background-image: url('../img/clippy.png');
-    width: 16px;
-    height: 16px;
-}
-
-.clippy-button {
-    float: left;
-}
-
-.ui-button .ui-icon-robot {
-    background-image: url('../img/robot.png');
-    width: 16px;
-    height: 16px;
-}
-
-.see-context-button {
-    float: right;
-    height: 20px;
-}
-
-.new-comment, .new-reply, .similar-comment, .similar-reply, .similar-comments-display, .new-comment:hover, .new-reply:hover, .similar-comment:hover, .similar-reply:hover, .similar-comments-display:hover {
+.new-comment, .new-reply, .similar-comment, .new-comment:hover, .new-reply:hover, .similar-comment:hover {
     background-color: #ffff88;
     cursor: default;
 }
@@ -315,23 +281,8 @@
     padding: 5px;
 }
 
-.similar-comments-wrapper .comment-form, .similar-comments-wrapper .reply-form {
-    padding: 0px 5px;
-    cursor: text;
-    clear: both;
-}
-
-.similar-comment .comment-header:hover, .similar-reply .comment-header:hover, .similar-comments-display:hover {
-    cursor: pointer;
-}
-
-.copy-hint {
-    display: none;
+.similar-comment-text {
+    padding: 5px;
     font-size: 9px;
-    background-color: #ffffcc;
-    border: 1px solid #d4d5aa;
-    color: black;
-    padding: 0px 2px;
-    z-index: 1000;
-    position: absolute;
 }
+

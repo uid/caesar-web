@@ -9,11 +9,11 @@ $(document).ready(function() {
   comment_type = "comment";
   {% endif %}
 
-  createSimilarCommentsDiv(comment_type);
+  createSimilarCommentWrapper(comment_type);
 
   // Remove similar-comment wrapper whenever the user closes a new comment entry box.
   $(".new-"+comment_type).on("remove", function(e) {
-    $(".similar-comments-display").remove();
+    removeSimilarCommentWrapper(comment_type);
   });
 
   $("#textentry").keypress(function(event) {
@@ -22,7 +22,7 @@ $(document).ready(function() {
     // 32  space
     var keys = [13, 32];
     if (keys.indexOf(event.which) != -1) {
-      commentSearch.search($("#textentry").val(), "similar-"+comment_type);
+      commentSearch.search($("#textentry").val(), comment_type);
     }
 
   });

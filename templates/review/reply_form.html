@@ -2,11 +2,12 @@
 
 $(document).ready(function() {
 
-  createSimilarCommentsDiv("reply");
+  var comment_type = "reply";
+  createSimilarCommentWrapper(comment_type);
 
   // Remove similar-comment wrapper whenever the user closes a new comment entry box.
   $(".new-reply").on("remove", function(e) {
-    $(".similar-comments-display").remove();
+    removeSimilarCommentWrapper(comment_type);
   });
 
   $("#textentry").keypress(function(event) {
@@ -15,7 +16,7 @@ $(document).ready(function() {
     // 32  space
     var keys = [13, 32];
     if (keys.indexOf(event.which) != -1) {
-      commentSearch.search($("#textentry").val(), "similar-reply");
+      commentSearch.search($("#textentry").val(), comment_type);
     }
 
   });
