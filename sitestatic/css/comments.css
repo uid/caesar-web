@@ -290,7 +290,7 @@
     height: 16px;
 }
 
-.comment-chunk-button {
+.see-context-button {
     float: right;
     height: 20px;
 }
@@ -323,4 +323,15 @@
 
 .similar-comment .comment-header:hover, .similar-reply .comment-header:hover, .similar-comments-display:hover {
     cursor: pointer;
+}
+
+.copy-hint {
+    display: none;
+    font-size: 9px;
+    background-color: #ffffcc;
+    border: 1px solid #d4d5aa;
+    color: black;
+    padding: 0px 2px;
+    z-index: 1000;
+    position: absolute;
 }

@@ -186,17 +186,26 @@ var commentSearch = new function() {
 
           // Who wrote this comment and when?
           var comment_author = $("<div class='comment-author'></div>");
-          var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
+          var clipboard_button = $("<button class='clippy-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='Copy to clipboard title'><span class='ui-button-icon-primary ui-icon ui-icon-clippy'></span><span class='ui-button-text'>Copy to clipboard</span></button>");
           clipboard_button.attr("id", "clipboard-button-"+results[i].index);
           clipboard_button.attr("data-clipboard-text", commentsData[results[i].index]);
+          var copy_hint = $("<div class='copy-hint'>Copied</div>");
+          comment_author.append(clipboard_button, copy_hint);
+
           // Set up ZeroClipboard which copies the text in comment_textdiv to the clipboard when user clicks on clipboard_button.
           var client = new ZeroClipboard(clipboard_button);
           client.on("ready", function() {
             this.on("aftercopy", function(event) {
-              $(event.target).attr("title", "Copied!");
+              var this_copy_hint = $(event.target).parent().find(".copy-hint");
+              console.log($(event.target).parent());
+              console.log(this_copy_hint);
+              //$(this_copy_hint).offset({top: event.target.offsetTop, left: event.target.offsetLeft});
+              $(this_copy_hint).attr("display", "block");
             });
           });
-          comment_author.append(clipboard_button);
+          $(clipboard_button).on("mouseleave", function() {
+            $(this).parent().find(".copy-hint").attr("display", "none");
+          });
 
           comment_author.append(commentsExtraData[results[i].index].date+" ago");
           if (commentsExtraData[results[i].index].author != "") {
@@ -208,7 +217,7 @@ var commentSearch = new function() {
 
           // Link to comment in context
           var comment_footer = $("<div class='comment-footer'></div>");
-          var see_context_button = $("<button class='comment-chunk-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='See context'><span class='ui-button-icon-primary ui-icon ui-icon-robot'></span><span class='ui-button-text'>See context</span></button>");
+          var see_context_button = $("<button class='see-context-button ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only' type='button' role='button' aria-disabled='false' title='See context'><span class='ui-button-icon-primary ui-icon ui-icon-robot'></span><span class='ui-button-text'>See context</span></button>");
           see_context_button.attr("onclick", "window.open('"+commentsExtraData[results[i].index].chunk_url+"')");
           comment_footer.append(see_context_button);
 
@@ -225,7 +234,7 @@ var commentSearch = new function() {
           $(comment_div).hide();
           $(comment_div).show("blind");
 
-          // Listeners to appropriately expand and collapse comments when you click on them
+          // Listeners to toggle expand/collapse comments when you click on them
           $("#"+similarCommentClass+"-"+results[i].index+" .comment-header").on("click", function() {
             var this_comment = $(this).parent();
             this_comment.toggleClass("expanded");
