@@ -19,16 +19,6 @@ function setupSimilarComments(comment_type) {
   $("#textentry").focus();
 }
 
-/*function createSimilarCommentWrapper(comment_type) {
-  var similar_comment_wrapper = $("<div class='similar-"+comment_type+"-wrapper'></div>");
-  $(".new-"+comment_type).after(similar_comment_wrapper);
-}
-
-// Remove all similar comment/reply wrappers whenever the user closes a new comment entry box.
-function removeSimilarCommentWrapper(comment_type) {
-  $(".similar-"+comment_type+"-wrapper").remove();
-}*/
-
 // Clear similarCommentsDB database !important
 function clearDatabase(chunk_id) {
   var db;
