@@ -11,9 +11,21 @@ function setupSimilarComments(comment_type) {
 
   // Copy textentry text to hidden form textarea, and perform search
   $("#textentry").keypress(function(event) {
-    var textentry_text = $("#textentry").text();
-    $("#hidden-textarea").val(textentry_text);
-    commentSearch.search(textentry_text, comment_type);
+    switch (event.which) {
+      case 37: // Left arrow
+        break;
+      case 38: // Up arrow
+        break;
+      case 39: // Right arrow
+        break;
+      case 40: // Down arrow
+        break;
+      default:
+        var textentry_text = $("#textentry").text();
+        $("#hidden-textarea").val(textentry_text);
+        commentSearch.search(textentry_text, comment_type);
+        break;
+    }
   });
 
   $("#textentry").focus();
@@ -142,8 +154,6 @@ var commentSearch = new function() {
 
             if (comment_div.index() != i) {
               $('.similar-'+comment_type+'-wrapper > div:nth-child('+i+')').after(comment_div);
-              $(comment_div).hide();
-              $(comment_div).show("blind");
             }
             continue;
           }
@@ -165,8 +175,6 @@ var commentSearch = new function() {
             // jQuery is stupid and 1-indexes its selectors, thus using i rather i-1
             $('.similar-'+comment_type+'-wrapper > div:nth-child('+i+')').after(comment_div);
           }
-          $(comment_div).hide();
-          $(comment_div).show("blind");
 
         }
 

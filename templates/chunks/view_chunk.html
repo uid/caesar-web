@@ -32,7 +32,6 @@
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js?v=1"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/fullproof-all-debug.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/ZeroClipboard.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/stopwords.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/comments_search.js"></script>
 
@@ -72,8 +71,6 @@
 
     commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");
 
-    // Configure ZeroClipboard
-    ZeroClipboard.config( { swfPath: "{{ STATIC_URL }}media/ZeroClipboard.swf" } );
   });
 
 </script>
