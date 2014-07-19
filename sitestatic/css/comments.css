@@ -294,9 +294,8 @@
     width: auto;
     height: 70px;
     background-color: white;
-    border: 1px solid black;
+    border: 1px solid #666666;
     resize: vertical;
     padding: 5px;
     overflow-y: scroll;
 }
-
