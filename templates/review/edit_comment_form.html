@@ -8,24 +8,11 @@ $(document).ready(function() {
   {% else %}
   comment_type = "comment";
   {% endif %}
+  setupSimilarComments(comment_type);
 
-  createSimilarCommentWrapper(comment_type);
+  // Copy comment text from hidden textarea into editable div
+  $("#textentry").text($("#hidden-textarea").val());
 
-  // Remove similar-comment wrapper whenever the user closes a new comment entry box.
-  $(".new-"+comment_type).on("remove", function(e) {
-    removeSimilarCommentWrapper(comment_type);
-  });
-
-  $("#textentry").keypress(function(event) {
-    // Keys
-    // 13  carriage return
-    // 32  space
-    var keys = [13, 32];
-    if (keys.indexOf(event.which) != -1) {
-      commentSearch.search($("#textentry").val(), comment_type);
-    }
-
-  });
 });
 
 </script>
@@ -46,6 +33,7 @@ $(document).ready(function() {
     <form id="edit-comment-form" 
       action="{% url 'review.views.edit_comment' %}" method="post">
       {% csrf_token %}
+      <div id='textentry' contenteditable='true'></div>
       {{ form.text }}
       {{ form.comment_id }}
       <button type="submit">Save</button>
@@ -59,6 +47,7 @@ $(document).ready(function() {
     <form id="edit-comment-form"
       action="{% url 'review.views.edit_comment' %}" method="post">
       {% csrf_token %}
+      <div id='textentry' contenteditable='true'></div>
       {{ form.text }}
       {{ form.comment_id }}
       <button type="submit">Save</button>

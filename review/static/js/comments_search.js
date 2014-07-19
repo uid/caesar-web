@@ -1,4 +1,25 @@
-function createSimilarCommentWrapper(comment_type) {
+function setupSimilarComments(comment_type) {
+
+  // Create similar-comment wrapper
+  var similar_comment_wrapper = $("<div class='similar-"+comment_type+"-wrapper'></div>");
+  $(".new-"+comment_type).after(similar_comment_wrapper);
+
+  // Remove similar-comment wrapper whenever the user closes a new comment entry box.
+  $(".new-"+comment_type).on("remove", function(e) {
+    $(".similar-"+comment_type+"-wrapper").remove();
+  });
+
+  // Copy textentry text to hidden form textarea, and perform search
+  $("#textentry").keypress(function(event) {
+    var textentry_text = $("#textentry").text();
+    $("#hidden-textarea").val(textentry_text);
+    commentSearch.search(textentry_text, comment_type);
+  });
+
+  $("#textentry").focus();
+}
+
+/*function createSimilarCommentWrapper(comment_type) {
   var similar_comment_wrapper = $("<div class='similar-"+comment_type+"-wrapper'></div>");
   $(".new-"+comment_type).after(similar_comment_wrapper);
 }
@@ -6,7 +27,7 @@ function createSimilarCommentWrapper(comment_type) {
 // Remove all similar comment/reply wrappers whenever the user closes a new comment entry box.
 function removeSimilarCommentWrapper(comment_type) {
   $(".similar-"+comment_type+"-wrapper").remove();
-}
+}*/
 
 // Clear similarCommentsDB database !important
 function clearDatabase(chunk_id) {
@@ -54,7 +75,7 @@ var commentSearch = new function() {
 
   var engineReady = function(b) {
     if (!b) {
-      alert("Can't load the search engine!");
+      console.log("Can't load the search engine!");
     }
   }
 
@@ -119,7 +140,6 @@ var commentSearch = new function() {
         var ids = [];
 
         // Display only the top 3 results.
-        // Use .html() rather than .text() to deal with special characters.
         for (var i=0; i<Math.min(results.length, 3); i++) {
 
           ids.push('#similar-comment-'+results[i].index);
@@ -138,15 +158,13 @@ var commentSearch = new function() {
             continue;
           }
 
+          // Display the full content in a div
           var comment_div = $("<div class='comment'></div>");
           comment_div.addClass("similar-comment");
           comment_div.attr("id", "similar-comment-"+results[i].index);
-
-          // Print the comment in a div
           var comment_text = $("<div></div>");
           comment_text.addClass("similar-comment-text");
           comment_text.html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
-
           comment_div.append(comment_text);
 
           // Add new similar comment to after the previous result, in the correct order

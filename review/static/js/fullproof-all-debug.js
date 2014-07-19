@@ -1693,7 +1693,6 @@ fullproof.store = fullproof.store || {};
         fullproof.store.indexedDB =  window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.msIndexedDB;
         fullproof.store.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.mozIDBTransaction || window.msIDBTransaction || {};
         fullproof.store.READWRITEMODE  = fullproof.store.IDBTransaction.readwrite || fullproof.store.IDBTransaction.READ_WRITE || "readwrite";
-        console.log(fullproof.store.READWRITEMODE);
     } catch(e) {
         fullproof.store.indexedDB = window.indexedDB;
         fullproof.store.IDBTransaction = window.IDBTransaction;
@@ -1946,9 +1945,6 @@ fullproof.store = fullproof.store || {};
      */
 	function createStores(database, indexRequestArray, metaStoreName) {
 		if (!database.objectStoreNames.contains(metaStoreName)) {
-            console.log(database);
-            console.log(metaStoreName);
-            console.log(fullproof.store);
 			database.createObjectStore(metaStoreName, {keyPath: "id"});
 		}
 		for (var i=0; i<indexRequestArray.length; ++i) {

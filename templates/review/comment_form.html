@@ -4,23 +4,8 @@
 $(document).ready(function() {
 
   var comment_type = "comment";
-  createSimilarCommentWrapper(comment_type);
+  setupSimilarComments(comment_type);
 
-  // Remove similar-comment wrapper whenever the user closes a new comment entry box.
-  $(".new-comment").on("remove", function(e) {
-    removeSimilarCommentWrapper(comment_type);
-  });
-
-  $("#textentry").keypress(function(event) {
-    // Keys
-    // 13  carriage return
-    // 32  space
-    var keys = [13, 32];
-    if (keys.indexOf(event.which) != -1) {
-      commentSearch.search($("#textentry").val(), comment_type);
-    }
-
-  });
 });
 
 </script>
@@ -40,6 +25,7 @@ $(document).ready(function() {
     <form id="new-comment-form" 
       action="{% url 'review.views.new_comment' %}" method="post">
       {% csrf_token %}
+      <div id='textentry' contenteditable='true'></div>
       {{ form.text }}
       {{ form.start }}
       {{ form.end }}
