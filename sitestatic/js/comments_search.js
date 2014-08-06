@@ -11,6 +11,15 @@ function setupSimilarComments(comment_type) {
 
   // Copy textentry text to hidden form textarea, and perform search
   $("#textentry").keypress(function(event) {
+    /*var sel = window.getSelection();
+    var range = document.createRange();
+    console.log(range);
+    range.setStart($(this), 0);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);*/
+    /*console.log($("#textentry").getCursorPosition());
+    console.log($.trim($("#textentry").val().length));
     switch (event.which) {
       case 37: // Left arrow
         break;
@@ -24,7 +33,7 @@ function setupSimilarComments(comment_type) {
         var textentry_text = $("#textentry").text();
         $("#hidden-textarea").val(textentry_text);
         commentSearch.search(textentry_text, comment_type);
-        break;
+        break;*/
     }
   });
 
