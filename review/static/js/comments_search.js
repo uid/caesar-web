@@ -48,7 +48,6 @@ function setupSimilarComments(comment_type) {
     // Get line number of cursor
     var lines = content.split("\n");
     var line_text = window.getSelection().getRangeAt(0).commonAncestorContainer.textContent;
-    line_text = line_text.replace(" ", "&nbsp;");
     var line_num = lines.indexOf(line_text);
 
     // Check if cursor is on last line
