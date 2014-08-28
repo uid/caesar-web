@@ -9,31 +9,95 @@ function setupSimilarComments(comment_type) {
     $(".similar-"+comment_type+"-wrapper").remove();
   });
 
+  function removeFeedback(textentry) {
+    $("#feedback").remove();
+  }
+
+  function addFeedback(textentry, similar_comment) {
+    console.log(similar_comment);
+    var feedback = $("<div id='feedback'></div>");
+    feedback.text(similar_comment);
+    textentry.append(feedback);
+  }
+
+  var arrow_keys = {37: "left", 38: "up", 39: "right", 40: "down"};
+
   // Copy textentry text to hidden form textarea, and perform search
-  $("#textentry").keypress(function(event) {
-    /*var sel = window.getSelection();
-    var range = document.createRange();
-    console.log(range);
-    range.setStart($(this), 0);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);*/
-    /*console.log($("#textentry").getCursorPosition());
-    console.log($.trim($("#textentry").val().length));
-    switch (event.which) {
-      case 37: // Left arrow
-        break;
-      case 38: // Up arrow
-        break;
-      case 39: // Right arrow
-        break;
-      case 40: // Down arrow
-        break;
-      default:
-        var textentry_text = $("#textentry").text();
-        $("#hidden-textarea").val(textentry_text);
-        commentSearch.search(textentry_text, comment_type);
-        break;*/
+  $("#textentry").on("keydown", function(event) {
+    var textentry = $(this);
+    var user_entry = textentry.clone();
+    user_entry.find("#feedback").remove();
+
+    // Get text content from contenteditable div
+    var content = $("<pre />").html(user_entry.html());
+    if ($.browser.webkit) {
+      content.find("div").replaceWith(function() {
+        return "\n" + this.innerHTML;
+      });
+    }
+    if ($.browser.msie) {
+      content.find("p").replaceWith(function() {
+        return this.innerHTML + "<br>";
+      });
+    }
+    if ($.browser.mozilla || $.browser.opera || $.browser.msie) {
+      content.find("br").replaceWith("\n");
+    }
+    content = content.text();
+
+    // Get line number of cursor
+    var lines = content.split("\n");
+    var line_text = window.getSelection().getRangeAt(0).commonAncestorContainer.textContent;
+    line_text = line_text.replace(" ", "&nbsp;");
+    var line_num = lines.indexOf(line_text);
+
+    // Check if cursor is on last line
+    if (line_num == lines.length - 1) {
+      var cursor_position = window.getSelection().getRangeAt(0).startOffset;
+      var length = line_text.length;
+
+      // Check if cursor is at last character of the line
+      if (cursor_position == length) {
+        if (arrow_keys[event.which] == "down") { // down arrow
+          if ($(".selected").length == 0) {
+            $(".similar-comment:first").addClass("selected");
+          }
+          else {
+            var selected = $(".selected");
+            if ($(selected).next().length > 0) {
+              $(selected).next().addClass("selected");
+              $(selected).removeClass("selected");
+            }
+          }
+          removeFeedback(textentry);
+          addFeedback(textentry, $(".selected .similar-comment-text").text());
+          return false;
+        }
+        else if (arrow_keys[event.which] == "up") { // up arrow
+          if ($(".selected").length != 0) {
+            var selected = $(".selected");
+            $(selected).prev().addClass("selected");
+            $(selected).removeClass("selected");
+            removeFeedback(textentry);
+            if ($(".selected").length != 0) {
+              addFeedback(textentry, $(".selected .similar-comment-text").text());                    
+            }
+            return false;
+          }
+        }
+      }
+    }
+  });
+
+  $("#textentry").on("keyup", function(event) {
+    if (!(event.which in arrow_keys)) {
+      removeFeedback($(this));
+      $(".selected").removeClass("selected");
+      var user_entry = $(this).clone();
+      user_entry.find("#feedback").remove();
+      var textentry_text = user_entry.text();
+      $("#hidden-textarea").val(textentry_text);
+      commentSearch.search(textentry_text, comment_type);
     }
   });
 

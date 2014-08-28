@@ -299,3 +299,12 @@
     padding: 5px;
     overflow-y: scroll;
 }
+
+.similar-comment.selected {
+    background-color: #ffe188;
+}
+
+#feedback {
+    color: grey;
+    font-style: italic;
+}
