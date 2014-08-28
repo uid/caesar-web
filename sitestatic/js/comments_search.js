@@ -14,74 +14,88 @@ function setupSimilarComments(comment_type) {
   }
 
   function addFeedback(textentry, similar_comment) {
-    console.log(similar_comment);
     var feedback = $("<div id='feedback'></div>");
     feedback.text(similar_comment);
     textentry.append(feedback);
   }
 
-  var arrow_keys = {37: "left", 38: "up", 39: "right", 40: "down"};
+  var ascii_keys = {13: "return", 37: "left", 38: "up", 39: "right", 40: "down"};
+
+  var halt_search;
 
   // Copy textentry text to hidden form textarea, and perform search
   $("#textentry").on("keydown", function(event) {
-    var textentry = $(this);
-    var user_entry = textentry.clone();
-    user_entry.find("#feedback").remove();
-
-    // Get text content from contenteditable div
-    var content = $("<pre />").html(user_entry.html());
-    if ($.browser.webkit) {
-      content.find("div").replaceWith(function() {
-        return "\n" + this.innerHTML;
-      });
+    if (halt_search) {
+      return;
     }
-    if ($.browser.msie) {
-      content.find("p").replaceWith(function() {
-        return this.innerHTML + "<br>";
-      });
-    }
-    if ($.browser.mozilla || $.browser.opera || $.browser.msie) {
-      content.find("br").replaceWith("\n");
-    }
-    content = content.text();
+    if (event.which in ascii_keys) {
+      var textentry = $(this);
+      var user_entry = textentry.clone();
+      user_entry.find("#feedback").remove();
 
-    // Get line number of cursor
-    var lines = content.split("\n");
-    var line_text = window.getSelection().getRangeAt(0).commonAncestorContainer.textContent;
-    var line_num = lines.indexOf(line_text);
+      // Get text content from contenteditable div
+      var content = $("<pre />").html(user_entry.html());
+      if ($.browser.webkit) {
+        content.find("div").replaceWith(function() {
+          return "\n" + this.innerHTML;
+        });
+      }
+      if ($.browser.msie) {
+        content.find("p").replaceWith(function() {
+          return this.innerHTML + "<br>";
+        });
+      }
+      if ($.browser.mozilla || $.browser.opera || $.browser.msie) {
+        content.find("br").replaceWith("\n");
+      }
+      content = content.text();
 
-    // Check if cursor is on last line
-    if (line_num == lines.length - 1) {
-      var cursor_position = window.getSelection().getRangeAt(0).startOffset;
-      var length = line_text.length;
+      // Get line number of cursor
+      var lines = content.split("\n");
+      var line_text = window.getSelection().getRangeAt(0).commonAncestorContainer.textContent;
+      var line_num = lines.indexOf(line_text);
 
-      // Check if cursor is at last character of the line
-      if (cursor_position == length) {
-        if (arrow_keys[event.which] == "down") { // down arrow
-          if ($(".selected").length == 0) {
-            $(".similar-comment:first").addClass("selected");
-          }
-          else {
-            var selected = $(".selected");
-            if ($(selected).next().length > 0) {
-              $(selected).next().addClass("selected");
-              $(selected).removeClass("selected");
+      // Check if cursor is on last line
+      if (line_num == lines.length - 1) {
+        var cursor_position = window.getSelection().getRangeAt(0).startOffset;
+        var length = line_text.length;
+
+        // Check if cursor is at last character of the line
+        if (cursor_position == length) {
+          if (ascii_keys[event.which] == "down") { // down arrow
+            if ($(".selected").length == 0) {
+              $(".similar-comment:first").addClass("selected");
             }
-          }
-          removeFeedback(textentry);
-          addFeedback(textentry, $(".selected .similar-comment-text").text());
-          return false;
-        }
-        else if (arrow_keys[event.which] == "up") { // up arrow
-          if ($(".selected").length != 0) {
-            var selected = $(".selected");
-            $(selected).prev().addClass("selected");
-            $(selected).removeClass("selected");
+            else {
+              var selected = $(".selected");
+              if ($(selected).next().length > 0) {
+                $(selected).next().addClass("selected");
+                $(selected).removeClass("selected");
+              }
+            }
             removeFeedback(textentry);
-            if ($(".selected").length != 0) {
-              addFeedback(textentry, $(".selected .similar-comment-text").text());                    
-            }
+            addFeedback(textentry, $(".selected .similar-comment-text").text());
             return false;
+          }
+          else if (ascii_keys[event.which] == "up") { // up arrow
+            if ($(".selected").length != 0) {
+              var selected = $(".selected");
+              $(selected).prev().addClass("selected");
+              $(selected).removeClass("selected");
+              removeFeedback(textentry);
+              if ($(".selected").length != 0) {
+                addFeedback(textentry, $(".selected .similar-comment-text").text());                    
+              }
+              return false;
+            }
+          }
+          else if (ascii_keys[event.which] == "return") {
+            feedback_text = $("#feedback").text();
+            $(this).append(feedback_text);
+            removeFeedback($(this));
+            $(".selected").removeClass("selected");
+            $(".similar-comment-wrapper").empty();
+            halt_search = true;
           }
         }
       }
@@ -89,7 +103,10 @@ function setupSimilarComments(comment_type) {
   });
 
   $("#textentry").on("keyup", function(event) {
-    if (!(event.which in arrow_keys)) {
+    if (halt_search) {
+      return;
+    }
+    if (!(event.which in ascii_keys)) {
       removeFeedback($(this));
       $(".selected").removeClass("selected");
       var user_entry = $(this).clone();
