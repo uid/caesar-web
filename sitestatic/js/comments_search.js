@@ -19,7 +19,7 @@ function setupSimilarComments(comment_type) {
     textentry.append(feedback);
   }
 
-  var ascii_keys = {13: "return", 37: "left", 38: "up", 39: "right", 40: "down"};
+  var ascii_keys = {9: "tab", 13: "return", 37: "left", 38: "up", 39: "right", 40: "down"};
 
   var halt_search;
 
@@ -62,7 +62,7 @@ function setupSimilarComments(comment_type) {
 
         // Check if cursor is at last character of the line
         if (cursor_position == length) {
-          if (ascii_keys[event.which] == "down") { // down arrow
+          if (ascii_keys[event.which] == "down" || ascii_keys[event.which] == "right" || ascii_keys[event.which] == "tab") {
             if ($(".selected").length == 0) {
               $(".similar-comment:first").addClass("selected");
             }
@@ -77,7 +77,7 @@ function setupSimilarComments(comment_type) {
             addFeedback(textentry, $(".selected .similar-comment-text").text());
             return false;
           }
-          else if (ascii_keys[event.which] == "up") { // up arrow
+          else if (ascii_keys[event.which] == "up" || ascii_keys[event.which] == "left") {
             if ($(".selected").length != 0) {
               var selected = $(".selected");
               $(selected).prev().addClass("selected");
