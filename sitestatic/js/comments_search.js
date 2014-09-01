@@ -103,6 +103,11 @@ function setupSimilarComments(comment_type) {
   });
 
   $("#textentry").on("keyup", function(event) {
+    console.log($(this).html());
+    console.log($(this).text());
+    if ($(this).html() == "") {
+      halt_search = false;
+    }
     if (halt_search) {
       return;
     }
