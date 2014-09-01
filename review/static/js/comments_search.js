@@ -251,10 +251,16 @@ var commentSearch = new function() {
           var comment_div = $("<div class='comment'></div>");
           comment_div.addClass("similar-comment");
           comment_div.attr("id", "similar-comment-"+results[i].index);
-          var comment_text = $("<div></div>");
+          var comment_text = $("<span></span>");
           comment_text.addClass("similar-comment-text");
           comment_text.html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
           comment_div.append(comment_text);
+          if (commentsExtraData[results[i].index].author != "") {
+            var author_link = $("<a target='_blank' class='similar-comment-author-link'></a>");
+            author_link.attr("href", commentsExtraData[results[i].index].author_url);
+            author_link.html(commentsExtraData[results[i].index].author);
+            comment_div.append(" - ", author_link);
+          }
 
           // Add new similar comment to after the previous result, in the correct order
           if (i == 0) { // This is the first result to be displayed

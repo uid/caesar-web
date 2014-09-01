@@ -281,7 +281,7 @@
     padding: 5px;
 }
 
-.similar-comment-text {
+.similar-comment-text, .similar-comment-author-link {
     padding: 5px;
     font-size: 9px;
 }

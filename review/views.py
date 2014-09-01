@@ -41,24 +41,12 @@ def new_comment(request):
         })
         chunk = Chunk.objects.get(pk=chunk_id)
 
-#        semester = chunk.file.submission.milestone.assignment.semester
-#        subject = semester.subject
-#        membership = Member.objects.filter(user=request.user).filter(semester=semester)
-#        role = membership[0].role
-
-#        if role == 'S':
-#            oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct()
-#        else:
-#            q = Q(author__membership__role = 'T') | Q(author__membership__role = 'V')
-#            oldComments = Comment.objects.filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct()
-
         return render(request, 'review/comment_form.html', {
             'form': form,
             'start': start,
             'end': end,
             'snippet': chunk.generate_snippet(start, end),
             'chunk': chunk, 
-#            'oldComments': oldComments,
         })
     else:
         form = CommentForm(request.POST)
