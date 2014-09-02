@@ -23,6 +23,14 @@ function setupSimilarComments(comment_type) {
     textentry.append(feedback);
   }
 
+  function turnOnSelection() {
+    $(".new-"+comment_type).addClass("selected");
+  }
+
+  function turnOffSelection() {
+    $(".selected").removeClass("selected");
+  }
+
   function selectNext() {
     var selected = $(".selected");
     if (selected.hasClass("new-"+comment_type)) {
@@ -47,69 +55,78 @@ function setupSimilarComments(comment_type) {
     }
   }
 
+  function cursorAtEnd(textentry) {
+    var user_entry = textentry.clone();
+    user_entry.find("#feedback").remove();
+
+    // Get text content from contenteditable div
+    var content = $("<pre />").html(user_entry.html());
+    if ($.browser.webkit) {
+      content.find("div").replaceWith(function() {
+        return "\n" + this.innerHTML;
+      });
+    }
+    if ($.browser.msie) {
+      content.find("p").replaceWith(function() {
+        return this.innerHTML + "<br>";
+      });
+    }
+    if ($.browser.mozilla || $.browser.opera || $.browser.msie) {
+      content.find("br").replaceWith("\n");
+    }
+    content = content.text();
+
+    // Get line number of cursor
+    var lines = content.split("\n");
+    var line_text = window.getSelection().getRangeAt(0).commonAncestorContainer.textContent;
+    var line_num = lines.indexOf(line_text);
+
+    // Check if cursor is on last line
+    if (line_num == lines.length - 1) {
+      var cursor_position = window.getSelection().getRangeAt(0).startOffset;
+      var length = line_text.length;
+
+      // Check if cursor is at last character of the line
+      if (cursor_position == length) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // Copy textentry text to hidden form textarea, and perform search
   $("#textentry").on("keydown", function(event) {
     if (halt_search) {
       return;
     }
     if (event.which in ascii_keys) {
-      var textentry = $(this);
-      var user_entry = textentry.clone();
-      user_entry.find("#feedback").remove();
-
-      // Get text content from contenteditable div
-      var content = $("<pre />").html(user_entry.html());
-      if ($.browser.webkit) {
-        content.find("div").replaceWith(function() {
-          return "\n" + this.innerHTML;
-        });
-      }
-      if ($.browser.msie) {
-        content.find("p").replaceWith(function() {
-          return this.innerHTML + "<br>";
-        });
-      }
-      if ($.browser.mozilla || $.browser.opera || $.browser.msie) {
-        content.find("br").replaceWith("\n");
-      }
-      content = content.text();
-
-      // Get line number of cursor
-      var lines = content.split("\n");
-      var line_text = window.getSelection().getRangeAt(0).commonAncestorContainer.textContent;
-      var line_num = lines.indexOf(line_text);
-
-      // Check if cursor is on last line
-      if (line_num == lines.length - 1) {
-        var cursor_position = window.getSelection().getRangeAt(0).startOffset;
-        var length = line_text.length;
-
-        // Check if cursor is at last character of the line
-        if (cursor_position == length) {
-          if (ascii_keys[event.which] == "down" || ascii_keys[event.which] == "right" || ascii_keys[event.which] == "tab") {
-            selectNext();
-            removeFeedback(textentry);
-            addFeedback(textentry, $(".selected .similar-comment-text").text());
+      if (cursorAtEnd($(this))) {
+        if (ascii_keys[event.which] == "down" || ascii_keys[event.which] == "right" || ascii_keys[event.which] == "tab") {
+          selectNext();
+          removeFeedback($(this));
+          addFeedback($(this), $(".similar-comment.selected .similar-comment-text").text());
+          return false;
+        }
+        else if (ascii_keys[event.which] == "up" || ascii_keys[event.which] == "left") {
+          if ($(".similar-comment.selected").length != 0) {
+            selectPrevious();
+            removeFeedback($(this));
+            if ($(".selected").length != 0) {
+              addFeedback($(this), $(".similar-comment.selected .similar-comment-text").text());
+            }
             return false;
           }
-          else if (ascii_keys[event.which] == "up" || ascii_keys[event.which] == "left") {
-            if ($(".selected").length != 0) {
-              selectPrevious();
-              removeFeedback(textentry);
-              if ($(".selected").length != 0) {
-                addFeedback(textentry, $(".selected .similar-comment-text").text());
-              }
-              return false;
-            }
+          else {
+            turnOffSelection();
           }
-          else if (ascii_keys[event.which] == "return") {
-            feedback_text = $("#feedback").text();
-            $(this).append(feedback_text);
-            removeFeedback($(this));
-            $(".selected").removeClass("selected");
-            $(".similar-"+comment_type+"-wrapper").empty();
-            halt_search = true;
-          }
+        }
+        else if (ascii_keys[event.which] == "return") {
+          feedback_text = $("#feedback").text();
+          $(this).append(feedback_text);
+          removeFeedback($(this));
+          $(".selected").removeClass("selected");
+          $(".similar-"+comment_type+"-wrapper").empty();
+          halt_search = true;
         }
       }
     }
@@ -128,6 +145,12 @@ function setupSimilarComments(comment_type) {
       var textentry_text = $(this).text();
       $("#hidden-textarea").val(textentry_text);
       commentSearch.search(textentry_text, comment_type);
+      if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
+        turnOffSelection();
+      }
+    }
+    if (cursorAtEnd($(this)) && $(".selected").length == 0 && !$(".similar-"+comment_type+"-wrapper").is(":empty")) {
+      turnOnSelection();
     }
   });
 
@@ -210,8 +233,13 @@ var commentSearch = new function() {
 
   this.search = function(value, comment_type) {
 
+    //console.log("----------------------------");
+    //console.log("value: "+value);
+
     // Create regular expression for highlighting query words
     var wordset = value.replace(/\n|\r/g, " ").split(" ");
+    //console.log("value: "+value);
+    //console.log("wordset: "+wordset);
     var patternset = [];
     for (var i in wordset) {
       // stopwords is a list of stopwords from stopwords.js. This is a copy of the stopwords used by fullproof.
@@ -220,7 +248,9 @@ var commentSearch = new function() {
       }
     }
     var pattern = patternset.join("|");
+    //console.log("pattern: "+pattern);
     var regex = new RegExp(pattern, "ig");
+    //console.log("regex: "+regex);
 
     // Request a search to the comments engine, then displays the results, if any.
     try {
@@ -293,13 +323,6 @@ var commentSearch = new function() {
                                 .concat(ids.join())
                                 .concat(")");
         $(selectorString).remove();
-
-        if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
-          $(".new-"+comment_type).removeClass("selected");
-        }
-        else if (!$(".new-"+comment_type).hasClass("selected")) {
-          $(".new-"+comment_type).addClass("selected");          
-        }
 
       });
     } catch(err) {
