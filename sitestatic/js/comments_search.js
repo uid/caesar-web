@@ -1,5 +1,9 @@
 function setupSimilarComments(comment_type) {
 
+  var ascii_keys = {9: "tab", 13: "return", 37: "left", 38: "up", 39: "right", 40: "down"};
+
+  var halt_search = false;
+
   // Create similar-comment wrapper
   var similar_comment_wrapper = $("<div class='similar-"+comment_type+"-wrapper'></div>");
   $(".new-"+comment_type).after(similar_comment_wrapper);
@@ -19,9 +23,29 @@ function setupSimilarComments(comment_type) {
     textentry.append(feedback);
   }
 
-  var ascii_keys = {9: "tab", 13: "return", 37: "left", 38: "up", 39: "right", 40: "down"};
+  function selectNext() {
+    var selected = $(".selected");
+    if (selected.hasClass("new-"+comment_type)) {
+      $(".similar-comment:first").addClass("selected");
+      selected.removeClass("selected");
+    }
+    else if (selected.next().length > 0) {
+      selected.next().addClass("selected");
+      selected.removeClass("selected");
+    }
+  }
 
-  var halt_search;
+  function selectPrevious() {
+    var selected = $(".selected");
+    if (selected.is(".similar-comment:first")) {
+      $(".new-"+comment_type).addClass("selected");
+      selected.removeClass("selected");
+    }
+    else if (!selected.hasClass("new-"+comment_type)) {
+      $(selected).prev().addClass("selected");
+      $(selected).removeClass("selected");
+    }
+  }
 
   // Copy textentry text to hidden form textarea, and perform search
   $("#textentry").on("keydown", function(event) {
@@ -63,28 +87,17 @@ function setupSimilarComments(comment_type) {
         // Check if cursor is at last character of the line
         if (cursor_position == length) {
           if (ascii_keys[event.which] == "down" || ascii_keys[event.which] == "right" || ascii_keys[event.which] == "tab") {
-            if ($(".selected").length == 0) {
-              $(".similar-comment:first").addClass("selected");
-            }
-            else {
-              var selected = $(".selected");
-              if ($(selected).next().length > 0) {
-                $(selected).next().addClass("selected");
-                $(selected).removeClass("selected");
-              }
-            }
+            selectNext();
             removeFeedback(textentry);
             addFeedback(textentry, $(".selected .similar-comment-text").text());
             return false;
           }
           else if (ascii_keys[event.which] == "up" || ascii_keys[event.which] == "left") {
             if ($(".selected").length != 0) {
-              var selected = $(".selected");
-              $(selected).prev().addClass("selected");
-              $(selected).removeClass("selected");
+              selectPrevious();
               removeFeedback(textentry);
               if ($(".selected").length != 0) {
-                addFeedback(textentry, $(".selected .similar-comment-text").text());                    
+                addFeedback(textentry, $(".selected .similar-comment-text").text());
               }
               return false;
             }
@@ -94,7 +107,7 @@ function setupSimilarComments(comment_type) {
             $(this).append(feedback_text);
             removeFeedback($(this));
             $(".selected").removeClass("selected");
-            $(".similar-comment-wrapper").empty();
+            $(".similar-"+comment_type+"-wrapper").empty();
             halt_search = true;
           }
         }
@@ -103,8 +116,6 @@ function setupSimilarComments(comment_type) {
   });
 
   $("#textentry").on("keyup", function(event) {
-    console.log($(this).html());
-    console.log($(this).text());
     if ($(this).html() == "") {
       halt_search = false;
     }
@@ -113,10 +124,8 @@ function setupSimilarComments(comment_type) {
     }
     if (!(event.which in ascii_keys)) {
       removeFeedback($(this));
-      $(".selected").removeClass("selected");
-      var user_entry = $(this).clone();
-      user_entry.find("#feedback").remove();
-      var textentry_text = user_entry.text();
+      $(".similar-comment.selected").removeClass("selected");
+      var textentry_text = $(this).text();
       $("#hidden-textarea").val(textentry_text);
       commentSearch.search(textentry_text, comment_type);
     }
@@ -201,7 +210,7 @@ var commentSearch = new function() {
 
   this.search = function(value, comment_type) {
 
-    // Create regular expression for highlighting query words]
+    // Create regular expression for highlighting query words
     var wordset = value.replace(/\n|\r/g, " ").split(" ");
     var patternset = [];
     for (var i in wordset) {
@@ -284,6 +293,13 @@ var commentSearch = new function() {
                                 .concat(ids.join())
                                 .concat(")");
         $(selectorString).remove();
+
+        if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
+          $(".new-"+comment_type).removeClass("selected");
+        }
+        else if (!$(".new-"+comment_type).hasClass("selected")) {
+          $(".new-"+comment_type).addClass("selected");          
+        }
 
       });
     } catch(err) {

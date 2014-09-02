@@ -300,8 +300,9 @@
     overflow-y: scroll;
 }
 
-.similar-comment.selected {
-    background-color: #ffe188;
+.similar-comment.selected, .new-comment.selected {
+    /*background-color: #ffe188;*/
+    border: 2px dotted #666666;
 }
 
 #feedback {
