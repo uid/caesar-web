@@ -13,14 +13,22 @@ function setupSimilarComments(comment_type) {
     $(".similar-"+comment_type+"-wrapper").remove();
   });
 
-  function removeFeedback(textentry) {
+  function removeFeedback($textentry) {
     $("#feedback").remove();
+    $(".bubble").remove();
   }
 
-  function addFeedback(textentry, similar_comment) {
+  function addFeedback($textentry, $similar_comment, similar_comment_text) {
     var feedback = $("<div id='feedback'></div>");
-    feedback.text(similar_comment);
-    textentry.append(feedback);
+    feedback.text(similar_comment_text);
+    $textentry.append(feedback);
+    var bubble = $("<span class='bubble triangle-isosceles left'>here's some text!</span>");
+    var offset = $similar_comment.offset();
+    var width = $similar_comment.width();
+    var height = $similar_comment.height();
+    // Triangle center is 16px from top of bubble, with 10px on the top and bottom. I tried getting these values from the CSS but I couldn't find them, so this will have to be a magic number.
+    bubble.offset({"top": offset.top + height/2.0 - 36, "left": offset.left + width});
+    $("body").append(bubble);
   }
 
   function turnOnSelection() {
@@ -104,7 +112,7 @@ function setupSimilarComments(comment_type) {
         if (ascii_keys[event.which] == "down" || ascii_keys[event.which] == "right" || ascii_keys[event.which] == "tab") {
           selectNext();
           removeFeedback($(this));
-          addFeedback($(this), $(".similar-comment.selected .similar-comment-text").text());
+          addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
           return false;
         }
         else if (ascii_keys[event.which] == "up" || ascii_keys[event.which] == "left") {
@@ -112,7 +120,7 @@ function setupSimilarComments(comment_type) {
             selectPrevious();
             removeFeedback($(this));
             if ($(".selected").length != 0) {
-              addFeedback($(this), $(".similar-comment.selected .similar-comment-text").text());
+              addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
             }
             return false;
           }

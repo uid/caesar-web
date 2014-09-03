@@ -309,3 +309,17 @@
     color: grey;
     font-style: italic;
 }
+
+.bubble.triangle-isosceles.left {
+    z-index: 1000;
+    background-color: #ffff88;
+    border: 1px solid #ddd;
+    position: absolute;
+    margin-left: 30px;
+}
+
+.bubble.triangle-isosceles.left::after {
+    border-color:transparent #ffff88;
+    border-width:10px 30px 10px 0;
+    left: -30px;
+}
