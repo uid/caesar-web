@@ -130,7 +130,7 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
             current_milestone_data.append((milestone, user_extension))
 
     #find total slack days left for each membership
-    current_memberships = Member.objects.filter(user=dashboard_user)
+    current_memberships = Member.objects.filter(user=dashboard_user).select_related('semester__subject')
 
     current_slack_data = []
     for membership in current_memberships:
