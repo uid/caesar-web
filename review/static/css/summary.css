@@ -78,6 +78,12 @@ table.assignment-stream {
 	margin-top:1px;
 	margin-bottom:1px
 }
+.no-votes {
+    background-color: white;;
+    text-align: center;
+    margin-top: 1px;
+    margin-bottom: 1px;
+}
 .result{
     text-align: right;
 }
