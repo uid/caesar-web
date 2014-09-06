@@ -44,10 +44,13 @@ function setupSimilarComments(comment_type) {
     if (selected.hasClass("new-"+comment_type)) {
       $(".similar-comment:first").addClass("selected");
       selected.removeClass("selected");
+      //addFeedback($("#textentry"), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
     }
     else if (selected.next().length > 0) {
       selected.next().addClass("selected");
       selected.removeClass("selected");
+      //removeFeedback($("#textentry"));
+      //addFeedback($("#textentry"), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
     }
   }
 
@@ -56,10 +59,13 @@ function setupSimilarComments(comment_type) {
     if (selected.is(".similar-comment:first")) {
       $(".new-"+comment_type).addClass("selected");
       selected.removeClass("selected");
+      //removeFeedback($("#textentry"));
     }
     else if (!selected.hasClass("new-"+comment_type)) {
       $(selected).prev().addClass("selected");
       $(selected).removeClass("selected");
+      //removeFeedback($("#textentry"));
+      //addFeedback($("#textentry"), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
     }
   }
 
@@ -119,7 +125,7 @@ function setupSimilarComments(comment_type) {
           if ($(".similar-comment.selected").length != 0) {
             selectPrevious();
             removeFeedback($(this));
-            if ($(".selected").length != 0) {
+            if ($("similar-comment.selected").length != 0) {
               addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
             }
             return false;
@@ -140,24 +146,29 @@ function setupSimilarComments(comment_type) {
     }
   });
 
-  $("#textentry").on("keyup", function(event) {
-    if ($(this).html() == "") {
+  $("#textentry").on("keyup mouseup", function(event) {
+    var textentry = $(this);
+    if (textentry.html() == "") {
       halt_search = false;
     }
     if (halt_search) {
       return;
     }
-    if (!(event.which in ascii_keys)) {
-      removeFeedback($(this));
+    if (!(event.which in ascii_keys) || event.type=="mouseup") {
+      removeFeedback(textentry);
       $(".similar-comment.selected").removeClass("selected");
-      var textentry_text = $(this).text();
+      var textentry_text = textentry.text();
       $("#hidden-textarea").val(textentry_text);
-      commentSearch.search(textentry_text, comment_type);
-      if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
-        turnOffSelection();
-      }
+      commentSearch.search(textentry_text, comment_type, function() {
+        if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
+          turnOffSelection();
+        }
+        else if (cursorAtEnd(textentry) && $(".selected").length == 0) {
+          turnOnSelection();
+        }
+      });
     }
-    if (cursorAtEnd($(this)) && $(".selected").length == 0 && !$(".similar-"+comment_type+"-wrapper").is(":empty")) {
+    else if (cursorAtEnd(textentry) && $(".selected").length == 0 && !$(".similar-"+comment_type+"-wrapper").is(":empty")) {
       turnOnSelection();
     }
   });
@@ -239,7 +250,7 @@ var commentSearch = new function() {
 
   };
 
-  this.search = function(value, comment_type) {
+  this.search = function(value, comment_type, _callback) {
 
     //console.log("----------------------------");
     //console.log("value: "+value);
@@ -332,13 +343,17 @@ var commentSearch = new function() {
                                 .concat(")");
         $(selectorString).remove();
 
+        _callback();
+
       });
     } catch(err) {
       // fullproof engine throws an error when the only query words are stopwords (or the query is empty).
       // This is ok because there will be 0 similar comments, so just hard code this.
 
       $(".similar-"+comment_type+"-wrapper").empty();
+
     }
+
   };
 
 }
