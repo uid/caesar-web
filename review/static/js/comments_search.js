@@ -102,9 +102,12 @@ function setupSimilarComments(comment_type) {
     return false;
   }
 
-  // Copy textentry text to hidden form textarea, and perform search
+  // Handle arrow key navigation of textentry box and similar comments
   $("#textentry").on("keydown", function(event) {
     if (halt_search) {
+      return;
+    }
+    if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
       return;
     }
     if (event.which in ascii_keys) {
@@ -140,16 +143,19 @@ function setupSimilarComments(comment_type) {
     }
   });
 
+  // Copy textentry text to hidden form textarea, and perform search
   $("#textentry").on("keyup mouseup", function(event) {
     var textentry = $(this);
-    if (textentry.text() == "") {
-      textentry.empty();
-      halt_search = false;
-    }
     if (halt_search) {
       return;
     }
-    if (!(event.which in ascii_keys) || event.type=="mouseup") {
+    if (textentry.text() == "") {
+      textentry.empty();
+      turnOffSelection();
+      halt_search = false;
+      $(".similar-"+comment_type+"-wrapper").empty();
+    }
+    else if (!(event.which in ascii_keys) || event.type=="mouseup") {
       removeFeedback(textentry);
       $(".similar-comment.selected").removeClass("selected");
       var textentry_text = textentry.text();
@@ -247,13 +253,8 @@ var commentSearch = new function() {
 
   this.search = function(value, comment_type, _callback) {
 
-    //console.log("----------------------------");
-    //console.log("value: "+value);
-
     // Create regular expression for highlighting query words
-    var wordset = value.replace(/\n|\r/g, " ").split(" ");
-    //console.log("value: "+value);
-    //console.log("wordset: "+wordset);
+    var wordset = value.replace(/\n|\r|\s/g, "zDVJRqVs").split("zDVJRqVs");
     var patternset = [];
     for (var i in wordset) {
       // stopwords is a list of stopwords from stopwords.js. This is a copy of the stopwords used by fullproof.
@@ -262,9 +263,7 @@ var commentSearch = new function() {
       }
     }
     var pattern = patternset.join("|");
-    //console.log("pattern: "+pattern);
     var regex = new RegExp(pattern, "ig");
-    //console.log("regex: "+regex);
 
     // Request a search to the comments engine, then displays the results, if any.
     try {
