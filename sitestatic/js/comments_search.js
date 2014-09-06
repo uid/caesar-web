@@ -44,13 +44,10 @@ function setupSimilarComments(comment_type) {
     if (selected.hasClass("new-"+comment_type)) {
       $(".similar-comment:first").addClass("selected");
       selected.removeClass("selected");
-      //addFeedback($("#textentry"), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
     }
     else if (selected.next().length > 0) {
       selected.next().addClass("selected");
       selected.removeClass("selected");
-      //removeFeedback($("#textentry"));
-      //addFeedback($("#textentry"), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
     }
   }
 
@@ -59,13 +56,10 @@ function setupSimilarComments(comment_type) {
     if (selected.is(".similar-comment:first")) {
       $(".new-"+comment_type).addClass("selected");
       selected.removeClass("selected");
-      //removeFeedback($("#textentry"));
     }
     else if (!selected.hasClass("new-"+comment_type)) {
       $(selected).prev().addClass("selected");
       $(selected).removeClass("selected");
-      //removeFeedback($("#textentry"));
-      //addFeedback($("#textentry"), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
     }
   }
 
@@ -148,7 +142,8 @@ function setupSimilarComments(comment_type) {
 
   $("#textentry").on("keyup mouseup", function(event) {
     var textentry = $(this);
-    if (textentry.html() == "") {
+    if (textentry.text() == "") {
+      textentry.empty();
       halt_search = false;
     }
     if (halt_search) {
