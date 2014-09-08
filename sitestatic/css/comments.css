@@ -281,8 +281,12 @@
     padding: 5px;
 }
 
+.similar-comment {
+    padding: 0px 4px;
+}
+
 .similar-comment-text, .similar-comment-author-link {
-    padding: 5px;
+    /*padding: 5px;*/
     font-size: 9px;
 }
 
