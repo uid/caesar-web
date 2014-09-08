@@ -11,6 +11,7 @@ function setupSimilarComments(comment_type) {
   // Remove similar-comment wrapper whenever the user closes a new comment entry box.
   $(".new-"+comment_type).on("remove", function(e) {
     $(".similar-"+comment_type+"-wrapper").remove();
+    $(".bubble").remove();
   });
 
   function removeFeedback($textentry) {
@@ -122,7 +123,7 @@ function setupSimilarComments(comment_type) {
           if ($(".similar-comment.selected").length != 0) {
             selectPrevious();
             removeFeedback($(this));
-            if ($("similar-comment.selected").length != 0) {
+            if ($(".similar-comment.selected").length != 0) {
               addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
             }
             return false;
@@ -149,13 +150,24 @@ function setupSimilarComments(comment_type) {
     if (halt_search) {
       return;
     }
-    if (textentry.text() == "") {
+    if (textentry.text() == "") { // No need to search because textfield is empty
       textentry.empty();
       turnOffSelection();
       halt_search = false;
       $(".similar-"+comment_type+"-wrapper").empty();
     }
-    else if (!(event.which in ascii_keys) || event.type=="mouseup") {
+    else if (event.which in ascii_keys || event.type=="mouseup") { // User is navigating
+      if (cursorAtEnd(textentry)) {
+        if ($(".selected").length == 0 && !$(".similar-"+comment_type+"-wrapper").is(":empty")) {
+          turnOnSelection();
+        }
+      }
+      else {
+        removeFeedback();
+        turnOffSelection();
+      }
+    }
+    else { // User types normal keys (ex. letters/numbers)
       removeFeedback(textentry);
       $(".similar-comment.selected").removeClass("selected");
       var textentry_text = textentry.text();
@@ -168,9 +180,6 @@ function setupSimilarComments(comment_type) {
           turnOnSelection();
         }
       });
-    }
-    else if (cursorAtEnd(textentry) && $(".selected").length == 0 && !$(".similar-"+comment_type+"-wrapper").is(":empty")) {
-      turnOnSelection();
     }
   });
 

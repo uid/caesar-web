@@ -108,7 +108,7 @@ def view_chunk(request, chunk_id):
         oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().select_related('chunk', 'author__profile')
     else:
         q = Q(author__membership__role = 'T') | Q(author__membership__role = 'V')
-        oldComments = Comment.objects.filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().select_related('chunk', 'author__profile')
+        oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().select_related('chunk', 'author__profile')
 
     return render(request, 'chunks/view_chunk.html', {
         'chunk': chunk,
