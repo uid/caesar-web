@@ -50,7 +50,9 @@
     // Add comments to database
     var commentsData = [];
     var commentsExtraData = [];
-    {% for comment in oldComments %}
+    {% for comment, chunk_lines in old_comment_data %}
+
+      console.log("{{chunk_lines}}");
       // Need to use escapejs filter to escape newline characters coming from the textarea
       commentsData.push("{{comment.text|escapejs}}");
 
@@ -61,14 +63,24 @@
         author = "{{comment.author.get_full_name|default:comment.author.username}} ({{comment.author.profile.reputation}})";
         author_url = "{% url 'accounts.views.view_profile' comment.author.username %}"
       {% endif %}
+      {% comment %}{% with start=comment.start|add:"-1" %}{% endcomment %}
       commentsExtraData.push({
         "date": "{{comment.created|timesince_human}}",
         "chunk_name": "{{comment.chunk.name}}",
+        {% comment %}{% # %}//"chunk_content": "{{comment.chunk.lines|slice:'comment.start:comment.end'}}",{% endcomment %}
         "chunk_url": "{% url 'chunks.views.view_comment' comment.id %}",
         "author": author,
         "author_url": author_url,
+
       });
+      {% comment %}{% # %}{% endwith %}{% endcomment %}
     {% endfor %}
+    {% for comment in comment_chunk_lines %}
+      {% for line in comment %}
+        console.log("{{line}}")
+      {% endfor %}
+    {% endfor %}
+
 
     commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");
 
@@ -202,5 +214,28 @@
   {% endfor %}
   </div>
 </div>
+
+{% for comment, chunk_line in old_comment_data %}
+  <span class='bubble triangle-isosceles left'>
+    <div class="syntax">
+    {% for n, line, staff_code in chunk_line %}
+      {% if not staff_code %}
+        <span id="chunk-{{comment.chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student">
+          <span id="line-{{comment.chunk.id}}-{{ n }}-{{comment.chunk.file.id}}" class="line">
+            <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+          </span>
+        </span>
+      {% else %}
+        <span id="chunk-{{comment.chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff">
+          <span id="line-{{comment.chunk.id}}-{{ n }}-{{comment.chunk.file.id}}" class="line">
+            <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+          </span>
+        </span>
+      {% endif %}
+    {% endfor %}
+    </div>
+  </span>
+{% endfor%}
+
 {% endblock %}
 

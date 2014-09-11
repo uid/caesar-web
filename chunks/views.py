@@ -105,10 +105,27 @@ def view_chunk(request, chunk_id):
     role = membership[0].role
 
     if role == 'S':
-        oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().select_related('chunk', 'author__profile')
+        oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().select_related('chunk__file', 'author__profile')
     else:
         q = Q(author__membership__role = 'T') | Q(author__membership__role = 'V')
         oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().select_related('chunk', 'author__profile')
+    old_comment_data = []
+    for oldComment in oldComments:
+        numbers, lines = zip(*oldComment.chunk.lines[oldComment.start-1:oldComment.end])
+        # highlight the code this way to correctly identify multi-line constructs
+        # TODO implement a custom formatter to do this instead
+        highlighted = zip(numbers,
+                highlight(oldComment.chunk.data, lexer, formatter).splitlines())
+        highlighted_comment_lines = []
+        staff_line_index = 0
+        for number, line in highlighted:
+            if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
+                while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
+                    staff_line_index += 1
+                highlighted_comment_lines.append((number, line, True))
+            else:
+                highlighted_comment_lines.append((number, line, False))
+        old_comment_data.append((oldComment, highlighted_comment_lines))
 
     return render(request, 'chunks/view_chunk.html', {
         'chunk': chunk,
@@ -122,7 +139,7 @@ def view_chunk(request, chunk_id):
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
         'last_task': last_task,
         'remaining_task_count': remaining_task_count,
-        'oldComments': oldComments,
+        'old_comment_data': old_comment_data,
     })
 
 @login_required

@@ -23,12 +23,13 @@ function setupSimilarComments(comment_type) {
     var feedback = $("<div id='feedback'></div>");
     feedback.text(similar_comment_text);
     $textentry.append(feedback);
-    var bubble = $("<span class='bubble triangle-isosceles left'>here's some text!</span>");
+    var bubble = $("<span class='bubble triangle-isosceles left'>hello world</span>");
     var offset = $similar_comment.offset();
     var width = $similar_comment.width();
     var height = $similar_comment.height();
     // Triangle center is 16px from top of bubble, with 10px on the top and bottom. I tried getting these values from the CSS but I couldn't find them, so this will have to be a magic number.
     bubble.offset({"top": offset.top + height/2.0 - 36, "left": offset.left + width});
+    //bubble.html($similar_comment.data());
     $("body").append(bubble);
   }
 
@@ -327,13 +328,15 @@ var commentSearch = new function() {
             author_link.html(commentsExtraData[results[i].index].author);
             comment_div.append(" - ", author_link);
           }
+          //comment_div.data(commentsExtraData[results[i].index].chunk_content);
+          //console.log(commentsExtraData[results[i].index].chunk_content);
 
           // Add new similar comment to after the previous result, in the correct order
           if (i == 0) { // This is the first result to be displayed
             $('.similar-'+comment_type+'-wrapper').prepend(comment_div);
           }
           else {
-            // jQuery is stupid and 1-indexes its selectors, thus using i rather i-1
+            // jQuery 1-indexes its selectors, thus using i rather i-1
             $('.similar-'+comment_type+'-wrapper > div:nth-child('+i+')').after(comment_div);
           }
 
