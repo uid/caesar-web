@@ -49,7 +49,8 @@ def assign_tasks(review_milestone, reviewer, tasks_to_assign=None, simulate=Fals
 	chunks = chunks.exclude(name__in=list_chunks_to_exclude(review_milestone))
 	# remove chunks that already have enough reviewers
 	chunks = chunks.annotate(num_tasks=Count('tasks')).exclude(num_tasks__gte=num_tasks_for_user(review_milestone, reviewer))
-	chunks = chunks.exclude(pk__in = chunks.filter(file__submission__authors__id = reviewer.id))
+	# remove chunks that the reviewer authored
+	chunks = chunks.exclude(pk__in=chunks.filter(file__submission__authors__id=reviewer.id))
 	chunks = chunks.select_related('id','file__submission__id','file__submission__authors')
 
 	# remove chunks that the reviewer authored
@@ -68,7 +69,9 @@ def assign_tasks(review_milestone, reviewer, tasks_to_assign=None, simulate=Fals
 		task = Task(reviewer_id=reviewer.id, chunk_id=c.id, milestone=review_milestone, submission_id=c.file.submission.id)
 		# Why is this here?
 		# c.file.submission.reviewers.add(reviewer)
-		print c if simulate else task.save()
+		if not simulate:
+			task.save()
+	return chunks_to_assign
 
 # this method ignores any tasks already int eh database for this milestone
 def simulate_tasks(review_milestone, num_students, num_staff, num_alum):
@@ -92,32 +95,30 @@ def simulate_tasks(review_milestone, num_students, num_staff, num_alum):
 		# 		# .values('id', 'name', 'cluster_id', 'file__submission', 'class_type', 'student_lines')\
 		# 		.select_related('id','file__submission__id','file__submission__authors')
 		
-
-		# get the chunks for the milestone
-		chunks = Chunk.objects.all();
-		chunks = chunks.filter(file__submission__milestone=review_milestone.submit_milestone)
-		# don't need to remove chunks already assigned to reviewer because
-		# the reviewer doesn't have any chunks assigned to them yet in the simulation
-		# chunks = chunks.exclude(tasks__reviewer=r)
-		# remove chunks that have too few student-generated lines
-		chunks = chunks.exclude(student_lines__lt=review_milestone.min_student_lines)
-		# remove chunks that aren't selected for review
-		chunks = chunks.exclude(name__in=list_chunks_to_exclude(review_milestone))
-		# remove chunks that already have enough reviewers
-		chunks = chunks.annotate(num_tasks=Count('tasks')).exclude(num_tasks__gte=num_tasks_for_user(review_milestone, r))
-		chunks = chunks.select_related('id','file__submission__id','file__submission__authors')
-
-
+		# # get the chunks for the milestone
+		# chunks = Chunk.objects.all();
+		# chunks = chunks.filter(file__submission__milestone=review_milestone.submit_milestone)
+		# # don't need to remove chunks already assigned to reviewer because
+		# # the reviewer doesn't have any chunks assigned to them yet in the simulation
+		# # chunks = chunks.exclude(tasks__reviewer=r)
+		# # remove chunks that have too few student-generated lines
+		# chunks = chunks.exclude(student_lines__lt=review_milestone.min_student_lines)
+		# # remove chunks that aren't selected for review
+		# chunks = chunks.exclude(name__in=list_chunks_to_exclude(review_milestone))
+		# # remove chunks that already have enough reviewers
+		# chunks = chunks.annotate(num_tasks=Count('tasks')).exclude(num_tasks__gte=num_tasks_for_user(review_milestone, r))
+		# chunks = chunks.select_related('id','file__submission__id','file__submission__authors')
 
 		# remove chunks that the reviewer authored
-		chunks_to_choose_from = [c for c in chunks if r not in c.file.submission.authors.filter()]
+		# chunks_to_choose_from = [c for c in chunks if r not in c.file.submission.authors.filter()]
 		# randomly order the chunks
-		random.shuffle(chunks_to_choose_from)
+		# random.shuffle(chunks_to_choose_from)
 		# take the first num_tasks_for_user chunks
-		chunks_to_assign = chunks_to_choose_from[:num_tasks_for_user(review_milestone, r)]
+		# chunks_to_assign = chunks_to_choose_from[:num_tasks_for_user(review_milestone, r)]
 		# if len(chunks_to_assign) < num_tasks_for_user, the reviewr will be assigned fewer
 		# tasks than they should be and they will be assigned more tasks the next time they
 		# log in if there are more tasks they can be assigned
+		chunks_to_assign = assign_tasks(review_milestone, r, tasks_to_assign=None, simulate=True)
 		for c in chunks_to_assign:
 			task = Task(reviewer_id=r.id, chunk_id=c.id, milestone=review_milestone, submission_id=c.file.submission.id)
 			if c.id in chunk_id_task_map.keys:
