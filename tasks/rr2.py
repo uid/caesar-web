@@ -127,7 +127,7 @@ chunks_to_assign = chunks_list[:random_routing.num_tasks_for_user(review_milesto
 # print "chunks chosen to be tasks"
 # print random_routing.assign_tasks(review_milestone, reviewer, tasks_to_assign=None, simulate=True)
 
-chunk_id_task_map = random_routing.simulate_tasks(review_milestone):
+chunk_id_task_map = random_routing.simulate_tasks(review_milestone)
 for c in chunk_id_task_map.keys():
   print c
   print chunk_id_task_map[c]
