@@ -94,10 +94,8 @@ $(document).ready(function() {
 <div class="slack-data">
   {% for semester, slack_left in current_slack_data %}
     <div class="semester-slack">
-      <p class="slack-left"><b>{{semester.subject.name}}: </b> {{slack_left}} slack days left</p>
+      <p class="slack-left"><b>{{semester.subject.name}}: </b> {{slack_left}} slack days left to use this semester.</p>
     </div>
-  {% empty %}
-      <div> You have no active classes </div>
   {% endfor %}
 </div>
 
@@ -117,6 +115,7 @@ $(document).ready(function() {
     </td>
   </tr>
   {% empty %}
+    No assignments in progress.
   {% endfor %}
 </table>
 </div>
