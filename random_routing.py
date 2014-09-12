@@ -58,8 +58,8 @@ def assign_tasks(review_milestone, reviewer, tasks_to_assign=None, simulate=Fals
 	return chunks_to_assign
 
 # this method ignores any tasks already int eh database for this milestone
-def simulate_tasks(review_milestone, num_students, num_staff, num_alum):
-	reviewers = User.objects.filter(membership__semester=review_milestone.milestone.assignment.semester)
+def simulate_tasks(review_milestone):
+	reviewers = User.objects.filter(membership__semester=review_milestone.assignment.semester)
 	reviewers_list = list(reviewers)
 	random.shuffle(reviewers_list)
 	chunk_id_task_map = {}
