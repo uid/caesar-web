@@ -68,7 +68,7 @@ def simulate_tasks(review_milestone):
 		chunks_to_assign = assign_tasks(review_milestone, r, tasks_to_assign=None, simulate=True)
 		for c in chunks_to_assign:
 			task = Task(reviewer_id=r.id, chunk_id=c.id, milestone=review_milestone, submission_id=c.file.submission.id)
-			if c.id in chunk_id_task_map.keys:
+			if c.id in chunk_id_task_map.keys():
 				chunk_id_task_map[c.id] += [task]
 			else:
 				chunk_id_task_map[c.id] = [task]
