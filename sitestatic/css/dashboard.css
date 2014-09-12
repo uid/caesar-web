@@ -148,3 +148,6 @@ table.current-assignment {
     font-size: 1em;
     text-shadow: none;
 }
+.semester-slack * {
+    display: inline-block;
+}

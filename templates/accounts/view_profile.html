@@ -130,14 +130,20 @@ $(document).ready(function() {
                     {% else %}comment-{{comment.id}}-{{comment.chunk.id}}
                     {% endif %}" class="{% if user.is_staff or user == participant or review_milestone.assignment.semester in semesters_taught %}activity-line{%else%}non-activity-line{%endif%}">
               
-              <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
-              
-              {% if comment.upvote_count == 0 and comment.downvote_count == 0 or is_vote %}
-              <td colspan="2" class="{% if is_vote %}grey-text{% else %}black-text{% endif %}"> {{ snippet }} </td>
-            {% else %}
-              <td>{% if comment.upvote_count > 0 %}<span class="positive-votes">+{{comment.upvote_count}}</span>{% endif %}{% if comment.upvote_count > 0 and comment.downvote_count > 0 %}/{% endif %}{% if comment.downvote_count > 0 %}<span class="negative-votes">-{{comment.downvote_count}}</span>{% endif %}</td>
-              <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {{ snippet }} </td>
-            {% endif %}
+            <td><span class="type" id="{{type}}" title="{{type}}"></span></td>
+            <td> 
+                {% if comment.upvote_count == 0 and comment.downvote_count == 0 or is_vote %}
+                    <span class="no-votes"></span>
+                {% endif %}
+                {% if comment.upvote_count > 0 %}
+                    <span class="positive-votes">+{{comment.upvote_count}}</span>
+                {% endif %}
+                {% if comment.upvote_count > 0 and comment.downvote_count > 0 %}/{% endif %}
+                {% if comment.downvote_count > 0 %}
+                    <span class="negative-votes">-{{comment.downvote_count}}</span>
+                {% endif %}
+            </td>      
+            <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {{ snippet }} </td>
 
               <td class="grey-text"> {{ comment.chunk.name }} </td>
               <td class="grey-text"> {{ comment.modified }} </td>
