@@ -62,7 +62,7 @@ def view_chunk(request, chunk_id):
         snippet = chunk.generate_snippet(comment.start, comment.end)
         return (comment, vote, snippet)
 
-    comment_data = map(get_comment_data, chunk.comments.select_related('author__profile'))
+    comment_data = map(get_comment_data, chunk.comments.prefetch_related('author__profile', 'author__membership__semester'))
 
     lexer = get_lexer_for_filename(chunk.file.path)
     
@@ -236,7 +236,7 @@ def view_all_chunks(request, viewtype, submission_id):
                     snippet = chunk.generate_snippet(comment.start, comment.end)
                     return (comment, snippet)
 
-                comments = chunk.comments.select_related('chunk', 'author__profile')
+                comments = chunk.comments.prefetch_related('chunk', 'author__profile', 'author__membership__semester')
                 comment_data = map(get_comment_data, comments)
 
                 user_comments += comments.filter(type='U').count()

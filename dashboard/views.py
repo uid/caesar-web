@@ -129,6 +129,17 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
         if datetime.datetime.now() <= milestone.duedate + datetime.timedelta(days=extension_days) + datetime.timedelta(hours=2):
             current_milestone_data.append((milestone, user_extension))
 
+    #find total slack days left for each membership
+    current_memberships = Member.objects.filter(user=dashboard_user, role=Member.STUDENT).select_related('semester__subject')
+
+    current_slack_data = []
+    for membership in current_memberships:
+        total_slack = membership.slack_budget
+        if total_slack > 0:
+            used_slack = sum([extension.slack_used for extension in Extension.objects.filter(user=dashboard_user, milestone__assignment__semester=membership.semester)])
+            slack_left = total_slack - used_slack
+            current_slack_data.append((membership.semester, slack_left))
+
     return render(request, 'dashboard/dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
@@ -138,6 +149,7 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
         'old_submission_data': old_submission_data,
         'current_milestone_data': current_milestone_data,
         'allow_requesting_more_tasks': allow_requesting_more_tasks,
+        'current_slack_data': current_slack_data,
     })
 
 

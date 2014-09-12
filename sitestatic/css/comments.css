@@ -108,21 +108,45 @@
     font-size: 10px;
 }
 
-.comment-author-name.staff {
+/*.comment-author-name.staff {
     color: #482;
 }
 
 .comment-author-name.staff:before {
     content: "[T] ";
+}*/
+
+.comment-author-name.teacher {
+    color: #482;
+}
+
+.comment-author-name.teacher a {
+    color: #482 !important;
+}
+
+.comment-author-icon.teacher {
+    content: url('../img/staralt_comments.png');
+}
+
+.comment-author-name.volunteer {
+    color: #ff3636;
+}
+
+.comment-author-name.volunteer a {
+    color: #ff3636 !important;
+}
+
+.comment-author-icon.volunteer {
+    content: url('../img/staralt_comments.png');
 }
 
 .comment-author-name.student {
     color: #66f;
 }
 
-.comment-author-name.student:before {
+/*.comment-author-name.student:before {
     content: "[S] ";
-}
+}*/
 
 .collapsed .comment-author {
     display: none;

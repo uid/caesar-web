@@ -252,7 +252,7 @@ def all_activity(request, review_milestone_id, username):
             else:
                 highlighted_lines.append((number, line, False))
 
-        comments = chunk.comments.select_related('votes', 'author__profile')
+        comments = chunk.comments.prefetch_related('votes', 'author__profile', 'author__membership__semester')
         highlighted_comments = []
         highlighted_votes = []
         for comment in comments:

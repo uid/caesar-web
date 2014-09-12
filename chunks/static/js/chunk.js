@@ -313,8 +313,8 @@ function drawCommentMarker(comment) {
               scrollCodeTo(comment);
               checkIfSpecial(comment);
               $.each(model.comments, function(index, innerComment) {
-                  if (innerComment.start == comment.start) {
-                      $(innerComment.elt).effect('highlight', {}, 2000);
+                  if (innerComment.start === comment.start) {
+                      expandComment(innerComment); //expands the related comments when the marker is clicked.
                   }
               });
           });
