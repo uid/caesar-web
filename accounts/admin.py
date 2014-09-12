@@ -12,8 +12,8 @@ class UserProfileInline(AdminImageMixin, admin.StackedInline):
 class UserProfileAdmin(UserAdmin):
     inlines = [UserProfileInline]
 
-UserAdmin.list_display += ('date_joined',)
-UserAdmin.list_filter += ('date_joined',)
+UserAdmin.list_display += ('date_joined', 'last_login',)
+UserAdmin.list_filter += ('date_joined', 'last_login',)
 
 class MemberAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'semester__semester', 'semester__subject__name')
