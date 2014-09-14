@@ -88,6 +88,7 @@
         <!-- Checks for Javadoc comments.                     -->
         <!-- See http://checkstyle.sf.net/config_javadoc.html -->
         <module name="JavadocMethod">
+            <property name="scope" value="package"/>
             <message key="javadoc.missing"
                      value="Missing a #javadoc comment. #important"/>
             <message key="javadoc.unusedTag"
