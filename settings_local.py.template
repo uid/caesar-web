@@ -3,20 +3,20 @@
 SECRET_KEY = "changeme"
 
 
-# Turn on the debugging toolbar.
-# deployment: set this to False
+# development: turn on the debugging toolbar and get exceptions displayed in the browser.
+# deployment: set this to False to avoid showing debugging info to users 
 DEBUG = TEMPLATE_DEBUG = True
 
 
 DATABASES = {
     'default': {
 
-        # by default, use a local SQLite file as the database.
+        # development: use a local SQLite file as the database.
+        
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': '/var/django/caesar/fixtures/test_fixtures.sqlite3',
+        'NAME':   '/var/django/db/caesar.sqlite3',  # see Vagrantfile for explanation of why it's put here
 
-
-        # deployment: use a database server by commenting out the above and uncommenting below.
+        # deployment: use a database server.
 
         # 'ENGINE': 'django.db.backends.mysql',
         # 'NAME': '',

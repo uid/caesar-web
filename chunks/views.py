@@ -62,7 +62,7 @@ def view_chunk(request, chunk_id):
         snippet = chunk.generate_snippet(comment.start, comment.end)
         return (comment, vote, snippet)
 
-    comment_data = map(get_comment_data, chunk.comments.select_related('author__profile'))
+    comment_data = map(get_comment_data, chunk.comments.prefetch_related('author__profile', 'author__membership__semester'))
 
     lexer = get_lexer_for_filename(chunk.file.path)
     
@@ -120,6 +120,7 @@ def view_all_chunks(request, viewtype, submission_id):
     submission = Submission.objects.get(id = submission_id)
     semester = Semester.objects.get(assignments__milestones__submitmilestone__submissions=submission)
     authors = User.objects.filter(submissions=submission)
+    is_reviewer = Task.objects.filter(submission=submission, reviewer=user).exists()
 
     # block a user who's crawling
     if user.username=="dekehu":
@@ -133,7 +134,7 @@ def view_all_chunks(request, viewtype, submission_id):
         # # you aren't django staff
         # #   and
         # # you aren't an author of the submission
-        if not user_membership.is_teacher() and not user.is_staff and not (user in authors):
+        if not user_membership.is_teacher() and not user.is_staff and not (user in authors) and not is_reviewer:
             raise PermissionDenied
     except Member.MultipleObjectsReturned:
         raise Http404 # you can't be multiple members for a class so this should never get called
@@ -208,7 +209,7 @@ def view_all_chunks(request, viewtype, submission_id):
                     snippet = chunk.generate_snippet(comment.start, comment.end)
                     return (comment, snippet)
 
-                comments = chunk.comments.select_related('chunk', 'author__profile')
+                comments = chunk.comments.prefetch_related('chunk', 'author__profile', 'author__membership__semester')
                 comment_data = map(get_comment_data, comments)
 
                 user_comments += comments.filter(type='U').count()

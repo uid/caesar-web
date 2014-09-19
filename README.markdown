@@ -34,6 +34,7 @@ Log into it:
 
     vagrant ssh
 
+If it asks you for a password, the password for the vagrant account is just "vagrant".
 
 ### Configure local settings
 
@@ -47,7 +48,7 @@ The default settings are intended for development: DEBUG is turned on, a local s
 
 ### Initialize the database
 
-Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in fixtures/, so you can always delete that file and start this part over if things go wrong. 
+Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in /home/vagrant, so you can always delete that file and start this part over if things go wrong. 
 
     cd /var/django/caesar
     ./manage.py syncdb         # say "no", don't create superuser yet
@@ -93,6 +94,11 @@ To run Caesar in debug mode, use the following command:
 This will cause Django to automatically reload all altered code. Additionally, by using:
     import pdb; pdb.set_trace()
 you can drop down into a PDB session, which is incredibly useful for debugging crashes & bugs.
+
+By default, your development web server isn't visible outside your laptop.  Nobody else can browse to 10.18.6.30.  But you can make it visible (at your laptop's IP address) using an ssh tunnel:
+
+    sudo ssh -L 0.0.0.0:80:localhost:80 -L 0.0.0.0:443:localhost:443 vagrant@10.18.6.30
+    (Default) Password: vagrant
 
 
 Deployment

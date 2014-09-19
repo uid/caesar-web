@@ -16,8 +16,8 @@ cd /tmp
 pip install -r $CAESAR_DIR/requirements.txt
 
 # Set permissions on Caesar folder tree
-chgrp -R www-data $CAESAR_DIR/fixtures $CAESAR_DIR/media
-chmod -R g+ws $CAESAR_DIR/fixtures $CAESAR_DIR/media
+chgrp -R www-data $CAESAR_DIR/media
+chmod -R g+ws $CAESAR_DIR/media
 
 # Set up SSL, with MIT certificate authority for checking certificates presented by users.
 cp $CAESAR_DIR/apache/mitCAclient.pem /etc/ssl/certs/

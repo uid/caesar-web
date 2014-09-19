@@ -31,7 +31,17 @@
     automatically generated 
     {% endif %}
     {% if not comment.deleted %}
-    by <span class="comment-author-name
+    by <span class="comment-author-icon
+        {% with commentSemester=comment.chunk.file.submission.milestone.assignment.semester %}
+            {% for membership in author.membership.all %}
+                {% if commentSemester == membership.semester %}
+                    {{ membership.get_role_display }}
+                {% endif %}
+            {% endfor %}
+        {% endwith %}"
+             title="{% with commentSemester=comment.chunk.file.submission.milestone.assignment.semester %}{% for membership in author.membership.all %}{% if commentSemester == membership.semester %}{{ membership.get_role_display|title }}{% endif %}{% endfor %}{% endwith %}">
+      </span>
+      <span class="comment-author-name
       {{ member.get_role_display }}">
       {% if comment.type == 'U' %}
         <a href="{% url 'accounts.views.view_profile' author.username %}">
