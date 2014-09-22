@@ -337,16 +337,27 @@
     font-style: italic;
 }
 
-.bubble.triangle-isosceles.left {
+/*.bubble.triangle-border.left {
     z-index: 1000;
     background-color: #ffff88;
     border: 1px solid #ddd;
     position: absolute;
     margin-left: 30px;
-}
+    display: none;
+}*/
 
-.bubble.triangle-isosceles.left::after {
+/*.bubble.triangle-border.left::after {
     border-color:transparent #ffff88;
     border-width:10px 30px 10px 0;
     left: -30px;
+}*/
+
+.bubble {
+    display: none;
+    border-color: #ffff88;
 }
+
+.bubble:before {
+    border-color: transparent #ffff88 !important;
+}
+

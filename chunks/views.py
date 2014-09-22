@@ -115,7 +115,7 @@ def view_chunk(request, chunk_id):
         # highlight the code this way to correctly identify multi-line constructs
         # TODO implement a custom formatter to do this instead
         highlighted = zip(numbers,
-                highlight(oldComment.chunk.data, lexer, formatter).splitlines())
+                highlight(oldComment.chunk.data, lexer, formatter).splitlines()[oldComment.start-1:oldComment.end])
         highlighted_comment_lines = []
         staff_line_index = 0
         for number, line in highlighted:

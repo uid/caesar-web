@@ -11,26 +11,26 @@ function setupSimilarComments(comment_type) {
   // Remove similar-comment wrapper whenever the user closes a new comment entry box.
   $(".new-"+comment_type).on("remove", function(e) {
     $(".similar-"+comment_type+"-wrapper").remove();
-    $(".bubble").remove();
+    $(".bubble").hide();
   });
 
   function removeFeedback($textentry) {
     $("#feedback").remove();
-    $(".bubble").remove();
+    $(".bubble").hide();
   }
 
   function addFeedback($textentry, $similar_comment, similar_comment_text) {
     var feedback = $("<div id='feedback'></div>");
     feedback.text(similar_comment_text);
     $textentry.append(feedback);
-    var bubble = $("<span class='bubble triangle-isosceles left'>hello world</span>");
+    var comment_id = $similar_comment.attr("id").replace("similar-comment-", "");
+    var bubble = $("#bubble-"+comment_id);
+    bubble.show();
     var offset = $similar_comment.offset();
-    var width = $similar_comment.width();
+    var width = $similar_comment.outerWidth();
     var height = $similar_comment.height();
     // Triangle center is 16px from top of bubble, with 10px on the top and bottom. I tried getting these values from the CSS but I couldn't find them, so this will have to be a magic number.
-    bubble.offset({"top": offset.top + height/2.0 - 36, "left": offset.left + width});
-    //bubble.html($similar_comment.data());
-    $("body").append(bubble);
+    bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
   }
 
   function turnOnSelection() {
@@ -253,7 +253,7 @@ var commentSearch = new function() {
     var index2 = new fullproof.IndexUnit(
       "stemmedindex",
       new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
-      new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.english.metaphone),
+      new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.english.porter_stemmer),
       initializer
     );
 
@@ -300,11 +300,11 @@ var commentSearch = new function() {
         // Display only the top 3 results.
         for (var i=0; i<Math.min(results.length, 3); i++) {
 
-          ids.push('#similar-comment-'+results[i].index);
+          ids.push('#similar-comment-'+commentsExtraData[results[i].index].comment_id);
 
            // Check whether this result is already displayed
-          if ($('#similar-comment-'+results[i].index).length != 0) {
-            var comment_div = $('#similar-comment-'+results[i].index);
+          if ($('#similar-comment-'+commentsExtraData[results[i].index].comment_id).length != 0) {
+            var comment_div = $('#similar-comment-'+commentsExtraData[results[i].index].comment_id);
             var text = $(comment_div).find(".similar-comment-text").text();
             $(comment_div).find(".similar-comment-text").html(text.replace(regex, '<i><b>$&</b></i>'));
 
@@ -317,7 +317,7 @@ var commentSearch = new function() {
           // Display the full content in a div
           var comment_div = $("<div class='comment'></div>");
           comment_div.addClass("similar-comment");
-          comment_div.attr("id", "similar-comment-"+results[i].index);
+          comment_div.attr("id", "similar-comment-"+commentsExtraData[results[i].index].comment_id);
           var comment_text = $("<span></span>");
           comment_text.addClass("similar-comment-text");
           comment_text.html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));

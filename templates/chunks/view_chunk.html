@@ -13,8 +13,8 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/toolbar.css" type="text/css" />
 
 <link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/triangle.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/syntax.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/fullchunks.css" type="text/css" />
 
@@ -50,9 +50,8 @@
     // Add comments to database
     var commentsData = [];
     var commentsExtraData = [];
-    {% for comment, chunk_lines in old_comment_data %}
+    {% for comment, chunk_line in old_comment_data %}
 
-      console.log("{{chunk_lines}}");
       // Need to use escapejs filter to escape newline characters coming from the textarea
       commentsData.push("{{comment.text|escapejs}}");
 
@@ -63,24 +62,16 @@
         author = "{{comment.author.get_full_name|default:comment.author.username}} ({{comment.author.profile.reputation}})";
         author_url = "{% url 'accounts.views.view_profile' comment.author.username %}"
       {% endif %}
-      {% comment %}{% with start=comment.start|add:"-1" %}{% endcomment %}
       commentsExtraData.push({
+        "comment_id": "{{comment.id}}",
         "date": "{{comment.created|timesince_human}}",
         "chunk_name": "{{comment.chunk.name}}",
-        {% comment %}{% # %}//"chunk_content": "{{comment.chunk.lines|slice:'comment.start:comment.end'}}",{% endcomment %}
         "chunk_url": "{% url 'chunks.views.view_comment' comment.id %}",
         "author": author,
         "author_url": author_url,
 
       });
-      {% comment %}{% # %}{% endwith %}{% endcomment %}
     {% endfor %}
-    {% for comment in comment_chunk_lines %}
-      {% for line in comment %}
-        console.log("{{line}}")
-      {% endfor %}
-    {% endfor %}
-
 
     commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");
 
@@ -216,7 +207,7 @@
 </div>
 
 {% for comment, chunk_line in old_comment_data %}
-  <span class='bubble triangle-isosceles left'>
+  <span class='bubble triangle-border left' id='bubble-{{ comment.id }}'>
     <div class="syntax">
     {% for n, line, staff_code in chunk_line %}
       {% if not staff_code %}
