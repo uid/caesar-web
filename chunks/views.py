@@ -105,17 +105,19 @@ def view_chunk(request, chunk_id):
     role = membership[0].role
 
     if role == 'S':
-        oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().select_related('chunk__file', 'author__profile')
+        oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
     else:
         q = Q(author__membership__role = 'T') | Q(author__membership__role = 'V')
-        oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().select_related('chunk', 'author__profile')
+        oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
     old_comment_data = []
     for oldComment in oldComments:
-        numbers, lines = zip(*oldComment.chunk.lines[oldComment.start-1:oldComment.end])
+        start = oldComment.start-1
+        end = oldComment.end
+        numbers, lines = zip(*oldComment.chunk.lines[start:end])
         # highlight the code this way to correctly identify multi-line constructs
         # TODO implement a custom formatter to do this instead
         highlighted = zip(numbers,
-                highlight(oldComment.chunk.data, lexer, formatter).splitlines()[oldComment.start-1:oldComment.end])
+                highlight(oldComment.chunk.data, lexer, formatter).splitlines()[start:end])
         highlighted_comment_lines = []
         staff_line_index = 0
         for number, line in highlighted:

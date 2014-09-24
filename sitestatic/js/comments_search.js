@@ -19,6 +19,13 @@ function setupSimilarComments(comment_type) {
     $(".bubble").hide();
   }
 
+/*  $(".bubble-line").on("click", function() {
+    data = $(this).attr("id").split("-");
+    chunk = data[1];
+    comment = data[2];
+
+  });*/
+
   function addFeedback($textentry, $similar_comment, similar_comment_text) {
     var feedback = $("<div id='feedback'></div>");
     feedback.text(similar_comment_text);

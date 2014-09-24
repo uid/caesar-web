@@ -211,17 +211,17 @@
     <div class="syntax">
     {% for n, line, staff_code in chunk_line %}
       {% if not staff_code %}
-        <span id="chunk-{{comment.chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student">
-          <span id="line-{{comment.chunk.id}}-{{ n }}-{{comment.chunk.file.id}}" class="line">
+        <a id="chunk-{{comment.chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student" href='/chunks/view/{{comment.chunk.id}}#comment-{{comment.id}}' target='_blank'>
+          <span id="line-{{comment.chunk.id}}-{{ n }}-{{comment.chunk.file.id}}" class="bubble-line">
             <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
           </span>
-        </span>
+        </a>
       {% else %}
-        <span id="chunk-{{comment.chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff">
-          <span id="line-{{comment.chunk.id}}-{{ n }}-{{comment.chunk.file.id}}" class="line">
+        <a id="chunk-{{comment.chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff" href = '/chunks/view/{{comment.chunk.id}}#comment-{{comment.id}}' target='_blank'>
+          <span id="line-{{comment.chunk.id}}-{{ n }}-{{comment.chunk.file.id}}" class="bubble-line">
             <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
           </span>
-        </span>
+        </a>
       {% endif %}
     {% endfor %}
     </div>

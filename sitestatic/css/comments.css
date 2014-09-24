@@ -361,3 +361,7 @@
     border-color: transparent #ffff88 !important;
 }
 
+.bubble a, .bubble a:hover {
+    text-decoration: none;
+    color: inherit;
+}
