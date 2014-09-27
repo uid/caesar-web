@@ -185,6 +185,28 @@ function setupSimilarComments(comment_type) {
   });
 
   $("#textentry").focus();
+
+  $(".similar-"+comment_type+"-wrapper").on("mouseover", ".similar-comment", function() {
+    var selected = $(".selected");
+    $(this).addClass("selected");
+    selected.removeClass("selected");
+    removeFeedback($("#textentry"));
+    addFeedback($("#textentry"), $(this), $(this).find(".similar-comment-text").text());
+  });
+
+  $(".similar-"+comment_type+"-wrapper").on("mouseout", ".similar-comment", function() {
+    $(this).removeClass("selected");
+    removeFeedback($("#textentry"));
+  });
+
+  $(".similar-"+comment_type+"-wrapper").on("click", ".similar-comment", function() {
+    feedback_text = $("#feedback").text();
+    $("#textentry").append(feedback_text);
+    removeFeedback($("#textentry"));
+    $(".selected").removeClass("selected");
+    $(".similar-"+comment_type+"-wrapper").empty();
+    halt_search = true;
+  });
 }
 
 // Clear similarCommentsDB database !important
