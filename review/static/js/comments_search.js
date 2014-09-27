@@ -197,6 +197,9 @@ function setupSimilarComments(comment_type) {
   $(".similar-"+comment_type+"-wrapper").on("mouseout", ".similar-comment", function() {
     $(this).removeClass("selected");
     removeFeedback($("#textentry"));
+    if (cursorAtEnd($("#textentry"))) {
+      turnOnSelection();
+    }
   });
 
   $(".similar-"+comment_type+"-wrapper").on("click", ".similar-comment", function() {
