@@ -5,14 +5,13 @@ from review.models import Comment, Vote, Star
 from tasks.models import Task
 from tasks.routing import simulate_tasks
 
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.conf.urls import url
 
 from pygments import highlight
 from pygments.lexers import get_lexer_for_filename
@@ -25,7 +24,6 @@ import subprocess
 import datetime
 import sys
 from collections import defaultdict
-import json
 
 import logging
 
@@ -607,85 +605,3 @@ def publish_code(request):
         'user': request.user,
         'submissions': submissions,
     })
-
-@login_required
-def load_previous_comments(request, chunk_id):
-    user = request.user
-    chunk = get_object_or_404(Chunk, pk=chunk_id)
-    semester = chunk.file.submission.milestone.assignment.semester
-    subject = semester.subject
-    membership = Member.objects.filter(user=request.user).filter(semester=semester)
-    role = membership[0].role
-
-    if role == 'S':
-        oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
-    else:
-        q = Q(author__membership__role = 'T') | Q(author__membership__role = 'V')
-        oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
-
-    lexer = get_lexer_for_filename(chunk.file.path)
-    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-    staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
-    # old_comment_data = []
-
-    commentsData = []
-    commentsExtraData = []
-    highlightedLines = []
-
-    for oldComment in oldComments:
-        start = oldComment.start-1
-        end = oldComment.end
-        numbers, lines = zip(*oldComment.chunk.lines[start:end])
-        # highlight the code this way to correctly identify multi-line constructs
-        # TODO implement a custom formatter to do this instead
-        highlighted = zip(numbers,
-                highlight(oldComment.chunk.data, lexer, formatter).splitlines()[start:end])
-        highlighted_comment_lines = []
-        staff_line_index = 0
-        for number, line in highlighted:
-            if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
-                while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
-                    staff_line_index += 1
-                highlighted_comment_lines.append((number, line, True))
-            else:
-                highlighted_comment_lines.append((number, line, False))
-        # old_comment_data.append((oldComment, highlighted_comment_lines))
-
-        
-        commentsData.append(oldComment.text)
-        chunk_url = "{% url 'chunks.views.view_comment' "+str(oldComment.id)+" %}"
-        author = "";
-        author_url = "";
-        if role != 'S' and oldComment.author.username != user.username:
-            if oldComment.author.get_full_name():
-                author = str(oldComment.author.get_full_name())
-            else:
-                author = str(oldComment.author.username)
-            author += " ("+str(oldComment.author.profile.reputation)+")"
-            author_url = "{% url 'accounts.views.view_profile' "+str(oldComment.author.username)+" %}"
-        commentsExtraData.append({
-            "comment_id": oldComment.id,
-            "chunk_name": oldComment.chunk.name,
-            "chunk_url": chunk_url,
-            "author": author,
-            "author_url": author_url,
-        })
-        highlightedLines.append({
-            "comment_id": oldComment.id,
-            "chunk_lines": highlighted_comment_lines,
-            "comment_chunk_id": oldComment.chunk.id,
-            "comment_chunk_file_id": oldComment.chunk.file.id,
-        })
-
-    data = {
-        "commentsData": commentsData,
-        "commentsExtraData": commentsExtraData,
-        "highlightedLines": highlightedLines,
-    }
-    return HttpResponse(json.dumps(data), mimetype='application/json')
-
-    # return HttpResponse({'old_comment_data': old_comment_data})
-    # return HttpResponse({'response': "Hello world"})
-    # return render(request, 'chunks/comment_search.html', {
-    #     'old_comment_data': old_comment_data,
-    # })

@@ -204,7 +204,7 @@ function setupSimilarComments(comment_type) {
 
   $(".similar-"+comment_type+"-wrapper").on("click", ".similar-comment", function() {
     feedback_text = $("#feedback").text();
-    $("#textentry").append(feedback_text);
+    $("#textentry").append("\n", feedback_text);
     removeFeedback($("#textentry"));
     $(".selected").removeClass("selected");
     $(".similar-"+comment_type+"-wrapper").empty();

@@ -47,57 +47,10 @@
     // on load, clear database
     clearDatabase("{{chunk.id}}");
 
-    // Load previous comments
-    $.ajax({
-      type: "GET",
-      url: "{% url 'chunks.views.load_previous_comments' chunk.id %}",
-      success: function(data){
-        commentsData = data.commentsData;
-        commentsExtraData = data.commentsExtraData;
-        highlightedLines = data.highlightedLines;
-        commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");
-
-        for (var line in highlightedLines) {
-          var comment_id = highlightedLines[line].comment_id;
-          var chunk_lines = highlightedLines[line].chunk_lines;
-          var comment_chunk_id = highlightedLines[line].comment_chunk_id;
-          var comment_chunk_file_id = highlightedLines[line].comment_chunk_file_id;
-          var bubble = $("span").addClass("bubble triangle-border left").attr("id", "bubble-"+comment_id);
-          var syntax = $("div").addClass("syntax");
-          var outer;
-          for (var chunk_line in chunk_lines) {
-            var n = chunk_lines[chunk_line][0];
-            var line = chunk_lines[chunk_line][1];
-            var staff_code = chunk_lines[chunk_line][2];
-            outer = $("a").addClass("chunk-line").attr({
-              "id": "chunk-"+comment_chunk_id+"-line-"+n,
-              "href": "/chunks/view/"+comment_chunk_id+"#comment-"+comment_id,
-              "target": "_blank",
-            });
-            if (staff_code) {
-              outer.addClass("chunk-line-staff");
-            }
-            else {
-              outer.addClass("chunk-line-student");
-            }
-            var middle = $("span").addClass("bubble-line").attr("id", "line-"+comment_chunk_id+"-"+n+"-"+comment_chunk_file_id);
-            var inner_span = $("span").addClass("line-number").text(n);
-            var inner_pre = $("pre").addClass("line-code").text(line);
-            middle.append(inner_span, inner_pre);
-            outer.append(middle);
-          }
-          /*syntax.append(outer);
-          bubble.append(syntax);
-          $("body").append(bubble);*/
-        }
-        console.log("success!");
-      }
-    });
-
     // Add comments to database
-    /*var commentsData = [];
+    var commentsData = [];
     var commentsExtraData = [];
-    {%comment%}{% for comment, chunk_line in old_comment_data %}
+    {% for comment, chunk_line in old_comment_data %}
 
       // Need to use escapejs filter to escape newline characters coming from the textarea
       commentsData.push("{{comment.text|escapejs}}");
@@ -120,7 +73,7 @@
       });
     {% endfor %}
 
-    commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");{%endcomment%}*/
+    commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");
 
   });
 
@@ -253,8 +206,7 @@
   </div>
 </div>
 
-<!--
-{%comment%}{% for comment, chunk_line in old_comment_data %}
+{% for comment, chunk_line in old_comment_data %}
   <span class='bubble triangle-border left' id='bubble-{{ comment.id }}'>
     <div class="syntax">
     {% for n, line, staff_code in chunk_line %}
@@ -274,7 +226,7 @@
     {% endfor %}
     </div>
   </span>
-{% endfor%}{%endcomment%}
--->
+{% endfor%}
+
 {% endblock %}
 
