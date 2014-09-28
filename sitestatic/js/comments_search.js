@@ -2,8 +2,6 @@ function setupSimilarComments(comment_type) {
 
   var ascii_keys = {9: "tab", 13: "return", 37: "left", 38: "up", 39: "right", 40: "down"};
 
-  var halt_search = false;
-
   // Create similar-comment wrapper
   var similar_comment_wrapper = $("<div class='similar-"+comment_type+"-wrapper'></div>");
   $(".new-"+comment_type).after(similar_comment_wrapper);
@@ -106,9 +104,6 @@ function setupSimilarComments(comment_type) {
 
   // Handle arrow key navigation of textentry box and similar comments
   $("#textentry").on("keydown", function(event) {
-    if (halt_search) {
-      return;
-    }
     if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
       return;
     }
@@ -139,7 +134,6 @@ function setupSimilarComments(comment_type) {
           removeFeedback($(this));
           $(".selected").removeClass("selected");
           $(".similar-"+comment_type+"-wrapper").empty();
-          halt_search = true;
         }
       }
     }
@@ -148,13 +142,9 @@ function setupSimilarComments(comment_type) {
   // Copy textentry text to hidden form textarea, and perform search
   $("#textentry").on("keyup mouseup", function(event) {
     var textentry = $(this);
-    if (halt_search) {
-      return;
-    }
     if (textentry.text() == "") { // No need to search because textfield is empty
       textentry.empty();
       turnOffSelection();
-      halt_search = false;
       $(".similar-"+comment_type+"-wrapper").empty();
     }
     else if (event.which in ascii_keys || event.type=="mouseup") { // User is navigating
@@ -204,11 +194,10 @@ function setupSimilarComments(comment_type) {
 
   $(".similar-"+comment_type+"-wrapper").on("click", ".similar-comment", function() {
     feedback_text = $("#feedback").text();
-    $("#textentry").append("\n", feedback_text);
+    $("#textentry").append(feedback_text);
     removeFeedback($("#textentry"));
     $(".selected").removeClass("selected");
     $(".similar-"+comment_type+"-wrapper").empty();
-    halt_search = true;
   });
 }
 
