@@ -205,21 +205,7 @@ function setupSimilarComments(comment_type) {
 function clearDatabase(chunk_id) {
   var db;
   if ($.browser.mozilla) {
-    /*var request = indexedDB.open('similarCommentsDB-'+chunk_id);
-    request.onerror = function(event) {
-      alert("Why didn't you allow my web app to use IndexedDB?!");
-    };
-    request.onsuccess = function(event) {
-      db = request.result;
-      function clearStore(store_name) {
-        var tx = db.transaction(store_name, 'readwrite');
-        var store = tx.objectStore(store_name);
-        store.clear();
-      }
-      clearStore('fullproofmetadata');
-      clearStore('normalindex');
-      clearStore('stemmedindex');
-    };*/
+    indexedDB.deleteDatabase("similarCommentsDB-"+chunk_id);
   }
   else {
     db = openDatabase('similarCommentsDB-'+chunk_id, '1.0', 'similarCommentsDB-'+chunk_id, 2 * 1024 * 1024);
