@@ -12,6 +12,17 @@ function setupSimilarComments(comment_type) {
     $(".bubble").hide();
   });
 
+  function logUsage(action, comment_id) {
+    $.ajax({
+      type: "POST",
+      url: "/userlogging/log_comment_search/",
+      data: {
+        "action": action,
+        "comment_id": comment_id,
+      },
+    });
+  }
+
   function removeFeedback($textentry) {
     $("#feedback").remove();
     $(".bubble").hide();
@@ -31,6 +42,12 @@ function setupSimilarComments(comment_type) {
     bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
   }
 
+  $(".bubble .syntax .chunk-line").on("click", function() {
+    // Get comment id from bubble, whose id is bubble-{{comment.id}}
+    var comment_id = $(this).parent().parent().attr("id").split("-")[1];
+    logUsage("Clicked on chunk", comment_id);
+  });
+
   function turnOnSelection() {
     $(".new-"+comment_type).addClass("selected");
   }
@@ -49,6 +66,8 @@ function setupSimilarComments(comment_type) {
       selected.next().addClass("selected");
       selected.removeClass("selected");
     }
+    var comment_id = $(".selected").attr("id").split("-")[2];
+    logUsage("Cursor navigation", comment_id);
   }
 
   function selectPrevious() {
@@ -60,6 +79,8 @@ function setupSimilarComments(comment_type) {
     else if (!selected.hasClass("new-"+comment_type)) {
       $(selected).prev().addClass("selected");
       $(selected).removeClass("selected");
+      var comment_id = $(".selected").attr("id").split("-")[2];
+      logUsage("Cursor navigation", comment_id);
     }
   }
 
@@ -156,6 +177,7 @@ function setupSimilarComments(comment_type) {
           var comment_id = $(".selected").attr("id").split("-")[2];
           $(".selected").removeClass("selected");
           $(".similar-"+comment_type+"-wrapper").empty();
+          logUsage("Press enter to select", comment_id);
           return false; // Halt the return key propagation because this will delete the selected text!
         }
       }
@@ -205,6 +227,8 @@ function setupSimilarComments(comment_type) {
     selected.removeClass("selected");
     removeFeedback($("#textentry"));
     addFeedback($("#textentry"), $(this), $(this).find(".similar-comment-text").text());
+    var comment_id = $(".selected").attr("id").split("-")[2];
+    logUsage("Navigating with mouse", comment_id);
   });
 
   $(".similar-"+comment_type+"-wrapper").on("mouseout", ".similar-comment", function() {
@@ -220,8 +244,10 @@ function setupSimilarComments(comment_type) {
     selectText("textentry");
     $("#textentry").append("</br>", feedback_text);
     removeFeedback($("#textentry"));
+    var comment_id = $(".selected").attr("id").split("-")[2];
     $(".selected").removeClass("selected");
     $(".similar-"+comment_type+"-wrapper").empty();
+    logUsage("Mouse click to select", comment_id);
   });
 }
 
