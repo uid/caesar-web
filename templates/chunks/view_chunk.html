@@ -58,15 +58,10 @@
       // Need to save extra information about each comment. Only save the author and the link to the author's profile page if the author is not the current user.
       var author = "";
       var author_url = "";
-      {% if role != 'S' and comment.author.username != user.username %}
-        author = "{{comment.author.get_full_name|default:comment.author.username}} ({{comment.author.profile.reputation}})";
-        author_url = "{% url 'accounts.views.view_profile' comment.author.username %}"
-      {% endif %}
+      author = "{{comment.author.get_full_name|default:comment.author.username}} ({{comment.author.profile.reputation}})";
+      author_url = "{% url 'accounts.views.view_profile' comment.author.username %}"
       commentsExtraData.push({
         "comment_id": "{{comment.id}}",
-        "date": "{{comment.created|timesince_human}}",
-        "chunk_name": "{{comment.chunk.name}}",
-        "chunk_url": "{% url 'chunks.views.view_comment' comment.id %}",
         "author": author,
         "author_url": author_url,
 

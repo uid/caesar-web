@@ -102,6 +102,26 @@ function setupSimilarComments(comment_type) {
     return false;
   }
 
+  // Select (highlight) the text contained in the div with ID elementId
+  function selectText(elementId) {
+    var doc = document
+      , text = doc.getElementById(elementId)
+      , range, selection
+    ;
+    if (doc.body.createTextRange) {
+      range = document.body.createTextRange();
+      range.moveToElementText(text);
+      range.select();
+    } else if (window.getSelection) {
+      selection = window.getSelection();        
+      range = document.createRange();
+      range.selectNodeContents(text);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  }
+
+
   // Handle arrow key navigation of textentry box and similar comments
   $("#textentry").on("keydown", function(event) {
     if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
@@ -130,10 +150,13 @@ function setupSimilarComments(comment_type) {
         }
         else if (ascii_keys[event.which] == "return") {
           feedback_text = $("#feedback").text();
-          $(this).append(feedback_text);
+          selectText($(this).attr("id"));
+          $(this).append("</br>", feedback_text);
           removeFeedback($(this));
+          var comment_id = $(".selected").attr("id").split("-")[2];
           $(".selected").removeClass("selected");
           $(".similar-"+comment_type+"-wrapper").empty();
+          return false; // Halt the return key propagation because this will delete the selected text!
         }
       }
     }
@@ -194,7 +217,8 @@ function setupSimilarComments(comment_type) {
 
   $(".similar-"+comment_type+"-wrapper").on("click", ".similar-comment", function() {
     feedback_text = $("#feedback").text();
-    $("#textentry").append(feedback_text);
+    selectText("textentry");
+    $("#textentry").append("</br>", feedback_text);
     removeFeedback($("#textentry"));
     $(".selected").removeClass("selected");
     $(".similar-"+comment_type+"-wrapper").empty();
@@ -322,14 +346,10 @@ var commentSearch = new function() {
           comment_text.addClass("similar-comment-text");
           comment_text.html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
           comment_div.append(comment_text);
-          if (commentsExtraData[results[i].index].author != "") {
-            var author_link = $("<a target='_blank' class='similar-comment-author-link'></a>");
-            author_link.attr("href", commentsExtraData[results[i].index].author_url);
-            author_link.html(commentsExtraData[results[i].index].author);
-            comment_div.append(" - ", author_link);
-          }
-          //comment_div.data(commentsExtraData[results[i].index].chunk_content);
-          //console.log(commentsExtraData[results[i].index].chunk_content);
+          var author_link = $("<a target='_blank' class='similar-comment-author-link'></a>");
+          author_link.attr("href", commentsExtraData[results[i].index].author_url);
+          author_link.html(commentsExtraData[results[i].index].author);
+          comment_div.append(" - ", author_link);
 
           // Add new similar comment to after the previous result, in the correct order
           if (i == 0) { // This is the first result to be displayed
