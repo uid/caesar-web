@@ -21,7 +21,7 @@ urlpatterns = patterns('',
     (r'^wiki/', include('simplewiki.urls')),
     (r'^dashboard/', include('dashboard.urls')),
     (r'^tasks/', include('tasks.urls')),
-    (r'^userlogging/', include('userlogging.urls')),
+    (r'^log/', include('log.urls')),
 
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

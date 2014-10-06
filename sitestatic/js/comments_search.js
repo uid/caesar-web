@@ -12,14 +12,11 @@ function setupSimilarComments(comment_type) {
     $(".bubble").hide();
   });
 
-  function logUsage(action, comment_id) {
+  function logUsage(data) {
     $.ajax({
       type: "POST",
-      url: "/userlogging/log_comment_search/",
-      data: {
-        "action": action,
-        "comment_id": comment_id,
-      },
+      url: "/log/log/",
+      data: data
     });
   }
 
@@ -45,7 +42,13 @@ function setupSimilarComments(comment_type) {
   $(".bubble .syntax .chunk-line").on("click", function() {
     // Get comment id from bubble, whose id is bubble-{{comment.id}}
     var comment_id = $(this).parent().parent().attr("id").split("-")[1];
-    logUsage("Clicked on chunk", comment_id);
+    // Get chunk id from chunkline, whose id is chunkline-{{comment.chunk.id}}-line-{{n}}
+    var chunk_id = $(this).attr("id").split("-"[1]);
+    logUsage({
+      "event": "mouseclick",
+      "comment_id": comment_id,
+      "chunk_id": chunk_id
+    });
   });
 
   function turnOnSelection() {
@@ -66,8 +69,6 @@ function setupSimilarComments(comment_type) {
       selected.next().addClass("selected");
       selected.removeClass("selected");
     }
-    var comment_id = $(".selected").attr("id").split("-")[2];
-    logUsage("Cursor navigation", comment_id);
   }
 
   function selectPrevious() {
@@ -79,8 +80,6 @@ function setupSimilarComments(comment_type) {
     else if (!selected.hasClass("new-"+comment_type)) {
       $(selected).prev().addClass("selected");
       $(selected).removeClass("selected");
-      var comment_id = $(".selected").attr("id").split("-")[2];
-      logUsage("Cursor navigation", comment_id);
     }
   }
 
@@ -154,6 +153,11 @@ function setupSimilarComments(comment_type) {
           selectNext();
           removeFeedback($(this));
           addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
+          var comment_id = $(".selected").attr("id").split("-")[2];
+          logUsage({
+            "event": ascii_keys[event.which],
+            "comment_id": comment_id
+          });
           return false;
         }
         else if (ascii_keys[event.which] == "up" || ascii_keys[event.which] == "left") {
@@ -162,6 +166,11 @@ function setupSimilarComments(comment_type) {
             removeFeedback($(this));
             if ($(".similar-comment.selected").length != 0) {
               addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
+              var comment_id = $(".selected").attr("id").split("-")[2];
+              logUsage({
+                "event": ascii_keys[event.which],
+                "comment_id": comment_id
+              });
             }
             return false;
           }
@@ -177,7 +186,10 @@ function setupSimilarComments(comment_type) {
           var comment_id = $(".selected").attr("id").split("-")[2];
           $(".selected").removeClass("selected");
           $(".similar-"+comment_type+"-wrapper").empty();
-          logUsage("Press enter to select", comment_id);
+          logUsage({
+            "event": ascii_keys[event.which],
+            "comment_id": comment_id
+          });
           return false; // Halt the return key propagation because this will delete the selected text!
         }
       }
@@ -228,7 +240,10 @@ function setupSimilarComments(comment_type) {
     removeFeedback($("#textentry"));
     addFeedback($("#textentry"), $(this), $(this).find(".similar-comment-text").text());
     var comment_id = $(".selected").attr("id").split("-")[2];
-    logUsage("Navigating with mouse", comment_id);
+    logUsage({
+      "event": "mouseover",
+      "comment_id": comment_id
+    });
   });
 
   $(".similar-"+comment_type+"-wrapper").on("mouseout", ".similar-comment", function() {
@@ -247,7 +262,10 @@ function setupSimilarComments(comment_type) {
     var comment_id = $(".selected").attr("id").split("-")[2];
     $(".selected").removeClass("selected");
     $(".similar-"+comment_type+"-wrapper").empty();
-    logUsage("Mouse click to select", comment_id);
+    logUsage({
+      "event": "mouseclick",
+      "comment_id": comment_id
+    });
   });
 }
 

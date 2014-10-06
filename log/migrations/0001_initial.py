@@ -8,19 +8,19 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'CommentSearchLog'
-        db.create_table(u'userlogging_commentsearchlog', (
+        # Adding model 'Log'
+        db.create_table(u'log_log', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('action', self.gf('django.db.models.fields.CharField')(max_length=50)),
+            ('log', self.gf('django.db.models.fields.TextField')()),
             ('timestamp', self.gf('django.db.models.fields.DateField')()),
         ))
-        db.send_create_signal(u'userlogging', ['CommentSearchLog'])
+        db.send_create_signal(u'log', ['Log'])
 
 
     def backwards(self, orm):
-        # Deleting model 'CommentSearchLog'
-        db.delete_table(u'userlogging_commentsearchlog')
+        # Deleting model 'Log'
+        db.delete_table(u'log_log')
 
 
     models = {
@@ -60,13 +60,13 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        u'userlogging.commentsearchlog': {
-            'Meta': {'object_name': 'CommentSearchLog'},
-            'action': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
+        u'log.log': {
+            'Meta': {'object_name': 'Log'},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'log': ('django.db.models.fields.TextField', [], {}),
             'timestamp': ('django.db.models.fields.DateField', [], {}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['auth.User']"})
         }
     }
 
-    complete_apps = ['userlogging']
+    complete_apps = ['log']
