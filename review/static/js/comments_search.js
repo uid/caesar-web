@@ -1,3 +1,4 @@
+// Call this function when opening a comment form
 function setupSimilarComments(comment_type) {
 
   var ascii_keys = {9: "tab", 13: "return", 37: "left", 38: "up", 39: "right", 40: "down"};
@@ -6,25 +7,17 @@ function setupSimilarComments(comment_type) {
   var similar_comment_wrapper = $("<div class='similar-"+comment_type+"-wrapper'></div>");
   $(".new-"+comment_type).after(similar_comment_wrapper);
 
-  // Remove similar-comment wrapper whenever the user closes a new comment entry box.
-  $(".new-"+comment_type).on("remove", function(e) {
-    $(".similar-"+comment_type+"-wrapper").remove();
-    $(".bubble").hide();
-  });
+  ////////////////////////////////////////////////////////////////////////
+  // Helper methods
+  ////////////////////////////////////////////////////////////////////////  
 
-  function logUsage(data) {
-    $.ajax({
-      type: "POST",
-      url: "/log/log/",
-      data: data
-    });
-  }
-
+  // Remove similar-comment feedback from textentry
   function removeFeedback($textentry) {
     $("#feedback").remove();
     $(".bubble").hide();
   }
 
+  // Add similar-comment feedback to textentry
   function addFeedback($textentry, $similar_comment, similar_comment_text) {
     var feedback = $("<div id='feedback'></div>");
     feedback.text(similar_comment_text);
@@ -39,26 +32,17 @@ function setupSimilarComments(comment_type) {
     bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
   }
 
-  $(".bubble .syntax .chunk-line").on("click", function() {
-    // Get comment id from bubble, whose id is bubble-{{comment.id}}
-    var comment_id = $(this).parent().parent().attr("id").split("-")[1];
-    // Get chunk id from chunkline, whose id is chunkline-{{comment.chunk.id}}-line-{{n}}
-    var chunk_id = $(this).attr("id").split("-"[1]);
-    logUsage({
-      "event": "mouseclick",
-      "comment_id": comment_id,
-      "chunk_id": chunk_id
-    });
-  });
-
+  // Select the textentry (to show that navigation through similar comments is possible)
   function turnOnSelection() {
     $(".new-"+comment_type).addClass("selected");
   }
 
+  // Deselect the textentry (to show that navigation through similar comments is disabled)
   function turnOffSelection() {
     $(".selected").removeClass("selected");
   }
 
+  // Navigate to the next similar comment in the list
   function selectNext() {
     var selected = $(".selected");
     if (selected.hasClass("new-"+comment_type)) {
@@ -71,6 +55,7 @@ function setupSimilarComments(comment_type) {
     }
   }
 
+  // Navigate to the previous similar comment in the list, or to the textentry if user is at the top of the list
   function selectPrevious() {
     var selected = $(".selected");
     if (selected.is(".similar-comment:first")) {
@@ -105,13 +90,15 @@ function setupSimilarComments(comment_type) {
     return content;
   }
 
+  // Save content to hidden textarea.  CRITICAL so that form is saved.
   function saveToHiddenTextarea() {
     var content = getText($("#textentry"));
     $("#hidden-textarea").val(content);
   }
 
-  function cursorAtEnd(textentry) {
-    var user_entry = textentry.clone();
+  // Check whether cursor is at the end of the the textentry
+  function cursorAtEnd($textentry) {
+    var user_entry = $textentry.clone();
     user_entry.find("#feedback").remove();
 
     var content = getText(user_entry);
@@ -153,6 +140,18 @@ function setupSimilarComments(comment_type) {
     }
   }
 
+  // Record how user uses the system in the Caesar log
+  function logUsage(data) {
+    $.ajax({
+      type: "POST",
+      url: "/log/log/",
+      data: data
+    });
+  }
+
+  ////////////////////////////////////////////////////////////////////////
+  // Listeners
+  ////////////////////////////////////////////////////////////////////////  
 
   // Handle arrow key navigation of textentry box and similar comments
   $("#textentry").on("keydown", function(event) {
@@ -214,14 +213,14 @@ function setupSimilarComments(comment_type) {
 
   // Copy textentry text to hidden form textarea, and perform search
   $("#textentry").on("keyup mouseup", function(event) {
-    var textentry = $(this);
-    if (textentry.text() == "") { // No need to search because textfield is empty
-      textentry.empty();
+    var $textentry = $(this);
+    if ($textentry.text() == "") { // No need to search because textfield is empty
+      $textentry.empty();
       turnOffSelection();
       $(".similar-"+comment_type+"-wrapper").empty();
     }
     else if (event.which in ascii_keys || event.type=="mouseup") { // User is navigating
-      if (cursorAtEnd(textentry)) {
+      if (cursorAtEnd($textentry)) {
         if ($(".selected").length == 0 && !$(".similar-"+comment_type+"-wrapper").is(":empty")) {
           turnOnSelection();
         }
@@ -232,22 +231,20 @@ function setupSimilarComments(comment_type) {
       }
     }
     else { // User types normal keys (ex. letters/numbers)
-      removeFeedback(textentry);
+      removeFeedback($textentry);
       $(".similar-comment.selected").removeClass("selected");
-      var textentry_text = textentry.text();
+      var textentry_text = $textentry.text();
       saveToHiddenTextarea();
       commentSearch.search(textentry_text, comment_type, function() {
         if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
           turnOffSelection();
         }
-        else if (cursorAtEnd(textentry) && $(".selected").length == 0) {
+        else if (cursorAtEnd($textentry) && $(".selected").length == 0) {
           turnOnSelection();
         }
       });
     }
   });
-
-  $("#textentry").focus();
 
   $(".similar-"+comment_type+"-wrapper").on("mouseover", ".similar-comment", function() {
     var selected = $(".selected");
@@ -283,6 +280,31 @@ function setupSimilarComments(comment_type) {
       "comment_id": comment_id
     });
   });
+
+  // When user clicks on the chunks in the bubble next to a similar comment, opens a new tab at that comment
+  $(".bubble .syntax .chunk-line").on("click", function() {
+    // Get comment id from bubble, whose id is bubble-{{comment.id}}
+    var comment_id = $(this).parent().parent().attr("id").split("-")[1];
+    // Get chunk id from chunkline, whose id is chunkline-{{comment.chunk.id}}-line-{{n}}
+    var chunk_id = $(this).attr("id").split("-"[1]);
+    logUsage({
+      "event": "mouseclick",
+      "comment_id": comment_id,
+      "chunk_id": chunk_id
+    });
+  });
+
+  // Remove similar-comment wrapper whenever the user closes a new comment entry box.
+  $(".new-"+comment_type).on("remove", function(e) {
+    $(".similar-"+comment_type+"-wrapper").remove();
+    $(".bubble").hide();
+  });
+
+  ////////////////////////////////////////////////////////////////////////
+  // Final steps
+  ////////////////////////////////////////////////////////////////////////  
+
+  $("#textentry").focus();
 }
 
 // Clear similarCommentsDB database !important
