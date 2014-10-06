@@ -83,11 +83,10 @@ function setupSimilarComments(comment_type) {
     }
   }
 
-  function cursorAtEnd(textentry) {
+  // Get text content of contenteditable div (without HTML attributes)
+  function getText(textentry) {
     var user_entry = textentry.clone();
-    user_entry.find("#feedback").remove();
 
-    // Get text content from contenteditable div
     var content = $("<pre />").html(user_entry.html());
     if ($.browser.webkit) {
       content.find("div").replaceWith(function() {
@@ -103,6 +102,19 @@ function setupSimilarComments(comment_type) {
       content.find("br").replaceWith("\n");
     }
     content = content.text();
+    return content;
+  }
+
+  function saveToHiddenTextarea() {
+    var content = getText($("#textentry"));
+    $("#hidden-textarea").val(content);
+  }
+
+  function cursorAtEnd(textentry) {
+    var user_entry = textentry.clone();
+    user_entry.find("#feedback").remove();
+
+    var content = getText(user_entry);
 
     // Get line number of cursor
     var lines = content.split("\n");
@@ -179,18 +191,22 @@ function setupSimilarComments(comment_type) {
           }
         }
         else if (ascii_keys[event.which] == "return") {
-          feedback_text = $("#feedback").text();
-          selectText($(this).attr("id"));
-          $(this).append("</br>", feedback_text);
-          removeFeedback($(this));
-          var comment_id = $(".selected").attr("id").split("-")[2];
-          $(".selected").removeClass("selected");
-          $(".similar-"+comment_type+"-wrapper").empty();
-          logUsage({
-            "event": ascii_keys[event.which],
-            "comment_id": comment_id
-          });
-          return false; // Halt the return key propagation because this will delete the selected text!
+          if ($(".similar-comment.selected").length != 0) {
+            feedback_text = $("#feedback").text();
+            selectText($(this).attr("id"));
+            $(this).append("</br>", feedback_text);
+            removeFeedback($(this));
+            var comment_id = $(".selected").attr("id").split("-")[2];
+            $(".selected").removeClass("selected");
+            $(".similar-"+comment_type+"-wrapper").empty();
+            logUsage({
+              "event": ascii_keys[event.which],
+              "comment_id": comment_id
+            });
+            $("#hidden-similar-comment").val(comment_id);
+            saveToHiddenTextarea();
+            return false; // Halt the return key propagation because this will delete the selected text!
+          }
         }
       }
     }
@@ -219,7 +235,7 @@ function setupSimilarComments(comment_type) {
       removeFeedback(textentry);
       $(".similar-comment.selected").removeClass("selected");
       var textentry_text = textentry.text();
-      $("#hidden-textarea").val(textentry_text);
+      saveToHiddenTextarea();
       commentSearch.search(textentry_text, comment_type, function() {
         if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
           turnOffSelection();

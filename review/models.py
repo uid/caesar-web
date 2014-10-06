@@ -36,6 +36,7 @@ class Comment(models.Model):
     thread_id = models.IntegerField(null=True)
     deleted = models.BooleanField(default=False)
     batch = models.ForeignKey(Batch, blank=True, null=True, related_name='comments')
+    similar_comment = models.ForeignKey('self', related_name='similar_comments', blank=True, null=True)
 
     def __unicode__(self):
         return self.text
@@ -69,23 +70,6 @@ class Comment(models.Model):
         if len(self.text) < snippet_length:
             return self.text
         return self.text[0:snippet_length] + "..."
-
-    # # Generate a short snippet which contains the given substrings
-    # def generate_relevant_snippet(self, substring):
-    #     snippet_length = 30
-    #     index = self.text.find(substring)
-    #     if index == -1:
-    #         return ''
-    #     if len(self.text) < snippet_length:
-    #         return self.text
-    #     # Include buffer characters before and after the keyword
-    #     bufferchars = (snippet_length - len(substring)) / 2
-    #     if index < bufferchars: # Substring found very close to beginning of text
-    #         return self.text[0:snippet_length] + "..."
-    #     elif index + len(substring) + bufferchars > len(self.text): # Substring found very close to end of text
-    #         return "..." + self.text[-snippet_length:]
-    #     else:
-    #         return "..." + self.text[index-bufferchars:index+snippet_length-bufferchars] + "..."
 
     def is_checkstyle(self):
       return self.author.username is 'checkstyle'
