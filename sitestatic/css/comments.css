@@ -325,6 +325,7 @@
     resize: vertical;
     padding: 5px;
     overflow-y: scroll;
+    white-space: pre;
 }
 
 .similar-comment.selected, .new-comment.selected {
