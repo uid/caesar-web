@@ -98,6 +98,15 @@ MIDDLEWARE_CLASSES = (
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware'
 )
 
+# Create settings variables here to be rendered in templates. For example, {{ COMMENT_SEARCH }}
+# For comment search on, set COMMENT_SEARCH = True
+COMMENT_SEARCH = True
+
+def custom_context_processors(request):
+    return {
+        'COMMENT_SEARCH': COMMENT_SEARCH,
+    }
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
@@ -106,6 +115,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.core.context_processors.request',
     'django.contrib.messages.context_processors.messages',
+    'settings.custom_context_processors',
 )
 
 AUTHENTICATION_BACKENDS = (

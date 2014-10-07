@@ -1,10 +1,10 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-
-  var comment_type = "reply";
-  setupSimilarComments(comment_type);
-
+  {% if COMMENT_SEARCH %}
+    var comment_type = "reply";
+    setupSimilarComments(comment_type);
+  {% endif %}
 });
 
 </script>

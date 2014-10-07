@@ -105,6 +105,15 @@ def reply(request):
     else:
         form = ReplyForm(request.POST)
         if form.is_valid():
+            try:
+                similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
+                overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
+                if overlap_length > 20 or overlap_length == len(comment.text):
+                    form.similar_comment = similar_comment
+                else:
+                    form.similar_comment = None
+            except:
+                form.similar_comment = None
             comment = form.save(commit=False)
             comment.author = request.user
             parent = Comment.objects.get(id=comment.parent_id)
@@ -154,6 +163,15 @@ def edit_comment(request):
     else:
         form = EditCommentForm(request.POST)
         if form.is_valid():
+            try:
+                similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
+                overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
+                if overlap_length > 20 or overlap_length == len(comment.text):
+                    form.similar_comment = similar_comment
+                else:
+                    form.similar_comment = None
+            except:
+                form.similar_comment = None
             comment_id = form.cleaned_data['comment_id']
             comment = Comment.objects.get(id=comment_id)
             comment.text = form.cleaned_data['text']

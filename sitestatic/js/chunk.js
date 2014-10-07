@@ -136,7 +136,7 @@ function showCommentForm(startLine, endLine, chunkId, fileId) {
                 chunk: chunkId,
                 file: fileId
             }, true, function() {
-                $('textarea').focus();
+                $('#textentry').focus();
             }); 
         }
     );
@@ -179,7 +179,7 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
                 chunk: chunkId,
                 file: fileId
             }, true, function() {
-                $('textarea').focus();
+                $('#textentry').focus();
             }); 
         }
     );
@@ -416,7 +416,7 @@ function attachCommentHandlers(comment) {
             expandComment(comment);
         } else {
             scrollCodeTo(comment);
-            checkIfSpecial(comment);
+            checkIfSpecial(comment)
         }
     });
 
@@ -446,7 +446,7 @@ function attachCommentHandlers(comment) {
                         file: comment.file,
                         elt: replyElt.get(0) 
                     }, true, function() { 
-                        $('textarea').focus();
+                        $('#textentry').focus();
                     });
                 }
             );
@@ -544,191 +544,226 @@ model.addListener('taskStarted', function() {
     $('#done-button').removeAttr('disabled');
 });
 
+// Get text content of contenteditable div (without HTML attributes)
+function getText($textentry) {
+  var $textentry_clone = $textentry.clone();
+  if ($textentry_clone.find("#feedback").length != 0) {
+    $textentry_clone.find("#feedback").remove();
+  }
+
+  var content = $("<pre />").html($textentry_clone.html());
+  if ($.browser.webkit) {
+    content.find("div").replaceWith(function() {
+      return "\n" + this.innerHTML;
+    });
+  }
+  if ($.browser.msie) {
+    content.find("p").replaceWith(function() {
+      return this.innerHTML + "<br>";
+    });
+  }
+  if ($.browser.mozilla || $.browser.opera || $.browser.msie) {
+    content.find("br").replaceWith("\n");
+  }
+  content = content.text();
+  return content;
+}
+
 $(document).ready(function() {
 
-$('.comment').each(function() { 
-    model.addCommentFromDOM(this);
-});
+    $('.comment').each(function() { 
+        model.addCommentFromDOM(this);
+    });
 
-// Clear the selected lines if the user clicks anywhere except the comment form
-$('body').mousedown(function(e) {
-    if ($(e.target).is('.new-comment *') || $(e.target).is('.new-reply *') || $(e.target).is('.similar-comment *')) {
-        return true;
-    }
-    if ($('.new-comment textarea').val() || $('.new-reply textarea').val()) {
-        return false;
-    }
-    clearSelection();
-    if (!$(e.target).is('.comment *, .chunk-line *')) {
-        resetScroll();
-    }
-    return true;
-});
-
-if (caesar.state.fullView) {
-    $('div#chunk-display').selectable({
-        filter: '.line',
-        cancel: '.comment-marker',
-        start: function(event, ui) {
-            isSelecting = true;
-        },
-        stop: function(event, ui) {
-            var startLine = Number.MAX_VALUE;
-            var endLine = Number.MIN_VALUE;
-            var chunkId = null;
-            var fileId = null;
-            $('.line.ui-selected').each(function(i) {
-                var n = parseInt($(this).attr('id').split('-')[2]);
-                endLine = Math.max(endLine, n);
-                startLine = Math.min(startLine, n);
-                chunkId = parseInt($(this).attr('id').split('-')[1]);
-                fileId = parseInt($(this).attr('id').split('-')[3])
-            });
-            if (chunkId == null) {
-                return; // no lines selected, don't show the form
-	    }
-            showCommentForm(startLine, endLine, chunkId, fileId);
+    // Clear the selected lines if the user clicks anywhere except the comment form
+    $('body').mousedown(function(e) {
+        if ($(e.target).is('.new-comment *') || $(e.target).is('.new-reply *') || $(e.target).is('.similar-comment *')) {
+            return true;
         }
-    });
-}
-
-$('#new-comment-form').live('submit', function() {
-    var dataString = $(this).serialize();
-    $.post(caesar.urls.new_comment, dataString, function(data) {
-        var newNode = $(data);
-        $('.new-comment').replaceWith(newNode);
-        model.addCommentFromDOM(newNode.get(0));
-        newNode.effect('highlight', {}, 2000);
-        resetScroll();
+        if ($('.new-comment #textentry').val() || $('.new-reply #textentry').val()) {
+            return false;
+        }
         clearSelection();
+        if (!$(e.target).is('.comment *, .chunk-line *')) {
+            resetScroll();
+        }
+        return true;
     });
-    return false;
-});
 
-$('#edit-comment-form').live('submit', function() {
-    var dataString = $(this).serialize();
-    $.post(caesar.urls.edit_comment, dataString, function(data) {
-        var newNode = $(data);
-        $('.new-comment').replaceWith(newNode);
-        $('.new-reply').replaceWith(newNode);
-        //remove the one that's hiding
-        var idSplit = newNode.get(0).id.split('-');
-        var comment_id = parseInt(idSplit[1]);
-        $.each(model.comments, function(index, comment) {
-            if (comment != undefined && comment.id == comment_id){
-                model.removeComment(comment);
+    if (caesar.state.fullView) {
+        $('div#chunk-display').selectable({
+            filter: '.line',
+            cancel: '.comment-marker',
+            start: function(event, ui) {
+                isSelecting = true;
+            },
+            stop: function(event, ui) {
+                var startLine = Number.MAX_VALUE;
+                var endLine = Number.MIN_VALUE;
+                var chunkId = null;
+                var fileId = null;
+                $('.line.ui-selected').each(function(i) {
+                    var n = parseInt($(this).attr('id').split('-')[2]);
+                    endLine = Math.max(endLine, n);
+                    startLine = Math.min(startLine, n);
+                    chunkId = parseInt($(this).attr('id').split('-')[1]);
+                    fileId = parseInt($(this).attr('id').split('-')[3])
+                });
+                if (chunkId == null) {
+                    return; // no lines selected, don't show the form
+    	    }
+                showCommentForm(startLine, endLine, chunkId, fileId);
             }
         });
-        model.addCommentFromDOM(newNode.get(0));
-        newNode.effect('highlight', {}, 2000);
+    }
+
+    // Save content to hidden textarea. CRITICAL so that form is saved.
+    function saveTextToForm() {
+        var content = getText($("#textentry"));
+        $("#hidden-textarea").val(content);
+        console.log(content);
+    }
+
+    $('#new-comment-form').live('submit', function() {
+        saveTextToForm();
+        var dataString = $(this).serialize();
+        $.post(caesar.urls.new_comment, dataString, function(data) {
+            var newNode = $(data);
+            $('.new-comment').replaceWith(newNode);
+            model.addCommentFromDOM(newNode.get(0));
+            newNode.effect('highlight', {}, 2000);
+            resetScroll();
+            clearSelection();
+        });
+        return false;
+    });
+
+    $('#edit-comment-form').live('submit', function() {
+        saveTextToForm();
+        var dataString = $(this).serialize();
+        $.post(caesar.urls.edit_comment, dataString, function(data) {
+            var newNode = $(data);
+            $('.new-comment').replaceWith(newNode);
+            $('.new-reply').replaceWith(newNode);
+            //remove the one that's hiding
+            var idSplit = newNode.get(0).id.split('-');
+            var comment_id = parseInt(idSplit[1]);
+            $.each(model.comments, function(index, comment) {
+                if (comment != undefined && comment.id == comment_id){
+                    model.removeComment(comment);
+                }
+            });
+            model.addCommentFromDOM(newNode.get(0));
+            newNode.effect('highlight', {}, 2000);
+            resetScroll();
+            clearSelection();
+        });
+        return false;
+    });
+
+    $('#reply-comment-form').live('submit', function() {
+        saveTextToForm();
+        var dataString = $(this).serialize();
+        $.post(caesar.urls.reply, dataString, function(data) {
+            var newNode = $(data);
+            $('.new-reply').replaceWith(newNode);
+            model.addCommentFromDOM(newNode.get(0));
+            newNode.effect('highlight', {}, 2000);
+            resetScroll();
+            clearSelection();
+        });
+        return false;
+    });
+
+    $('#cancel-button').live('click', function() {
         resetScroll();
         clearSelection();
+        $.each(model.comments, function(index, comment) {
+            $(comment.elt).show();
+        });
     });
-    return false;
-});
 
-$('#reply-comment-form').live('submit', function() {
-    var dataString = $(this).serialize();
-    $.post(caesar.urls.reply, dataString, function(data) {
-        var newNode = $(data);
-        $('.new-reply').replaceWith(newNode);
-        model.addCommentFromDOM(newNode.get(0));
-        newNode.effect('highlight', {}, 2000);
+    $('#cancel-reply-button').live('click', function() {
         resetScroll();
-        clearSelection();
+        $('.reply-form').parent().remove();
+        $.each(model.comments, function(index, comment) {
+            $(comment.elt).show();
+        });
     });
-    return false;
-});
 
-$('#cancel-button').live('click', function() {
-    resetScroll();
-    clearSelection();
-    $.each(model.comments, function(index, comment) {
-        $(comment.elt).show();
+    var toggleCommentsText = {
+        collapse: 'Collapse all comments', 
+        expand: 'Expand all comments'
+    };
+    $('#toggle-comments-button').data('state', 'collapse');
+    $('#toggle-comments-button').click(function() {
+        var state = $(this).data('state');
+        if (state === 'collapse') {
+            collapseAllComments();
+            state = 'expand';
+        } else {
+            expandAllComments();
+            state = 'collapse';
+        }
+        $(this).text(toggleCommentsText[state]).data('state', state);
     });
-});
 
-$('#cancel-reply-button').live('click', function() {
-    resetScroll();
-    $('.reply-form').parent().remove();
-    $.each(model.comments, function(index, comment) {
-        $(comment.elt).show();
+    var toggleAutoCommentsText = {
+        collapse: 'Collapse all checkstyle comments', 
+        expand: 'Expand all checkstyle comments'
+    };
+    $('#toggle-auto-comments-button').data('state', 'collapse');
+    $('#toggle-auto-comments-button').click(function() {
+        var state = $(this).data('state');
+        if (state === 'collapse') {
+            collapseAllAutoComments();
+            state = 'expand';
+        } else {
+            expandAllAutoComments();
+            state = 'collapse';
+        }
+        $(this).text(toggleAutoCommentsText[state]).data('state', state);
     });
-});
 
-var toggleCommentsText = {
-    collapse: 'Collapse all comments', 
-    expand: 'Expand all comments'
-};
-$('#toggle-comments-button').data('state', 'collapse');
-$('#toggle-comments-button').click(function() {
-    var state = $(this).data('state');
-    if (state === 'collapse') {
-        collapseAllComments();
-        state = 'expand';
-    } else {
-        expandAllComments();
-        state = 'collapse';
-    }
-    $(this).text(toggleCommentsText[state]).data('state', state);
-});
+    var toggleInstructionsText = {
+        visible: 'Hide instructions', 
+        hidden: 'Show instructions' 
+    };
+    var instructionsState = $.cookie('instructionsState') || 'visible';
 
-var toggleAutoCommentsText = {
-    collapse: 'Collapse all checkstyle comments', 
-    expand: 'Expand all checkstyle comments'
-};
-$('#toggle-auto-comments-button').data('state', 'collapse');
-$('#toggle-auto-comments-button').click(function() {
-    var state = $(this).data('state');
-    if (state === 'collapse') {
-        collapseAllAutoComments();
-        state = 'expand';
-    } else {
-        expandAllAutoComments();
-        state = 'collapse';
-    }
-    $(this).text(toggleAutoCommentsText[state]).data('state', state);
-});
-
-var toggleInstructionsText = {
-    visible: 'Hide instructions', 
-    hidden: 'Show instructions' 
-};
-var instructionsState = $.cookie('instructionsState') || 'visible';
-
-if (instructionsState === 'visible') {
-    $('#instructions-text').show();
-} else {
-    $('#instructions-text').hide();
-}
-$('#toggle-instructions-button')
-        .text(toggleInstructionsText[instructionsState]);
-
-$('#toggle-instructions-button').click(function() {
     if (instructionsState === 'visible') {
-        $('#instructions-text').slideUp(400);
-        instructionsState = 'hidden';
+        $('#instructions-text').show();
     } else {
-        $('#instructions-text').slideDown(400);
-        instructionsState = 'visible';
+        $('#instructions-text').hide();
     }
-    $.cookie('instructionsState', instructionsState);
-    $(this).text(toggleInstructionsText[instructionsState]);
-});
+    $('#toggle-instructions-button')
+            .text(toggleInstructionsText[instructionsState]);
 
-$('.dropdown-link').click(function() {
-    var menu = $(this).next('.dropdown-menu');
-    var position = $(this).position();
-    var height = $(this).outerHeight();
-    menu.css({ top: position.top + height, left: position.left });
-    menu.slideDown(400);
-    return false;
-});
+    $('#toggle-instructions-button').click(function() {
+        if (instructionsState === 'visible') {
+            $('#instructions-text').slideUp(400);
+            instructionsState = 'hidden';
+        } else {
+            $('#instructions-text').slideDown(400);
+            instructionsState = 'visible';
+        }
+        $.cookie('instructionsState', instructionsState);
+        $(this).text(toggleInstructionsText[instructionsState]);
+    });
 
-$('body').click(function() {
-    $('.dropdown-menu').slideUp(400); 
-});
+    $('.dropdown-link').click(function() {
+        var menu = $(this).next('.dropdown-menu');
+        var position = $(this).position();
+        var height = $(this).outerHeight();
+        menu.css({ top: position.top + height, left: position.left });
+        menu.slideDown(400);
+        return false;
+    });
 
-$('pre.line-code').each(function(i,e){$(this).prepend($(this).prev());$(this).prev().remove();})
+    $('body').click(function() {
+        $('.dropdown-menu').slideUp(400); 
+    });
+
+    $('pre.line-code').each(function(i,e){$(this).prepend($(this).prev());$(this).prev().remove();})
 
 });

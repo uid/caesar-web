@@ -1,4 +1,77 @@
+////////////////////////////////////////////////////////////////////////
+// Helper methods
+////////////////////////////////////////////////////////////////////////  
+
+// Check whether cursor is at the end of the the textentry
+function cursorAtEnd($textentry) {
+  // getText() found in chunk.js
+  var content = getText($textentry);
+
+  // Get line number of cursor
+  var lines = content.split("\n");
+  var line_text = window.getSelection().getRangeAt(0).commonAncestorContainer.textContent;
+  var line_num = lines.indexOf(line_text);
+
+  // Check if cursor is on last line
+  if (line_num == lines.length - 1) {
+    var cursor_position = window.getSelection().getRangeAt(0).startOffset;
+    var length = line_text.length;
+
+    // Check if cursor is at last character of the line
+    if (cursor_position == length) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Select (highlight) the text contained in the div with ID elementId
+function selectText(elementId) {
+  var doc = document
+    , text = doc.getElementById(elementId)
+    , range, selection
+  ;
+  if (doc.body.createTextRange) {
+    range = document.body.createTextRange();
+    range.moveToElementText(text);
+    range.select();
+  } else if (window.getSelection) {
+    selection = window.getSelection();        
+    range = document.createRange();
+    range.selectNodeContents(text);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+}
+
+// Record how user uses the system in the Caesar log
+function logUsage(data) {
+  $.ajax({
+    type: "POST",
+    url: "/log/log/",
+    data: data
+  });
+}
+
+// Clear similarCommentsDB database !important
+function clearDatabase(chunk_id) {
+  var db;
+  if ($.browser.mozilla) {
+    indexedDB.deleteDatabase("similarCommentsDB-"+chunk_id);
+  }
+  else {
+    db = openDatabase('similarCommentsDB-'+chunk_id, '1.0', 'similarCommentsDB-'+chunk_id, 2 * 1024 * 1024);
+    db.transaction(function (tx) {
+      tx.executeSql('DROP TABLE fullproofmetadata');
+      tx.executeSql('DROP TABLE normalindex');
+      tx.executeSql('DROP TABLE stemmedindex');
+    });
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
 // Call this function when opening a comment form
+////////////////////////////////////////////////////////////////////////  
 function setupSimilarComments(comment_type) {
 
   var ascii_keys = {9: "tab", 13: "return", 37: "left", 38: "up", 39: "right", 40: "down"};
@@ -6,10 +79,6 @@ function setupSimilarComments(comment_type) {
   // Create similar-comment wrapper
   var similar_comment_wrapper = $("<div class='similar-"+comment_type+"-wrapper'></div>");
   $(".new-"+comment_type).after(similar_comment_wrapper);
-
-  ////////////////////////////////////////////////////////////////////////
-  // Helper methods
-  ////////////////////////////////////////////////////////////////////////  
 
   // Remove similar-comment feedback from textentry
   function removeFeedback($textentry) {
@@ -68,87 +137,6 @@ function setupSimilarComments(comment_type) {
     }
   }
 
-  // Get text content of contenteditable div (without HTML attributes)
-  function getText(textentry) {
-    var user_entry = textentry.clone();
-
-    var content = $("<pre />").html(user_entry.html());
-    if ($.browser.webkit) {
-      content.find("div").replaceWith(function() {
-        return "\n" + this.innerHTML;
-      });
-    }
-    if ($.browser.msie) {
-      content.find("p").replaceWith(function() {
-        return this.innerHTML + "<br>";
-      });
-    }
-    if ($.browser.mozilla || $.browser.opera || $.browser.msie) {
-      content.find("br").replaceWith("\n");
-    }
-    content = content.text();
-    return content;
-  }
-
-  // Save content to hidden textarea.  CRITICAL so that form is saved.
-  function saveToHiddenTextarea() {
-    var content = getText($("#textentry"));
-    $("#hidden-textarea").val(content);
-  }
-
-  // Check whether cursor is at the end of the the textentry
-  function cursorAtEnd($textentry) {
-    var user_entry = $textentry.clone();
-    user_entry.find("#feedback").remove();
-
-    var content = getText(user_entry);
-
-    // Get line number of cursor
-    var lines = content.split("\n");
-    var line_text = window.getSelection().getRangeAt(0).commonAncestorContainer.textContent;
-    var line_num = lines.indexOf(line_text);
-
-    // Check if cursor is on last line
-    if (line_num == lines.length - 1) {
-      var cursor_position = window.getSelection().getRangeAt(0).startOffset;
-      var length = line_text.length;
-
-      // Check if cursor is at last character of the line
-      if (cursor_position == length) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  // Select (highlight) the text contained in the div with ID elementId
-  function selectText(elementId) {
-    var doc = document
-      , text = doc.getElementById(elementId)
-      , range, selection
-    ;
-    if (doc.body.createTextRange) {
-      range = document.body.createTextRange();
-      range.moveToElementText(text);
-      range.select();
-    } else if (window.getSelection) {
-      selection = window.getSelection();        
-      range = document.createRange();
-      range.selectNodeContents(text);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-  }
-
-  // Record how user uses the system in the Caesar log
-  function logUsage(data) {
-    $.ajax({
-      type: "POST",
-      url: "/log/log/",
-      data: data
-    });
-  }
-
   ////////////////////////////////////////////////////////////////////////
   // Listeners
   ////////////////////////////////////////////////////////////////////////  
@@ -203,7 +191,6 @@ function setupSimilarComments(comment_type) {
               "comment_id": comment_id
             });
             $("#hidden-similar-comment").val(comment_id);
-            saveToHiddenTextarea();
             return false; // Halt the return key propagation because this will delete the selected text!
           }
         }
@@ -234,7 +221,6 @@ function setupSimilarComments(comment_type) {
       removeFeedback($textentry);
       $(".similar-comment.selected").removeClass("selected");
       var textentry_text = $textentry.text();
-      saveToHiddenTextarea();
       commentSearch.search(textentry_text, comment_type, function() {
         if ($(".similar-"+comment_type+"-wrapper").is(":empty")) {
           turnOffSelection();
@@ -300,29 +286,11 @@ function setupSimilarComments(comment_type) {
     $(".bubble").hide();
   });
 
-  ////////////////////////////////////////////////////////////////////////
-  // Final steps
-  ////////////////////////////////////////////////////////////////////////  
-
-  $("#textentry").focus();
 }
 
-// Clear similarCommentsDB database !important
-function clearDatabase(chunk_id) {
-  var db;
-  if ($.browser.mozilla) {
-    indexedDB.deleteDatabase("similarCommentsDB-"+chunk_id);
-  }
-  else {
-    db = openDatabase('similarCommentsDB-'+chunk_id, '1.0', 'similarCommentsDB-'+chunk_id, 2 * 1024 * 1024);
-    db.transaction(function (tx) {
-      tx.executeSql('DROP TABLE fullproofmetadata');
-      tx.executeSql('DROP TABLE normalindex');
-      tx.executeSql('DROP TABLE stemmedindex');
-    });
-  }
-}
-
+////////////////////////////////////////////////////////////////////////
+// Comment Search Class
+////////////////////////////////////////////////////////////////////////  
 var commentSearch = new function() {
 
   var dbName, commentsSearchEngine, commentsData, commentsExtraData;

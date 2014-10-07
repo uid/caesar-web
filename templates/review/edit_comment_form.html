@@ -1,18 +1,18 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-
-  var comment_type;
-  {% if reply %}
-  comment_type = "reply";
-  {% else %}
-  comment_type = "comment";
+  {% if COMMENT_SEARCH %}
+    var comment_type;
+    {% if reply %}
+      comment_type = "reply";
+    {% else %}
+      comment_type = "comment";
+    {% endif %}
+    setupSimilarComments(comment_type);
   {% endif %}
-  setupSimilarComments(comment_type);
-
+  
   // Copy comment text from hidden textarea into editable div
   $("#textentry").text($("#hidden-textarea").val());
-
 });
 
 </script>
