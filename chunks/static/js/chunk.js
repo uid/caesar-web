@@ -580,7 +580,7 @@ $(document).ready(function() {
         if ($(e.target).is('.new-comment *') || $(e.target).is('.new-reply *') || $(e.target).is('.similar-comment *') || $(e.target).is('.bubble *')) {
             return true;
         }
-        if ($('.new-comment #textentry').val() || $('.new-reply #textentry').val()) {
+        if ($('.new-comment #textentry').text() || $('.new-reply #textentry').text() || $('#edit-comment-form #textentry').text() || $('#edit-reply-form #textentry').text()) {
             return false;
         }
         clearSelection();

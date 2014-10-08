@@ -13,6 +13,9 @@ $(document).ready(function() {
   
   // Copy comment text from hidden textarea into editable div
   $("#textentry").text($("#hidden-textarea").val());
+  console.log("{{form.comment_id.value}}");
+  console.log("{{form.text.value}}");
+  console.log("{{form.similar_comment.value}}");
 })
 
 </script>

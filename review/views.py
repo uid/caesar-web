@@ -86,7 +86,7 @@ def new_comment(request):
             try:
                 similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
                 overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
-                if overlap_length > 20 or overlap_length == len(comment.text):
+                if overlap_length > 20 or overlap_length == len(form.cleaned_data['text']):
                     form.similar_comment = similar_comment
                 else:
                     form.similar_comment = None
@@ -128,7 +128,7 @@ def reply(request):
             try:
                 similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
                 overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
-                if overlap_length > 20 or overlap_length == len(comment.text):
+                if overlap_length > 20 or overlap_length == len(form.cleaned_data['text']):
                     form.similar_comment = similar_comment
                 else:
                     form.similar_comment = None
@@ -167,10 +167,14 @@ def edit_comment(request):
         comment = Comment.objects.get(pk=comment_id)
         start = comment.start
         end = comment.end
+        try:
+            similar_comment = comment.similar_comment.id
+        except:
+            similar_comment = None
         form = EditCommentForm(initial={
              'text': comment.text,
              'comment_id': comment.id,
-             'similar_comment': comment.similar_comment,
+             'similar_comment': similar_comment,
         })
         chunk = Chunk.objects.get(pk=comment.chunk.id)
         markLogStart(request.user)
@@ -190,18 +194,18 @@ def edit_comment(request):
             comment = Comment.objects.get(id=comment_id)
             comment.text = form.cleaned_data['text']
             comment.edited = datetime.datetime.now()
-            try:
-                similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
-                overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
-                if overlap_length > 20 or overlap_length == len(comment.text):
-                    comment.similar_comment = similar_comment
-                else:
-                    comment.similar_comment = None
-            except:
-                comment.similar_comment = None
+            # try:
+            #     similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
+            #     overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
+            #     if overlap_length > 20 or overlap_length == len(comment.text):
+            #         comment.similar_comment = similar_comment
+            #     else:
+            #         comment.similar_comment = None
+            # except:
+            #     comment.similar_comment = None
             comment.save()
             chunk = comment.chunk
-            aggregateLog(request.user, comment.id)
+            aggregateLog(request.user, comment_id)
             return render(request, 'review/comment.html', {
                 'comment': comment,
                 'chunk': chunk,
