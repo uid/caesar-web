@@ -168,7 +168,6 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
                 });
                 if (!added) {
                     $('.file-'+fileId).append(elt);
-                    console.log("uh oh");
                 }
                 // construct a fake "comment" boundary object to pass in
                 commentElt = elt.filter('.comment').get(0);
@@ -622,7 +621,6 @@ $(document).ready(function() {
     function saveTextToForm() {
         var content = getText($("#textentry"));
         $("#hidden-textarea").val(content);
-        console.log(content);
     }
 
     $('#new-comment-form').live('submit', function() {

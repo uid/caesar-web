@@ -4,4 +4,4 @@ from django.contrib.auth.models import User
 class Log(models.Model):
     user = models.ForeignKey(User)
     log = models.TextField()
-    timestamp = models.DateField()
+    timestamp = models.DateTimeField()

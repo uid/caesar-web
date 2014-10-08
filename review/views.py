@@ -43,6 +43,22 @@ def longest_common_substring(s1, s2):
                 m[x][y] = 0
     return s1[x_longest - longest: x_longest]
 
+def markLogStart(user):
+    logStart = Log(user=user, log='LOGSTART', timestamp=datetime.datetime.now())
+    logStart.save()
+
+def aggregateLog(user, comment_id):
+    logStart = Log.objects.filter(log='LOGSTART').order_by('-timestamp')[0]
+    timestart = logStart.timestamp
+    logStart.delete()
+    logs = Log.objects.filter(user=user, timestamp__gte=timestart)
+    logDict = {'comment_id': comment_id,
+                'logs': [l.log for l in logs]
+            }
+    logs.delete()
+    aggregateLog = Log(user=user, log=str(logDict), timestamp=datetime.datetime.now())
+    aggregateLog.save()
+
 @login_required
 def new_comment(request):
     if request.method == 'GET':
@@ -55,7 +71,7 @@ def new_comment(request):
             'chunk': chunk_id
         })
         chunk = Chunk.objects.get(pk=chunk_id)
-        timestart = datetime.datetime.now()
+        markLogStart(request.user)
 
         return render(request, 'review/comment_form.html', {
             'form': form,
@@ -88,7 +104,7 @@ def new_comment(request):
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
-            aggregateLog(timestart, datetime.datetime.now(), request.user)
+            aggregateLog(request.user, comment.id)
             return render(request, 'review/comment.html', {
                 'comment': comment,
                 'chunk': chunk,
@@ -104,6 +120,7 @@ def reply(request):
         form = ReplyForm(initial={
             'parent': request.GET['parent']
         })
+        markLogStart(request.user)
         return render(request, 'review/reply_form.html', {'form': form})
     else:
         form = ReplyForm(request.POST)
@@ -135,6 +152,7 @@ def reply(request):
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
+            aggregateLog(request.user, comment.id)
             return render(request, 'review/comment.html', {
                 'comment': comment,
                 'chunk': chunk,
@@ -155,6 +173,7 @@ def edit_comment(request):
              'similar_comment': comment.similar_comment,
         })
         chunk = Chunk.objects.get(pk=comment.chunk.id)
+        markLogStart(request.user)
         return render(request, 'review/edit_comment_form.html', {
             'form': form,
             'start': start,
@@ -182,6 +201,7 @@ def edit_comment(request):
                 comment.similar_comment = None
             comment.save()
             chunk = comment.chunk
+            aggregateLog(request.user, comment.id)
             return render(request, 'review/comment.html', {
                 'comment': comment,
                 'chunk': chunk,
