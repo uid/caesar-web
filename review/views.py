@@ -170,7 +170,7 @@ def edit_comment(request):
         try:
             similar_comment = comment.similar_comment.id
         except:
-            similar_comment = None
+            similar_comment = -1
         form = EditCommentForm(initial={
              'text': comment.text,
              'comment_id': comment.id,
@@ -194,15 +194,15 @@ def edit_comment(request):
             comment = Comment.objects.get(id=comment_id)
             comment.text = form.cleaned_data['text']
             comment.edited = datetime.datetime.now()
-            # try:
-            #     similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
-            #     overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
-            #     if overlap_length > 20 or overlap_length == len(comment.text):
-            #         comment.similar_comment = similar_comment
-            #     else:
-            #         comment.similar_comment = None
-            # except:
-            #     comment.similar_comment = None
+            try:
+                similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
+                overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
+                if overlap_length > 20 or overlap_length == len(comment.text):
+                    comment.similar_comment = similar_comment
+                else:
+                    comment.similar_comment = None
+            except:
+                comment.similar_comment = None
             comment.save()
             chunk = comment.chunk
             aggregateLog(request.user, comment_id)
@@ -213,6 +213,8 @@ def edit_comment(request):
                 'full_view': True,
                 'file': chunk.file,
             })
+        else:
+            return HttpResponse("hello world")
 
 @login_required
 def delete_comment(request):
