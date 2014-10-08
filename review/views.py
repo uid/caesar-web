@@ -149,6 +149,7 @@ def edit_comment(request):
         form = EditCommentForm(initial={
              'text': comment.text,
              'comment_id': comment.id,
+             'similar_comment': comment.similar_comment,
         })
         chunk = Chunk.objects.get(pk=comment.chunk.id)
         return render(request, 'review/edit_comment_form.html', {
@@ -163,19 +164,19 @@ def edit_comment(request):
     else:
         form = EditCommentForm(request.POST)
         if form.is_valid():
-            # try:
-            #     similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
-            #     overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
-            #     if overlap_length > 20 or overlap_length == len(comment.text):
-            #         form.similar_comment = similar_comment
-            #     else:
-            #         form.similar_comment = None
-            # except:
-            #     form.similar_comment = None
             comment_id = form.cleaned_data['comment_id']
             comment = Comment.objects.get(id=comment_id)
             comment.text = form.cleaned_data['text']
             comment.edited = datetime.datetime.now()
+            try:
+                similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
+                overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
+                if overlap_length > 20 or overlap_length == len(comment.text):
+                    comment.similar_comment = similar_comment
+                else:
+                    comment.similar_comment = None
+            except:
+                comment.similar_comment = None
             comment.save()
             chunk = comment.chunk
             return render(request, 'review/comment.html', {
