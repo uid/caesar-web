@@ -19,6 +19,7 @@ from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
 from accounts.models import UserProfile, Extension, Member
 from simplewiki.models import Article
+from log.models import Log
 
 from pygments import highlight
 from pygments.lexers import get_lexer_for_filename
@@ -54,13 +55,14 @@ def new_comment(request):
             'chunk': chunk_id
         })
         chunk = Chunk.objects.get(pk=chunk_id)
+        timestart = datetime.datetime.now()
 
         return render(request, 'review/comment_form.html', {
             'form': form,
             'start': start,
             'end': end,
             'snippet': chunk.generate_snippet(start, end),
-            'chunk': chunk, 
+            'chunk': chunk,
         })
     else:
         form = CommentForm(request.POST)
@@ -86,6 +88,7 @@ def new_comment(request):
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
+            aggregateLog(timestart, datetime.datetime.now(), request.user)
             return render(request, 'review/comment.html', {
                 'comment': comment,
                 'chunk': chunk,

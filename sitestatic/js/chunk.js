@@ -161,8 +161,6 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
                 $.each(model.comments, function(index, comment) {
                     if (comment.chunk == chunkId && ((startLine == comment.start && endLine > comment.end)
                         || startLine < comment.start)) {
-                        console.log("chunk: "+comment.chunk);
-                        console.log(comment.elt);
                         $(comment.elt).before(elt);
                         added = true;
                         return false;
@@ -580,7 +578,7 @@ $(document).ready(function() {
 
     // Clear the selected lines if the user clicks anywhere except the comment form
     $('body').mousedown(function(e) {
-        if ($(e.target).is('.new-comment *') || $(e.target).is('.new-reply *') || $(e.target).is('.similar-comment *')) {
+        if ($(e.target).is('.new-comment *') || $(e.target).is('.new-reply *') || $(e.target).is('.similar-comment *') || $(e.target).is('.bubble *')) {
             return true;
         }
         if ($('.new-comment #textentry').val() || $('.new-reply #textentry').val()) {
