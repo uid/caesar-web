@@ -161,13 +161,16 @@ function showEditForm(commentId, startLine, endLine, chunkId, fileId, comment) {
                 $.each(model.comments, function(index, comment) {
                     if (comment.chunk == chunkId && ((startLine == comment.start && endLine > comment.end)
                         || startLine < comment.start)) {
-                        $(comment.elt).before(elt);                        
+                        console.log("chunk: "+comment.chunk);
+                        console.log(comment.elt);
+                        $(comment.elt).before(elt);
                         added = true;
                         return false;
                     }
                 });
                 if (!added) {
                     $('.file-'+fileId).append(elt);
+                    console.log("uh oh");
                 }
                 // construct a fake "comment" boundary object to pass in
                 commentElt = elt.filter('.comment').get(0);

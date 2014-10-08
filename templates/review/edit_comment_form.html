@@ -1,7 +1,7 @@
 <script type="text/javascript">
 
 $(document).ready(function() {
-  {% if COMMENT_SEARCH %}
+  /*{% if COMMENT_SEARCH %}
     var comment_type;
     {% if reply %}
       comment_type = "reply";
@@ -9,11 +9,11 @@ $(document).ready(function() {
       comment_type = "comment";
     {% endif %}
     setupSimilarComments(comment_type);
-  {% endif %}
+  {% endif %}*/
   
   // Copy comment text from hidden textarea into editable div
   $("#textentry").text($("#hidden-textarea").val());
-});
+})
 
 </script>
 
