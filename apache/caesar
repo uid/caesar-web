@@ -2,6 +2,11 @@ SSLVerifyClient require
 SSLVerifyDepth 1
 SSLCACertificateFile /etc/ssl/certs/mitCAclient.pem
 
+ServerName caesar.eecs.mit.edu
+SSLCertificateChainFile    /var/django/caesar/apache/ssl/InCommon-chain.crt
+SSLCertificateKeyFile      /var/django/caesar/apache/ssl/caesar.eecs.mit.edu.key
+SSLCertificateFile         /var/django/caesar/apache/ssl/caesar.eecs.mit.edu.crt
+
 Alias /media /var/django/caesar/media
 Alias /static /var/django/caesar/sitestatic
 Alias /favicon.ico /var/django/caesar/sitestatic/favicon.ico
