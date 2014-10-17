@@ -43,21 +43,17 @@ def longest_common_substring(s1, s2):
                 m[x][y] = 0
     return s1[x_longest - longest: x_longest]
 
-def markLogStart(user):
-    logStart = Log(user=user, log='LOGSTART', timestamp=datetime.datetime.now())
+def markLogStart(user, log):
+    logStart = Log(user=user, log='LOGSTART: '+str(log), timestamp=datetime.datetime.now())
     logStart.save()
 
-def aggregateLog(user, comment_id):
-    logStart = Log.objects.filter(log='LOGSTART').order_by('-timestamp')[0]
-    timestart = logStart.timestamp
-    logStart.delete()
-    logs = Log.objects.filter(user=user, timestamp__gte=timestart)
-    logDict = {'comment_id': comment_id,
-                'logs': [l.log for l in logs]
-            }
-    logs.delete()
-    aggregateLog = Log(user=user, log=str(logDict), timestamp=datetime.datetime.now())
-    aggregateLog.save()
+def find_similar_comment(similar_comment_id, form_text):
+    similar_comment = Comment.objects.get(id=similar_comment_id)
+    overlap_length = len(longest_common_substring(form_text, similar_comment.text))
+    if overlap_length > 20 or overlap_length == len(form_text):
+        return similar_comment
+    else:
+        return None
 
 @login_required
 def new_comment(request):
@@ -71,7 +67,12 @@ def new_comment(request):
             'chunk': chunk_id
         })
         chunk = Chunk.objects.get(pk=chunk_id)
-        markLogStart(request.user)
+        markLogStart(request.user, {
+            'type': 'new comment',
+            'start': start,
+            'end': end,
+            'chunk': chunk_id
+        })
 
         return render(request, 'review/comment_form.html', {
             'form': form,
@@ -84,12 +85,7 @@ def new_comment(request):
         form = CommentForm(request.POST)
         if form.is_valid():
             try:
-                similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
-                overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
-                if overlap_length > 20 or overlap_length == len(form.cleaned_data['text']):
-                    form.similar_comment = similar_comment
-                else:
-                    form.similar_comment = None
+                form.similar_comment = find_similar_comment(form.cleaned_data['similar_comment'], form.cleaned_data['text'])
             except:
                 form.similar_comment = None
             comment = form.save(commit=False)
@@ -104,7 +100,6 @@ def new_comment(request):
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
-            aggregateLog(request.user, comment.id)
             return render(request, 'review/comment.html', {
                 'comment': comment,
                 'chunk': chunk,
@@ -120,18 +115,16 @@ def reply(request):
         form = ReplyForm(initial={
             'parent': request.GET['parent']
         })
-        markLogStart(request.user)
+        markLogStart(request.user,  {
+            'type': 'new reply',
+            'parent': request.GET['parent'],
+        })
         return render(request, 'review/reply_form.html', {'form': form})
     else:
         form = ReplyForm(request.POST)
         if form.is_valid():
             try:
-                similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
-                overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
-                if overlap_length > 20 or overlap_length == len(form.cleaned_data['text']):
-                    form.similar_comment = similar_comment
-                else:
-                    form.similar_comment = None
+                form.similar_comment = find_similar_comment(form.cleaned_data['similar_comment'], form.cleaned_data['text'])
             except:
                 form.similar_comment = None
             comment = form.save(commit=False)
@@ -152,7 +145,6 @@ def reply(request):
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
-            aggregateLog(request.user, comment.id)
             return render(request, 'review/comment.html', {
                 'comment': comment,
                 'chunk': chunk,
@@ -177,7 +169,12 @@ def edit_comment(request):
              'similar_comment': similar_comment,
         })
         chunk = Chunk.objects.get(pk=comment.chunk.id)
-        markLogStart(request.user)
+        markLogStart(request.user,  {
+            'type': 'edit comment',
+            'text': comment.text,
+            'comment_id': comment.id,
+            'similar_comment': similar_comment,
+        })
         return render(request, 'review/edit_comment_form.html', {
             'form': form,
             'start': start,
@@ -195,17 +192,11 @@ def edit_comment(request):
             comment.text = form.cleaned_data['text']
             comment.edited = datetime.datetime.now()
             try:
-                similar_comment = Comment.objects.get(id=form.cleaned_data['similar_comment'])
-                overlap_length = len(longest_common_substring(form.cleaned_data['text'], similar_comment.text))
-                if overlap_length > 20 or overlap_length == len(comment.text):
-                    comment.similar_comment = similar_comment
-                else:
-                    comment.similar_comment = None
+                comment.similar_comment = find_similar_comment(form.cleaned_data['similar_comment'], form.cleaned_data['text'])
             except:
                 comment.similar_comment = None
             comment.save()
             chunk = comment.chunk
-            aggregateLog(request.user, comment_id)
             return render(request, 'review/comment.html', {
                 'comment': comment,
                 'chunk': chunk,
@@ -213,8 +204,6 @@ def edit_comment(request):
                 'full_view': True,
                 'file': chunk.file,
             })
-        else:
-            return HttpResponse("hello world")
 
 @login_required
 def delete_comment(request):

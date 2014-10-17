@@ -13,7 +13,6 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/toolbar.css" type="text/css" />
 
 <link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/syntax.css" type="text/css" />
 
 {% if full_view %}
@@ -33,7 +32,6 @@
 </script>
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js?v=1"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}/js/fullproof-all-debug.js"></script>
 
 <script type="text/javascript" charset="utf-8">
 
@@ -176,6 +174,8 @@ $(document).ready(function() {
 </table>
 {% empty %}
 {% endfor %}
+
+{% include "review/similar_comments.html" %}
 
 {% endblock %}
 

@@ -137,6 +137,21 @@ function setupSimilarComments(comment_type) {
     }
   }
 
+  function selectSimilarComment($textentry) {
+    feedback_text = $("#feedback").text();
+    selectText($textentry.attr("id"));
+    $textentry.append("</br>", feedback_text);
+    removeFeedback($textentry);
+    var comment_id = $(".selected").attr("id").split("-")[2];
+    $(".selected").removeClass("selected");
+    $(".similar-"+comment_type+"-wrapper").empty();
+    logUsage({
+      "event": ascii_keys[event.which],
+      "comment_id": comment_id
+    });
+    $("#hidden-similar-comment").val(comment_id);
+  }
+
   ////////////////////////////////////////////////////////////////////////
   // Listeners
   ////////////////////////////////////////////////////////////////////////  
@@ -179,18 +194,19 @@ function setupSimilarComments(comment_type) {
         }
         else if (ascii_keys[event.which] == "return") {
           if ($(".similar-comment.selected").length != 0) {
-            feedback_text = $("#feedback").text();
-            selectText($(this).attr("id"));
-            $(this).append("</br>", feedback_text);
-            removeFeedback($(this));
-            var comment_id = $(".selected").attr("id").split("-")[2];
-            $(".selected").removeClass("selected");
-            $(".similar-"+comment_type+"-wrapper").empty();
-            logUsage({
-              "event": ascii_keys[event.which],
-              "comment_id": comment_id
-            });
-            $("#hidden-similar-comment").val(comment_id);
+            selectSimilarComment($(this));
+            // feedback_text = $("#feedback").text();
+            // selectText($(this).attr("id"));
+            // $(this).append("</br>", feedback_text);
+            // removeFeedback($(this));
+            // var comment_id = $(".selected").attr("id").split("-")[2];
+            // $(".selected").removeClass("selected");
+            // $(".similar-"+comment_type+"-wrapper").empty();
+            // logUsage({
+            //   "event": ascii_keys[event.which],
+            //   "comment_id": comment_id
+            // });
+            // $("#hidden-similar-comment").val(comment_id);
             return false; // Halt the return key propagation because this will delete the selected text!
           }
         }
@@ -254,17 +270,19 @@ function setupSimilarComments(comment_type) {
   });
 
   $(".similar-"+comment_type+"-wrapper").on("click", ".similar-comment", function() {
-    feedback_text = $("#feedback").text();
-    selectText("textentry");
-    $("#textentry").append("</br>", feedback_text);
-    removeFeedback($("#textentry"));
-    var comment_id = $(".selected").attr("id").split("-")[2];
-    $(".selected").removeClass("selected");
-    $(".similar-"+comment_type+"-wrapper").empty();
-    logUsage({
-      "event": "mouseclick",
-      "comment_id": comment_id
-    });
+    selectSimilarComment($("#textentry"));
+    // feedback_text = $("#feedback").text();
+    // selectText("textentry");
+    // $("#textentry").append("</br>", feedback_text);
+    // removeFeedback($("#textentry"));
+    // var comment_id = $(".selected").attr("id").split("-")[2];
+    // $(".selected").removeClass("selected");
+    // $(".similar-"+comment_type+"-wrapper").empty();
+    // logUsage({
+    //   "event": "mouseclick",
+    //   "comment_id": comment_id
+    // });
+    // $("#hidden-similar-comment").val(comment_id);
   });
 
   // When user clicks on the chunks in the bubble next to a similar comment, opens a new tab at that comment
@@ -338,7 +356,8 @@ var commentSearch = new function() {
   this.search = function(value, comment_type, _callback) {
 
     // Create regular expression for highlighting query words
-    var wordset = value.replace(/\n|\r|\s/g, "zDVJRqVs").split("zDVJRqVs");
+    var split_string = "zDVJRqVs";
+    var wordset = value.replace(/\n|\r|\s/g, split_string).split(split_string);
     var patternset = [];
     for (var i in wordset) {
       // stopwords is a list of stopwords from stopwords.js. This is a copy of the stopwords used by fullproof.

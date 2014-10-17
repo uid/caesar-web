@@ -1,0 +1,71 @@
+<link rel="stylesheet" href="{{ STATIC_URL }}css/triangle.min.css" type="text/css" />
+<link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
+<script type="text/javascript" src="{{ STATIC_URL }}js/fullproof-all.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/stopwords.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/comments_search.js"></script>
+
+
+<script type="text/javascript">
+  // on unload this page, clear database
+  $(window).on("unload", function() {
+    {% if COMMENT_SEARCH %}
+      clearDatabase("{{chunk.id}}");
+    {% endif %}
+  });
+
+  $(document).ready(function() {
+    {% if COMMENT_SEARCH %}
+      // on load, clear database
+      clearDatabase("{{chunk.id}}");
+
+      // Add comments to database
+      var commentsData = [];
+      var commentsExtraData = [];
+      {% for comment, chunk_line in old_comment_data %}
+
+        // Need to use escapejs filter to escape newline characters coming from the textarea
+        commentsData.push("{{comment.text|escapejs}}");
+
+        // Need to save extra information about each comment. Only save the author and the link to the author's profile page if the author is not the current user.
+        var author = "";
+        var author_url = "";
+        author = "{{comment.author.get_full_name|default:comment.author.username}} ({{comment.author.profile.reputation}})";
+        author_url = "{% url 'accounts.views.view_profile' comment.author.username %}"
+        commentsExtraData.push({
+          "comment_id": "{{comment.id}}",
+          "author": author,
+          "author_url": author_url,
+
+        });
+      {% endfor %}
+
+      commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");
+    {% endif %}
+
+  });
+
+</script>
+
+{% if COMMENT_SEARCH %}
+  {% for comment, chunk_line in old_comment_data %}
+<span class='bubble triangle-border left' id='bubble-{{ comment.id }}'>
+  <div class="syntax">
+  {% for n, line, staff_code in chunk_line %}
+    {% if not staff_code %}
+      <a id="chunk-{{comment.chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student" href='/chunks/view/{{comment.chunk.id}}#comment-{{comment.id}}' target='_blank'>
+        <span id="line-{{comment.chunk.id}}-{{ n }}-{{comment.chunk.file.id}}" class="bubble-line">
+          <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+        </span>
+      </a>
+    {% else %}
+      <a id="chunk-{{comment.chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff" href = '/chunks/view/{{comment.chunk.id}}#comment-{{comment.id}}' target='_blank'>
+        <span id="line-{{comment.chunk.id}}-{{ n }}-{{comment.chunk.file.id}}" class="bubble-line">
+          <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+        </span>
+      </a>
+    {% endif %}
+  {% endfor %}
+  </div>
+</span>
+  {% endfor%}
+{% endif %}
