@@ -65,23 +65,26 @@ def view_chunk(request, chunk_id):
 
     comment_data = map(get_comment_data, chunk.comments.prefetch_related('author__profile', 'author__membership__semester'))
 
+    def highlight_chunk_lines(lexer, formatter, chunk, start=None, end=None):
+        [numbers, lines] = zip(*chunk.lines[start:end])
+        # highlight the code this way to correctly identify multi-line constructs
+        # TODO implement a custom formatter to do this instead
+        highlighted = zip(numbers,
+                highlight(chunk.data, lexer, formatter).splitlines()[start:end])
+        highlighted_lines = []
+        staff_line_index = 0
+        for number, line in highlighted:
+            if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
+                while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
+                    staff_line_index += 1
+                highlighted_lines.append((number, line, True))
+            else:
+                highlighted_lines.append((number, line, False))
+        return highlighted_lines
+
     lexer = get_lexer_for_filename(chunk.file.path)
-    
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-    numbers, lines = zip(*chunk.lines)
-    # highlight the code this way to correctly identify multi-line constructs
-    # TODO implement a custom formatter to do this instead
-    highlighted = zip(numbers,
-            highlight(chunk.data, lexer, formatter).splitlines())
-    highlighted_lines = []
-    staff_line_index = 0
-    for number, line in highlighted:
-        if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
-            while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
-                staff_line_index += 1
-            highlighted_lines.append((number, line, True))
-        else:
-            highlighted_lines.append((number, line, False))
+    highlighted_lines = highlight_chunk_lines(lexer, formatter, chunk)
 
     task_count = Task.objects.filter(reviewer=user) \
             .exclude(status='C').exclude(status='U').count()
@@ -129,20 +132,7 @@ def view_chunk(request, chunk_id):
         for oldComment in oldComments:
             start = oldComment.start-1
             end = oldComment.end
-            numbers, lines = zip(*oldComment.chunk.lines[start:end])
-            # highlight the code this way to correctly identify multi-line constructs
-            # TODO implement a custom formatter to do this instead
-            highlighted = zip(numbers,
-                    highlight(oldComment.chunk.data, lexer, formatter).splitlines()[start:end])
-            highlighted_comment_lines = []
-            staff_line_index = 0
-            for number, line in highlighted:
-                if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
-                    while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
-                        staff_line_index += 1
-                    highlighted_comment_lines.append((number, line, True))
-                else:
-                    highlighted_comment_lines.append((number, line, False))
+            highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, oldComment.chunk, start, end)
             old_comment_data.append((oldComment, highlighted_comment_lines))
         context['old_comment_data'] = old_comment_data
 
@@ -278,11 +268,6 @@ def view_all_chunks(request, viewtype, submission_id):
         'full_view': True,
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
-
-def view_comment(request, comment_id):
-  comment = Comment.objects.get(pk=comment_id)
-  chunk_id = comment.chunk.id
-  return redirect('/chunks/view/'+str(chunk_id)+'#comment-'+str(comment_id))
 
 @login_required
 def view_submission_for_milestone(request, viewtype, milestone_id, username):

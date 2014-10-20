@@ -109,7 +109,6 @@
     });
 
     // As a default, check the box of the class that the user is in
-    //var user_memberships = [];
     {% for membership in user.membership.all %}
       $("#filter-table input[value='{{membership.semester.subject.id}}'].subject").attr("checked", "checked");
     {% endfor %}
