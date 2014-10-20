@@ -7,7 +7,7 @@ from collections import defaultdict
 
 checkstyle_settings = {
     'settings': '/var/django/caesar/preprocessor/checks.xml',
-    'jar': '/var/django/caesar/preprocessor/checkstyle-5.7-all.jar',
+    'jar': '/var/django/caesar/preprocessor/checkstyle-5.9-all.jar',
     }
 
 # ignored_warnings maps a class type (from the Chunk model)
