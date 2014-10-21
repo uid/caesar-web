@@ -24,6 +24,7 @@ import subprocess
 import datetime
 import sys
 from collections import defaultdict
+from django.conf import settings
 
 import logging
 
@@ -64,23 +65,26 @@ def view_chunk(request, chunk_id):
 
     comment_data = map(get_comment_data, chunk.comments.prefetch_related('author__profile', 'author__membership__semester'))
 
+    def highlight_chunk_lines(lexer, formatter, chunk, start=None, end=None):
+        [numbers, lines] = zip(*chunk.lines[start:end])
+        # highlight the code this way to correctly identify multi-line constructs
+        # TODO implement a custom formatter to do this instead
+        highlighted = zip(numbers,
+                highlight(chunk.data, lexer, formatter).splitlines()[start:end])
+        highlighted_lines = []
+        staff_line_index = 0
+        for number, line in highlighted:
+            if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
+                while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
+                    staff_line_index += 1
+                highlighted_lines.append((number, line, True))
+            else:
+                highlighted_lines.append((number, line, False))
+        return highlighted_lines
+
     lexer = get_lexer_for_filename(chunk.file.path)
-    
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-    numbers, lines = zip(*chunk.lines)
-    # highlight the code this way to correctly identify multi-line constructs
-    # TODO implement a custom formatter to do this instead
-    highlighted = zip(numbers,
-            highlight(chunk.data, lexer, formatter).splitlines())
-    highlighted_lines = []
-    staff_line_index = 0
-    for number, line in highlighted:
-        if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
-            while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
-                staff_line_index += 1
-            highlighted_lines.append((number, line, True))
-        else:
-            highlighted_lines.append((number, line, False))
+    highlighted_lines = highlight_chunk_lines(lexer, formatter, chunk)
 
     task_count = Task.objects.filter(reviewer=user) \
             .exclude(status='C').exclude(status='U').count()
@@ -100,7 +104,7 @@ def view_chunk(request, chunk_id):
             task = Task.objects.filter(chunk=chunk)[0]
         last_task = False
 
-    return render(request, 'chunks/view_chunk.html', {
+    context = {
         'chunk': chunk,
         'similar_chunks': chunk.get_similar_chunks(),
         'highlighted_lines': highlighted_lines,
@@ -112,7 +116,27 @@ def view_chunk(request, chunk_id):
         'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
         'last_task': last_task,
         'remaining_task_count': remaining_task_count,
-    })
+    }
+
+    if settings.COMMENT_SEARCH:
+        subject = semester.subject
+        membership = Member.objects.filter(user=request.user).filter(semester=semester)
+        role = membership[0].role
+
+        if role == Member.STUDENT:
+            oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
+        else:
+            q = Q(author__membership__role = Member.TEACHER) | Q(author__membership__role = Member.VOLUNTEER)
+            oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
+        old_comment_data = []
+        for oldComment in oldComments:
+            start = oldComment.start-1
+            end = oldComment.end
+            highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, oldComment.chunk, start, end)
+            old_comment_data.append((oldComment, highlighted_comment_lines))
+        context['old_comment_data'] = old_comment_data
+
+    return render(request, 'chunks/view_chunk.html', context)
 
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
@@ -121,10 +145,6 @@ def view_all_chunks(request, viewtype, submission_id):
     semester = Semester.objects.get(assignments__milestones__submitmilestone__submissions=submission)
     authors = User.objects.filter(submissions=submission)
     is_reviewer = Task.objects.filter(submission=submission, reviewer=user).exists()
-
-    # block a user who's crawling
-    if user.username=="dekehu":
-        raise Http404
 
     try:
         user_membership = Member.objects.get(user=user, semester=semester)

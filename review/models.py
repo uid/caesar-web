@@ -36,6 +36,7 @@ class Comment(models.Model):
     thread_id = models.IntegerField(null=True)
     deleted = models.BooleanField(default=False)
     batch = models.ForeignKey(Batch, blank=True, null=True, related_name='comments')
+    similar_comment = models.ForeignKey('self', related_name='similar_comments', blank=True, null=True)
 
     def __unicode__(self):
         return self.text

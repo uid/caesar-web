@@ -19,6 +19,7 @@ from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
 from accounts.models import UserProfile, Extension, Member
 from simplewiki.models import Article
+from log.models import Log
 
 from pygments import highlight
 from pygments.lexers import get_lexer_for_filename
@@ -27,6 +28,32 @@ from pygments.formatters import HtmlFormatter
 import datetime
 import sys
 import logging
+
+def longest_common_substring(s1, s2):
+    m = [[0] * (1 + len(s2)) for i in xrange(1 + len(s1))]
+    longest, x_longest = 0, 0
+    for x in xrange(1, 1 + len(s1)):
+        for y in xrange(1, 1 + len(s2)):
+            if s1[x - 1] == s2[y - 1]:
+                m[x][y] = m[x - 1][y - 1] + 1
+                if m[x][y] > longest:
+                    longest = m[x][y]
+                    x_longest = x
+            else:
+                m[x][y] = 0
+    return s1[x_longest - longest: x_longest]
+
+def markLogStart(user, log):
+    logStart = Log(user=user, log='LOGSTART: '+str(log), timestamp=datetime.datetime.now())
+    logStart.save()
+
+def find_similar_comment(similar_comment_id, form_text):
+    similar_comment = Comment.objects.get(id=similar_comment_id)
+    overlap_length = len(longest_common_substring(form_text, similar_comment.text))
+    if overlap_length > 20:
+        return similar_comment
+    else:
+        return None
 
 @login_required
 def new_comment(request):
@@ -40,6 +67,13 @@ def new_comment(request):
             'chunk': chunk_id
         })
         chunk = Chunk.objects.get(pk=chunk_id)
+        markLogStart(request.user, {
+            'type': 'new comment',
+            'start': start,
+            'end': end,
+            'chunk': chunk_id
+        })
+
         return render(request, 'review/comment_form.html', {
             'form': form,
             'start': start,
@@ -50,6 +84,10 @@ def new_comment(request):
     else:
         form = CommentForm(request.POST)
         if form.is_valid():
+            try:
+                form.similar_comment = find_similar_comment(form.cleaned_data['similar_comment'], form.cleaned_data['text'])
+            except:
+                form.similar_comment = None
             comment = form.save(commit=False)
             comment.author = request.user
             comment.save()
@@ -77,10 +115,18 @@ def reply(request):
         form = ReplyForm(initial={
             'parent': request.GET['parent']
         })
+        markLogStart(request.user,  {
+            'type': 'new reply',
+            'parent': request.GET['parent'],
+        })
         return render(request, 'review/reply_form.html', {'form': form})
     else:
         form = ReplyForm(request.POST)
         if form.is_valid():
+            try:
+                form.similar_comment = find_similar_comment(form.cleaned_data['similar_comment'], form.cleaned_data['text'])
+            except:
+                form.similar_comment = None
             comment = form.save(commit=False)
             comment.author = request.user
             parent = Comment.objects.get(id=comment.parent_id)
@@ -113,11 +159,22 @@ def edit_comment(request):
         comment = Comment.objects.get(pk=comment_id)
         start = comment.start
         end = comment.end
+        try:
+            similar_comment = comment.similar_comment.id
+        except:
+            similar_comment = -1
         form = EditCommentForm(initial={
              'text': comment.text,
              'comment_id': comment.id,
+             'similar_comment': similar_comment,
         })
         chunk = Chunk.objects.get(pk=comment.chunk.id)
+        markLogStart(request.user,  {
+            'type': 'edit comment',
+            'text': comment.text,
+            'comment_id': comment.id,
+            'similar_comment': similar_comment,
+        })
         return render(request, 'review/edit_comment_form.html', {
             'form': form,
             'start': start,
@@ -134,6 +191,10 @@ def edit_comment(request):
             comment = Comment.objects.get(id=comment_id)
             comment.text = form.cleaned_data['text']
             comment.edited = datetime.datetime.now()
+            try:
+                comment.similar_comment = find_similar_comment(form.cleaned_data['similar_comment'], form.cleaned_data['text'])
+            except:
+                comment.similar_comment = None
             comment.save()
             chunk = comment.chunk
             return render(request, 'review/comment.html', {

@@ -1,3 +1,22 @@
+<script type="text/javascript">
+
+$(document).ready(function() {
+  {% if COMMENT_SEARCH %}
+    var comment_type;
+    {% if reply %}
+      comment_type = "reply";
+    {% else %}
+      comment_type = "comment";
+    {% endif %}
+    setupSimilarComments(comment_type);
+  {% endif %}
+  
+  // Copy comment text from hidden textarea into editable div
+  $("#textentry").text($("#hidden-textarea").val());
+})
+
+</script>
+
 {% if not reply %}
 <div class="comment new-comment" title="Edit a comment">
   <div class="comment-header">
@@ -14,8 +33,10 @@
     <form id="edit-comment-form" 
       action="{% url 'review.views.edit_comment' %}" method="post">
       {% csrf_token %}
+      <div id='textentry' contenteditable='true'></div>
       {{ form.text }}
       {{ form.comment_id }}
+      {{ form.similar_comment }}
       <button type="submit">Save</button>
       <button id="cancel-button" type="button">Cancel</button>
     </form>
@@ -27,8 +48,10 @@
     <form id="edit-comment-form"
       action="{% url 'review.views.edit_comment' %}" method="post">
       {% csrf_token %}
+      <div id='textentry' contenteditable='true'></div>
       {{ form.text }}
       {{ form.comment_id }}
+      {{ form.similar_comment }}
       <button type="submit">Save</button>
       <button id="cancel-reply-button" type="button">Cancel</button>
     </form>
