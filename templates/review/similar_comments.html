@@ -25,9 +25,7 @@
         // Need to use escapejs filter to escape newline characters coming from the textarea
         commentsData.push("{{comment.text|escapejs}}");
 
-        // Need to save extra information about each comment. Only save the author and the link to the author's profile page if the author is not the current user.
-        var author = "";
-        var author_url = "";
+        // Need to save extra information about each comment.
         author = "{{comment.author.get_full_name|default:comment.author.username}} ({{comment.author.profile.reputation}})";
         author_url = "{% url 'accounts.views.view_profile' comment.author.username %}"
         commentsExtraData.push({
@@ -39,6 +37,7 @@
       {% endfor %}
 
       commentSearch.init(commentsData, commentsExtraData, "{{chunk.id}}");
+
     {% endif %}
 
   });
