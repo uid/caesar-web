@@ -333,7 +333,8 @@ def allusers(request):
     return render(request, 'accounts/allusers.html', {
         'participants': participants,
         'subjects': subjects,
-        'roles': roles
+        'roles': roles,
+        'enrolled_classes': request.user,
     })
 
 @login_required

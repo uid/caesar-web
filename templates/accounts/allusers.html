@@ -39,6 +39,7 @@
       roles.push("{{role}}");
     {% endfor %}
 
+
     var subjectsl = subjects.length;
     var rolesl = roles.length;
     for (var i=0; i<Math.max(subjectsl, rolesl); i++) {
@@ -106,6 +107,11 @@
         }
       }
     });
+
+    // As a default, check the box of the class that the user is in
+    {% for membership in user.membership.all %}
+      $("#filter-table input[value='{{membership.semester.subject.id}}'].subject").attr("checked", "checked");
+    {% endfor %}
 
   });
 </script>

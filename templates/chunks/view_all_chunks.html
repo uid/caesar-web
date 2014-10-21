@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-
+{% load extra_tags %}
 
 {% block css %}
 <!-- bootstap messes this page up, so hacking around it. -->
@@ -175,6 +175,8 @@ $(document).ready(function() {
 </table>
 {% empty %}
 {% endfor %}
+
+{% include "review/similar_comments.html" %}
 
 {% endblock %}
 

@@ -4,9 +4,9 @@
     min-height: 5px;
 }
 
-.comment {
+.comment, .reply {
     border: 1px solid #ddd;
-    margin: 0px 0px 10px 0px;
+    margin: 10px 0px 0px 0px;
     border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
@@ -22,21 +22,29 @@
     height: 16px;
     overflow: hidden;
 }
+
 .collapsed.comment.comment-reply {
     height: 0px; 
     border: 0px;
 }
 
-.comment.comment-reply {
+.comment.comment-reply, .comment.similar-comment {
     border-top: 0px;
-    margin-top: -10px;
-    margin-left: 20px;
+    margin-top: 0px;
     border-top-left-radius: 0px;
     -moz-border-top-left-radius: 0px;
     -webkit-border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     -moz-border-top-right-radius: 0px;
     -webkit-border-top-right-radius: 0px;
+}
+
+.comment.comment-reply, .similar-comment-wrapper {
+    margin-left: 20px;
+}
+
+.similar-reply-wrapper {
+    margin-left: 40px;
 }
 
 .comment.comment-auto {
@@ -61,9 +69,12 @@
     text-overflow: ellipsis;
     font-family: 'andale mono', 'lucida console', monospace;
 }
-
 .collapsed .comment-header {
     border-bottom: 0px;
+}
+
+.comment-title {
+    overflow: hidden;
 }
 
 .collapsed .comment-snippet {
@@ -78,7 +89,7 @@
     right: 0px;
 }
 
-.comment:hover .comment-visibility {
+.comment:hover .comment-visibility, .reply:hover .comment-visibility {
     display: block;
 }
 
@@ -86,7 +97,7 @@
     background-image: url('../img/toggle-small.png');
 }
 
-.collapsed .comment-visibility {
+.comment.collapsed .comment-visibility {
     background-image: url('../img/toggle-small-expand.png');
 }
 
@@ -138,6 +149,10 @@
 }*/
 
 .collapsed .comment-author {
+    display: none;
+}
+
+.collapsed .comment-form {
     display: none;
 }
 
@@ -270,8 +285,9 @@
     height: 16px;
 }
 
-.new-comment, .new-reply, .new-comment:hover, .new-reply:hover {
+.new-comment, .new-reply, .similar-comment, .new-comment:hover, .new-reply:hover, .similar-comment:hover {
     background-color: #ffff88;
+    cursor: default;
 }
 
 .new-comment textarea, .reply-form textarea {
@@ -282,9 +298,128 @@
     -moz-box-sizing: border-box;
     -ms-box-sizing: border-box;
     height: auto;
+    cursor: text;
 }
 
 .comment-form, .reply-form {
     padding: 5px;
 }
 
+.similar-comment {
+    padding: 0px 4px;
+}
+
+.similar-comment-text, .similar-comment-author-link {
+    font-size: 9px;
+}
+
+#hidden-textarea {
+    display: none;
+}
+
+#textentry {
+    width: auto;
+    height: 70px;
+    background-color: white;
+    border: 1px solid #666666;
+    resize: vertical;
+    padding: 5px;
+    overflow-y: scroll;
+    white-space: pre;
+}
+
+.similar-comment.selected, .new-comment.selected {
+    border: 2px dotted #666666;
+}
+
+#feedback {
+    color: grey;
+    font-style: italic;
+}
+
+/* ------------------------------------------
+PURE CSS SPEECH BUBBLES
+by Nicolas Gallagher
+- http://nicolasgallagher.com/pure-css-speech-bubbles/
+
+Created: 02 March 2010
+Version: 1.2 (03 March 2011)
+
+Dual licensed under MIT and GNU GPLv2 Nicolas Gallagher
+------------------------------------------ */
+
+.triangle-border {
+    position:relative;
+    padding:15px;
+    margin:1em 0 3em;
+    border:5px solid #5a8f00;
+    color:#333;
+    background:#fff;
+    /* css3 */
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    border-radius:10px;
+}
+
+.triangle-border.left {
+    margin-left:30px;
+}
+
+.triangle-border:before {
+    content:"";
+    position:absolute;
+    bottom:-20px; /* value = - border-top-width - border-bottom-width */
+    left:40px; /* controls horizontal position */
+    border-width:20px 20px 0;
+    border-style:solid;
+    border-color:#5a8f00 transparent;
+    /* reduce the damage in FF3.0 */
+    display:block;
+    width:0;
+}
+
+/* creates the smaller  triangle */
+.triangle-border:after {
+    content:"";
+    position:absolute;
+    bottom:-13px; /* value = - border-top-width - border-bottom-width */
+    left:47px; /* value = (:before left) + (:before border-left) - (:after border-left) */
+    border-width:13px 13px 0;
+    border-style:solid;
+    border-color:#fff transparent;
+    /* reduce the damage in FF3.0 */
+    display:block;
+    width:0;
+}
+
+/* creates the larger triangle */
+.triangle-border.left:before {
+    top:10px; /* controls vertical position */
+    bottom:auto;
+    left:-30px; /* value = - border-left-width - border-right-width */
+    border-width:15px 30px 15px 0;
+    border-color:transparent #5a8f00;
+}
+
+/* creates the smaller  triangle */
+.triangle-border.left:after {
+    top:16px; /* value = (:before top) + (:before border-top) - (:after border-top) */
+    bottom:auto;
+    left:-21px; /* value = - border-left-width - border-right-width */
+    border-width:9px 21px 9px 0;
+    border-color:transparent #fff;
+}
+
+.bubble {
+    display: none;
+    border-color: #ffff88;
+}
+
+.bubble:before {
+    border-color: transparent #ffff88 !important;
+}
+
+.bubble a, .bubble a:hover {
+    text-decoration: none;
+    color: inherit;
+}

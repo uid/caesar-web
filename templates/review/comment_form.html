@@ -1,3 +1,15 @@
+{% load extra_tags %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+  {% if COMMENT_SEARCH %}
+    var comment_type = "comment";
+    setupSimilarComments(comment_type);
+  {% endif %}
+});
+
+</script>
+
 <div class="comment new-comment" title="Add a comment">
   <div class="comment-header">
     <span class="comment-line-numbers">
@@ -13,10 +25,12 @@
     <form id="new-comment-form" 
       action="{% url 'review.views.new_comment' %}" method="post">
       {% csrf_token %}
+      <div id='textentry' contenteditable='true'></div>
       {{ form.text }}
       {{ form.start }}
       {{ form.end }}
       {{ form.chunk }}
+      {{ form.similar_comment }}
       <button type="submit">Save</button>
       <button id="cancel-button" type="button">Cancel</button>
     </form>
