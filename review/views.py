@@ -50,7 +50,7 @@ def markLogStart(user, log):
 def find_similar_comment(similar_comment_id, form_text):
     similar_comment = Comment.objects.get(id=similar_comment_id)
     overlap_length = len(longest_common_substring(form_text, similar_comment.text))
-    if overlap_length > 20 or overlap_length == len(form_text):
+    if overlap_length > 20:
         return similar_comment
     else:
         return None

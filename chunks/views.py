@@ -123,10 +123,10 @@ def view_chunk(request, chunk_id):
         membership = Member.objects.filter(user=request.user).filter(semester=semester)
         role = membership[0].role
 
-        if role == 'S':
+        if role == Member.STUDENT:
             oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
         else:
-            q = Q(author__membership__role = 'T') | Q(author__membership__role = 'V')
+            q = Q(author__membership__role = Member.TEACHER) | Q(author__membership__role = Member.VOLUNTEER)
             oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
         old_comment_data = []
         for oldComment in oldComments:
@@ -144,10 +144,6 @@ def view_all_chunks(request, viewtype, submission_id):
     submission = Submission.objects.get(id = submission_id)
     semester = Semester.objects.get(assignments__milestones__submitmilestone__submissions=submission)
     authors = User.objects.filter(submissions=submission)
-
-    # block a user who's crawling
-    if user.username=="dekehu":
-        raise Http404
 
     try:
         user_membership = Member.objects.get(user=user, semester=semester)
