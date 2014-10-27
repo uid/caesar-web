@@ -29,7 +29,7 @@
     $("select").get(0).selectedIndex = (index == possible_extensions.length - 1) ? index : index + 1;
 
     $("select").change(function () {
-      var index = $("select").attr("selectedIndex");
+      var index = $("select").prop("selectedIndex");
       var requested_extension = (index != -1) ? possible_extensions[index] : {{ current_extension }};
       var updated_slack_left = {{ total_extension_days }} - requested_extension;
       $("#slackleft").text("After this change, you will have " + updated_slack_left + " slack day" + ((updated_slack_left == 1) ? "" : "s") +
