@@ -128,7 +128,10 @@ def load_similar_comments(request, chunk_id):
         semester = chunk.file.submission.milestone.assignment.semester
         subject = semester.subject
         membership = Member.objects.filter(user=request.user).filter(semester=semester)
-        role = membership[0].role
+        try:
+            role = membership[0].role
+        except:
+            return HttpResponse()
 
         if role == Member.STUDENT:
             oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
@@ -150,6 +153,7 @@ def load_similar_comments(request, chunk_id):
             'old_comment_data': old_comment_data,
         }
         return render(request, 'review/similar_comments.html', context)
+    return HttpResponse()
 
 @login_required
 def view_all_chunks(request, viewtype, submission_id):
