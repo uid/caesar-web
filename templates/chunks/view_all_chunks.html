@@ -30,6 +30,7 @@
     caesar.state = {
         fullView: {% if full_view %}true{% else %}false{% endif %}
     };
+
 </script>
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js?v=1"></script>
@@ -175,8 +176,6 @@ $(document).ready(function() {
 </table>
 {% empty %}
 {% endfor %}
-
-{% include "review/similar_comments.html" %}
 
 {% endblock %}
 

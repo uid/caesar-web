@@ -5,7 +5,7 @@ from review.models import Comment, Vote, Star
 from tasks.models import Task
 from tasks.routing import simulate_tasks
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
@@ -27,6 +27,23 @@ from collections import defaultdict
 from django.conf import settings
 
 import logging
+
+def highlight_chunk_lines(lexer, formatter, staff_lines, chunk, start=None, end=None):
+    [numbers, lines] = zip(*chunk.lines[start:end])
+    # highlight the code this way to correctly identify multi-line constructs
+    # TODO implement a custom formatter to do this instead
+    highlighted = zip(numbers,
+            highlight(chunk.data, lexer, formatter).splitlines()[start:end])
+    highlighted_lines = []
+    staff_line_index = 0
+    for number, line in highlighted:
+        if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
+            while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
+                staff_line_index += 1
+            highlighted_lines.append((number, line, True))
+        else:
+            highlighted_lines.append((number, line, False))
+    return highlighted_lines
 
 @login_required
 def view_chunk(request, chunk_id):
@@ -65,26 +82,9 @@ def view_chunk(request, chunk_id):
 
     comment_data = map(get_comment_data, chunk.comments.prefetch_related('author__profile', 'author__membership__semester'))
 
-    def highlight_chunk_lines(lexer, formatter, chunk, start=None, end=None):
-        [numbers, lines] = zip(*chunk.lines[start:end])
-        # highlight the code this way to correctly identify multi-line constructs
-        # TODO implement a custom formatter to do this instead
-        highlighted = zip(numbers,
-                highlight(chunk.data, lexer, formatter).splitlines()[start:end])
-        highlighted_lines = []
-        staff_line_index = 0
-        for number, line in highlighted:
-            if staff_line_index < len(staff_lines) and number >= staff_lines[staff_line_index].start_line and number <= staff_lines[staff_line_index].end_line:
-                while staff_line_index < len(staff_lines) and number == staff_lines[staff_line_index].end_line:
-                    staff_line_index += 1
-                highlighted_lines.append((number, line, True))
-            else:
-                highlighted_lines.append((number, line, False))
-        return highlighted_lines
-
     lexer = get_lexer_for_filename(chunk.file.path)
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-    highlighted_lines = highlight_chunk_lines(lexer, formatter, chunk)
+    highlighted_lines = highlight_chunk_lines(lexer, formatter, staff_lines, chunk)
 
     task_count = Task.objects.filter(reviewer=user) \
             .exclude(status='C').exclude(status='U').count()
@@ -118,7 +118,14 @@ def view_chunk(request, chunk_id):
         'remaining_task_count': remaining_task_count,
     }
 
+    return render(request, 'chunks/view_chunk.html', context)
+
+@login_required
+def load_similar_comments(request, chunk_id):
     if settings.COMMENT_SEARCH:
+        user = request.user
+        chunk = get_object_or_404(Chunk, pk=chunk_id)
+        semester = chunk.file.submission.milestone.assignment.semester
         subject = semester.subject
         membership = Member.objects.filter(user=request.user).filter(semester=semester)
         role = membership[0].role
@@ -128,15 +135,21 @@ def view_chunk(request, chunk_id):
         else:
             q = Q(author__membership__role = Member.TEACHER) | Q(author__membership__role = Member.VOLUNTEER)
             oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
+
+        staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
+        lexer = get_lexer_for_filename(chunk.file.path)
+        formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
         old_comment_data = []
         for oldComment in oldComments:
             start = oldComment.start-1
             end = oldComment.end
-            highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, oldComment.chunk, start, end)
+            highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, staff_lines, oldComment.chunk, start, end)
             old_comment_data.append((oldComment, highlighted_comment_lines))
-        context['old_comment_data'] = old_comment_data
-
-    return render(request, 'chunks/view_chunk.html', context)
+        context = {
+            'chunk': chunk,
+            'old_comment_data': old_comment_data,
+        }
+        return render(request, 'review/similar_comments.html', context)
 
 @login_required
 def view_all_chunks(request, viewtype, submission_id):

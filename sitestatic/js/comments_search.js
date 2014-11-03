@@ -102,8 +102,8 @@ function setupSimilarComments(comment_type) {
         $link.addClass("chunk-line-staff");
       }
       var $line = $("<span class='bubble-line'></span>").attr("id", "line-"+chunkData.chunk_id+"-"+chunkData.chunk_lines[i].n+"-"+chunkData.file_id);
-      var $line_number = $("<span class='line-number'></span>").text(chunkData.chunk_lines[i].n);
-      var $line_code = $("<pre class='line-code'></pre>").text(chunkData.chunk_lines[i].line);
+      var $line_number = $("<span class='line-number'></span>").html(chunkData.chunk_lines[i].n);
+      var $line_code = $("<pre class='line-code'></pre>").html(chunkData.chunk_lines[i].line);
       $line.append($line_number, $line_code);
       $link.append($line);
       $syntax.append($link);
