@@ -28,6 +28,13 @@
         chunkId: {{ chunk.id }},
         fullView: {% if full_view %}true{% else %}false{% endif %}
     };
+
+    $.ajax({
+      url: "{% url 'chunks.views.load_similar_comments' chunk.id %}",
+      success: function(response) {
+        $("body").append(response);
+      },
+    });
 </script>
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js?v=1"></script>
@@ -158,8 +165,6 @@
   {% endfor %}
   </div>
 </div>
-
-{% include "review/similar_comments.html" %}
 
 {% endblock %}
 

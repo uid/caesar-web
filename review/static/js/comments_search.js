@@ -86,19 +86,51 @@ function setupSimilarComments(comment_type) {
     $(".bubble").hide();
   }
 
+  function createBubble(commentsData) {
+    var chunkData = commentsData.chunk;
+    var $bubble = $("<span class='bubble triangle-border left'></span>").attr("id", "bubble-"+commentsData.comment_id);
+    var $syntax = $("<div class='syntax'></div>");
+    for (var i in chunkData.chunk_lines) {
+      var $link = $("<a class='chunk-line' target='_blank'></a>").attr(
+        {"id": "chunk-"+chunkData.chunk_id,
+        "href": "/chunks/view/"+chunkData.chunk_id+"#comment-"+commentsData.comment_id}
+      );
+      if (!chunkData.chunk_lines[i].staff_code) {
+        $link.addClass("chunk-line-student");
+      }
+      else {
+        $link.addClass("chunk-line-staff");
+      }
+      var $line = $("<span class='bubble-line'></span>").attr("id", "line-"+chunkData.chunk_id+"-"+chunkData.chunk_lines[i].n+"-"+chunkData.file_id);
+      var $line_number = $("<span class='line-number'></span>").html(chunkData.chunk_lines[i].n);
+      var $line_code = $("<pre class='line-code'></pre>").html(chunkData.chunk_lines[i].line);
+      $line.append($line_number, $line_code);
+      $link.append($line);
+      $syntax.append($link);
+    }
+    $bubble.append($syntax);
+    return $bubble;
+  }
+
   // Add similar-comment feedback to textentry
   function addFeedback($textentry, $similar_comment, similar_comment_text) {
     var feedback = $("<div id='feedback'></div>");
     feedback.text(similar_comment_text);
     $textentry.append(feedback);
     var comment_id = $similar_comment.attr("id").replace("similar-comment-", "");
-    var bubble = $("#bubble-"+comment_id);
-    bubble.show();
+    var $bubble = $("#bubble-"+comment_id);
+    if ($bubble.length == 0) {
+      $bubble = createBubble($similar_comment.data());
+      $("body").append($bubble);
+    }
+    else {
+      $bubble.show();
+    }
     var offset = $similar_comment.offset();
     var width = $similar_comment.outerWidth();
     var height = $similar_comment.height();
     // Triangle center is 16px from top of bubble, with 10px on the top and bottom. I tried getting these values from the CSS but I couldn't find them, so this will have to be a magic number.
-    bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
+    $bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
   }
 
   // Select the textentry (to show that navigation through similar comments is possible)
@@ -270,7 +302,7 @@ function setupSimilarComments(comment_type) {
     logUsage({
       "event": "mouseclick",
       "comment_id": comment_id,
-      "chunk_id": chunk_id
+      "chunk_id": chunk_id,
     });
   });
 
@@ -287,16 +319,19 @@ function setupSimilarComments(comment_type) {
 ////////////////////////////////////////////////////////////////////////  
 var commentSearch = new function() {
 
-  var dbName, commentsSearchEngine, commentsData, commentsExtraData;
+  var dbName, commentsSearchEngine, commentsData;
 
   var initializer = function(injector, callback) {
-    var commentsData_copy = commentsData.slice(0);
+    var commentsData_copy = [];
+    for (var i in commentsData) {
+      commentsData_copy.push(commentsData[i].comment);
+    }
     var synchro = fullproof.make_synchro_point(callback, commentsData_copy.length-1);
     var values = [];
     for (var i=0;i<commentsData_copy.length; ++i) {
       values.push(i);
     }
-    injector.injectBulk(commentsData, values, callback);      
+    injector.injectBulk(commentsData_copy, values, callback);
   }
 
   var engineReady = function(b) {
@@ -305,12 +340,11 @@ var commentSearch = new function() {
     }
   }
 
-  this.init = function(commentsData_, commentsExtraData_, chunk_id) {
+  this.init = function(commentsData_, chunk_id) {
 
     dbName = "similarCommentsDB-"+chunk_id;
     commentsSearchEngine = new fullproof.ScoringEngine();
     commentsData = commentsData_;
-    commentsExtraData = commentsExtraData_;
     var index1 = new fullproof.IndexUnit(
       "normalindex",
       new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName(dbName).setComparatorObject(fullproof.ScoredEntry.comparatorObject).setDbSize(8*1024*1024),
@@ -355,7 +389,7 @@ var commentSearch = new function() {
               results.push({
                 "index": e.value,
                 "score": e.score,
-                "bag_of_words": regex.exec(commentsData[e.value]),
+                "bag_of_words": regex.exec(commentsData[e.value].comment),
               });              
             }
           });
@@ -369,11 +403,11 @@ var commentSearch = new function() {
         // Display only the top 3 results.
         for (var i=0; i<Math.min(results.length, 3); i++) {
 
-          ids.push('#similar-comment-'+commentsExtraData[results[i].index].comment_id);
+          ids.push('#similar-comment-'+commentsData[results[i].index].comment_id);
 
            // Check whether this result is already displayed
-          if ($('#similar-comment-'+commentsExtraData[results[i].index].comment_id).length != 0) {
-            var comment_div = $('#similar-comment-'+commentsExtraData[results[i].index].comment_id);
+          if ($('#similar-comment-'+commentsData[results[i].index].comment_id).length != 0) {
+            var comment_div = $('#similar-comment-'+commentsData[results[i].index].comment_id);
             var text = $(comment_div).find(".similar-comment-text").text();
             $(comment_div).find(".similar-comment-text").html(text.replace(regex, '<i><b>$&</b></i>'));
 
@@ -386,15 +420,16 @@ var commentSearch = new function() {
           // Display the full content in a div
           var comment_div = $("<div class='comment'></div>");
           comment_div.addClass("similar-comment");
-          comment_div.attr("id", "similar-comment-"+commentsExtraData[results[i].index].comment_id);
+          comment_div.attr("id", "similar-comment-"+commentsData[results[i].index].comment_id);
           var comment_text = $("<span></span>");
           comment_text.addClass("similar-comment-text");
-          comment_text.html(commentsData[results[i].index].replace(regex, '<i><b>$&</b></i>'));
+          comment_text.html(commentsData[results[i].index].comment.replace(regex, '<i><b>$&</b></i>'));
           comment_div.append(comment_text);
           var author_link = $("<a target='_blank' class='similar-comment-author-link'></a>");
-          author_link.attr("href", commentsExtraData[results[i].index].author_url);
-          author_link.html(commentsExtraData[results[i].index].author);
+          author_link.attr("href", commentsData[results[i].index].author_url);
+          author_link.html(commentsData[results[i].index].author);
           comment_div.append(" - ", author_link);
+          comment_div.data(commentsData[results[i].index]);
 
           // Add new similar comment to after the previous result, in the correct order
           if (i == 0) { // This is the first result to be displayed

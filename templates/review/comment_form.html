@@ -4,7 +4,10 @@
 $(document).ready(function() {
   {% if COMMENT_SEARCH %}
     var comment_type = "comment";
-    setupSimilarComments(comment_type);
+    try {
+      setupSimilarComments(comment_type);      
+    }
+    catch(e) {}
   {% endif %}
 });
 

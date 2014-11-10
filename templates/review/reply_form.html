@@ -3,7 +3,10 @@
 $(document).ready(function() {
   {% if COMMENT_SEARCH %}
     var comment_type = "reply";
-    setupSimilarComments(comment_type);
+    try {
+      setupSimilarComments(comment_type);      
+    }
+    catch(e) {}
   {% endif %}
 });
 

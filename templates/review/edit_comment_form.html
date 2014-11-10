@@ -8,7 +8,10 @@ $(document).ready(function() {
     {% else %}
       comment_type = "comment";
     {% endif %}
-    setupSimilarComments(comment_type);
+    try {
+      setupSimilarComments(comment_type);      
+    }
+    catch(e) {}
   {% endif %}
   
   // Copy comment text from hidden textarea into editable div
