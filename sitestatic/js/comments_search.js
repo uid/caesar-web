@@ -90,7 +90,6 @@ function setupSimilarComments(comment_type) {
     $.ajax({
       url: commentsData.highlight_chunk_line_url,
       success: function(response) {
-        console.log(response);
         var $bubble = $("<span class='bubble triangle-border left'></span>").attr("id", "bubble-"+commentsData.comment_id);
         var $syntax = $("<div class='syntax'></div>");
         for (var i in response.chunk_lines) {
@@ -132,7 +131,6 @@ function setupSimilarComments(comment_type) {
     var $bubble = $("#bubble-"+comment_id);
     if ($bubble.length == 0) {
       createBubble($similar_comment.data(), function($bubble) {
-        console.log("in callback");
         $("body").append($bubble);
         // Triangle center is 16px from top of bubble, with 10px on the top and bottom. I tried getting these values from the CSS but I couldn't find them, so this will have to be a magic number.
         $bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
@@ -186,9 +184,6 @@ function setupSimilarComments(comment_type) {
     $textentry.append("</br>", feedback_text);
     removeFeedback($textentry);
     var comment_id = $(".selected").data().comment_id;
-    console.log(comment_id);
-    //var comment_id = $(".selected").attr("id").split("-")[2];
-    //console.log(comment_id);
     $(".selected").removeClass("selected");
     $(".similar-"+comment_type+"-wrapper").empty();
     logUsage({
@@ -214,9 +209,6 @@ function setupSimilarComments(comment_type) {
           removeFeedback($(this));
           addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
           var comment_id = $(".selected").data().comment_id;
-          console.log(comment_id);
-          //var comment_id = $(".selected").attr("id").split("-")[2];
-          //console.log(comment_id);
           logUsage({
             "event": ascii_keys[event.which],
             "comment_id": comment_id
@@ -230,9 +222,6 @@ function setupSimilarComments(comment_type) {
             if ($(".similar-comment.selected").length != 0) {
               addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
               var comment_id = $(".selected").data().comment_id;
-              console.log(comment_id);
-              //var comment_id = $(".selected").attr("id").split("-")[2];
-              //console.log(comment_id);
               logUsage({
                 "event": ascii_keys[event.which],
                 "comment_id": comment_id
@@ -295,9 +284,6 @@ function setupSimilarComments(comment_type) {
     removeFeedback($("#textentry"));
     addFeedback($("#textentry"), $(this), $(this).find(".similar-comment-text").text());
     var comment_id = $(".selected").data().comment_id;
-    console.log(comment_id);
-    //var comment_id = $(".selected").attr("id").split("-")[2];
-    //console.log(comment_id);
     logUsage({
       "event": "mouseover",
       "comment_id": comment_id
@@ -320,9 +306,6 @@ function setupSimilarComments(comment_type) {
   $(".bubble .syntax .chunk-line").on("click", function() {
     // Get comment id from bubble, whose id is bubble-{{comment.id}}
     var comment_id = $(this).parent().parent().data().comment_id;
-    console.log(comment_id);
-    //var comment_id = $(this).parent().parent().attr("id").split("-")[1];
-    //console.log(comment_id);
     // Get chunk id from chunkline, whose id is chunkline-{{comment.chunk.id}}-line-{{n}}
     var chunk_id = $(this).attr("id").split("-"[1]);
     logUsage({
