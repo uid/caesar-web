@@ -23,6 +23,7 @@ import os
 import subprocess
 import datetime
 import sys
+import json
 from collections import defaultdict
 from django.conf import settings
 
@@ -139,21 +140,31 @@ def load_similar_comments(request, chunk_id):
             q = Q(author__membership__role = Member.TEACHER) | Q(author__membership__role = Member.VOLUNTEER)
             oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
 
-        staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
-        lexer = get_lexer_for_filename(chunk.file.path)
-        formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-        old_comment_data = []
-        for oldComment in oldComments:
-            start = oldComment.start-1
-            end = oldComment.end
-            highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, staff_lines, oldComment.chunk, start, end)
-            old_comment_data.append((oldComment, highlighted_comment_lines))
         context = {
             'chunk': chunk,
-            'old_comment_data': old_comment_data,
+            'old_comment_data': oldComments,
         }
         return render(request, 'review/similar_comments.html', context)
     return HttpResponse()
+
+@login_required
+def highlight_comment_chunk_line(request, comment_id):
+    if settings.COMMENT_SEARCH:
+        comment = get_object_or_404(Comment, pk=comment_id)
+        chunk = comment.chunk
+        staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
+        lexer = get_lexer_for_filename(chunk.file.path)
+        formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
+        start = comment.start-1
+        end = comment.end
+        highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, staff_lines, comment.chunk, start, end)
+
+        return HttpResponse(json.dumps({
+            'file_id': chunk.file.id,
+            'chunk_lines': highlighted_comment_lines,
+            }), content_type="application/json")
+    # Should never get here
+    return HttpResponse() 
 
 @login_required
 def view_all_chunks(request, viewtype, submission_id):

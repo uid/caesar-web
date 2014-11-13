@@ -8,4 +8,5 @@ urlpatterns = patterns('chunks.views',
     (r'^list_users/(?P<review_milestone_id>\d+)', 'list_users'),
     (r'^publish/', 'publish_code'),
     (r'^load_similar_comments/(?P<chunk_id>\d+)', 'load_similar_comments'),
+    (r'^highlight_comment_chunk_line/(?P<comment_id>\d+)', 'highlight_comment_chunk_line'),
 )

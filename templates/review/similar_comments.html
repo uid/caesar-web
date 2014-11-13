@@ -20,7 +20,7 @@
 
       // Add comments to database
       var commentsData = [];
-      {% for comment, chunk_line in old_comment_data %}
+      {% for comment in old_comment_data %}
 
         // Need to use escapejs filter to escape newline characters coming from the textarea
         commentsData.push({
@@ -28,17 +28,8 @@
           "comment_id": "{{comment.id}}",
           "author": "{{comment.author.get_full_name|default:comment.author.username}} ({{comment.author.profile.reputation}})",
           "author_url": "{% url 'accounts.views.view_profile' comment.author.username %}",
-          "chunk": {
-            "chunk_id": "{{comment.chunk.id}}",
-            "file_id": "{{comment.chunk.file.id}}",
-            "chunk_lines": [{% for n, line, staff_code in chunk_line %}
-              {
-                "n": "{{n}}",
-                "line": "{{line|escapejs|safe}}",
-                "staff_code": "{{staff_code}}",
-              },
-            {% endfor %}]
-          }
+          "chunk_id": "{{comment.chunk.id}}",
+          "highlight_chunk_line_url": "{% url 'chunks.views.highlight_comment_chunk_line' comment.id %}",
         });
       {% endfor %}
       commentSearch.init(commentsData, "{{chunk.id}}");
