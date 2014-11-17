@@ -86,16 +86,16 @@ function setupSimilarComments(comment_type) {
     $(".bubble").hide();
   }
 
-  function createBubble(commentsData, _callback) {
-    $.ajax({
-      url: commentsData.highlight_chunk_line_url,
-      success: function(response) {
+/*  function createBubble(commentsData) {
+    //$.ajax({
+    //  url: commentsData.highlight_chunk_line_url,
+    //  success: function(response) {
         var $bubble = $("<span class='bubble triangle-border left'></span>").attr("id", "bubble-"+commentsData.comment_id);
         var $syntax = $("<div class='syntax'></div>");
-        for (var i in response.chunk_lines) {
-          n = response.chunk_lines[i][0];
-          chunk_line = response.chunk_lines[i][1];
-          staff_code = response.chunk_lines[i][2];
+        for (var i in commentsData.chunk_lines) {
+          n = commentsData.chunk_lines[i][0];
+          chunk_line = commentsData.chunk_lines[i][1];
+          staff_code = commentsData.chunk_lines[i][2];
           var $link = $("<a class='chunk-line' target='_blank'></a>").attr(
             {"id": "chunk-"+commentsData.chunk_id,
             "href": "/chunks/view/"+commentsData.chunk_id+"#comment-"+commentsData.comment_id}
@@ -106,7 +106,7 @@ function setupSimilarComments(comment_type) {
           else {
             $link.addClass("chunk-line-staff");
           }
-          var $line = $("<span class='bubble-line'></span>").attr("id", "line-"+commentsData.chunk_id+"-"+n+"-"+response.file_id);
+          var $line = $("<span class='bubble-line'></span>").attr("id", "line-"+commentsData.chunk_id+"-"+n+"-"+commentsData.file_id);
           var $line_number = $("<span class='line-number'></span>").html(n);
           var $line_code = $("<pre class='line-code'></pre>").html(chunk_line);
           $line.append($line_number, $line_code);
@@ -114,10 +114,11 @@ function setupSimilarComments(comment_type) {
           $syntax.append($link);
         }
         $bubble.append($syntax);
-        _callback($bubble);
-      }
-    });
-  }
+        $(body).append($bubble);
+        //_callback($bubble);
+    //  }
+    //});
+  }*/
 
   // Add similar-comment feedback to textentry
   function addFeedback($textentry, $similar_comment, similar_comment_text) {
@@ -129,17 +130,18 @@ function setupSimilarComments(comment_type) {
     var width = $similar_comment.outerWidth();
     var height = $similar_comment.height();
     var $bubble = $("#bubble-"+comment_id);
-    if ($bubble.length == 0) {
-      createBubble($similar_comment.data(), function($bubble) {
+    console.log($bubble);
+    //if ($bubble.length == 0) {
+      /*createBubble($similar_comment.data(), function($bubble) {
         $("body").append($bubble);
         // Triangle center is 16px from top of bubble, with 10px on the top and bottom. I tried getting these values from the CSS but I couldn't find them, so this will have to be a magic number.
         $bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
-      });
-    }
-    else {
+      });*/
+    //}
+    //else {
       $bubble.show();
       $bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
-    }
+    //}
   }
 
   // Select the textentry (to show that navigation through similar comments is possible)
@@ -372,6 +374,35 @@ var commentSearch = new function() {
 
   };
 
+    function createBubble(commentsData) {
+      var $bubble = $("<span class='bubble triangle-border left'></span>").attr("id", "bubble-"+commentsData.comment_id);
+      var $syntax = $("<div class='syntax'></div>");
+      for (var i in commentsData.chunk_lines) {
+        n = commentsData.chunk_lines[i][0];
+        chunk_line = commentsData.chunk_lines[i][1];
+        staff_code = commentsData.chunk_lines[i][2];
+        var $link = $("<a class='chunk-line' target='_blank'></a>").attr(
+          {"id": "chunk-"+commentsData.chunk_id,
+          "href": "/chunks/view/"+commentsData.chunk_id+"#comment-"+commentsData.comment_id}
+        );
+        if (!staff_code) {
+          $link.addClass("chunk-line-student");
+        }
+        else {
+          $link.addClass("chunk-line-staff");
+        }
+        var $line = $("<span class='bubble-line'></span>").attr("id", "line-"+commentsData.chunk_id+"-"+n+"-"+commentsData.file_id);
+        var $line_number = $("<span class='line-number'></span>").html(n);
+        var $line_code = $("<pre class='line-code'></pre>").html(chunk_line);
+        $line.append($line_number, $line_code);
+        $link.append($line);
+        $syntax.append($link);
+      }
+      $bubble.append($syntax);
+      $("body").append($bubble);
+  }
+
+
   this.search = function(value, comment_type, _callback) {
 
     // Create regular expression for highlighting query words
@@ -448,6 +479,17 @@ var commentSearch = new function() {
             // jQuery 1-indexes its selectors, thus using i rather i-1
             $('.similar-'+comment_type+'-wrapper > div:nth-child('+i+')').after(comment_div);
           }
+
+          $.ajax({
+            url: commentsData[results[i].index].highlight_chunk_line_url,
+            success: function(response) {
+              var comment_div = $("#similar-comment-"+response.comment_id);
+              comment_div.data(response);
+              console.log(response);
+              console.log(comment_div.data());
+              createBubble(comment_div.data());
+            }
+          });
 
         }
 

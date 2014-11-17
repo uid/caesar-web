@@ -160,6 +160,7 @@ def highlight_comment_chunk_line(request, comment_id):
         highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, staff_lines, comment.chunk, start, end)
 
         return HttpResponse(json.dumps({
+            'comment_id': comment_id,
             'file_id': chunk.file.id,
             'chunk_lines': highlighted_comment_lines,
             }), content_type="application/json")
