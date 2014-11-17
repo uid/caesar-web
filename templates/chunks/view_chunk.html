@@ -35,6 +35,13 @@
         $("body").append(response);
       },
     });
+    $.ajax({
+      url: "{% url 'chunks.views.load_similar_staff_comments' chunk.id %}",
+      success: function(response) {
+        $("body").append(response);
+      },
+    });
+
 </script>
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js?v=1"></script>

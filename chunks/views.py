@@ -128,18 +128,31 @@ def load_similar_comments(request, chunk_id):
         chunk = get_object_or_404(Chunk, pk=chunk_id)
         semester = chunk.file.submission.milestone.assignment.semester
         subject = semester.subject
+
+        oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
+
+        context = {
+            'chunk': chunk,
+            'old_comment_data': oldComments,
+        }
+        return render(request, 'review/similar_comments.html', context)
+    return HttpResponse()
+
+def load_similar_staff_comments(request, chunk_id):
+    if settings.COMMENT_SEARCH:
+        user = request.user
+        chunk = get_object_or_404(Chunk, pk=chunk_id)
+        semester = chunk.file.submission.milestone.assignment.semester
+        subject = semester.subject
         membership = Member.objects.filter(user=request.user).filter(semester=semester)
         try:
             role = membership[0].role
         except:
             return HttpResponse()
 
-        if role == Member.STUDENT:
-            oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
-        else:
+        if role != Member.STUDENT:
             q = Q(author__membership__role = Member.TEACHER) | Q(author__membership__role = Member.VOLUNTEER)
             oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
-
         context = {
             'chunk': chunk,
             'old_comment_data': oldComments,
@@ -155,7 +168,11 @@ def highlight_comment_chunk_line(request, comment_id):
         staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
         lexer = get_lexer_for_filename(chunk.file.path)
         formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
+        # comment.start is a line number, which is 1-indexed
+        # start is an index into a list of lines, which is 0-indexed
         start = comment.start-1
+        # comment.end is a line number
+        # end is an index into a list of lines, which excludes the last line
         end = comment.end
         highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, staff_lines, comment.chunk, start, end)
 
