@@ -326,8 +326,24 @@ var commentSearch = new function() {
       initializer
     );
 
-    commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
+    commentsSearchEngine.open([index1, index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
 
+  };
+
+  this.addCommentsToDB = function(commentsData_) {
+    var commentsData_copy = [];
+    for (var i in commentsData_) {
+      commentsData_copy.push(commentsData_[i].comment);
+    }
+    var synchro = fullproof.make_synchro_point(function() {}, commentsData_.length-1);
+    var numComments = commentsData.length;
+    var values = [];
+    for (var i=0; i<commentsData_copy.length; ++i) {
+      values.push(i+numComments);
+    }
+    commentsSearchEngine.injectBulkDocument(commentsData_copy, values, function(){
+      commentsData = commentsData.concat(commentsData_);
+    });
   };
 
   function createBubble(commentsData) {
@@ -421,8 +437,8 @@ var commentSearch = new function() {
           comment_text.html(commentsData[results[i].index].comment.replace(regex, '<i><b>$&</b></i>'));
           comment_div.append(comment_text);
           var author_link = $("<a target='_blank' class='similar-comment-author-link'></a>");
-          author_link.attr("href", commentsData[results[i].index].author_url);
-          author_link.html(commentsData[results[i].index].author);
+          author_link.attr("href", "/accounts/user/"+commentsData[results[i].index].author_username);
+          author_link.html(commentsData[results[i].index].author+" ("+commentsData[results[i].index].reputation+")");
           comment_div.append(" - ", author_link);
           comment_div.data(commentsData[results[i].index]);
 
@@ -435,14 +451,17 @@ var commentSearch = new function() {
             $('.similar-'+comment_type+'-wrapper > div:nth-child('+i+')').after(comment_div);
           }
 
-          $.ajax({
-            url: commentsData[results[i].index].highlight_chunk_line_url,
-            success: function(response) {
-              var comment_div = $("#similar-comment-"+response.comment_id);
-              comment_div.data(response);
-              createBubble(comment_div.data());
-            }
-          });
+          var $bubble = $("#bubble-"+commentsData[results[i].index].comment_id);
+          if ($bubble.length == 0) {
+            $.ajax({
+              url: "/chunks/highlight_comment_chunk_line/"+commentsData[results[i].index].comment_id,
+              success: function(response) {
+                var comment_div = $("#similar-comment-"+response.comment_id);
+                comment_div.data(response);
+                createBubble(comment_div.data());
+              }
+            });
+          }
 
         }
 

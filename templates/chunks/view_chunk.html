@@ -17,6 +17,13 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/syntax.css" type="text/css" />
 <link rel="stylesheet" href="{{ STATIC_URL }}css/fullchunks.css" type="text/css" />
 
+{% if COMMENT_SEARCH %}
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
+  <script type="text/javascript" src="{{ STATIC_URL }}js/fullproof-all.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}js/stopwords.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}js/comments_search.js"></script>
+{% endif %}
+
 {% endblock %}
 
 {% block js %}
@@ -29,19 +36,31 @@
         fullView: {% if full_view %}true{% else %}false{% endif %}
     };
 
-    $.ajax({
-      url: "{% url 'chunks.views.load_similar_comments' chunk.id %}",
-      success: function(response) {
-        $("body").append(response);
-      },
-    });
-    $.ajax({
-      url: "{% url 'chunks.views.load_similar_staff_comments' chunk.id %}",
-      success: function(response) {
-        $("body").append(response);
-      },
-    });
+    {% if COMMENT_SEARCH %}
+      // on unload this page, clear database
+      $(window).on("unload", function() {
+        clearDatabase("{{chunk.id}}");
+      });
 
+      $(document).ready(function() {
+        $.ajax({
+          url: "{% url 'chunks.views.load_similar_comments' chunk.id False %}",
+          success: function(response1) {
+            // on load, clear database
+            clearDatabase("{{chunk.id}}");
+            // Add comments to database
+            commentSearch.init(response1.similar_comment_data, "{{chunk.id}}");
+            
+            $.ajax({
+              url: "{% url 'chunks.views.load_similar_comments' chunk.id True %}",
+              success: function(response2) {
+                commentSearch.addCommentsToDB(response2.similar_comment_data);
+              },
+            });
+          },
+        });
+      });
+    {% endif %}
 </script>
 
 <script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js?v=1"></script>

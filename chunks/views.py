@@ -122,23 +122,7 @@ def view_chunk(request, chunk_id):
     return render(request, 'chunks/view_chunk.html', context)
 
 @login_required
-def load_similar_comments(request, chunk_id):
-    if settings.COMMENT_SEARCH:
-        user = request.user
-        chunk = get_object_or_404(Chunk, pk=chunk_id)
-        semester = chunk.file.submission.milestone.assignment.semester
-        subject = semester.subject
-
-        oldComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
-
-        context = {
-            'chunk': chunk,
-            'old_comment_data': oldComments,
-        }
-        return render(request, 'review/similar_comments.html', context)
-    return HttpResponse()
-
-def load_similar_staff_comments(request, chunk_id):
+def load_similar_comments(request, chunk_id, load_all_staff_comments):
     if settings.COMMENT_SEARCH:
         user = request.user
         chunk = get_object_or_404(Chunk, pk=chunk_id)
@@ -150,14 +134,29 @@ def load_similar_staff_comments(request, chunk_id):
         except:
             return HttpResponse()
 
-        if role != Member.STUDENT:
-            q = Q(author__membership__role = Member.TEACHER) | Q(author__membership__role = Member.VOLUNTEER)
-            oldComments = Comment.objects.filter(author__membership__semester=semester).filter(q).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
-        context = {
-            'chunk': chunk,
-            'old_comment_data': oldComments,
-        }
-        return render(request, 'review/similar_comments.html', context)
+        if load_all_staff_comments == "True":
+            if role == Member.TEACHER:
+                similarComments = Comment.objects.filter(author__membership__semester=semester).filter(author__membership__role=Member.TEACHER).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
+            else:
+                similarComments = []
+        else:
+            similarComments = Comment.objects.filter(author=request.user).filter(chunk__file__submission__milestone__assignment__semester__subject=subject).distinct().prefetch_related('chunk__file__submission__authors__profile', 'author__profile')
+
+        similar_comment_data = []
+        for comment in similarComments:
+            if comment.author.get_full_name():
+                author = comment.author.get_full_name()
+            else:
+                author = comment.author.username
+            similar_comment_data.append({
+                'comment': comment.text,
+                'comment_id': comment.id,
+                'chunk_id': comment.chunk.id,
+                'author': author,
+                'author_username': comment.author.username,
+                'reputation': comment.author.profile.reputation,
+            })
+        return HttpResponse(json.dumps({'similar_comment_data': similar_comment_data}), content_type="application/json")
     return HttpResponse()
 
 @login_required
