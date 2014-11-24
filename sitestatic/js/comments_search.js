@@ -330,6 +330,40 @@ var commentSearch = new function() {
 
   };
 
+  var injectBulkDocument = function(engine, textArray, valueArray, callback) {
+    console.log("beginning injection");
+    var synchro = fullproof.make_synchro_point(function(data) {
+        callback();
+    });
+    var words = [];
+    var values = [];
+    engine.forEach(function(name, index, analyzer) {
+        if (name) {
+            for (var i=0, max=Math.min(textArray.length, valueArray.length); i<max; ++i) {
+                (function(text,value) {
+                    analyzer.getArray(text, function(array_of_words) {
+                        for (var w=0; w<array_of_words.length; ++w) {
+                            var val = array_of_words[w];
+                            if (val instanceof fullproof.ScoredEntry) {
+                                val.value = val.value===undefined?value:val.value;
+                                words.push(val.key);
+                                values.push(val);
+                            } else {
+                                words.push(val);
+                                values.push(value);
+                            }
+                        }
+                    });
+                })(textArray[i], valueArray[i]);
+            }
+            index.injectBulk(words, values, callback);
+        }
+        else {
+            synchro(false);
+        }
+    }, false);
+}
+
   this.addCommentsToDB = function(commentsData_) {
     var commentsData_copy = [];
     for (var i in commentsData_) {
@@ -341,7 +375,8 @@ var commentSearch = new function() {
     for (var i=0; i<commentsData_copy.length; ++i) {
       values.push(i+numComments);
     }
-    commentsSearchEngine.injectBulkDocument(commentsData_copy, values, function(){
+    injectBulkDocument(commentsSearchEngine, commentsData_copy, values, function(){
+      console.log("finished injecting");
       commentsData = commentsData.concat(commentsData_);
     });
   };
