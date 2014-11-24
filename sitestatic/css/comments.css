@@ -37,6 +37,7 @@
     border-top-right-radius: 0px;
     -moz-border-top-right-radius: 0px;
     -webkit-border-top-right-radius: 0px;
+    line-height: 1.2;
 }
 
 .comment.comment-reply, .similar-comment-wrapper {
