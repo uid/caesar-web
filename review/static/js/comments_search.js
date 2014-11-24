@@ -86,50 +86,17 @@ function setupSimilarComments(comment_type) {
     $(".bubble").hide();
   }
 
-  function createBubble(commentsData) {
-    var chunkData = commentsData.chunk;
-    var $bubble = $("<span class='bubble triangle-border left'></span>").attr("id", "bubble-"+commentsData.comment_id);
-    var $syntax = $("<div class='syntax'></div>");
-    for (var i in chunkData.chunk_lines) {
-      var $link = $("<a class='chunk-line' target='_blank'></a>").attr(
-        {"id": "chunk-"+chunkData.chunk_id,
-        "href": "/chunks/view/"+chunkData.chunk_id+"#comment-"+commentsData.comment_id}
-      );
-      if (!chunkData.chunk_lines[i].staff_code) {
-        $link.addClass("chunk-line-student");
-      }
-      else {
-        $link.addClass("chunk-line-staff");
-      }
-      var $line = $("<span class='bubble-line'></span>").attr("id", "line-"+chunkData.chunk_id+"-"+chunkData.chunk_lines[i].n+"-"+chunkData.file_id);
-      var $line_number = $("<span class='line-number'></span>").html(chunkData.chunk_lines[i].n);
-      var $line_code = $("<pre class='line-code'></pre>").html(chunkData.chunk_lines[i].line);
-      $line.append($line_number, $line_code);
-      $link.append($line);
-      $syntax.append($link);
-    }
-    $bubble.append($syntax);
-    return $bubble;
-  }
-
   // Add similar-comment feedback to textentry
   function addFeedback($textentry, $similar_comment, similar_comment_text) {
     var feedback = $("<div id='feedback'></div>");
     feedback.text(similar_comment_text);
     $textentry.append(feedback);
     var comment_id = $similar_comment.attr("id").replace("similar-comment-", "");
-    var $bubble = $("#bubble-"+comment_id);
-    if ($bubble.length == 0) {
-      $bubble = createBubble($similar_comment.data());
-      $("body").append($bubble);
-    }
-    else {
-      $bubble.show();
-    }
     var offset = $similar_comment.offset();
     var width = $similar_comment.outerWidth();
     var height = $similar_comment.height();
-    // Triangle center is 16px from top of bubble, with 10px on the top and bottom. I tried getting these values from the CSS but I couldn't find them, so this will have to be a magic number.
+    var $bubble = $("#bubble-"+comment_id);
+    $bubble.show();
     $bubble.offset({"top": offset.top + height/2.0 - 26, "left": offset.left + width + 30});
   }
 
@@ -174,7 +141,7 @@ function setupSimilarComments(comment_type) {
     selectText($textentry.attr("id"));
     $textentry.append("</br>", feedback_text);
     removeFeedback($textentry);
-    var comment_id = $(".selected").attr("id").split("-")[2];
+    var comment_id = $(".selected").data().comment_id;
     $(".selected").removeClass("selected");
     $(".similar-"+comment_type+"-wrapper").empty();
     logUsage({
@@ -199,7 +166,7 @@ function setupSimilarComments(comment_type) {
           selectNext();
           removeFeedback($(this));
           addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
-          var comment_id = $(".selected").attr("id").split("-")[2];
+          var comment_id = $(".selected").data().comment_id;
           logUsage({
             "event": ascii_keys[event.which],
             "comment_id": comment_id
@@ -212,7 +179,7 @@ function setupSimilarComments(comment_type) {
             removeFeedback($(this));
             if ($(".similar-comment.selected").length != 0) {
               addFeedback($(this), $(".similar-comment.selected"), $(".similar-comment.selected .similar-comment-text").text());
-              var comment_id = $(".selected").attr("id").split("-")[2];
+              var comment_id = $(".selected").data().comment_id;
               logUsage({
                 "event": ascii_keys[event.which],
                 "comment_id": comment_id
@@ -274,7 +241,7 @@ function setupSimilarComments(comment_type) {
     selected.removeClass("selected");
     removeFeedback($("#textentry"));
     addFeedback($("#textentry"), $(this), $(this).find(".similar-comment-text").text());
-    var comment_id = $(".selected").attr("id").split("-")[2];
+    var comment_id = $(".selected").data().comment_id;
     logUsage({
       "event": "mouseover",
       "comment_id": comment_id
@@ -296,7 +263,7 @@ function setupSimilarComments(comment_type) {
   // When user clicks on the chunks in the bubble next to a similar comment, opens a new tab at that comment
   $(".bubble .syntax .chunk-line").on("click", function() {
     // Get comment id from bubble, whose id is bubble-{{comment.id}}
-    var comment_id = $(this).parent().parent().attr("id").split("-")[1];
+    var comment_id = $(this).parent().parent().data().comment_id;
     // Get chunk id from chunkline, whose id is chunkline-{{comment.chunk.id}}-line-{{n}}
     var chunk_id = $(this).attr("id").split("-"[1]);
     logUsage({
@@ -359,9 +326,88 @@ var commentSearch = new function() {
       initializer
     );
 
-    commentsSearchEngine.open([index1,index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
+    commentsSearchEngine.open([index1, index2], fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
 
   };
+
+  var injectBulkDocument = function(engine, textArray, valueArray, callback) {
+    console.log("beginning injection");
+    var synchro = fullproof.make_synchro_point(function(data) {
+        callback();
+    });
+    var words = [];
+    var values = [];
+    engine.forEach(function(name, index, analyzer) {
+        if (name) {
+            for (var i=0, max=Math.min(textArray.length, valueArray.length); i<max; ++i) {
+                (function(text,value) {
+                    analyzer.getArray(text, function(array_of_words) {
+                        for (var w=0; w<array_of_words.length; ++w) {
+                            var val = array_of_words[w];
+                            if (val instanceof fullproof.ScoredEntry) {
+                                val.value = val.value===undefined?value:val.value;
+                                words.push(val.key);
+                                values.push(val);
+                            } else {
+                                words.push(val);
+                                values.push(value);
+                            }
+                        }
+                    });
+                })(textArray[i], valueArray[i]);
+            }
+            index.injectBulk(words, values, callback);
+        }
+        else {
+            synchro(false);
+        }
+    }, false);
+}
+
+  this.addCommentsToDB = function(commentsData_) {
+    var commentsData_copy = [];
+    for (var i in commentsData_) {
+      commentsData_copy.push(commentsData_[i].comment);
+    }
+    var synchro = fullproof.make_synchro_point(function() {}, commentsData_.length-1);
+    var numComments = commentsData.length;
+    var values = [];
+    for (var i=0; i<commentsData_copy.length; ++i) {
+      values.push(i+numComments);
+    }
+    injectBulkDocument(commentsSearchEngine, commentsData_copy, values, function(){
+      console.log("finished injecting");
+      commentsData = commentsData.concat(commentsData_);
+    });
+  };
+
+  function createBubble(commentsData) {
+    var $bubble = $("<span class='bubble triangle-border left'></span>").attr("id", "bubble-"+commentsData.comment_id);
+    var $syntax = $("<div class='syntax'></div>");
+    for (var i in commentsData.chunk_lines) {
+      n = commentsData.chunk_lines[i][0];
+      chunk_line = commentsData.chunk_lines[i][1];
+      staff_code = commentsData.chunk_lines[i][2];
+      var $link = $("<a class='chunk-line' target='_blank'></a>").attr(
+        {"id": "chunk-"+commentsData.chunk_id,
+        "href": "/chunks/view/"+commentsData.chunk_id+"#comment-"+commentsData.comment_id}
+      );
+      if (!staff_code) {
+        $link.addClass("chunk-line-student");
+      }
+      else {
+        $link.addClass("chunk-line-staff");
+      }
+      var $line = $("<span class='bubble-line'></span>").attr("id", "line-"+commentsData.chunk_id+"-"+n+"-"+commentsData.file_id);
+      var $line_number = $("<span class='line-number'></span>").html(n);
+      var $line_code = $("<pre class='line-code'></pre>").html(chunk_line);
+      $line.append($line_number, $line_code);
+      $link.append($line);
+      $syntax.append($link);
+    }
+    $bubble.append($syntax);
+    $("body").append($bubble);
+  }
 
   this.search = function(value, comment_type, _callback) {
 
@@ -426,8 +472,8 @@ var commentSearch = new function() {
           comment_text.html(commentsData[results[i].index].comment.replace(regex, '<i><b>$&</b></i>'));
           comment_div.append(comment_text);
           var author_link = $("<a target='_blank' class='similar-comment-author-link'></a>");
-          author_link.attr("href", commentsData[results[i].index].author_url);
-          author_link.html(commentsData[results[i].index].author);
+          author_link.attr("href", "/accounts/user/"+commentsData[results[i].index].author_username);
+          author_link.html(commentsData[results[i].index].author+" ("+commentsData[results[i].index].reputation+")");
           comment_div.append(" - ", author_link);
           comment_div.data(commentsData[results[i].index]);
 
@@ -438,6 +484,18 @@ var commentSearch = new function() {
           else {
             // jQuery 1-indexes its selectors, thus using i rather i-1
             $('.similar-'+comment_type+'-wrapper > div:nth-child('+i+')').after(comment_div);
+          }
+
+          var $bubble = $("#bubble-"+commentsData[results[i].index].comment_id);
+          if ($bubble.length == 0) {
+            $.ajax({
+              url: "/chunks/highlight_comment_chunk_line/"+commentsData[results[i].index].comment_id,
+              success: function(response) {
+                var comment_div = $("#similar-comment-"+response.comment_id);
+                comment_div.data(response);
+                createBubble(comment_div.data());
+              }
+            });
           }
 
         }
