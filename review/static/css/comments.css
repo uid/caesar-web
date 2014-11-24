@@ -325,7 +325,6 @@
     resize: vertical;
     padding: 5px;
     overflow-y: scroll;
-    overflow-x: none;
     white-space: pre-wrap;
 }
 
