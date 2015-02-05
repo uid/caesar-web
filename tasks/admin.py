@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from tasks.models import Task
+from tasks.models import Task, ChunkReview
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('id', 'status', 'reviewer', 'submission', 'chunk')
@@ -9,3 +9,4 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = ('reviewer__user__username', 'submission__authors__username', 'milestone__assignment__semester__semester', 'milestone__assignment__semester__subject__name','milestone__assignment__name')
 
 admin.site.register(Task, TaskAdmin)
+admin.site.register(ChunkReview)
