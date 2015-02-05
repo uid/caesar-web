@@ -3,21 +3,21 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import DataMigration
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
 class Migration(DataMigration):
 
     def forwards(self, orm):
         for task in orm.Task.objects.all():
             (chunk_review, created) = orm.ChunkReview.objects.get_or_create(chunk=task.chunk)
-            role =  orm['accounts.Member'].objects.get(semester=task.milestone.assignment.semester,user=task.reviewer).role
-            # role = task.milestone.assignment.semester.members.get(user=task.reviewer).role
-            # role = task.reviewer.membership.get(semester=task.milestone.assignment.semester).role
-            # migration does not let you access static model members (like Member.STUDENT) because the model file isnt' pinned ot hte migration
-            if role == 'S' or role == 'V':
-                chunk_review.student_or_alum_reviewers += 1
-            elif role == 'T':
-                chunk_review.staff_reviewers += 1
-            chunk_review.save()
+            for member in orm['accounts.Member'].objects.filter(semester=task.milestone.assignment.semester,user=task.reviewer):
+                role = member.role
+                # migration does not let you access static model members (like Member.STUDENT) because the model file isnt' pinned ot hte migration
+                if role == 'S' or role == 'V':
+                    chunk_review.student_or_alum_reviewers += 1
+                elif role == 'T':
+                    chunk_review.staff_reviewers += 1
+                chunk_review.save()
             task.chunk_review = chunk_review
             task.save()
 
