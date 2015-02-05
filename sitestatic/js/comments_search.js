@@ -331,7 +331,6 @@ var commentSearch = new function() {
   };
 
   var injectBulkDocument = function(engine, textArray, valueArray, callback) {
-    console.log("beginning injection");
     var synchro = fullproof.make_synchro_point(function(data) {
         callback();
     });
@@ -376,7 +375,6 @@ var commentSearch = new function() {
       values.push(i+numComments);
     }
     injectBulkDocument(commentsSearchEngine, commentsData_copy, values, function(){
-      console.log("finished injecting");
       commentsData = commentsData.concat(commentsData_);
     });
   };
