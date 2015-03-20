@@ -184,11 +184,16 @@
         </module>
         
         <module name="RedundantImport">
+            <message key="import.lang"
+                     value="Redundant import from the java.lang package - {0}. java.lang classes don't need to be imported. In Eclipse, you can use Source >> Organize Imports to remove this unnecessary import statement."/>
+            <message key="import.same"
+                     value="Redundant import from the same package - {0}. Classes in the current package don't need to be imported.  In Eclipse, you can use Source >> Organize Imports to remove these unnecessary import statements."/>
         </module>
         
         <module name="UnusedImports">
+            <message key="import.unused"
+                     value="Unused import - {0}. In Eclipse, you can use Source >> Organize Imports to remove these unnecessary import statements."/>
         </module>
-        
         
         
         <!-- Checks for Size Violations.                    -->
