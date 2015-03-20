@@ -268,7 +268,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
             user in chunk.reviewers,
             user in chunk.submission.authors,
             review_priority,
-#            type_priority,
+            type_priority,
 #            -total_affinity(user, chunk.submission.reviewers),
 #            -total_affinity(user, chunk.reviewers),
             len(chunk.submission.reviewers),
