@@ -1,7 +1,8 @@
-import os
+import os, re
 from collections import defaultdict
 
-DEFAULT_FILE_EXTENSIONS = ['java', 'c', 'h', 'cpp', 'CC', 'py', 'scm']
+DEFAULT_FILE_EXTENSIONS = ['java', 'c', 'h', 'cpp', 'CC', 'py', 'scm', 'g4']
+EXCLUDE_PATTERNS = ['ExpressionBaseListener', 'ExpressionLexer', 'ExpressionListener', 'ExpressionParser']
 
 def file_extension(filename):
   if '.' in filename:
@@ -12,6 +13,14 @@ def has_valid_file_extension_helper(file_extensions):
   def has_valid_file_extension(filename):
     return file_extension(filename) in file_extensions
   return has_valid_file_extension
+
+def exclude_patterns_helper(patterns):
+  def allow_filename(filename):
+    for pattern in patterns:
+      if re.search(pattern, filename):
+        return False
+    return True
+  return allow_filename
 
 def crawl_submissions(base_dir, file_extensions=DEFAULT_FILE_EXTENSIONS):
   '''Crawls the students code and returns a dictionary mapping student usernames to
@@ -35,6 +44,8 @@ def crawl_submissions(base_dir, file_extensions=DEFAULT_FILE_EXTENSIONS):
       student_code[student_dir].extend([root + '/' + file_path for file_path in files])
     # Only take files of the extension we want.
     student_code[student_dir] = filter(has_valid_file_extension_helper(file_extensions), student_code[student_dir])
+    # Remove excluded files
+    student_code[student_dir] = filter(exclude_patterns_helper(EXCLUDE_PATTERNS), student_code[student_dir])
 
   return student_code
 
