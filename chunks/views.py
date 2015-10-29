@@ -3,7 +3,7 @@ from chunks.models import Chunk, File, Assignment, ReviewMilestone, SubmitMilest
 # from chunks.forms import SimulateRoutingForm
 from review.models import Comment, Vote, Star
 from tasks.models import Task
-from tasks.random_routing import simulate_tasks
+from tasks.old_routing import simulate_tasks
 
 from django.http import Http404, HttpResponse
 from django.core.exceptions import PermissionDenied
@@ -14,8 +14,9 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 
 from pygments import highlight
-from pygments.lexers import get_lexer_for_filename
+from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
 from pygments.formatters import HtmlFormatter
+from pygments.util import ClassNotFound
 
 from simplewiki.models import Article
 
@@ -31,7 +32,25 @@ import logging
 from operator import itemgetter, attrgetter
 from django.utils.datastructures import SortedDict
 
-def highlight_chunk_lines(lexer, formatter, staff_lines, chunk, start=None, end=None):
+def get_best_lexer(filename):
+    # first see if Pygments knows a good lexer for this filename
+    try:
+        return get_lexer_for_filename(filename)
+    except ClassNotFound:
+        pass
+    # We use .g4 for Antlr files, but Pygments uses .g
+    if filename.endswith(".g4"):
+        try:
+            return get_lexer_by_name("antlr")
+        except ClassNotFound:
+            pass
+    # fall back to Python lexer
+    return get_lexer_by_name("python")
+
+def highlight_chunk_lines(staff_lines, chunk, start=None, end=None):
+    lexer = get_best_lexer(chunk.file.path)
+    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
+
     [numbers, lines] = zip(*chunk.lines[start:end])
     # highlight the code this way to correctly identify multi-line constructs
     # TODO implement a custom formatter to do this instead
@@ -85,9 +104,7 @@ def view_chunk(request, chunk_id):
 
     comment_data = map(get_comment_data, chunk.comments.prefetch_related('author__profile', 'author__membership__semester'))
 
-    lexer = get_lexer_for_filename(chunk.file.path)
-    formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
-    highlighted_lines = highlight_chunk_lines(lexer, formatter, staff_lines, chunk)
+    highlighted_lines = highlight_chunk_lines(staff_lines, chunk)
 
     task_count = Task.objects.filter(reviewer=user) \
             .exclude(status='C').exclude(status='U').count()
@@ -167,15 +184,13 @@ def highlight_comment_chunk_line(request, comment_id):
         comment = get_object_or_404(Comment, pk=comment_id)
         chunk = comment.chunk
         staff_lines = StaffMarker.objects.filter(chunk=chunk).order_by('start_line', 'end_line')
-        lexer = get_lexer_for_filename(chunk.file.path)
-        formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
         # comment.start is a line number, which is 1-indexed
         # start is an index into a list of lines, which is 0-indexed
         start = comment.start-1
         # comment.end is a line number
         # end is an index into a list of lines, which excludes the last line
         end = comment.end
-        highlighted_comment_lines = highlight_chunk_lines(lexer, formatter, staff_lines, comment.chunk, start, end)
+        highlighted_comment_lines = highlight_chunk_lines(staff_lines, comment.chunk, start, end)
 
         return HttpResponse(json.dumps({
             'comment_id': comment_id,
@@ -234,7 +249,7 @@ def view_all_chunks(request, viewtype, submission_id):
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     for afile in files:
         staff_lines = StaffMarker.objects.filter(chunk__file=afile).order_by('start_line', 'end_line')
-        lexer = get_lexer_for_filename(afile.path)
+        lexer = get_best_lexer(afile.path)
         #prepare the file - get the lines that are part of chunk and the ones that aren't
         highlighted_lines_for_file = []
         numbers, lines = zip(*afile.lines)
