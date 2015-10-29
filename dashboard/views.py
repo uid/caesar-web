@@ -12,7 +12,7 @@ from  django.core.exceptions import ObjectDoesNotExist
 from chunks.models import Chunk, Assignment, Milestone, SubmitMilestone, ReviewMilestone, Submission, StaffMarker
 from review.models import Comment
 from tasks.models import Task
-from tasks.random_routing import assign_tasks
+from tasks.old_routing import assign_tasks
 from accounts.models import UserProfile, Extension, Member
 
 import datetime
