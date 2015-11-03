@@ -37,7 +37,6 @@ parser.add_argument('-n', '--dry-run',
                     help="just do a test run -- don't save anything into the Caesar database")
 parser.add_argument('--starting',
                     metavar="PATH",
-                    required=False,
                     default=None,
                     help="folder containing starting code for the assignment.  Should contain one subfolder, under which is the starting code.")
 parser.add_argument('--submissions',
@@ -47,7 +46,14 @@ parser.add_argument('--submissions',
 parser.add_argument('--restrict',
                     action="store_true",
                     help="Restrict who can view the students' chunks to the student authors and any assigned reviewers")
-
+parser.add_argument('--include',
+                    action="append",
+                    default=['*.java', '*.c', '*.h', '*.cpp', '*.CC', '*.py'],
+                    help="filename patterns to upload to Caesar; e.g. *Foo*.java matches Foo.java and src/TheFool/Bar.java")
+parser.add_argument('--exclude',
+                    action="append",
+                    default=[],
+                    help="filename patterns to exclude from upload")
 args = parser.parse_args()
 #print args
 
@@ -73,7 +79,7 @@ starting_time = time.time()
 submit_milestone = SubmitMilestone.objects.get(id=settings['submit_milestone_id'])
 print "Found existing submit milestone. Adding code to %s." % (submit_milestone.full_name())
 
-staff_code = parse_staff_code(settings['staff_dir']) if settings['staff_dir'] is not None else {}
+staff_code = parse_staff_code(settings['staff_dir'], args.include, args.exclude) if settings['staff_dir'] is not None else {}
 #print staff_code.keys()
 
 batch = Batch(name=submit_milestone.full_name())
@@ -82,7 +88,7 @@ if settings['save_data']:
   print "Batch ID: %s" % (batch.id)
 
 # Crawling the file system.
-student_code = crawl_submissions(settings['student_submission_dir'])
+student_code = crawl_submissions(settings['student_submission_dir'], args.include, args.exclude)
 
 code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, submit_milestone, settings['save_data'], staff_code, args.restrict)
 

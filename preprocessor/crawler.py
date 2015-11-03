@@ -1,39 +1,23 @@
-import os, re
+import os, fnmatch
 from collections import defaultdict
 
-DEFAULT_FILE_EXTENSIONS = ['java', 'c', 'h', 'cpp', 'CC', 'py', 'scm', 'g4']
-EXCLUDE_PATTERNS = ['ExpressionBaseListener', 'ExpressionLexer', 'ExpressionListener', 'ExpressionParser']
-
-def file_extension(filename):
-  if '.' in filename:
-    return filename.split('.')[-1]
-  return ''
-
-def has_valid_file_extension_helper(file_extensions):
-  def has_valid_file_extension(filename):
-    return file_extension(filename) in file_extensions
-  return has_valid_file_extension
-
-def exclude_patterns_helper(patterns):
-  def allow_filename(filename):
-    for pattern in patterns:
-      if re.search(pattern, filename):
-        return False
-    return True
-  return allow_filename
-
-def crawl_submissions(base_dir, file_extensions=DEFAULT_FILE_EXTENSIONS):
+def crawl_submissions(base_dir, includes, excludes):
   '''Crawls the students code and returns a dictionary mapping student usernames to
   absolute file paths of their code. NOTE: Does not guarantee that the users exist
   on the server.
   Params:
     base_dir: directory that contains all of the student sub-directories
-    file_extensions: which file extensions have source code in them. Default: ['java']
+    includes: list of filename patterns (using fnmatch syntax) that should be uploaded to Caesar.
+               For example, '*.java' would match both Foo.java and src/foo/Bar.java.
+    excludes: list of filename patterns that should be excluded from the upload
   Returns:
-    Dictionary mapping user names (i.e. directories) to absolute path names of the code.
+    Dictionary mapping user names (i.e. directories) to a list of pathnames, all of which start with base_dir.
   '''
   student_dirs = os.listdir(base_dir)
   student_code = defaultdict(list)
+
+  def matchesAnyPattern(filename, patterns):
+    return reduce(lambda p1,p2: p1 or p2, [fnmatch.fnmatch(filename, pattern) for pattern in patterns], False)
 
   for student_dir in student_dirs:
     filepath = base_dir + '/' + student_dir
@@ -42,11 +26,8 @@ def crawl_submissions(base_dir, file_extensions=DEFAULT_FILE_EXTENSIONS):
       continue
     for root, _, files in os.walk(filepath):
       student_code[student_dir].extend([root + '/' + file_path for file_path in files])
-    # Only take files of the extension we want.
-    student_code[student_dir] = filter(has_valid_file_extension_helper(file_extensions), student_code[student_dir])
-    # Remove excluded files
-    student_code[student_dir] = filter(exclude_patterns_helper(EXCLUDE_PATTERNS), student_code[student_dir])
-
+    # Only take files that are included but not excluded.
+    student_code[student_dir] = [filename for filename in student_code[student_dir] 
+                                          if matchesAnyPattern(filename, includes) 
+                                             and not matchesAnyPattern(filename, excludes)]
   return student_code
-
-

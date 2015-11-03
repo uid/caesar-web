@@ -9,8 +9,8 @@ from crawler import crawl_submissions
 failed_users = set()
 diff_object = diff_match_patch()
 
-def parse_staff_code(staff_dir):
-  staff_files = crawl_submissions(staff_dir)
+def parse_staff_code(staff_dir, includes, excludes):
+  staff_files = crawl_submissions(staff_dir, includes, excludes)
   num_subdirs = len(staff_dir.split('/'))
   staff_code = {}
   for files in staff_files.values():
