@@ -114,7 +114,7 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
     old_submission_data = collect_submission_data(old_submissions)
 
     #find the current submissions
-    current_milestones = SubmitMilestone.objects.filter(assignment__semester__members__user=dashboard_user, assignment__semester__members__role=Member.STUDENT)\
+    current_milestones = SubmitMilestone.objects.filter(assignment__semester__members__user=dashboard_user, assignment__semester__members__role=Member.STUDENT, assignment__semester__is_current_semester=True)\
         .filter(assigned_date__lt= datetime.datetime.now())\
         .order_by('duedate')
 
@@ -130,7 +130,7 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
             current_milestone_data.append((milestone, user_extension))
 
     #find total slack days left for each membership
-    current_memberships = Member.objects.filter(user=dashboard_user, role=Member.STUDENT).select_related('semester__subject')
+    current_memberships = Member.objects.filter(user=dashboard_user, role=Member.STUDENT, semester__is_current_semester=True).select_related('semester__subject')
 
     current_slack_data = []
     for membership in current_memberships:

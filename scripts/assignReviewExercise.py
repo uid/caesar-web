@@ -48,8 +48,8 @@ print args
 
 try:
   submission = Submission.objects.get(pk=args.submission)
-except Submssion.DoesNotExist:
-  print "can't find submission #" + args.submission
+except Submission.DoesNotExist:
+  print "can't find submission #", args.submission
   sys.exit(-1)
 print "using submission ", submission
 
