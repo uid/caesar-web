@@ -60,10 +60,15 @@ def fetch_user_data_from_LDAP(user, ):
     fields = ['cn', 'sn', 'givenName', 'mail', ]
     userfilter = ldap.filter.filter_format('uid=%s', [username])
     result = con.search_s('dc=mit,dc=edu', ldap.SCOPE_SUBTREE, userfilter, fields)
+    print result
     if len(result) == 1:
-        user.first_name = result[0][1]['givenName'][0]
-        user.last_name = result[0][1]['sn'][0]
-        user.email = result[0][1]['mail'][0]
+        data = result[0][1]
+        if 'givenName' in data:
+            user.first_name = data['givenName'][0] 
+        if 'sn' in data:
+            user.last_name = data['sn'][0]
+        if 'mail' in data:
+            user.email = data['mail'][0]
         user.save()
         user.profile.company = 'MIT'
         user.profile.save()

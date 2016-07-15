@@ -26,19 +26,7 @@ Dumps a JSON file containing all the data associated with a particular subject-s
 - the Assignments, Milestones, Submissions, Files, Chunks
 - the Tasks and Comments
 
-After dumping a semester, you can delete the semester as follows:
-   ./manage.py shell
-   from chunks.models import Semester
-   semester = Semester.objects.get(subject__name="your subject", semester="your semester")
-   print semester
-   semester.delete()
-
 To restore a semester, use ./manage.py loaddata your-json-file
-You may get errors like
-    Column 'assignment_id' cannot be null
-or
-    DoesNotExist
-The workaround is to run loaddata repeatedly until it says something like "Installed N object(s) from 1 fixture(s)".
 """)
 parser.add_argument('--subject',
                     nargs=1,
@@ -100,9 +88,7 @@ class CustomSerializer(JSONSerializer):
 
 
 # dump everything as JSON
-print >>sys.stderr, "serializing..."
-theSerializer = CustomSerializer()
-theSerializer.serialize(everything, indent=2)
 print >>sys.stderr, "writing..."
-print theSerializer.getvalue()
+theSerializer = CustomSerializer()
+theSerializer.serialize(everything, indent=2, stream=sys.stdout)
 
