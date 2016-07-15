@@ -43,6 +43,26 @@ parser.add_argument('--semester',
 args = parser.parse_args()
 #print args
 
+import gc
+
+# code from https://baxeico.wordpress.com/2014/09/30/optimize-django-memory-usage/
+# fetches query set in batches, with garbage collections in between, 
+# to avoid Django's default behavior of fetching the entire query client-side first
+def queryset_iterator(qs, batchsize = 500, gc_collect = True):
+    iterator = qs.values_list('pk', flat=True).order_by('pk').distinct().iterator()
+    eof = False
+    while not eof:
+        primary_key_buffer = []
+        try:
+            while len(primary_key_buffer) < batchsize:
+                primary_key_buffer.append(iterator.next())
+        except StopIteration:
+            eof = True
+        for obj in qs.filter(pk__in=primary_key_buffer).order_by('pk').iterator():
+            yield obj
+        if gc_collect:
+            gc.collect()
+
 
 everything = []
 
@@ -50,7 +70,7 @@ def include(model, filter):
   global everything
   queryset = filter(model.objects)
   print >>sys.stderr, model.__name__ + ": " + str(queryset.count())
-  everything = chain(everything, queryset)
+  everything = chain(everything, queryset_iterator(queryset))
   return queryset
 
 subject  = include(Subject,  lambda m: m.filter(name=args.subject[0])).get()
@@ -75,6 +95,8 @@ include(Vote,        lambda m: m.filter(comment__chunk__file__submission__milest
 from django.core import serializers
 JSONSerializer = serializers.get_serializer("json")
 
+modelInProgress = None
+
 # Customize it so that the assignment field is also spit out in the subclasses ReviewMilestone and SubmitMilestone.
 # Even though this is redundant (since the superclass Milestone spit is out), without this customization, the default 
 # serializer just emits the local fields for each , and manage.py loaddata generates errors ("Warning: Problem installing fixture 
@@ -84,11 +106,16 @@ class CustomSerializer(JSONSerializer):
         dump_object = super(CustomSerializer, self).get_dump_object(obj)
         if dump_object["model"] in ["chunks.reviewmilestone", "chunks.submitmilestone"]:
           dump_object["fields"]["assignment"] = obj.assignment_id
+
+        global modelInProgress
+        if modelInProgress != dump_object["model"]:
+          modelInProgress = dump_object["model"]
+          print >>sys.stderr, "writing " + modelInProgress + "..."
+
         return dump_object
 
 
 # dump everything as JSON
-print >>sys.stderr, "writing..."
 theSerializer = CustomSerializer()
 theSerializer.serialize(everything, indent=2, stream=sys.stdout)
 
