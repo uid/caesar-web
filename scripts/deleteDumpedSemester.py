@@ -53,6 +53,8 @@ args = parser.parse_args()
 for jsonFile in args.jsonFile:
   print "processing " + jsonFile.name
 
+  # although we could read in the json with json.load(), it's faster and uses less memory
+  # to scan through it line by line
   primaryKeys = []
   models = []
   for line in jsonFile:
