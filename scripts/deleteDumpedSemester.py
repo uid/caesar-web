@@ -39,6 +39,9 @@ import argparse
 parser = argparse.ArgumentParser(description="""
 Given one or more JSON files produced by dumpSemester, deletes the semester's corresponding objects from the database.
 """)
+parser.add_argument('-n', '--dry-run',
+                    action="store_true",
+                    help="just do a test run -- don't delete anything from the database")
 parser.add_argument('jsonFile',
                     nargs='+',
                     type=argparse.FileType('r'),
@@ -80,6 +83,9 @@ for jsonFile in args.jsonFile:
       print "deleting " + str(len(primaryKeys)) + " objects from " + modelName
       objectsToDelete = modelClass.objects.filter(id__in=primaryKeys)
       print "   found " + str(objectsToDelete.count()) + " matching objects in the database"
-      print "   deleting...",
-      objectsToDelete._raw_delete(objectsToDelete.db);
-      print "done"
+      if args.dry_run:
+        print "   (dry run, didn't delete)"
+      else:
+        print "   deleting...",
+        objectsToDelete._raw_delete(objectsToDelete.db);
+        print "done"
