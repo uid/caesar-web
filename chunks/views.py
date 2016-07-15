@@ -72,25 +72,17 @@ def view_chunk(request, chunk_id):
     user = request.user
     chunk = get_object_or_404(Chunk, pk=chunk_id)
     semester = chunk.file.submission.milestone.assignment.semester
-    is_reviewer = Task.objects.filter(chunk=chunk, reviewer=user).exists()
 
-    # you get a 404 page if
-    # # you weren't a teacher during the semester
-    # #   and
-    # # you didn't write the code
-    # #   and
-    # # you weren't assigned to review the code
-    # #   and
-    # # you aren't a django admin
-    try:
-        user_membership = Member.objects.get(user=user, semester=semester)
-        if not user_membership.is_teacher() and not chunk.file.submission.has_author(user) and not is_reviewer and not user.is_staff:
-            raise PermissionDenied
-    except Member.MultipleObjectsReturned:
-        raise Http404 # you can't be multiple members for a class so this should never get called
-    except Member.DoesNotExist:
-        if not user.is_staff:
-            raise PermissionDenied # you get a 401 page if you aren't a member of the semester
+    if Member.objects.filter(user=user, semester=semester, role=Member.TEACHER).exists():
+        pass
+    elif chunk.file.submission.has_author(user):
+        pass
+    elif Task.objects.filter(chunk=chunk, reviewer=user).exists():
+        pass
+    elif user.is_staff:
+        pass
+    else:
+        raise PermissionDenied
     
     user_votes = dict((vote.comment_id, vote.value) \
             for vote in user.votes.filter(comment__chunk=chunk_id))
@@ -205,24 +197,17 @@ def view_all_chunks(request, viewtype, submission_id):
     user = request.user
     submission = Submission.objects.get(id = submission_id)
     semester = Semester.objects.get(assignments__milestones__submitmilestone__submissions=submission)
-    authors = User.objects.filter(submissions=submission)
-    is_reviewer = Task.objects.filter(submission=submission, reviewer=user).exists()
 
-    try:
-        user_membership = Member.objects.get(user=user, semester=semester)
-        # you get a 404 page ifchrome
-        # # you weren't a teacher during the semester
-        # #   and
-        # # you aren't django staff
-        # #   and
-        # # you aren't an author of the submission
-        if not user_membership.is_teacher() and not user.is_staff and not (user in authors) and not is_reviewer:
-            raise PermissionDenied
-    except Member.MultipleObjectsReturned:
-        raise Http404 # you can't be multiple members for a class so this should never get called
-    except Member.DoesNotExist:
-        if not user.is_staff:
-            raise PermissionDenied # you get a 401 page if you aren't a member of the semester
+    if Member.objects.filter(user=user, semester=semester, role=Member.TEACHER).exists():
+        pass
+    elif submission.has_author(user):
+        pass
+    elif Task.objects.filter(chunk=chunk, reviewer=user).exists():
+        pass
+    elif user.is_staff:
+        pass
+    else:
+        raise PermissionDenied
         
     files = File.objects.filter(submission=submission_id).select_related('chunks')
     if not files:
