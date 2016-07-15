@@ -133,6 +133,9 @@ def denormalize_votes(sender, instance, created=False, **kwargs):
     except Comment.DoesNotExist:
         # vote is getting deleted from a comment delete cascade, do nothing
         pass
+    except Chunk.DoesNotExist:
+        # vote is getting deleted from a comment delete cascade, do nothing
+        pass
 
 
 class Star(models.Model):

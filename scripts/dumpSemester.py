@@ -19,9 +19,6 @@ from caesar.accounts.models import *
 
 from itertools import chain
 
-from django.core import serializers
-
-
 import argparse
 parser = argparse.ArgumentParser(description="""
 Dumps a JSON file containing all the data associated with a particular subject-semester:
@@ -29,9 +26,12 @@ Dumps a JSON file containing all the data associated with a particular subject-s
 - the Assignments, Milestones, Submissions, Files, Chunks
 - the Tasks and Comments
 
-After dumping a semester, you can delete the semester from the database by selecting it in the admin interface
-(/admin/chunks/semester/) and choosing the action Delete selected objects.  You may get a "Chunk matching query does not exist."
-after this deletion operation.
+After dumping a semester, you can delete the semester as follows:
+   ./manage.py shell
+   from chunks.models import Semester
+   semester = Semester.objects.get(subject__name="your subject", semester="your semester")
+   print semester
+   semester.delete()
 
 To restore a semester, use ./manage.py loaddata your-json-file
 You may get errors like
@@ -54,6 +54,7 @@ parser.add_argument('--semester',
 
 args = parser.parse_args()
 #print args
+
 
 everything = []
 
@@ -81,47 +82,27 @@ include(Task,        lambda m: m.filter(milestone__assignment__semester=semester
 include(Comment,     lambda m: m.filter(chunk__file__submission__milestone__assignment__semester=semester))
 include(Vote,        lambda m: m.filter(comment__chunk__file__submission__milestone__assignment__semester=semester))
 
-# members = Member.objects.filter(semester=semester)
-# print >>sys.stderr, "Members: " + str(members.count())
 
-# assignments = Assignment.objects.filter(semester=semester)
-# print >>sys.stderr, "Assignments: " + str(assignments.count())
+# get the built-in JSON serializer
+from django.core import serializers
+JSONSerializer = serializers.get_serializer("json")
 
-# milestones = Milestone.objects.filter(assignment__semester=semester)
-# print >>sys.stderr, "Milestones: " + str(milestones.count())
+# Customize it so that the assignment field is also spit out in the subclasses ReviewMilestone and SubmitMilestone.
+# Even though this is redundant (since the superclass Milestone spit is out), without this customization, the default 
+# serializer just emits the local fields for each , and manage.py loaddata generates errors ("Warning: Problem installing fixture 
+# '6005-sp13.json': Column 'assignment_id' cannot be null") when trying to load it back into the database.
+class CustomSerializer(JSONSerializer):
+    def get_dump_object(self, obj):
+        dump_object = super(CustomSerializer, self).get_dump_object(obj)
+        if dump_object["model"] in ["chunks.reviewmilestone", "chunks.submitmilestone"]:
+          dump_object["fields"]["assignment"] = obj.assignment_id
+        return dump_object
 
-# submitmilestones = SubmitMilestone.objects.filter(assignment__semester=semester)
-# print >>sys.stderr, "SubmitMilestones: " + str(submitmilestones.count())
-
-# reviewmilestones = ReviewMilestone.objects.filter(assignment__semester=semester)
-# print >>sys.stderr, "ReviewMilestones: " + str(reviewmilestones.count())
-
-# batches = Batch.objects.filter(submissions__milestone__assignment__semester=semester)
-# print >>sys.stderr, "Batches: " + str(batches.count())
-
-# submissions = Submission.objects.filter(milestone__assignment__semester=semester)
-# print >>sys.stderr, "Submissions: " + str(submissions.count())
-
-# files = File.objects.filter(submission__milestone__assignment__semester=semester)
-# print >>sys.stderr, "Files: " + str(files.count())
-
-# chunks = Chunk.objects.filter(file__submission__milestone__assignment__semester=semester)
-# print >>sys.stderr, "Chunks: " + str(chunks.count())
-
-# staffmarkers = StaffMarker.objects.filter(chunk__file__submission__milestone__assignment__semester=semester)
-# print >>sys.stderr, "StaffMarkers: " + str(staffmarkers.count())
-
-# tasks = Task.objects.filter(milestone__assignment__semester=semester)
-# print >>sys.stderr, "Tasks: " + str(tasks.count())
-
-# comments = Comment.objects.filter(chunk__file__submission__milestone__assignment__semester=semester)
-# print >>sys.stderr, "Comments: " + str(comments.count())
-
-# votes = Vote.objects.filter(comment__chunk__file__submission__milestone__assignment__semester=semester)
-# print >>sys.stderr, "Votes: " + str(votes.count())
 
 # dump everything as JSON
-print >>sys.stderr, "before serialize"
-data = serializers.serialize("json", everything, indent=2)
-print >>sys.stderr, "before final print"
-print data
+print >>sys.stderr, "serializing..."
+theSerializer = CustomSerializer()
+theSerializer.serialize(everything, indent=2)
+print >>sys.stderr, "writing..."
+print theSerializer.getvalue()
+
