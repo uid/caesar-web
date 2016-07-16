@@ -151,7 +151,6 @@ INSTALLED_APPS = (
     'chunks',
     'review',
     'tasks',
-    'simplewiki',
     'notifications',
     'log',
 )

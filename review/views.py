@@ -18,7 +18,6 @@ from models import Comment, Vote, Star
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
 from accounts.models import UserProfile, Extension, Member
-from simplewiki.models import Article
 from log.models import Log
 
 from pygments import highlight
@@ -332,7 +331,6 @@ def all_activity(request, review_milestone_id, username):
         'participant': participant,
         'activity_view': True,
         'full_view': True,
-        'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
 
 def view_helper(comments):

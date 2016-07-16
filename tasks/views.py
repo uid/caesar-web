@@ -18,7 +18,6 @@ from review.models import Comment, Vote, Star
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
 from accounts.models import UserProfile, Extension, Member
-from simplewiki.models import Article
 
 import datetime
 import sys

@@ -18,8 +18,6 @@ from pygments.lexers import get_lexer_for_filename, get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 from pygments.util import ClassNotFound
 
-from simplewiki.models import Article
-
 import os
 import subprocess
 import datetime
@@ -125,7 +123,6 @@ def view_chunk(request, chunk_id):
         'task_count': task_count,
         'full_view': True,
         'file': chunk.file,
-        'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
         'last_task': last_task,
         'remaining_task_count': remaining_task_count,
     }
@@ -310,7 +307,6 @@ def view_all_chunks(request, viewtype, submission_id):
         'read_only': False,
         'comment_view': comment_view,
         'full_view': True,
-        'articles': [x for x in Article.objects.all() if not x == Article.get_root()],
     })
 
 @login_required
