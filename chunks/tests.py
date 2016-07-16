@@ -23,26 +23,3 @@ class UserTest(TestCase):
         Count number of submissions that exist
         """
         # self.assertTrue(File.objects.all().count() == 64)
-
-class PublishCodeTest(TestCase):
-    fixtures = ['test_fixtures.json']
-
-    def test_publishing(self):
-        """
-        Tests that an attempt to publish code results in publication.
-        """
-        c = Client()
-        c.login(username='kimdeal', password='test')
-        u = User.objects.get(username='kimdeal')
-        submission = u.submissions.all()[0]
-        self.assertFalse(submission.published)
-        c.post('/chunks/publish/', {'submission_id': '472', 'published': 'False'})
-        u = User.objects.get(username='kimdeal')
-        submission = u.submissions.all()[0]
-        self.assertTrue(submission.published)
-
-    def test_publishing_others(self):
-        """
-        Tests that an attempt to publish someone else's code results in failure.
-        """
-        pass

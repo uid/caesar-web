@@ -144,8 +144,6 @@ def view_profile(request, username):
     review_milestone_data = []
     #get all review milestones
     review_milestones = ReviewMilestone.objects.all().order_by('-assigned_date')
-    # turn off Publishing until it's ready
-    #submissions = Submission.objects.filter(authors=participant).filter(published=True)
     for review_milestone in review_milestones:
         #get all comments that the user wrote
         comments = Comment.objects.filter(author=participant) \
@@ -174,7 +172,6 @@ def view_profile(request, username):
         'review_milestone_data': review_milestone_data,
         'participant': participant,
         'semesters_taught': Semester.objects.filter(members__in=user_memberships)
-#        'submissions': submissions,  turn off Publishing until it's ready
     })
 
 @login_required

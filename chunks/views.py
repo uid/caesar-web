@@ -480,29 +480,3 @@ def list_users(request, review_milestone_id, simulate=False, chunk_id_task_map={
 
   # users_data = sorted(data.values(), key=itemgetter('num_chunks_submitted', 'num_chunks_assigned'),reverse=True) 
   return render(request, 'chunks/list_users.html', {'users_data': data})
-
-@login_required
-def publish_code(request):
-    """Allow users to publish their written code."""
-    submissions = Submission.objects.filter(authors=request.user)
-
-    if request.method == "POST":
-        # handle ajax post to this url
-        submission_id = request.POST['submission_id']
-        submission = Submission.objects.get(pk=submission_id)
-        if not submission.has_author(request.user):
-            raise PermissionDenied
-
-        if request.POST['published']=='False':
-            logging.info('Publishing!')
-            submission.published = True
-            submission.save()
-        else:
-            logging.info('Unpublishing!')
-            submission.published = False
-            submission.save()
-
-    return render(request, 'chunks/publish_code.html', {
-        'user': request.user,
-        'submissions': submissions,
-    })

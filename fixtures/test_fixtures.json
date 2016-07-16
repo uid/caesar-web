@@ -11057,7 +11057,6 @@
   "fields": {
     "name": "ernie", 
     "created": "2013-02-06T23:24:31", 
-    "published": false, 
     "batch": null, 
     "authors": [
       [
@@ -11078,7 +11077,6 @@
   "fields": {
     "name": "gregk", 
     "created": "2013-02-06T23:24:31", 
-    "published": false, 
     "batch": null, 
     "authors": [
       [
@@ -11096,7 +11094,6 @@
   "fields": {
     "name": "qsitters", 
     "created": "2013-02-06T23:24:31", 
-    "published": false, 
     "batch": null, 
     "authors": [
       [
@@ -11114,7 +11111,6 @@
   "fields": {
     "name": "kathleenhanna", 
     "created": "2013-02-06T23:24:32", 
-    "published": false, 
     "batch": null, 
     "authors": [
       [
@@ -11132,7 +11128,6 @@
   "fields": {
     "name": "kimdeal", 
     "created": "2013-02-06T23:24:32", 
-    "published": false, 
     "batch": null, 
     "authors": [
       [
@@ -11150,7 +11145,6 @@
   "fields": {
     "name": "mikewatt", 
     "created": "2013-02-06T23:24:32", 
-    "published": false, 
     "batch": null, 
     "authors": [
       [
@@ -11168,7 +11162,6 @@
   "fields": {
     "name": "davidbowie", 
     "created": "2013-02-06T23:24:32", 
-    "published": false, 
     "batch": null, 
     "authors": [
       [
@@ -11186,7 +11179,6 @@
   "fields": {
     "name": "iggypop", 
     "created": "2013-02-09T14:00:08", 
-    "published": false, 
     "batch": null, 
     "authors": [
       [
@@ -11204,7 +11196,6 @@
   "fields": {
     "name": "rcm", 
     "created": "2013-09-17T10:20:09", 
-    "published": false, 
     "batch": 16, 
     "authors": [
       [
@@ -11222,7 +11213,6 @@
   "fields": {
     "name": "pnomario-polovoco", 
     "created": "2013-09-17T20:31:41", 
-    "published": false, 
     "batch": 17, 
     "authors": [
       [
@@ -11243,7 +11233,6 @@
   "fields": {
     "name": "graves", 
     "created": "2013-09-17T20:31:41", 
-    "published": false, 
     "batch": 17, 
     "authors": [
       [

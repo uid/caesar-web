@@ -58,20 +58,6 @@ $(document).ready(function() {
 
 <div class="row">
     <div class="span12" id='code'>
-<!-- turn off Publishing until it's ready
-      <h3>My Published Code</h3>
-      {% if submissions %}
-        {% for submission in submissions %}
-          <h4 class="assignment-display">
-            <a href="{% url 'chunks.views.view_all_chunks' 'code' submission.id %}">{{ submission.name }}</a> 
-            <span class='muted pull-right'>{{ submission.assignment.semester }}</span>
-          </h4>
-        {% endfor %}
-      {% else %}
-        <p>The user has no published code yet.</p>
-      {% endif %}
-      <a href='{% url "chunks.views.publish_code" %}' class='btn btn-small'>Start Publishing Code</a>
--->
       <h3>My Review Activity</h3>
       {% for review_milestone, review_data in review_milestone_data %}
         {% if review_data %}
