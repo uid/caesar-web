@@ -41,38 +41,14 @@ $(document).ready(function() {
 {% block content %}
 
  <div class="row">
-    <div class="span3">
-      <ul class='social'>
-        {% if participant.profile.twitter %}
-          <a href='http://twitter.com/{{ participant.profile.twitter}}'><li><i class="social foundicon-twitter"></i></li></a>
-        {% endif %}
-        {% if participant.profile.github %}
-          <a href='http://github.com/{{ participant.profile.github}}'><li><i class="social foundicon-github"></i></li></a>
-        {% endif %}
-        {% if participant.profile.linkedin %}
-          <a href='{{ participant.profile.linkedin}}'><li><i class="social foundicon-linkedin"></i></li></a>
-        {% endif %}
-        {% if participant.profile.website %}
-          <a href='{{ participant.profile.website}}'><li><i class="foundicon-globe"></i></li></a>
-        {% endif %}
-        <a href='mailto:{{ participant.email }}'><li><i class='foundicon-mail'></i></li></a>
-      </ul>
-
-    </div>
-    <div class="span9">
-      <h2 class="name">{{ participant.first_name }} {{ participant.last_name }} {{participant.profile.class_year|class_year}} <small>{{ participant.username }}</small></h2>
-      <div class='company'>{{participant.profile.company}}</div>
+    <div class="span12">
+      <h2 class="name">{{ participant.first_name }} {{ participant.last_name }} <small>{{ participant.username }}</small></h2>
       <h4 class="task header"> reputation: {{participant.profile.reputation}}</h4>
       {% for membership in participant.membership.all %}
         <span class='label current-{{membership.semester.is_current_semester}} class'>
           {{ membership.semester }} ({{ membership.get_role_display }})
         </span>
       {% endfor %}
-      {% if user == participant %}
-      <div class='buttons'>
-        <a class='btn btn-small' href="{% url 'accounts.views.edit_profile' user.username %}">Edit profile</a>
-      </div>
-      {% endif %}
       {% if user.is_staff %}
           <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.student_dashboard' participant.username %}"> [{{participant.username}} Dashboard]</a> 
       {%endif%}
@@ -81,12 +57,7 @@ $(document).ready(function() {
 
 
 <div class="row">
-    <div class="span3">
-      <h3>About Me</h3>
-      {{ participant.profile.about_html|safe }}
-    </div>
-
-    <div class="span9" id='code'>
+    <div class="span12" id='code'>
 <!-- turn off Publishing until it's ready
       <h3>My Published Code</h3>
       {% if submissions %}

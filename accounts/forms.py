@@ -38,7 +38,6 @@ class UserProfileForm(ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('class_year', 'company','twitter', 'github', 'website', 'linkedin', 'about',)
 
     def __init__(self, *args, **kw):
         super(UserProfileForm, self).__init__(*args, **kw)
@@ -50,13 +49,6 @@ class UserProfileForm(ModelForm):
             'first_name',
             'last_name',
             'email',
-            'class_year',
-            'company',
-            'about',
-            'twitter',
-            'github',
-            'website',
-            'linkedin',
             ]
 
     def save(self, *args, **kw):

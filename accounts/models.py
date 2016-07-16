@@ -57,21 +57,6 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile')
     reputation = models.IntegerField(default=0, editable=True)
 
-    about = MarkdownTextField(allow_html=False, blank=True, \
-        help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
-    company = models.CharField(max_length=100, default='', blank=True)
-    class_year = models.IntegerField(validators=[MinValueValidator(1920), MaxValueValidator(2050)], null=True, blank=True)
-
-    # social network links
-    twitter = models.CharField(max_length=16, blank=True, \
-        help_text='username. (ex.) ben-bitdiddle')
-    github = models.CharField(max_length=30, blank=True, \
-        help_text='username. (ex.) bitdiddle')
-    linkedin = models.URLField(blank=True,\
-        help_text='public profile URL. (ex.) http://www.linkedin.com/in/kiranbhattaram/')
-    website = models.URLField(blank=True,\
-        help_text='URL')
-
     def __unicode__(self):
         return self.user.__unicode__()
 
