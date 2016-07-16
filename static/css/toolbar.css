@@ -74,11 +74,6 @@
     margin: 3px; 
 }
 
-#toolbar-logged-in .user-photo {
-    vertical-align: middle;    
-    border: 1px solid #fff;
-}
-
 #secondary-toolbar {
     font-size: 1.1em;
     background: #fafafa; 

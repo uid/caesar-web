@@ -22,7 +22,6 @@ import datetime
 import sys
 import re
 
-from PIL import Image as PImage
 from os.path import join as pjoin
 from django.conf import settings
 from chunks.models import Milestone,SubmitMilestone,ReviewMilestone
@@ -185,30 +184,17 @@ def edit_profile(request, username):
         return redirect(reverse('accounts.views.view_profile', args=([username])))
     """Edit user profile."""
     profile = User.objects.get(username=username).profile
-    photo = None
-    img = None
-    if profile.photo:
-        photo = profile.photo.url
-    else:
-        photo = "http://placehold.it/180x144&text=Student"
 
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
             form.save()
-            if request.FILES:
-                # resize and save image under same filename
-                imfn = pjoin(settings.MEDIA_ROOT, profile.photo.name)
-                im = PImage.open(imfn)
-                im.thumbnail((180,180), PImage.ANTIALIAS)
-                im.save(imfn, "PNG")
             return redirect(reverse('accounts.views.view_profile', args=([username])))
     else:
         form = UserProfileForm(instance=profile)
 
     return render(request, 'accounts/edit_profile.html', {
-        'form': form,
-        'photo': photo,
+        'form': form
     })
 
 @staff_member_required

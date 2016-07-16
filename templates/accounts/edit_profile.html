@@ -23,18 +23,6 @@
 
         <div class="control-group">
 
-        {% if field.label == "Photo" %}
-          <div class="control-label">
-            <strong>Photo</strong>
-          </div>
-
-            <div class="controls">
-              <img id='profile-photo' class='edit-profile img-rounded' src="{{ photo }}"/>
-              <label for="photo-clear_id"><input type="checkbox" name="photo-clear" id="photo-clear_id"> Clear</label>
-              Change: <input type="file" name="photo" id="id_photo">
-            </div>
-
-        {% else %}
           <label class="control-label" for="{{ field.id }}">
             <strong>{{ field.label }}{% if field.field.required %}*{% endif %}</strong>
           </label>
@@ -43,7 +31,6 @@
             {{ field }}
             <div class='muted'>{{ field.help_text|safe }}</div>
           </div>
-        {% endif %}
 
         </div>
 

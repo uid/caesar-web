@@ -47,7 +47,6 @@ class UserProfileForm(ModelForm):
         self.fields['email'].initial = self.instance.user.email
 
         self.fields.keyOrder = [
-            'photo',
             'first_name',
             'last_name',
             'email',

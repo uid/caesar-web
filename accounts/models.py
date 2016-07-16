@@ -3,7 +3,6 @@ import datetime
 from chunks.models import Chunk, Assignment, Milestone, Semester
 
 from accounts.fields import MarkdownTextField
-from accounts.storage import OverwriteStorage
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -55,11 +54,6 @@ class Member(models.Model):
         return self.role == Member.VOLUNTEER
 
 class UserProfile(models.Model):
-    def get_photo_path(instance, filename):
-        return os.path.join(
-                settings.PROFILE_PHOTO_DIR,
-                instance.user.username)
-    
     user = models.OneToOneField(User, related_name='profile')
     reputation = models.IntegerField(default=0, editable=True)
 

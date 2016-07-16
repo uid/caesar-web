@@ -42,11 +42,6 @@ $(document).ready(function() {
 
  <div class="row">
     <div class="span3">
-        {% if participant.profile.photo %}
-          <img id='profile-photo' class='img-rounded' src="{{ participant.profile.photo.url }}" />
-        {% else %}
-          <img id='profile-photo' class='img-rounded' src="http://placehold.it/180x144&text=Student" />
-        {% endif %}
       <ul class='social'>
         {% if participant.profile.twitter %}
           <a href='http://twitter.com/{{ participant.profile.twitter}}'><li><i class="social foundicon-twitter"></i></li></a>

@@ -55,16 +55,6 @@ USE_L10N = True
 # Normalize all incoming URLs by appending a slash if necessary
 APPEND_SLASH = True
 
-# Absolute path to the directory that holds media.
-# Example: "/home/media/media.lawrence.com/"
-# This should be overridden in production in settings_local
-MEDIA_ROOT = project_path('media')
-
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash if there is a path component (optional in other cases).
-# Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/media/'
-
 STATIC_URL = '/static/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
@@ -77,8 +67,6 @@ STATICFILES_DIRS = (
 )
 
 STATIC_ROOT = project_path('sitestatic')
-
-PROFILE_PHOTO_DIR = 'photos/profiles'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

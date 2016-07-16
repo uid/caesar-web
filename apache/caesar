@@ -7,14 +7,8 @@ SSLCertificateChainFile    /var/django/caesar/apache/ssl/InCommon-chain.crt
 SSLCertificateKeyFile      /var/django/caesar/apache/ssl/caesar.eecs.mit.edu.key
 SSLCertificateFile         /var/django/caesar/apache/ssl/caesar.eecs.mit.edu.crt
 
-Alias /media /var/django/caesar/media
 Alias /static /var/django/caesar/sitestatic
 Alias /favicon.ico /var/django/caesar/sitestatic/favicon.ico
-
-<Directory /var/django/caesar/media>
-Order deny,allow
-Allow from all
-</Directory>
 
 <Directory /var/django/caesar/sitestatic>
 Order deny,allow
