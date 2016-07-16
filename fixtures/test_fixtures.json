@@ -16328,7 +16328,7 @@
 },
 {
   "pk": 149, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 1483, 
     "submission": 342, 
@@ -16342,7 +16342,7 @@
 },
 {
   "pk": 150, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 1485, 
     "submission": 342, 
@@ -16356,7 +16356,7 @@
 },
 {
   "pk": 203, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 1740, 
     "submission": 286, 
@@ -16370,7 +16370,7 @@
 },
 {
   "pk": 404, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 2122, 
     "submission": 327, 
@@ -16384,7 +16384,7 @@
 },
 {
   "pk": 405, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 2123, 
     "submission": 327, 
@@ -16398,7 +16398,7 @@
 },
 {
   "pk": 406, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 2124, 
     "submission": 327, 
@@ -16412,7 +16412,7 @@
 },
 {
   "pk": 407, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 2125, 
     "submission": 286, 
@@ -16426,7 +16426,7 @@
 },
 {
   "pk": 408, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 2126, 
     "submission": 286, 
@@ -16440,7 +16440,7 @@
 },
 {
   "pk": 409, 
-  "model": "notifications.notification", 
+  "model": "review.notification", 
   "fields": {
     "comment": 2130, 
     "submission": 851, 
