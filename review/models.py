@@ -177,56 +177,56 @@ class Notification(models.Model):
         ordering = [ '-created' ]
 
 
-NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE = Template(
-        "[Caesar] {{ comment.author.get_full_name|default:comment.author.username }} commented on your code")
+# NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE = Template(
+#         "[Caesar] {{ comment.author.get_full_name|default:comment.author.username }} commented on your code")
 
-NEW_REPLY_SUBJECT_TEMPLATE = Template(
-        "[Caesar] {{ comment.author.get_full_name|default:comment.author.username }} replied to your comment")
+# NEW_REPLY_SUBJECT_TEMPLATE = Template(
+#         "[Caesar] {{ comment.author.get_full_name|default:comment.author.username }} replied to your comment")
 
+# uncomment this when we're ready to send email notifications again
+# @receiver(post_save, sender=Comment)
+# def send_comment_notification(sender, instance, created=False, raw=False, **kwargs):
+#     if created and not raw:
+#         context = Context({
+#             'comment': instance,
+#             'chunk': instance.chunk
+#         })
+#         #comment gets a reply, the reply is not by the original author
+#         if instance.parent and instance.parent.author.email \
+#                 and instance.parent.author != instance.author:
+#             to = instance.parent.author.email
+#             subject = NEW_REPLY_SUBJECT_TEMPLATE.render(context)
+#             notification = Notification(recipient = instance.parent.author, reason='R')
+#             notification.submission = instance.chunk.file.submission
+#             notification.comment = instance
+#             notification.save()
 
-@receiver(post_save, sender=Comment)
-def send_comment_notification(sender, instance, created=False, raw=False, **kwargs):
-    if created and not raw:
-        context = Context({
-            'comment': instance,
-            'chunk': instance.chunk
-        })
-        #comment gets a reply, the reply is not by the original author
-        if instance.parent and instance.parent.author.email \
-                and instance.parent.author != instance.author:
-            to = instance.parent.author.email
-            subject = NEW_REPLY_SUBJECT_TEMPLATE.render(context)
-            notification = Notification(recipient = instance.parent.author, reason='R')
-            notification.submission = instance.chunk.file.submission
-            notification.comment = instance
-            notification.save()
+#             #sent = send_templated_mail(
+#             #    subject, None, (to,), 'new_reply',
+#             #    context, template_prefix='review/')
+#             #notification.email_sent = sent
+#             #notification.save()
+#             return
 
-            #sent = send_templated_mail(
-            #    subject, None, (to,), 'new_reply',
-            #    context, template_prefix='review/')
-            #notification.email_sent = sent
-            #notification.save()
-            return
+#         return # NOTE(TFK): The code below is broken since submissions can have multiple authors.
+#         submission_author = instance.chunk.file.submission.author
+#         submission = instance.chunk.file.submission
+#         #comment gets made on a submission after code review deadline has passed
+#         if submission_author and submission_author.email \
+#                 and instance.author != submission_author\
+#                 and instance.author.username != "checkstyle" \
+#                 and datetime.datetime.now() > submission.code_review_end_date():
+#             to = submission_author.email
+#             subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
+#             notification = Notification(recipient = submission_author, reason='C')
+#             notification.submission = instance.chunk.file.submission
+#             notification.comment = instance
+#             notification.save()
 
-        return # NOTE(TFK): The code below is broken since submissions can have multiple authors.
-        submission_author = instance.chunk.file.submission.author
-        submission = instance.chunk.file.submission
-        #comment gets made on a submission after code review deadline has passed
-        if submission_author and submission_author.email \
-                and instance.author != submission_author\
-                and instance.author.username != "checkstyle" \
-                and datetime.datetime.now() > submission.code_review_end_date():
-            to = submission_author.email
-            subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
-            notification = Notification(recipient = submission_author, reason='C')
-            notification.submission = instance.chunk.file.submission
-            notification.comment = instance
-            notification.save()
-
-            #sent = send_templated_mail(
-             #       subject, None, (to,), 'new_submission_comment',
-              #      context, template_prefix='review/')
-           # notification.email_sent = sent
-            #notification.save()
-    pass
+#             #sent = send_templated_mail(
+#              #       subject, None, (to,), 'new_submission_comment',
+#               #      context, template_prefix='review/')
+#            # notification.email_sent = sent
+#             #notification.save()
+#     pass
 
