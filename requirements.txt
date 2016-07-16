@@ -4,7 +4,6 @@ django-debug-toolbar==0.11.0  # later versions cause errors
 django-extensions
 Pygments
 django-email-templates
-pillow
 python-ldap
 MySQL-python
 markdown
