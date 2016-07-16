@@ -3,7 +3,6 @@ from django.template.loader import get_template
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.sites.models import Site
 from django.contrib.auth.models import User
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -40,18 +39,16 @@ class Notification(models.Model):
 
 
 NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE = Template(
-        "[{{ site.name }}] {{ comment.author.get_full_name|default:comment.author.username }} commented on your code")
+        "[Caesar] {{ comment.author.get_full_name|default:comment.author.username }} commented on your code")
 
 NEW_REPLY_SUBJECT_TEMPLATE = Template(
-        "[{{ site.name }}] {{ comment.author.get_full_name|default:comment.author.username }} replied to your comment")
+        "[Caesar] {{ comment.author.get_full_name|default:comment.author.username }} replied to your comment")
 
 
 @receiver(post_save, sender=Comment)
 def send_comment_notification(sender, instance, created=False, raw=False, **kwargs):
     if created and not raw:
-        site = Site.objects.get_current()
         context = Context({
-            'site': site,
             'comment': instance,
             'chunk': instance.chunk
         })

@@ -9001,14 +9001,6 @@
 },
 {
   "pk": 1, 
-  "model": "sites.site", 
-  "fields": {
-    "domain": "caesar.csail.mit.edu", 
-    "name": "caesar.csail.mit.edu"
-  }
-},
-{
-  "pk": 1, 
   "model": "admin.logentry", 
   "fields": {
     "action_flag": 1, 
