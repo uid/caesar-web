@@ -1,7 +1,7 @@
 from accounts.models import Member
 from chunks.models import Chunk, File, Assignment, ReviewMilestone, SubmitMilestone, Submission, StaffMarker, Semester
 # from chunks.forms import SimulateRoutingForm
-from review.models import Comment, Vote, Star
+from review.models import Comment, Vote
 from tasks.models import Task
 from tasks.old_routing import simulate_tasks
 

@@ -14,7 +14,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from chunks.models import Chunk, Assignment, Milestone, SubmitMilestone, ReviewMilestone, Submission, StaffMarker
 from tasks.models import Task
 from tasks.old_routing import assign_tasks
-from models import Comment, Vote, Star
+from models import Comment, Vote
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
 from accounts.models import UserProfile, Extension, Member

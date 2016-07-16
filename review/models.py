@@ -145,16 +145,6 @@ def denormalize_votes(sender, instance, created=False, **kwargs):
         pass
 
 
-class Star(models.Model):
-    value = models.BooleanField(default=False)
-    chunk = models.ForeignKey(Chunk, related_name="stars")
-    author = models.ForeignKey(User, related_name="stars")
-    created = models.DateTimeField(auto_now_add=True)
-    modified = models.DateTimeField(auto_now=True)
-
-
-
-
 class Notification(models.Model):
     SUMMARY = 'S'
     RECEIVED_REPLY = 'R'
