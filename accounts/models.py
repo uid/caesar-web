@@ -2,7 +2,6 @@ import os
 import datetime
 from chunks.models import Chunk, Assignment, Milestone, Semester
 
-from sorl.thumbnail import ImageField
 from accounts.fields import MarkdownTextField
 from accounts.storage import OverwriteStorage
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -64,8 +63,6 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile')
     reputation = models.IntegerField(default=0, editable=True)
 
-    photo = models.ImageField(upload_to=get_photo_path, storage=OverwriteStorage(), blank=True, null=True,\
-        help_text='Use a JPEG or PNG photo.')
     about = MarkdownTextField(allow_html=False, blank=True, \
         help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
     company = models.CharField(max_length=100, default='', blank=True)

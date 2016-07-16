@@ -1,5 +1,3 @@
-{% load thumbnail %}
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -140,12 +138,6 @@
               {% if user.is_authenticated %}
               <div id="toolbar-logged-in">
                 <a href="/accounts/allusers"> view all users</a> |
-                {% thumbnail user.get_profile.photo "20x20" crop="center" as photo %}
-                <img class="user-photo" src="{{ photo.url }}"/>
-                {% empty %}
-                <img class="user-photo" src="{{ STATIC_URL }}img/user-silhouette.png"/>
-                {% endthumbnail %}
-
                 <a href="{% url 'accounts.views.view_profile' user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
                 {% if user.is_staff %}
                 <a href="{% url 'admin:index' %}">Admin</a>|

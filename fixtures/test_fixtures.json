@@ -10440,48 +10440,6 @@
   }
 },
 {
-  "pk": "sorl-thumbnail||image||6b118302ebd088f725b2588a13f9e9d2", 
-  "model": "thumbnail.kvstore", 
-  "fields": {
-    "value": "{\"storage\": \"django.core.files.storage.FileSystemStorage\", \"name\": \"cache/65/f0/65f0116ca3edbd518156bb501ea255dd.jpg\", \"size\": [20, 20]}"
-  }
-},
-{
-  "pk": "sorl-thumbnail||image||958e07cecc580a38baeaa83efa5503c4", 
-  "model": "thumbnail.kvstore", 
-  "fields": {
-    "value": "{\"storage\": \"accounts.storage.OverwriteStorage\", \"name\": \"photos/profiles/kiranb\", \"size\": [180, 180]}"
-  }
-},
-{
-  "pk": "sorl-thumbnail||image||a23c7094532b05e6ee9ebd39aedb3ed2", 
-  "model": "thumbnail.kvstore", 
-  "fields": {
-    "value": "{\"storage\": \"django.core.files.storage.FileSystemStorage\", \"name\": \"cache/40/a6/40a614d0b3946c24a1b5d33e3a2350f8.jpg\", \"size\": [20, 20]}"
-  }
-},
-{
-  "pk": "sorl-thumbnail||image||ecc439a2f73501f61f2a0a6f9e838eab", 
-  "model": "thumbnail.kvstore", 
-  "fields": {
-    "value": "{\"storage\": \"accounts.storage.OverwriteStorage\", \"name\": \"photos/profiles/rcm\", \"size\": [120, 180]}"
-  }
-},
-{
-  "pk": "sorl-thumbnail||thumbnails||958e07cecc580a38baeaa83efa5503c4", 
-  "model": "thumbnail.kvstore", 
-  "fields": {
-    "value": "[\"6b118302ebd088f725b2588a13f9e9d2\"]"
-  }
-},
-{
-  "pk": "sorl-thumbnail||thumbnails||ecc439a2f73501f61f2a0a6f9e838eab", 
-  "model": "thumbnail.kvstore", 
-  "fields": {
-    "value": "[\"a23c7094532b05e6ee9ebd39aedb3ed2\"]"
-  }
-},
-{
   "pk": 9, 
   "model": "accounts.extension", 
   "fields": {
