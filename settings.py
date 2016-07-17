@@ -131,7 +131,6 @@ INSTALLED_APPS = (
     'south',
     'debug_toolbar',
 
-    'utils',
     'accounts',
     'chunks',
     'review',
