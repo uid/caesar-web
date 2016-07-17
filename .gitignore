@@ -7,3 +7,4 @@ settings_local.py
 /build
 *.sqlite3
 apache/ssl
+local-testing

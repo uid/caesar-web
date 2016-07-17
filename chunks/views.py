@@ -313,11 +313,20 @@ def view_submission_for_milestone(request, viewtype, milestone_id, username):
   user = request.user
   try:
     semester = SubmitMilestone.objects.get(id=milestone_id).assignment.semester
-    member = Member.objects.get(semester=semester, user=user)
     author = User.objects.get(username__exact=username)
-    if not member.is_teacher() and not user==author and not user.is_staff:
-      raise PermissionDenied
     submission = Submission.objects.get(milestone=milestone_id, authors__username=username)
+
+    if Member.objects.filter(user=user, semester=semester, role=Member.TEACHER).exists():
+        pass
+    elif user == author:
+        pass
+    elif Task.objects.filter(submission=submission, reviewer=user).exists():
+        pass
+    elif user.is_staff:
+        pass
+    else:
+        raise PermissionDenied
+
     return view_all_chunks(request, viewtype, submission.id)
   except Submission.DoesNotExist or User.DoesNotExist:
     raise Http404
