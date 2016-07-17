@@ -361,23 +361,6 @@ def search(request):
                                'review_data': [],
                            })
 
-@staff_member_required
-def stats(request):
-    chunks = Chunk.objects.all()
-    chunks_with_comments = \
-            Chunk.objects.filter(comments__type='U') \
-            .annotate(user_comment_count=Count('comments'))
-    tasks = Task.objects.all()
-    completed_tasks = Task.objects.filter(status='C')
-    recent_comments = Comment.objects.filter(type='U').order_by('-created')[:10]
-    return render(request, 'review/stats.html', {
-        'chunks': chunks,
-        'chunks_with_comments': chunks_with_comments,
-        'tasks': tasks,
-        'completed_tasks': completed_tasks,
-        'recent_comments': recent_comments,
-    })
-
 @login_required
 def change_task(request):
     task_id = request.REQUEST['task_id']
