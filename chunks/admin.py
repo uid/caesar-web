@@ -30,11 +30,7 @@ class MilestoneAdmin(admin.ModelAdmin):
 	extension_data.short_description = 'Extensions (0 Days / 1 Day / 2 Days / ...)'
 
 class ReviewMilestoneAdmin(MilestoneAdmin):
-	list_display = ('__unicode__', 'extension_data', 'review_info_link', 'routing_link', 'list_users_link',)
-	def review_info_link(self, obj):
-		return '<a href="%s%s">%s</a>' % ('/review/review_milestone_info/', obj.id, 'Review Info')
-	review_info_link.allow_tags = True
-	review_info_link.short_description = 'Review Info'
+	list_display = ('__unicode__', 'extension_data', 'routing_link', 'list_users_link',)
 	def routing_link(self, obj):
 		return '<a href="%s%s">%s</a>' % ('/chunks/simulate/', obj.id, 'Configure Routing')
 	routing_link.allow_tags = True
