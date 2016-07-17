@@ -4,13 +4,6 @@ import datetime
 
 register = template.Library()
 
-@register.filter(name='class_year')
-def class_year(value):
-  if value:
-    return "'"+str(value)[2:]
-  else:
-    return ""
-
 @register.filter(name='timesince_human')
 def humanize_timesince(date):
     delta = datetime.datetime.now() - date

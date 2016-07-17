@@ -15,12 +15,9 @@ class UserForm(auth.forms.UserCreationForm):
     first_name = CharField(max_length=30)
     last_name = CharField(max_length=30)
     email = EmailField()
-    class_year = IntegerField(validators=[MinValueValidator(1920), MaxValueValidator(2050)],\
-        help_text='yyyy format. (ex.) 2013',\
-        error_messages={'min_value': ('Enter a valid graduation year.'), 'max_value': ('Enter a valid graduation year.')})
 
     class Meta(auth.forms.UserCreationForm.Meta):
-        fields = ('username', 'first_name', 'last_name', 'class_year', 'email',)
+        fields = ('username', 'first_name', 'last_name', 'email',)
 
     def save(self, *args, **kwargs):
         super(UserForm, self).save(*args, **kwargs)
