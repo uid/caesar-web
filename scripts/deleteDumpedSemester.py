@@ -12,8 +12,7 @@ setup_environ(settings)
 #os.environ['DJANGO_SETTINGS_MODULE'] = "caesar.settings"
 
 from caesar.chunks.models import *
-from caesar.tasks.models import *
-from caesar.review.models import *
+from caesar.reviews.models import *
 from caesar.accounts.models import *
 
 MODEL_TO_CLASS = {
@@ -31,7 +30,7 @@ MODEL_TO_CLASS = {
   "chunks.submitmilestone": SubmitMilestone,
   "review.comment": Comment,
   "review.vote": Vote,
-  "tasks.task": Task
+  "review.task": Task
 }
 
 import re

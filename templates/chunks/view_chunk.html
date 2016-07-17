@@ -117,7 +117,7 @@
     {% if task %}
       <!-- mark task you're viewing as complete -->
       {% if remaining_task_count > 0 or last_task %}
-        <form method="get" action="{% url 'tasks.views.change_task' %}">
+        <form method="get" action="{% url 'review.views.change_task' %}">
           <input type="hidden" name="task_id" value="{{ task.id }}"/>
           <input type="hidden" name="status" value='C'/>
           <button id="done-button" type="submit">

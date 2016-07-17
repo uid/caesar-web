@@ -19,7 +19,6 @@ urlpatterns = patterns('',
     (r'^chunks/', include('chunks.urls')),
     (r'^review/', include('review.urls')),
     (r'^dashboard/', include('dashboard.urls')),
-    (r'^tasks/', include('tasks.urls')),
     (r'^log/', include('log.urls')),
 
 )

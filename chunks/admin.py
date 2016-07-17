@@ -32,7 +32,7 @@ class MilestoneAdmin(admin.ModelAdmin):
 class ReviewMilestoneAdmin(MilestoneAdmin):
 	list_display = ('__unicode__', 'extension_data', 'review_info_link', 'routing_link', 'list_users_link',)
 	def review_info_link(self, obj):
-		return '<a href="%s%s">%s</a>' % ('/tasks/review_milestone_info/', obj.id, 'Review Info')
+		return '<a href="%s%s">%s</a>' % ('/review/review_milestone_info/', obj.id, 'Review Info')
 	review_info_link.allow_tags = True
 	review_info_link.short_description = 'Review Info'
 	def routing_link(self, obj):
