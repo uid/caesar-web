@@ -135,7 +135,6 @@ INSTALLED_APPS = (
     'accounts',
     'chunks',
     'review',
-    'tasks',
     'log',
 )
 
