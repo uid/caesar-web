@@ -198,7 +198,7 @@ def view_all_chunks(request, viewtype, submission_id):
         pass
     elif submission.has_author(user):
         pass
-    elif Task.objects.filter(chunk=chunk, reviewer=user).exists():
+    elif Task.objects.filter(submission=submission, reviewer=user).exists():
         pass
     elif user.is_staff:
         pass
