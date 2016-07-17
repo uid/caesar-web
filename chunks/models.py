@@ -2,7 +2,6 @@ import app_settings
 import datetime
 import logging
 import textwrap
-import tasks
 import logging
 
 from accounts.fields import MarkdownTextField
