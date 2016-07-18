@@ -66,7 +66,7 @@ STATICFILES_DIRS = (
     project_path('static'),
 )
 
-STATIC_ROOT = project_path('sitestatic')
+STATIC_ROOT = project_path('collectedstatic')
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
