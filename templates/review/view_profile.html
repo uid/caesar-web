@@ -32,7 +32,7 @@ $(document).ready(function() {
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
   {% if user != participant %}
-    <a class="breadcrumb" href="{% url 'accounts.views.allusers' %}">all users</a>
+    <a class="breadcrumb" href="{% url 'review.views.allusers' %}">all users</a>
   {% endif %}
   <span class="breadcrumb">{{ participant.username }}</span>
 {% endblock %}

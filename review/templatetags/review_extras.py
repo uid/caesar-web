@@ -28,3 +28,10 @@ def humanize_timesince(date):
         return ungettext(u"%d minute", u"%d minutes", num_minutes) % num_minutes
 
     return ugettext(u"just a few seconds")
+
+@register.filter
+def is_enrolled(semester, enrolled_classes):
+    enrolled = False
+    if enrolled_classes.filter(semester=semester):
+        enrolled = True
+    return enrolled

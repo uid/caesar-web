@@ -8,30 +8,31 @@
 
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
-  <a class="breadcrumb" href="{% url 'accounts.views.manage' %}">manage</a>
+  <a class="breadcrumb" href="{% url 'review.views.manage' %}">manage</a>
   <span class="breadcrumb">adjust reputations</span>
 {% endblock %}
 
 {% block content %}
 
-{% if message %}
-<br />
-<br />
-<p><h2>
-  {{ message }}
-</h2></p>
+{% if empty %}
+    <p>
+    <h4>Enter a list of usernames and point adjustments. For example joe@mit.edu 5 or joe 5. </h1>
+    </p>
+{% else %}
+    {% if success %}
+    <p class="success">
+        Success! Reputations have been adjusted.
+    </p> 
+    {% else %}
+    <p class="error">
+        {{err}} Please try again.
+    </p>
+    {% endif %}
 {% endif %}
-
-<p>
-<h4>Enter a list usernames to add to the system, and choose a semester to make them members of. Everyone is automatically made a student. The usernames should be separated by commas, spaces, tabs, or newines.</h4>
-</p>
-
 <form id="new-comment-form" 
-  action="{% url 'accounts.views.bulk_add' %}" method="post">
+  action="{% url 'review.views.reputation_adjustment' %}" method="post">
   {% csrf_token %}
-  {{ form.users }}
-  <br />
-  {{ form.semester }}
+  {{ form.text }}
   <br/>
   <div class ="centered">
   <button type="submit">Save</button>

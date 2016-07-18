@@ -25,7 +25,7 @@ class MilestoneAdmin(admin.ModelAdmin):
 		for num_days in range(1, obj.max_extension+1):
 			num_extensions = Extension.objects.filter(milestone=obj).filter(slack_used=num_days).count()
 			extensions += ' / ' + str(num_extensions)
-		return '<a href="%s%s">%s</a>' % ('/accounts/all_extensions/', obj.id, extensions)
+		return '<a href="%s%s">%s</a>' % ('/review/all_extensions/', obj.id, extensions)
 	extension_data.allow_tags = True
 	extension_data.short_description = 'Extensions (0 Days / 1 Day / 2 Days / ...)'
 

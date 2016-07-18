@@ -4,7 +4,7 @@ import logging
 import textwrap
 import logging
 
-from accounts.fields import MarkdownTextField
+from review.fields import MarkdownTextField
 from collections import defaultdict
 from django_tools.middlewares import ThreadLocal
 from django.db import models

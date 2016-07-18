@@ -34,7 +34,7 @@
                 edit_comment: '{% url "review.views.edit_comment" %}',
                 cancel_assignment: '{% url "review.views.cancel_assignment" %}',
                 more_work: '{% url "review.views.more_work" %}',
-                edit_membership: '{% url "accounts.views.edit_membership" %}',
+                edit_membership: '{% url "review.views.edit_membership" %}',
             }
         };
 
@@ -136,12 +136,12 @@
           <div id="toolbar-user">
               {% if user.is_authenticated %}
               <div id="toolbar-logged-in">
-                <a href="/accounts/allusers"> view all users</a> |
-                <a href="{% url 'accounts.views.view_profile' user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
+                <a href="/review/allusers"> view all users</a> |
+                <a href="{% url 'review.views.view_profile' user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
                 {% if user.is_staff %}
                 <a href="{% url 'admin:index' %}">Admin</a>|
                 <a href="{% url 'review.views.search' %}">Search </a>|
-                <a href="{% url 'accounts.views.manage' %}">Manage </a>|
+                <a href="{% url 'review.views.manage' %}">Manage </a>|
                 {% endif %}
                 <a href="{% url 'django.contrib.auth.views.logout' %}">Logout</a>
               </div>

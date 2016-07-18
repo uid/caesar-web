@@ -21,7 +21,7 @@ def send_email(email, request):
     token = md5(settings.SECRET_KEY+email).hexdigest()
 
     subject, from_email, to = 'Caesar registration request', 'caesar@csail.mit.edu', email
-    url = ''.join([reverse('accounts.views.register', args=(quote_plus(email), token))])
+    url = ''.join([reverse('review.views.register', args=(quote_plus(email), token))])
     url = request.build_absolute_uri(url)
     text_body = 'Sign up at '+url
     html_body = 'Sign up at <a href="'+url+'">this link</a>.'

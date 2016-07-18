@@ -15,7 +15,7 @@ from caesar.chunks.models import *
 from caesar.reviews.models import *
 
 MODEL_TO_CLASS = {
-  "accounts.member": Member,
+  "review.member": Member,
   "chunks.assignment": Assignment,
   "chunks.batch": Batch,
   "chunks.chunk": Chunk,

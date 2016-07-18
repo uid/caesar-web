@@ -44,7 +44,7 @@
       <span class="comment-author-name
       {{ member.get_role_display }}">
       {% if comment.type == 'U' %}
-        <a href="{% url 'accounts.views.view_profile' author.username %}">
+        <a href="{% url 'review.views.view_profile' author.username %}">
         {{ author.get_full_name|default:author.username }}
         ({{author.profile.reputation}})
         </a>

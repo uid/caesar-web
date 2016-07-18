@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load account_extras %}
+{% load review_extras %}
 
 {% block css %}
 {{ block.super }}
@@ -15,7 +15,7 @@
 
 {% block breadcrumbs %}
   <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
-  <a class="breadcrumb" href="{% url 'accounts.views.edit_membership' %}">Volunteer for Classes</a>
+  <a class="breadcrumb" href="{% url 'review.views.edit_membership' %}">Volunteer for Classes</a>
 {% endblock %}
 
 {% block content %}

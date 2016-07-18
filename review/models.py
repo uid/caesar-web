@@ -10,7 +10,6 @@ from django.dispatch import receiver
 from django.conf import settings
 
 from chunks.models import *
-from accounts.fields import MarkdownTextField
 
 from email_templates import send_templated_mail
 

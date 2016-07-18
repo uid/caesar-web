@@ -10,6 +10,15 @@ from review.models import *
 from chunks.models import *
 from django.contrib.auth.models import User
 
+class UserTest(TestCase):
+    fixtures = ['test_fixtures.json']
+
+    def test_existence(self):
+        """
+        Tests that rcm is actually loaded.
+        """
+        self.assertTrue(User.objects.filter(username='rcm').exists())
+
 class RoutingTests(TestCase):
     # fixtures = ['6005fall2014.json']
     # fixtures = ['test_fixtures.json']

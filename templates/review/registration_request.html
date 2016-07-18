@@ -18,7 +18,7 @@
   <p>Not a valid email address. Please try again.</p>
   {% endif %}
 
-  <form method="post" action="{% url 'accounts.views.registration_request' %}">
+  <form method="post" action="{% url 'review.views.registration_request' %}">
     {% csrf_token %}
 
     <label for="email">Enter your email here:</label>

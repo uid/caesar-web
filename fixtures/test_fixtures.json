@@ -10441,7 +10441,7 @@
 },
 {
   "pk": 9, 
-  "model": "accounts.extension", 
+  "model": "review.extension", 
   "fields": {
     "slack_used": 2, 
     "user": [
@@ -10452,7 +10452,7 @@
 },
 {
   "pk": 10, 
-  "model": "accounts.extension", 
+  "model": "review.extension", 
   "fields": {
     "slack_used": 1, 
     "user": [
@@ -10463,7 +10463,7 @@
 },
 {
   "pk": 22, 
-  "model": "accounts.extension", 
+  "model": "review.extension", 
   "fields": {
     "slack_used": 2, 
     "user": [
@@ -10474,7 +10474,7 @@
 },
 {
   "pk": 17, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 5, 
     "semester": 2, 
@@ -10486,7 +10486,7 @@
 },
 {
   "pk": 61, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
@@ -10498,7 +10498,7 @@
 },
 {
   "pk": 77, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
@@ -10510,7 +10510,7 @@
 },
 {
   "pk": 145, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
@@ -10522,7 +10522,7 @@
 },
 {
   "pk": 159, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 9, 
     "semester": 2, 
@@ -10534,7 +10534,7 @@
 },
 {
   "pk": 220, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
@@ -10546,7 +10546,7 @@
 },
 {
   "pk": 234, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
@@ -10558,7 +10558,7 @@
 },
 {
   "pk": 245, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
@@ -10570,7 +10570,7 @@
 },
 {
   "pk": 292, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 0, 
     "semester": 2, 
@@ -10582,7 +10582,7 @@
 },
 {
   "pk": 294, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 0, 
     "semester": 2, 
@@ -10594,7 +10594,7 @@
 },
 {
   "pk": 321, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 10, 
     "semester": 2, 
@@ -10606,7 +10606,7 @@
 },
 {
   "pk": 322, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 5, 
     "semester": 2, 
@@ -10618,7 +10618,7 @@
 },
 {
   "pk": 323, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 5, 
     "semester": 5, 
@@ -10630,7 +10630,7 @@
 },
 {
   "pk": 324, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 5, 
     "semester": 2, 
@@ -10642,7 +10642,7 @@
 },
 {
   "pk": 325, 
-  "model": "accounts.member", 
+  "model": "review.member", 
   "fields": {
     "slack_budget": 5, 
     "semester": 3, 
@@ -10654,7 +10654,7 @@
 },
 {
   "pk": 3, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 117, 
     "user": [
@@ -10664,7 +10664,7 @@
 },
 {
   "pk": 27, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 109, 
     "user": [
@@ -10674,7 +10674,7 @@
 },
 {
   "pk": 95, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 127, 
     "user": [
@@ -10684,7 +10684,7 @@
 },
 {
   "pk": 372, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 116, 
     "user": [
@@ -10694,7 +10694,7 @@
 },
 {
   "pk": 680, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 2, 
     "user": [
@@ -10704,7 +10704,7 @@
 },
 {
   "pk": 782, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10714,7 +10714,7 @@
 },
 {
   "pk": 825, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10724,7 +10724,7 @@
 },
 {
   "pk": 840, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10734,7 +10734,7 @@
 },
 {
   "pk": 901, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10744,7 +10744,7 @@
 },
 {
   "pk": 970, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10754,7 +10754,7 @@
 },
 {
   "pk": 982, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 3, 
     "user": [
@@ -10764,7 +10764,7 @@
 },
 {
   "pk": 993, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10774,7 +10774,7 @@
 },
 {
   "pk": 1052, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 3, 
     "user": [
@@ -10784,7 +10784,7 @@
 },
 {
   "pk": 1053, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10794,7 +10794,7 @@
 },
 {
   "pk": 1054, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10804,7 +10804,7 @@
 },
 {
   "pk": 1055, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10814,7 +10814,7 @@
 },
 {
   "pk": 1056, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10824,7 +10824,7 @@
 },
 {
   "pk": 1057, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -10834,7 +10834,7 @@
 },
 {
   "pk": 1058, 
-  "model": "accounts.userprofile", 
+  "model": "review.userprofile", 
   "fields": {
     "reputation": 0, 
     "user": [
@@ -15908,7 +15908,7 @@
 },
 {
   "pk": 144, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-02-09T20:34:13", 
@@ -15923,7 +15923,7 @@
 },
 {
   "pk": 430, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-02-09T22:49:15", 
@@ -15938,7 +15938,7 @@
 },
 {
   "pk": 677, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-02-10T23:31:54", 
@@ -15953,7 +15953,7 @@
 },
 {
   "pk": 736, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-02-10T21:58:23", 
@@ -15968,7 +15968,7 @@
 },
 {
   "pk": 737, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-02-10T22:12:07", 
@@ -15983,7 +15983,7 @@
 },
 {
   "pk": 782, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "O", 
     "opened": "2013-09-10T15:36:47", 
@@ -15998,7 +15998,7 @@
 },
 {
   "pk": 783, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16013,7 +16013,7 @@
 },
 {
   "pk": 784, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "U", 
     "opened": null, 
@@ -16028,7 +16028,7 @@
 },
 {
   "pk": 785, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "O", 
     "opened": "2013-09-17T10:10:23", 
@@ -16043,7 +16043,7 @@
 },
 {
   "pk": 786, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "O", 
     "opened": "2013-10-23T10:32:28", 
@@ -16058,7 +16058,7 @@
 },
 {
   "pk": 787, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16073,7 +16073,7 @@
 },
 {
   "pk": 788, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16088,7 +16088,7 @@
 },
 {
   "pk": 789, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16103,7 +16103,7 @@
 },
 {
   "pk": 790, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16118,7 +16118,7 @@
 },
 {
   "pk": 791, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "S", 
     "opened": "2013-10-04T13:03:03", 
@@ -16133,7 +16133,7 @@
 },
 {
   "pk": 792, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16148,7 +16148,7 @@
 },
 {
   "pk": 793, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16163,7 +16163,7 @@
 },
 {
   "pk": 794, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16178,7 +16178,7 @@
 },
 {
   "pk": 795, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-09-11T07:58:53", 
@@ -16193,7 +16193,7 @@
 },
 {
   "pk": 796, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-09-11T08:05:12", 
@@ -16208,7 +16208,7 @@
 },
 {
   "pk": 797, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-09-11T08:06:34", 
@@ -16223,7 +16223,7 @@
 },
 {
   "pk": 798, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-09-11T08:06:43", 
@@ -16238,7 +16238,7 @@
 },
 {
   "pk": 799, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "C", 
     "opened": "2013-09-11T08:05:21", 
@@ -16253,7 +16253,7 @@
 },
 {
   "pk": 805, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16268,7 +16268,7 @@
 },
 {
   "pk": 806, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "N", 
     "opened": null, 
@@ -16283,7 +16283,7 @@
 },
 {
   "pk": 807, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "O", 
     "opened": "2013-09-17T21:22:03", 
@@ -16298,7 +16298,7 @@
 },
 {
   "pk": 808, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "O", 
     "opened": "2013-09-17T21:21:56", 
@@ -16313,7 +16313,7 @@
 },
 {
   "pk": 809, 
-  "model": "tasks.task", 
+  "model": "review.task", 
   "fields": {
     "status": "O", 
     "opened": "2013-09-17T21:21:50", 
