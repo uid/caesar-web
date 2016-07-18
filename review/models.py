@@ -765,7 +765,7 @@ class Notification(models.Model):
 
 #             #sent = send_templated_mail(
 #             #    subject, None, (to,), 'new_reply',
-#             #    context, template_prefix='review/')
+#             #    context, template_prefix='')
 #             #notification.email_sent = sent
 #             #notification.save()
 #             return
@@ -787,7 +787,7 @@ class Notification(models.Model):
 
 #             #sent = send_templated_mail(
 #              #       subject, None, (to,), 'new_submission_comment',
-#               #      context, template_prefix='review/')
+#               #      context, template_prefix='')
 #            # notification.email_sent = sent
 #             #notification.save()
 #     pass

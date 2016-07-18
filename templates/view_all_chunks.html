@@ -125,7 +125,7 @@ $(document).ready(function() {
         {% if is_chunk %}
             <div id="comment-display-inner" class="file-{{file.id}} files">
                 {% for comment, snippet in comment_data %}
-                    {% include "review/comment.html" %}
+                    {% include "comment.html" %}
                 {% empty %}
                 {% endfor %}
             </div>

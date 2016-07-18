@@ -87,7 +87,7 @@ $(document).ready(function() {
 <div id="comment-display" class="span-6">
     <div id="comment-display-inner" class="file-{{file.id}} files">
         {% for comment, highlight_comment, vote in comment_data %}
-            {% include "review/comment.html" %} 
+            {% include "comment.html" %} 
         {% empty %}
         {% endfor %}
     </div>

@@ -157,7 +157,7 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
             slack_left = total_slack - used_slack
             current_slack_data.append((membership.semester, slack_left))
 
-    return render(request, 'review/dashboard.html', {
+    return render(request, 'dashboard.html', {
         'active_tasks': active_tasks,
         'completed_tasks': completed_tasks,
         'old_completed_tasks': old_completed_tasks,
@@ -214,7 +214,7 @@ def new_comment(request):
         #     'chunk': chunk_id
         # })
 
-        return render(request, 'review/comment_form.html', {
+        return render(request, 'comment_form.html', {
             'form': form,
             'start': start,
             'end': end,
@@ -240,7 +240,7 @@ def new_comment(request):
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
-            return render(request, 'review/comment.html', {
+            return render(request, 'comment.html', {
                 'comment': comment,
                 'chunk': chunk,
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
@@ -259,7 +259,7 @@ def reply(request):
         #     'type': 'new reply',
         #     'parent': request.GET['parent'],
         # })
-        return render(request, 'review/reply_form.html', {'form': form})
+        return render(request, 'reply_form.html', {'form': form})
     else:
         form = ReplyForm(request.POST)
         if form.is_valid():
@@ -285,7 +285,7 @@ def reply(request):
                     task.mark_as('S')
             except Task.DoesNotExist:
                 pass
-            return render(request, 'review/comment.html', {
+            return render(request, 'comment.html', {
                 'comment': comment,
                 'chunk': chunk,
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
@@ -315,7 +315,7 @@ def edit_comment(request):
         #     'comment_id': comment.id,
         #     'similar_comment': similar_comment,
         # })
-        return render(request, 'review/edit_comment_form.html', {
+        return render(request, 'edit_comment_form.html', {
             'form': form,
             'start': start,
             'end': end,
@@ -337,7 +337,7 @@ def edit_comment(request):
                 comment.similar_comment = None
             comment.save()
             chunk = comment.chunk
-            return render(request, 'review/comment.html', {
+            return render(request, 'comment.html', {
                 'comment': comment,
                 'chunk': chunk,
                 'snippet': chunk.generate_snippet(comment.start, comment.end),
@@ -354,7 +354,7 @@ def delete_comment(request):
         comment.deleted = True
         comment.save()
     chunk = comment.chunk
-    return render(request, 'review/comment.html', {
+    return render(request, 'comment.html', {
         'comment': comment,
         'chunk': chunk,
         'snippet': chunk.generate_snippet(comment.start, comment.end),
@@ -467,7 +467,7 @@ def all_activity(request, review_milestone_id, username):
         comment_data = zip(comments, highlighted_comments, highlighted_votes)
         review_milestone_data.append((chunk, highlighted_lines, comment_data, chunk.file))
 
-    return render(request, 'review/all_activity.html', {
+    return render(request, 'all_activity.html', {
         'review_milestone_data': review_milestone_data,
         'participant': participant,
         'activity_view': True,
@@ -493,12 +493,12 @@ def search(request):
             comments = Comment.objects.filter(chunk__file__submission__milestone__assignment__semester__is_current_semester=True,
                                               text__icontains = querystring)
             review_data = view_helper(comments[:15])
-            return render(request, 'review/search.html', {
+            return render(request, 'search.html', {
                                    'review_data': review_data,
                                    'query': querystring,
                                    'num_results': len(comments),
             })
-    return render(request, 'review/search.html', {
+    return render(request, 'search.html', {
                                'review_data': [],
                            })
 
@@ -559,7 +559,7 @@ def more_work(request):
                                  "task_chunk_id": two.chunk.id},
             })
             return HttpResponse(response_json, mimetype='application/javascript')
-    return render(request, 'review/manage.html', {
+    return render(request, 'manage.html', {
     })
 
 @staff_member_required
@@ -581,14 +581,14 @@ def cancel_assignment(request):
                 'total': total,
             })
             return HttpResponse(response_json, mimetype='application/javascript')
-    return render(request, 'review/manage.html', {
+    return render(request, 'manage.html', {
     })
 
 
 def login(request):
     if request.method == 'GET':
         redirect_to = request.GET.get('next', '/')
-        return render(request, 'review/login.html', {
+        return render(request, 'login.html', {
             'form': AuthenticationForm(),
             'next': redirect_to
         })
@@ -606,19 +606,19 @@ def login(request):
             if user.is_active:
                 auth.login(request, user)
                 return HttpResponseRedirect(redirect_to)
-        return render(request, 'review/login.html', {
+        return render(request, 'login.html', {
             'form': form,
             'next': redirect_to
         })
 def invalid_registration(request):
     invalid_invitation = "Sorry, this invitation has expired. "
-    return render(request, 'review/invalidreg.html', {
+    return render(request, 'invalidreg.html', {
         'invalid_invitation': invalid_invitation,
     })
 
 def registration_request (request):
     if request.method == 'GET':
-        return render(request, 'review/registration_request.html')
+        return render(request, 'registration_request.html')
     else:
         redirect_to = request.POST.get('next', '/')
         #check if the email is a valid alum email
@@ -628,8 +628,8 @@ def registration_request (request):
             # should send out an email with SHA hash as token
             # redirect to some sort of success page
             send_email(email, request)
-            return render(request, 'review/registration_request_complete.html')
-    return render(request, 'review/invalidreg.html', {
+            return render(request, 'registration_request_complete.html')
+    return render(request, 'invalidreg.html', {
         'next': redirect_to,
         'invalid_invitation': valid_email
     })
@@ -638,7 +638,7 @@ def register(request, email, code):
     invalid_invitation = ""
     if not verify_token(email, code):
         invalid_invitation = "Sorry, this invitation link is invalid."
-        return render(request, 'review/invalidreg.html', {
+        return render(request, 'invalidreg.html', {
             'invalid_invitation': invalid_invitation,
         })
     if request.method == 'GET':
@@ -663,7 +663,7 @@ def register(request, email, code):
                     return redirect(redirect_to)
             else:
                 return redirect('/')
-    return render(request, 'review/register.html', {
+    return render(request, 'register.html', {
         'form': form,
         'next': redirect_to,
         'invalid_invitation': invalid_invitation,
@@ -688,7 +688,7 @@ def edit_membership(request):
             m = Member(user=request.user, role=Member.VOLUNTEER, semester=semester)
             m.save()
 
-    return render(request, 'review/edit_membership.html', {
+    return render(request, 'edit_membership.html', {
         'semesters': Semester.objects.filter(is_current_semester=True),
         'enrolled_classes': enrolled_classes,
     })
@@ -726,7 +726,7 @@ def view_profile(request, username):
         review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
         review_milestone_data.append((review_milestone, review_data))
         user_memberships = request.user.membership.filter(role=Member.TEACHER)
-    return render(request, 'review/view_profile.html', {
+    return render(request, 'view_profile.html', {
         'review_milestone_data': review_milestone_data,
         'participant': participant,
         'semesters_taught': Semester.objects.filter(members__in=user_memberships)
@@ -748,7 +748,7 @@ def edit_profile(request, username):
     else:
         form = UserProfileForm(instance=profile)
 
-    return render(request, 'review/edit_profile.html', {
+    return render(request, 'edit_profile.html', {
         'form': form
     })
 
@@ -756,13 +756,13 @@ def edit_profile(request, username):
 def bulk_add(request):
   if request.method == 'GET':
     form = UserBulkAddForm()
-    return render(request, 'review/bulk_add_form.html', {
+    return render(request, 'bulk_add_form.html', {
       'form': form
     })
   else: # bulk adding time
     form = UserBulkAddForm(request.POST)
     if not form.is_valid():
-      return render(request, 'review/bulk_add_form.html', {
+      return render(request, 'bulk_add_form.html', {
         'form': form,
         'message': 'Invalid form. Are you missing a field?'})
 
@@ -800,7 +800,7 @@ def bulk_add(request):
       else:
         existing_memberships += 1
 
-    return render(request, 'review/bulk_add_form.html', {
+    return render(request, 'bulk_add_form.html', {
       'form': form,
       'message': 'Created %s users, %s already existed. Added %s users to %s, %s were already members.' % (created_users, existing_users, created_memberships, semester, existing_memberships),
       })
@@ -810,7 +810,7 @@ def bulk_add(request):
 def reputation_adjustment(request):
     if request.method == 'GET':
         form = ReputationForm()
-        return render(request, 'review/reputation_form.html', {
+        return render(request, 'reputation_form.html', {
             'form': form,
             'empty': True,
             'success': True,
@@ -859,7 +859,7 @@ def reputation_adjustment(request):
                         profile.reputation += value
                         profile.save()
                         success = True
-            return render(request, 'review/reputation_form.html', {
+            return render(request, 'reputation_form.html', {
                 'form': form,
                 'empty': False,
                 'success': success,
@@ -871,7 +871,7 @@ def allusers(request):
     participants = User.objects.all().exclude(username = 'checkstyle').prefetch_related('profile', 'membership__semester__subject')
     subjects = Subject.objects.all()
     roles = [role[1] for role in Member.ROLE_CHOICES]
-    return render(request, 'review/allusers.html', {
+    return render(request, 'allusers.html', {
         'participants': participants,
         'subjects': subjects,
         'roles': roles,
@@ -922,7 +922,7 @@ def request_extension(request, milestone_id):
             written_dates.append(current_milestone.duedate + extension)
 
 
-        return render(request, 'review/extension_form.html', {
+        return render(request, 'extension_form.html', {
             'possible_extensions': possible_extensions,
             'current_extension': current_extension,
             'written_dates': written_dates,
@@ -949,7 +949,7 @@ def request_extension(request, milestone_id):
 
 @staff_member_required
 def manage(request):
-    return render(request, 'review/manage.html', {
+    return render(request, 'manage.html', {
     })
 
 @staff_member_required
@@ -964,7 +964,7 @@ def all_extensions(request, milestone_id):
     for slack_days in range(1,current_milestone.max_extension+1):
         student_slack.append("".join([str(ext.user.username)+"\\n" for ext in extensions.filter(slack_used=slack_days)]))
     
-    return render(request, 'review/all_extensions.html', {
+    return render(request, 'all_extensions.html', {
         'current_milestone': current_milestone,
         'student_slack': student_slack
     })
@@ -1068,7 +1068,7 @@ def view_chunk(request, chunk_id):
         'remaining_task_count': remaining_task_count,
     }
 
-    return render(request, 'review/view_chunk.html', context)
+    return render(request, 'view_chunk.html', context)
 
 @login_required
 def load_similar_comments(request, chunk_id, load_all_staff_comments):
@@ -1240,7 +1240,7 @@ def view_all_chunks(request, viewtype, submission_id):
 
     path_and_stats = zip(paths, user_stats, static_stats)
 
-    return render(request, 'review/view_all_chunks.html', {
+    return render(request, 'view_all_chunks.html', {
         'milestone_name': milestone_name,
         'path_and_stats': path_and_stats,
         'file_data': file_data,
@@ -1429,4 +1429,4 @@ def list_users(request, review_milestone_id, simulate=False, chunk_id_task_map={
     data[member_role].append({"user": user, "num_chunks_submitted": len(submitted_chunks), "num_chunks_assigned": len(assigned_chunks) ,'chunks': all_user_chunks})
 
   # users_data = sorted(data.values(), key=itemgetter('num_chunks_submitted', 'num_chunks_assigned'),reverse=True) 
-  return render(request, 'review/list_users.html', {'users_data': data})
+  return render(request, 'list_users.html', {'users_data': data})
