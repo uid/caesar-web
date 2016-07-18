@@ -46,18 +46,18 @@ class MilestoneAdmin(admin.ModelAdmin):
         for num_days in range(1, obj.max_extension+1):
             num_extensions = Extension.objects.filter(milestone=obj).filter(slack_used=num_days).count()
             extensions += ' / ' + str(num_extensions)
-        return '<a href="%s%s">%s</a>' % ('/review/all_extensions/', obj.id, extensions)
+        return '<a href="%s%s">%s</a>' % ('/all_extensions/', obj.id, extensions)
     extension_data.allow_tags = True
     extension_data.short_description = 'Extensions (0 Days / 1 Day / 2 Days / ...)'
 
 class ReviewMilestoneAdmin(MilestoneAdmin):
     list_display = ('__unicode__', 'extension_data', 'routing_link', 'list_users_link',)
     def routing_link(self, obj):
-        return '<a href="%s%s">%s</a>' % ('/review/simulate/', obj.id, 'Configure Routing')
+        return '<a href="%s%s">%s</a>' % ('/simulate/', obj.id, 'Configure Routing')
     routing_link.allow_tags = True
     routing_link.short_description = 'Configure Routing'
     def list_users_link(self, obj):
-        return '<a href="%s%s">%s</a>' % ('/review/list_users/', obj.id, 'List Users')
+        return '<a href="%s%s">%s</a>' % ('/list_users/', obj.id, 'List Users')
     list_users_link.allow_tags = True
     list_users_link.short_description = 'List Users'
     exclude = ('type',)

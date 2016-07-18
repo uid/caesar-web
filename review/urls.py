@@ -1,11 +1,12 @@
 from django.conf.urls.defaults import *
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView, TemplateView
 
 urlpatterns = patterns('',
-    (r'^dashboard/?$', 'review.views.dashboard'),
+    (r'^$', RedirectView.as_view(url='dashboard')),
     (r'^dashboard/(?P<username>\w+)', 'review.views.student_dashboard'),
-    (r'^more_work', 'review.views.more_work'),
-    (r'^cancel_assignment', 'review.views.cancel_assignment'),
+    (r'^dashboard/', 'review.views.dashboard'),
+    (r'^more_work/', 'review.views.more_work'),
+    (r'^cancel_assignment/', 'review.views.cancel_assignment'),
     (r'^view/(?P<chunk_id>\d+)', 'review.views.view_chunk'),
     (r'^submission/(?P<viewtype>(all|code))/(?P<submission_id>\d+)', 'review.views.view_all_chunks'),
     (r'^submission-for-milestone/(?P<viewtype>(all|code))/(?P<milestone_id>\d+)/(?P<username>\w+)', 'review.views.view_submission_for_milestone'),
@@ -21,7 +22,7 @@ urlpatterns = patterns('',
     (r'^vote/', 'review.views.vote'),
     (r'^unvote/', 'review.views.unvote'),
     (r'activity/(?P<review_milestone_id>\d+)/(?P<username>\w+)', 'review.views.all_activity'),
-    (r'^search', 'review.views.search'),
+    (r'^search/', 'review.views.search'),
     (r'login/', 'django.contrib.auth.views.login', {
         'template_name': 'review/login.html',
     }),

@@ -136,7 +136,7 @@
           <div id="toolbar-user">
               {% if user.is_authenticated %}
               <div id="toolbar-logged-in">
-                <a href="/review/allusers"> view all users</a> |
+                <a href="{% url 'review.views.allusers' %}"> view all users</a> |
                 <a href="{% url 'review.views.view_profile' user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
                 {% if user.is_staff %}
                 <a href="{% url 'admin:index' %}">Admin</a>|
