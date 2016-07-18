@@ -19,6 +19,7 @@ class UserTest(TestCase):
         self.assertTrue(User.objects.filter(username='rcm').exists())
 
 class RoutingTests(TestCase):
+    pass
     # fixtures = ['6005fall2014.json']
     # fixtures = ['test_fixtures.json']
     # review_milestone = ReviewMilestone.objects.all()[0]
