@@ -101,7 +101,7 @@ modelInProgress = None
 class CustomSerializer(JSONSerializer):
     def get_dump_object(self, obj):
         dump_object = super(CustomSerializer, self).get_dump_object(obj)
-        if dump_object["model"] in ["chunks.reviewmilestone", "chunks.submitmilestone"]:
+        if dump_object["model"] in ["review.reviewmilestone", "review.submitmilestone"]:
           dump_object["fields"]["assignment"] = obj.assignment_id
 
         global modelInProgress

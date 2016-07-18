@@ -44,7 +44,7 @@
 
       $(document).ready(function() {
         $.ajax({
-          url: "{% url 'chunks.views.load_similar_comments' chunk.id False %}",
+          url: "{% url 'review.views.load_similar_comments' chunk.id False %}",
           success: function(response1) {
             // on load, clear database
             clearDatabase("{{chunk.id}}");
@@ -52,7 +52,7 @@
             commentSearch.init(response1.similar_comment_data, "{{chunk.id}}");
             
             $.ajax({
-              url: "{% url 'chunks.views.load_similar_comments' chunk.id True %}",
+              url: "{% url 'review.views.load_similar_comments' chunk.id True %}",
               success: function(response2) {
                 commentSearch.addCommentsToDB(response2.similar_comment_data);
               },
@@ -160,7 +160,7 @@
 {% endcomment %}
 <!--
 <div id ="view-all-code">
-    <a href="{% url 'chunks.views.view_all_chunks' 'code' chunk.file.submission.id %}">
+    <a href="{% url 'review.views.view_all_chunks' 'code' chunk.file.submission.id %}">
       view all code
     </a>
 </div>

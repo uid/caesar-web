@@ -9,15 +9,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     (r'^admin/', include(admin.site.urls)),
-
     (r'^$', RedirectView.as_view(url='review/dashboard')),
-
-    # (r'^accounts/', include('accounts.urls')),
-    # (r'accounts/$', 'django.contrib.auth.views.login', {
-    #     'template_name': 'accounts/login.html',    
-    # }),
-    (r'^chunks/', include('chunks.urls')),
     (r'^review/', include('review.urls')),
-
 )
 

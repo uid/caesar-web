@@ -18,7 +18,7 @@ from review.fields import MarkdownTextField
 from south.modelsinspector import add_introspection_rules
 add_introspection_rules([], ["^review\.fields\.MarkdownTextField"])
 
-from datetime import datetime, timedelta
+import datetime
 import sys
 import os
 import textwrap
@@ -77,7 +77,7 @@ class Assignment(models.Model):
         return self.semester.is_current_semester
 
     def is_live_assignment(self):
-        return self.milestones.latest('assigned_date').assigned_date and datetime.now() < self.milestones.latest('duedate').duedate
+        return self.milestones.latest('assigned_date').assigned_date and datetime.datetime.now() < self.milestones.latest('duedate').duedate
 
 class Milestone(models.Model):
     SUBMIT = 'S'
@@ -222,7 +222,7 @@ class Submission(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('chunks.views.view_all_chunks', [str(self.milestone.assignment.name), str(self.name), "code"])
+        return ('review.views.view_all_chunks', [str(self.milestone.assignment.name), str(self.name), "code"])
 
     def has_author(self, user):
         return self.authors.filter(pk=user.pk).exists()
@@ -244,7 +244,7 @@ class Submission(models.Model):
             review_milestone = ReviewMilestone.objects.get(submit_milestone=self.milestone)
             return review_milestone.duedate
         except ObjectDoesNotExist:
-            return self.milestone.duedate + timedelta(days=7)
+            return self.milestone.duedate + datetime.timedelta(days=7)
         # this should never happen because submit_milestones should only have one review_milestone
         # although that's not true on our dev server so I'll leave it this way for now
         except MultipleObjectsReturned:
@@ -438,7 +438,7 @@ class Chunk(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('chunks.views.view_chunk', [str(self.id)])
+        return ('review.views.view_chunk', [str(self.id)])
 
     def __unicode__(self):
         return u'%s - %s' % (self.name,self.id)
@@ -574,11 +574,11 @@ class Task(models.Model):
             self.started = None
             self.completed = None
         elif status == 'O':
-            self.opened = datetime.now()
+            self.opened = datetime.datetime.now()
         elif status == 'S':
-            self.started = datetime.now()
+            self.started = datetime.datetime.now()
         elif status == 'C':
-            self.completed = datetime.now()
+            self.completed = datetime.datetime.now()
 
         self.save()
 
@@ -776,7 +776,7 @@ class Notification(models.Model):
 #         if submission_author and submission_author.email \
 #                 and instance.author != submission_author\
 #                 and instance.author.username != "checkstyle" \
-#                 and datetime.now() > submission.code_review_end_date():
+#                 and datetime.datetime.now() > submission.code_review_end_date():
 #             to = submission_author.email
 #             subject = NEW_SUBMISSION_COMMENT_SUBJECT_TEMPLATE.render(context)
 #             notification = Notification(recipient = submission_author, reason='C')
@@ -804,7 +804,7 @@ class Extension(models.Model):
         return self.milestone.assignment
 
     def new_duedate(self):
-        return self.milestone.duedate + timedelta(days=self.slack_used)
+        return self.milestone.duedate + datetime.timedelta(days=self.slack_used)
 
     def __str__(self):
       return '%s (%s) %s days' % (self.user.username, self.milestone.full_name(), self.slack_used)

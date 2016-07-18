@@ -15,17 +15,17 @@ from caesar.reviews.models import *
 
 MODEL_TO_CLASS = {
   "review.member": Member,
-  "chunks.assignment": Assignment,
-  "chunks.batch": Batch,
-  "chunks.chunk": Chunk,
-  "chunks.file": File,
-  "chunks.milestone": Milestone,
-  "chunks.reviewmilestone": ReviewMilestone,
-  "chunks.semester": Semester,
-  "chunks.staffmarker": StaffMarker,
-  "chunks.subject": None, # i.e. don't delete these!
-  "chunks.submission": Submission,
-  "chunks.submitmilestone": SubmitMilestone,
+  "review.assignment": Assignment,
+  "review.batch": Batch,
+  "review.chunk": Chunk,
+  "review.file": File,
+  "review.milestone": Milestone,
+  "review.reviewmilestone": ReviewMilestone,
+  "review.semester": Semester,
+  "review.staffmarker": StaffMarker,
+  "review.subject": None, # i.e. don't delete these!
+  "review.submission": Submission,
+  "review.submitmilestone": SubmitMilestone,
   "review.comment": Comment,
   "review.vote": Vote,
   "review.task": Task

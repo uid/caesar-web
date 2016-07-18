@@ -98,12 +98,12 @@ parser.add_argument('--subject',
                     nargs=1,
                     type=str,
                     required=True,
-                    help="name of Subject (in caesar.eecs.mit.edu/admin/chunks/subject/; for example '6.005'")
+                    help="name of Subject (in caesar.eecs.mit.edu/admin/review/subject/; for example '6.005'")
 parser.add_argument('--semester',
                     nargs=1,
                     type=str,
                     required=True,
-                    help="name of Semester (in caesar.eecs.mit.edu/admin/chunks/semester/; for example 'Fall 2013')")
+                    help="name of Semester (in caesar.eecs.mit.edu/admin/review/semester/; for example 'Fall 2013')")
 parser.add_argument('--role',
                     nargs=1,
                     type=str,

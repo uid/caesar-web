@@ -366,7 +366,7 @@ $(document).ready(function(){
 
 {% block content %}
 <form id="simluate-form" 
-  action="/chunks/simulate/{{review_milestone.id}}" method="post">
+  action="/review/simulate/{{review_milestone.id}}" method="post">
   {% csrf_token %}
 
 <p> <h1 class="task-header"> Settings for {{ review_milestone.full_name }}. </h1> </p>

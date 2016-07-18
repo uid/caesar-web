@@ -1,8 +1,8 @@
-from django import template
+# from django import template
 
-register = template.Library()
+# register = template.Library()
 
-def get_item(d, key):
-  return d.get(key)
+# def get_item(d, key):
+#   return d.get(key)
 
-register.filter('get_item', get_item)
+# register.filter('get_item', get_item)

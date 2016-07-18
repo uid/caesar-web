@@ -2,9 +2,9 @@
   {% if task.status == 'N' %}new{% endif %}
   " 
   {% if task.chunk != None %}
-  data-href="{% url 'chunks.views.view_chunk' task.chunk.id %}"
+  data-href="{% url 'review.views.view_chunk' task.chunk.id %}"
   {% else %}
-  data-href="{% url 'chunks.views.view_all_chunks' 'all' task.submission.id %}"
+  data-href="{% url 'review.views.view_all_chunks' 'all' task.submission.id %}"
   {% endif %}
   >
   <span class="chunk-name">

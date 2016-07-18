@@ -1,6 +1,6 @@
 from django.contrib import auth
 from django.forms import ModelForm, Form
-from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField, ModelChoiceField
+from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField, ModelChoiceField, IntegerField
 from django.core.validators import RegexValidator
 
 from review.models import *
@@ -84,3 +84,8 @@ class UserProfileForm(ModelForm):
 class UserBulkAddForm(Form):
   users = CharField(widget=Textarea(attrs={'cols': 10, 'rows': 10}))
   semester = ModelChoiceField(queryset=Semester.objects.all())
+
+class SimulateRoutingForm(Form):
+  num_students = IntegerField()
+  num_staff = IntegerField()
+  num_alum = IntegerField()

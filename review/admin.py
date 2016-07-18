@@ -53,11 +53,11 @@ class MilestoneAdmin(admin.ModelAdmin):
 class ReviewMilestoneAdmin(MilestoneAdmin):
     list_display = ('__unicode__', 'extension_data', 'routing_link', 'list_users_link',)
     def routing_link(self, obj):
-        return '<a href="%s%s">%s</a>' % ('/chunks/simulate/', obj.id, 'Configure Routing')
+        return '<a href="%s%s">%s</a>' % ('/review/simulate/', obj.id, 'Configure Routing')
     routing_link.allow_tags = True
     routing_link.short_description = 'Configure Routing'
     def list_users_link(self, obj):
-        return '<a href="%s%s">%s</a>' % ('/chunks/list_users/', obj.id, 'List Users')
+        return '<a href="%s%s">%s</a>' % ('/review/list_users/', obj.id, 'List Users')
     list_users_link.allow_tags = True
     list_users_link.short_description = 'List Users'
     exclude = ('type',)
