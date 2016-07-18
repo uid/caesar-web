@@ -14,7 +14,6 @@ setup_environ(settings)
 from django.db.models import Q
 from caesar.chunks.models import *
 from caesar.review.models import *
-from caesar.accounts.models import *
 
 from itertools import chain
 

@@ -13,7 +13,6 @@ setup_environ(settings)
 
 from caesar.chunks.models import *
 from caesar.reviews.models import *
-from caesar.accounts.models import *
 
 MODEL_TO_CLASS = {
   "accounts.member": Member,

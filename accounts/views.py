@@ -11,21 +11,18 @@ from django.http import Http404
 from django.http import HttpResponseRedirect
 from limit_registration import check_email, send_email, verify_token
 from django.core.exceptions import ObjectDoesNotExist
-from accounts.models import UserProfile, Member, Extension
-from accounts.forms import ReputationForm
-from chunks.models import Semester, Submission, Subject
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.db.models import Q, Max
-from caesar.accounts.models import Extension
 import datetime
 import sys
 import re
 
 from os.path import join as pjoin
 from django.conf import settings
-from chunks.models import Milestone,SubmitMilestone,ReviewMilestone
-from review.models import Comment, Vote
+from chunks.models import Milestone,SubmitMilestone,ReviewMilestone, Semester, Submission, Subject
+from review.models import Comment, Vote, UserProfile, Member, Extension
+from accounts.forms import ReputationForm
 
 def login(request):
     if request.method == 'GET':

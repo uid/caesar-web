@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from accounts.models import Extension, Member
+from review.models import Extension, Member
 from chunks.models import Assignment, ReviewMilestone, SubmitMilestone, Submission, File, Chunk, StaffMarker, Batch, Subject, Semester
 
 class AssignmentAdmin(admin.ModelAdmin):

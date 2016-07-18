@@ -2,7 +2,7 @@ from django.contrib import auth
 
 from django.forms import ModelForm, Form
 from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailField, URLField, ModelChoiceField, IntegerField
-from accounts.models import UserProfile
+from review.models import UserProfile
 from chunks.models import Semester
 from django.core.validators import RegexValidator, MinValueValidator, MaxValueValidator
 import re

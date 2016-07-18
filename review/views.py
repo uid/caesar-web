@@ -11,10 +11,9 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from chunks.models import Chunk, Assignment, Milestone, SubmitMilestone, ReviewMilestone, Submission, StaffMarker
 from review.old_routing import assign_tasks
-from review.models import Comment, Vote, Task
+from review.models import Comment, Vote, Task, UserProfile, Extension, Member
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
-from accounts.models import UserProfile, Extension, Member
 
 from pygments import highlight
 from pygments.lexers import get_lexer_for_filename

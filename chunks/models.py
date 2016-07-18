@@ -127,7 +127,7 @@ class ReviewMilestone(Milestone):
 
 @receiver(post_save, sender=ReviewMilestone)
 def create_current_review_milestone(sender, instance, created, **kwargs):
-    from accounts.models import Member # done here because of circular references between accounts.models and chunks.models 
+    from review.models import Member # done here because of circular references between review.models and chunks.models 
     if created:
         # This code appears to copy parms from previous assignments in that semester.
         past = ReviewMilestone.objects.filter(assignment__semester = instance.assignment.semester).order_by('-duedate').exclude(id = instance.id)

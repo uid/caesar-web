@@ -6,7 +6,7 @@ Replace these with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from accounts.models import User
+from review.models import User
 
 class UserTest(TestCase):
     fixtures = ['test_fixtures.json']

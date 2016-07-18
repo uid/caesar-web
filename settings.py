@@ -137,7 +137,7 @@ INSTALLED_APPS = (
 )
 
 LOGIN_REDIRECT_URL = '/'
-AUTH_PROFILE_MODULE = 'accounts.UserProfile'
+AUTH_PROFILE_MODULE = 'review.UserProfile'
 
 def show_debug_toolbar(request):
     return DEBUG
