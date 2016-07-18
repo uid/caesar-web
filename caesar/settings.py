@@ -55,16 +55,22 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'mit.auth.SSLRemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'mit.auth.SSLRemoteUserMiddleware',
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware'
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
     'mit.auth.SSLRemoteUserBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
+
+SECURE_SSL_REDIRECT = True
+
+LOGIN_REDIRECT_URL = '/'
+
+
 
 ROOT_URLCONF = 'caesar.urls'
 
@@ -83,13 +89,6 @@ TEMPLATES = [
         },
     },
 ]
-# TEMPLATE_DIRS = (
-#     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-#     # Always use forward slashes, even on Windows.
-#     # Don't forget to use absolute paths, not relative paths.
-
-#     project_path('templates'),
-# )
 
 WSGI_APPLICATION = 'caesar.wsgi.application'
 
@@ -137,6 +136,16 @@ USE_L10N = True
 
 USE_TZ = False
 
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# although not all choices may be available on all operating systems.
+# On Unix systems, a value of None will cause Django to use the same
+# timezone as the operating system.
+# If running in a Windows environment this must be set to the same as your
+# system time zone.
+TIME_ZONE = 'America/New_York'
+
+
 # Normalize all incoming URLs by appending a slash if necessary
 APPEND_SLASH = True
 
@@ -175,65 +184,25 @@ DEBUG_TOOLBAR_CONFIG = {
 # EMAIL_SUBJECT_PREFIX = '[Caesar] '
 # SERVER_EMAIL = 'Caesar code reviewing system <caesar@csail.mit.edu>'
 
-# # Local time zone for this installation. Choices can be found here:
-# # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# # although not all choices may be available on all operating systems.
-# # On Unix systems, a value of None will cause Django to use the same
-# # timezone as the operating system.
-# # If running in a Windows environment this must be set to the same as your
-# # system time zone.
-# TIME_ZONE = 'America/New_York'
+# Create settings variables here to be rendered in templates.
+COMMENT_SEARCH = False
 
-# # Language code for this installation. All choices can be found here:
-# # http://www.i18nguy.com/unicode/language-identifiers.html
-# LANGUAGE_CODE = 'en-us'
+def custom_context_processors(request):
+    return {
+        'COMMENT_SEARCH': COMMENT_SEARCH,
+    }
 
-# SITE_ID = 1
-
-# # List of callables that know how to import templates from various sources.
-# TEMPLATE_LOADERS = (
-#     'django.template.loaders.filesystem.Loader',
-#     'django.template.loaders.app_directories.Loader',
-# #     'django.template.loaders.eggs.Loader',
-# )
-
-# MIDDLEWARE_CLASSES = (
-#     'django.middleware.common.CommonMiddleware',
-#     'django.contrib.sessions.middleware.SessionMiddleware',
-#     'django.middleware.csrf.CsrfViewMiddleware',
-#     'django.contrib.auth.middleware.AuthenticationMiddleware',
-#     'mit.auth.SSLRemoteUserMiddleware',
-#     'django.contrib.messages.middleware.MessageMiddleware',
-#     'debug_toolbar.middleware.DebugToolbarMiddleware',
-#     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware'
-# )
-
-# # Create settings variables here to be rendered in templates.
-# COMMENT_SEARCH = False
-
-# def custom_context_processors(request):
-#     return {
-#         'COMMENT_SEARCH': COMMENT_SEARCH,
-#     }
-
-# TEMPLATE_CONTEXT_PROCESSORS = (
-#     'django.contrib.auth.context_processors.auth',
-#     'django.core.context_processors.debug',
-#     'django.core.context_processors.i18n',
-#     'django.core.context_processors.static',
-#     'django.core.context_processors.request',
-#     'django.contrib.messages.context_processors.messages',
-#     'settings.custom_context_processors',
-# )
-
-# AUTHENTICATION_BACKENDS = (
-#     'django.contrib.auth.backends.ModelBackend',
-#     'mit.auth.SSLRemoteUserBackend',
-# )
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.auth.context_processors.auth',
+    'django.core.context_processors.debug',
+    'django.core.context_processors.i18n',
+    'django.core.context_processors.static',
+    'django.core.context_processors.request',
+    'django.contrib.messages.context_processors.messages',
+    'settings.custom_context_processors',
+)
 
 
-# LOGIN_REDIRECT_URL = '/'
-# AUTH_PROFILE_MODULE = 'review.UserProfile'
 
 # PROJECT SPECIFIC SETTINGS
 MINIMUM_SNIPPET_LENGTH = 80

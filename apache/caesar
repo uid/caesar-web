@@ -17,7 +17,7 @@ Allow from all
 
 WSGIScriptAlias / /var/django/caesar/caesar/wsgi.py
 
-<Directory /var/django/caesar/apache>
+<Directory /var/django/caesar/caesar>
 Order deny,allow
 Allow from all
 WSGIPassAuthorization On
