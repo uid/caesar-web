@@ -1,7 +1,6 @@
-from chunks.models import Chunk, File, Assignment, ReviewMilestone, SubmitMilestone, Submission, StaffMarker, Semester
-# from chunks.forms import SimulateRoutingForm
-from review.models import Comment, Vote, Task, Member
+from review.models import *
 from review.old_routing import simulate_tasks
+# from chunks.forms import SimulateRoutingForm
 
 from django.http import Http404, HttpResponse
 from django.core.exceptions import PermissionDenied

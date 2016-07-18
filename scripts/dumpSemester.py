@@ -12,7 +12,6 @@ setup_environ(settings)
 #os.environ['DJANGO_SETTINGS_MODULE'] = "caesar.settings"
 
 from django.db.models import Q
-from caesar.chunks.models import *
 from caesar.review.models import *
 
 from itertools import chain

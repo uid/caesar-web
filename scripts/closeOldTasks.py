@@ -13,8 +13,7 @@ setup_environ(settings)
 
 from django.db.models import Q
 from django.contrib.auth.models import User
-from caesar.chunks.models import ReviewMilestone
-from caesar.reviews.models import Task
+from caesar.reviews.models import ReviewMilestone, Task
 
 import datetime
 

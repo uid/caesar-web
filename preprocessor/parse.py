@@ -1,4 +1,4 @@
-from chunks.models import Submission, File, Chunk, StaffMarker
+from review.models import Submission, File, Chunk, StaffMarker
 from django.contrib.auth.models import User
 
 import os

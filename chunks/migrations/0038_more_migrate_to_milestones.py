@@ -178,7 +178,7 @@ class Migration(DataMigration):
         },
         'chunks.semester': {
             'Meta': {'object_name': 'Semester'},
-            'about': ('accounts.fields.MarkdownTextField', [], {'blank': 'True'}),
+            'about': ('review.fields.MarkdownTextField', [], {'blank': 'True'}),
             'about_html': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '140', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

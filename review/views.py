@@ -12,7 +12,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 from django.contrib import auth
 
-from chunks.models import *
 from review.models import *
 from review.forms import *
 from review.old_routing import assign_tasks

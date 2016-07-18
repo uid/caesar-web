@@ -15,7 +15,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'Semester.about'
         db.add_column('chunks_semester', 'about',
-                      self.gf('accounts.fields.MarkdownTextField')(default='', blank=True),
+                      self.gf('review.fields.MarkdownTextField')(default='', blank=True),
                       keep_default=False)
 
         # Adding field 'Semester.about_html'
@@ -123,7 +123,7 @@ class Migration(SchemaMigration):
         },
         'chunks.semester': {
             'Meta': {'object_name': 'Semester'},
-            'about': ('accounts.fields.MarkdownTextField', [], {'blank': 'True'}),
+            'about': ('review.fields.MarkdownTextField', [], {'blank': 'True'}),
             'about_html': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '140', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

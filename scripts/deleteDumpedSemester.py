@@ -11,7 +11,6 @@ setup_environ(settings)
 # Set the DJANGO_SETTINGS_MODULE environment variable.
 #os.environ['DJANGO_SETTINGS_MODULE'] = "caesar.settings"
 
-from caesar.chunks.models import *
 from caesar.reviews.models import *
 
 MODEL_TO_CLASS = {

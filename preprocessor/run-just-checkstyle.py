@@ -9,7 +9,7 @@ import os
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 from checkstyle import generate_comments
-from chunks.models import Chunk, Batch
+from review.models import Chunk, Batch
 from django.contrib.auth.models import User
 
 import argparse

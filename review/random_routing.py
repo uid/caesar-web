@@ -3,8 +3,7 @@ from itertools import chain
 # from django.db.models import Count
 from django.contrib.auth.models import User
 from django.utils.datastructures import SortedDict
-from review.models import Task, ChunkReview, Member
-from chunks.models import Chunk
+from review.models import Task, ChunkReview, Member, Chunk
 from django.db.models import Q
 import copy
 

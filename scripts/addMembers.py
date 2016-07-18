@@ -13,8 +13,7 @@ setup_environ(settings)
 
 from django.db.models import Q
 from django.contrib.auth.models import User
-from review.models import UserProfile, Member
-from chunks.models import Chunk, Assignment, Submission, Subject, Semester
+from review.models import UserProfile, Member, Chunk, Assignment, Submission, Subject, Semester
 
 import ldap
 import ldap.filter

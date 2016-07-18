@@ -8,8 +8,7 @@ from django.contrib import auth
 from django.contrib.auth.models import User
 from django.db.models.query import prefetch_related_objects
 
-from review.models import Task, Member
-from chunks.models import Chunk
+from review.models import Task, Member, Chunk
 
 import random
 import sys

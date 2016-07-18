@@ -1,5 +1,4 @@
-from chunks.models import Submission, File, Chunk, Batch
-from review.models import Comment
+from review.models import Submission, File, Chunk, Batch, Comment
 from django.contrib.auth.models import User
 from xml.dom.minidom import parseString
 from subprocess import Popen, PIPE

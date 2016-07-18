@@ -11,7 +11,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 import time
 
 # Django imports
-from chunks.models import Assignment, Submission, File, Chunk, Batch, SubmitMilestone
+from review.models import Assignment, Submission, File, Chunk, Batch, SubmitMilestone
 from django.db import transaction
 
 # Preprocessor imports

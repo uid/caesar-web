@@ -7,7 +7,6 @@ Replace these with more appropriate tests for your application.
 
 from django.test import TestCase
 from review.models import *
-from chunks.models import *
 from django.contrib.auth.models import User
 
 class UserTest(TestCase):

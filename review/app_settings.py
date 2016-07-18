@@ -13,3 +13,9 @@ ROLE_AFFINITY_MULTIPLIER = getattr(settings, 'TASKS_ROLE_AFFINITY_MULTIPLIER',
                                    100)
 
 CHUNKS_PER_CLUSTER = getattr(settings, 'TASKS_CHUNKS_PER_CLUSTER', 3)
+
+CHUNK_SIMILARITY_THRESHOLD = getattr(
+        settings, 'CHUNKS_CHUNK_SIMILARITY_THRESHOLD', .4)
+
+SIMILAR_CHUNK_LIMIT = getattr(
+        settings, 'CHUNKS_SIMILAR_CHUNK_LIMIT', 10)

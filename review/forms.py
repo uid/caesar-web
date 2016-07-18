@@ -4,7 +4,6 @@ from django.forms import Textarea, HiddenInput, ChoiceField, CharField, EmailFie
 from django.core.validators import RegexValidator
 
 from review.models import *
-from chunks.models import Semester
 
 class CommentForm(ModelForm):
     class Meta:
