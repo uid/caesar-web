@@ -61,6 +61,7 @@ class UserProfileForm(ModelForm):
 
     class Meta:
         model = UserProfile
+        fields = '__all__'
 
     def __init__(self, *args, **kw):
         super(UserProfileForm, self).__init__(*args, **kw)

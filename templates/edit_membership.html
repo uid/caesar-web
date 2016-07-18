@@ -1,15 +1,16 @@
 {% extends "base.html" %}
 {% load review_extras %}
+{% load static from staticfiles %}
 
 {% block css %}
 {{ block.super }}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/membership.css" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/membership.css' %}" type="text/css" />
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}js/membership.js"></script>
+<script type="text/javascript" src="{% static 'js/membership.js' %}"></script>
 
 {% endblock %}
 

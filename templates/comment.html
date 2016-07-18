@@ -1,4 +1,5 @@
 {% load review_extras %}
+{% load static from staticfiles %}
 <div id="comment-{{ comment.id }}-{{ comment.start }}-{{ comment.end }}-{{ chunk.id }}-{{ file.id }}" 
   class="comment 
          {% if comment.is_reply %}

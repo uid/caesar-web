@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load static from staticfiles %}
 
 {% block css %}
 {{ block.super }}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/blueprint/screen.css" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/summary.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/blueprint/screen.css' %}" type="text/css" />
 
 <style type="text/css">
     #search {

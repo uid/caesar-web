@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load static from staticfiles %}
 {% block css %}
-  <link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
-  <link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+  <link rel="stylesheet" href="{% static 'css/chunks.css' %}" type="text/css" />
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" type="text/css" />
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
-  <link rel="stylesheet" href="{{ STATIC_URL }}css/list_users.css" type="text/css" />
+  <link rel="stylesheet" href="{% static 'css/list_users.css' %}" type="text/css" />
   {{ block.super }}
 {% endblock %}
 {% block js %}

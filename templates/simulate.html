@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+{% load static from staticfiles %}
 
 {% block css %}
 {{ block.super }}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/summary.css" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/summary.css' %}" type="text/css" />
 {% endblock %}
 
 {% block js %}
 {{ block.super }}
 
-<script src="{{ STATIC_URL }}js/highcharts-3.0.0.js"></script>
-<script src="{{ STATIC_URL }}js/highcharts-exporting.js"></script>
+<script src="{% static 'js/highcharts-3.0.0.js' %}"></script>
+<script src="{% static 'js/highcharts-exporting.js' %}"></script>
 <script>
 $(document).ready(function(){
 

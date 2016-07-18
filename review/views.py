@@ -12,7 +12,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate
 from django.contrib import auth
 from django.conf import settings
-from django.utils.datastructures import SortedDict
 from django.core.exceptions import PermissionDenied
 
 from pygments import highlight
@@ -28,7 +27,7 @@ import re
 import os
 import subprocess
 from operator import itemgetter, attrgetter
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 from review.models import *
 from review.forms import *
@@ -1297,7 +1296,7 @@ def list_users(request, review_milestone_id, simulate=False, chunk_id_task_map={
   member_roles = dict(Member.ROLE_CHOICES)
 
   # a dictionary mapping all users related to the class to reviewer information
-  data = SortedDict()
+  data = OrderedDict()
   data['student'] = []
   data['volunteer'] = []
   data['teacher'] = []
@@ -1331,7 +1330,7 @@ def list_users(request, review_milestone_id, simulate=False, chunk_id_task_map={
   # # populate the user_assigned_chunks dictionary
   # for chunk in milestone_chunks.all():
   #   # build a dictionary mapping reviewer member roles to their user objects for every task
-  #   reviewers = SortedDict()
+  #   reviewers = OrderedDict()
   #   reviewers['student'] = []
   #   reviewers['volunteer'] = []
   #   reviewers['teacher'] = []
@@ -1364,7 +1363,7 @@ def list_users(request, review_milestone_id, simulate=False, chunk_id_task_map={
 
   for chunk in milestone_chunks_tasks.iterator():
     # build a dictionary mapping reviewer member roles to their user objects for every task
-    reviewers = SortedDict()
+    reviewers = OrderedDict()
     reviewers['student'] = []
     reviewers['volunteer'] = []
     reviewers['teacher'] = []
@@ -1423,7 +1422,7 @@ def list_users(request, review_milestone_id, simulate=False, chunk_id_task_map={
     assigned_chunks = getChunkInfo(user_assigned_chunks[user['id']])
     member_role = member_roles[semester_members[user['id']]] if user['id'] in semester_members else "nonmember"
 
-    all_user_chunks = SortedDict()
+    all_user_chunks = OrderedDict()
     all_user_chunks['submitted'] = submitted_chunks
     all_user_chunks['assigned'] = assigned_chunks
     data[member_role].append({"user": user, "num_chunks_submitted": len(submitted_chunks), "num_chunks_assigned": len(assigned_chunks) ,'chunks': all_user_chunks})

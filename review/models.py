@@ -1,6 +1,5 @@
 from django.template import Context, Template
 from django.template.loader import get_template
-from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User
 from django.db import models
@@ -15,8 +14,6 @@ from email_templates import send_templated_mail
 import app_settings
 
 from review.fields import MarkdownTextField
-from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^review\.fields\.MarkdownTextField"])
 
 import datetime
 import sys

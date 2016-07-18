@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load static from staticfiles %}
 
 {% block css %}
 {{ block.super }}
-<link rel="stylesheet" href="{{ STATIC_URL }}css/dashboard.css" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" type="text/css" />
 {% endblock %}
 
 {% block js %}
@@ -196,7 +197,7 @@ $(document).ready(function() {
             our <a href="https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ" target="_blank">feedback survey</a>. 
             {%if allow_requesting_more_tasks %} 
               Or <button id="more_work" type="button">Get more tasks!</button> 
-              <span id="progress"><img src="{{ STATIC_URL }}img/progress.gif"/></span>
+              <span id="progress"><img src="{% static 'img/progress.gif' %}"/></span>
             {% endif%}
        </div>
     {% endfor %}

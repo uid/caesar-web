@@ -39,6 +39,3 @@ class MarkdownTextField (TextField):
 
     def __unicode__ (self):
         return self.attname
-
-from south.modelsinspector import add_introspection_rules
-add_introspection_rules([], ["^accounts\.fields\.MarkdownTextField"])

@@ -2,7 +2,7 @@ from __future__ import division
 from itertools import chain
 # from django.db.models import Count
 from django.contrib.auth.models import User
-from django.utils.datastructures import SortedDict
+from collections import OrderedDict
 from review.models import Task, ChunkReview, Member, Chunk
 from django.db.models import Q
 import copy
@@ -107,7 +107,7 @@ def simulate_tasks(review_milestone, routing_algorithm='random'):
 	member_roles = dict(Member.ROLE_CHOICES)
 	# create a dictionary to keep track of the tasks assigned to each chunk
 	chunk_id_task_map = {}
-	tasks = SortedDict()
+	tasks = OrderedDict()
 	tasks['student'] = []
 	tasks['volunteer'] = []
 	tasks['teacher'] = []

@@ -1,15 +1,16 @@
 {% extends "base.html" %}
+{% load static from staticfiles %}
 
 
 {% block css %}
 {{ block.super }}
 
-<link rel="stylesheet" href="{{ STATIC_URL }}css/chunks.css" type="text/css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/comments.css" type="text/css" />
-<link rel="stylesheet" href="{{ STATIC_URL }}css/syntax.css" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/chunks.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/comments.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/syntax.css' %}" type="text/css" />
 
 {% if full_view %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/fullchunks.css" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/fullchunks.css" type="text/css" />
 {% endif %}
 
 {% endblock %}
@@ -25,7 +26,7 @@
     };
 </script>
 
-<script type="text/javascript" src="{{ STATIC_URL }}js/chunk.js?v=1"></script>
+<script type="text/javascript" src="{% static 'js/chunk.js?v=1' %}"></script>
 
 <script type="text/javascript" charset="utf-8">
 

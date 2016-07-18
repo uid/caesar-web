@@ -15,7 +15,7 @@ Order deny,allow
 Allow from all
 </Directory>
 
-WSGIScriptAlias / /var/django/caesar/apache/caesar.wsgi
+WSGIScriptAlias / /var/django/caesar/caesar/wsgi.py
 
 <Directory /var/django/caesar/apache>
 Order deny,allow
