@@ -45,7 +45,6 @@ urlpatterns = [
     url(r'^registration/complete/$', TemplateView.as_view(template_name='registration_request_complete.html'), name='registration_request-complete'),
     url(r'^enroll/', review.views.edit_membership, name='edit_membership'),
     url(r'bulk_add/', review.views.bulk_add, name='bulk_add'),
-    url(r'^user/(?P<username>\w+)/edit', review.views.edit_profile, name='edit_profile'),
     url(r'^user/(?P<username>\w+)', review.views.view_profile, name='view_profile'),
     url(r'^request_extension/(?P<milestone_id>\d+)', review.views.request_extension, name='request_extension'),
     url(r'^allusers/', review.views.allusers, name='allusers'),

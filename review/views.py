@@ -729,26 +729,6 @@ def view_profile(request, username):
         'semesters_taught': Semester.objects.filter(members__in=user_memberships)
     })
 
-@login_required
-def edit_profile(request, username):
-    # can't edit if not current user
-    if request.user.username != username:
-        return redirect(reverse('review.views.view_profile', args=([username])))
-    """Edit user profile."""
-    profile = User.objects.get(username=username).profile
-
-    if request.method == "POST":
-        form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            form.save()
-            return redirect(reverse('review.views.view_profile', args=([username])))
-    else:
-        form = UserProfileForm(instance=profile)
-
-    return render(request, 'edit_profile.html', {
-        'form': form
-    })
-
 @staff_member_required
 def bulk_add(request):
   if request.method == 'GET':
