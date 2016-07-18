@@ -436,7 +436,7 @@ class Chunk(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('review.views.view_chunk', [str(self.id)])
+        return ('view_chunk', [str(self.id)])
 
     def __unicode__(self):
         return u'%s - %s' % (self.name,self.id)
@@ -676,25 +676,25 @@ class Vote(models.Model):
 @receiver(pre_save, sender=Vote)
 def update_reputation_on_vote_save(sender, instance, raw=False, **kwargs):
     if not raw:
-        comment_author = instance.comment.author.get_profile()
+        comment_author = instance.comment.author
         if instance.id:
             old_vote = Vote.objects.get(pk=instance.id)
             if old_vote.value > 0:
-                comment_author.reputation -= old_vote.value * Vote.REPUTATION_WEIGHT
+                comment_author.profile.reputation -= old_vote.value * Vote.REPUTATION_WEIGHT
 
         new_value = int(instance.value)
         if new_value > 0:
-            comment_author.reputation += new_value * Vote.REPUTATION_WEIGHT
+            comment_author.profile.reputation += new_value * Vote.REPUTATION_WEIGHT
 
-        comment_author.save()
+        comment_author.profile.save()
 
 
 @receiver(pre_delete, sender=Vote)
 def update_reputation_on_vote_delete(sender, instance, **kwargs):
     if instance.value > 0:
-        comment_author = instance.comment.author.get_profile()
-        comment_author.reputation -= instance.value * Vote.REPUTATION_WEIGHT
-        comment_author.save()
+        comment_author = instance.comment.author
+        comment_author.profile.reputation -= instance.value * Vote.REPUTATION_WEIGHT
+        comment_author.profile.save()
 
 
 @receiver(post_save, sender=Vote)

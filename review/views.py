@@ -112,7 +112,6 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
         .filter(milestone__duedate__lt=datetime.datetime.now()) \
         .order_by('milestone__duedate')\
         .filter(milestone__assignment__semester__is_current_semester=True)\
-        .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
 
@@ -123,7 +122,6 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
         .filter(milestone__duedate__lt=datetime.datetime.now()) \
         .order_by('milestone__duedate')\
         .exclude(milestone__assignment__semester__is_current_semester=True)\
-        .select_related('chunk__file__assignment') \
         .annotate(last_modified=Max('files__chunks__comments__modified'))\
         .reverse()
 
@@ -386,7 +384,7 @@ def vote(request):
         'upvote_count': comment.upvote_count,
         'downvote_count': comment.downvote_count,
     })
-    return HttpResponse(response_json, mimetype='application/javascript')
+    return HttpResponse(response_json, content_type='application/javascript')
 
 @login_required
 def unvote(request):
@@ -400,7 +398,7 @@ def unvote(request):
         'upvote_count': comment.upvote_count,
         'downvote_count': comment.downvote_count,
     })
-    return HttpResponse(response_json, mimetype='application/javascript')
+    return HttpResponse(response_json, content_type='application/javascript')
 
 @login_required
 def all_activity(request, review_milestone_id, username):
@@ -420,7 +418,7 @@ def all_activity(request, review_milestone_id, username):
     chunks = Chunk.objects \
         .filter(file__submission__milestone= review_milestone.submit_milestone) \
         .filter(Q(comments__author=participant) | Q(comments__votes__author=participant)) \
-        .select_related('comments__votes', 'comments__author_profile')
+        .prefetch_related('comments__votes', 'comments__author__profile')
     chunk_set = set()
     review_milestone_data = []
 
@@ -503,16 +501,16 @@ def search(request):
 
 @login_required
 def change_task(request):
-    task_id = request.REQUEST['task_id']
-    status = request.REQUEST['status']
+    task_id = request.GET['task_id']
+    status = request.GET['status']
     task = get_object_or_404(Task, pk=task_id)
     task.mark_as(status)
     try:
         next_task = request.user.tasks.exclude(status='C').exclude(status='U') \
                                               .order_by('created')[0:1].get()
-        return redirect('review.views.view_chunk', next_task.chunk_id) if next_task.chunk else redirect('review.views.view_all_chunks', 'all', next_task.submission_id)
+        return redirect('view_chunk', next_task.chunk_id) if next_task.chunk else redirect('view_all_chunks', 'all', next_task.submission_id)
     except Task.DoesNotExist:
-        return redirect('review.views.dashboard')
+        return redirect('dashboard')
 
 # => tasks
 @login_required
@@ -557,7 +555,7 @@ def more_work(request):
                                  "task_id": two.id,\
                                  "task_chunk_id": two.chunk.id},
             })
-            return HttpResponse(response_json, mimetype='application/javascript')
+            return HttpResponse(response_json, content_type='application/javascript')
     return render(request, 'manage.html', {
     })
 
@@ -579,7 +577,7 @@ def cancel_assignment(request):
             response_json = json.dumps({
                 'total': total,
             })
-            return HttpResponse(response_json, mimetype='application/javascript')
+            return HttpResponse(response_json, content_type='application/javascript')
     return render(request, 'manage.html', {
     })
 
@@ -1146,7 +1144,7 @@ def view_all_chunks(request, viewtype, submission_id):
     else:
         raise PermissionDenied
         
-    files = File.objects.filter(submission=submission_id).select_related('chunks')
+    files = File.objects.filter(submission=submission_id).prefetch_related('chunks')
     if not files:
         raise Http404
 
@@ -1276,13 +1274,13 @@ def view_submission_for_milestone(request, viewtype, milestone_id, username):
 
 @login_required
 def simulate(request, review_milestone_id):
-  review_milestone = ReviewMilestone.objects.prefetch_related('submit_milestone__assignment__semester__members','submit_milestone__assignment__semester__members__user').select_related('submit_milestone','submit_milestone__assignment','submit_milestone__assignment__semester').get(id=review_milestone_id)
+  review_milestone = ReviewMilestone.objects.prefetch_related('submit_milestone__assignment__semester__members','submit_milestone__assignment__semester__members__user').get(id=review_milestone_id)
   chunk_id_task_map = simulate_tasks(review_milestone)
   return list_users(request, review_milestone_id, simulate=True, chunk_id_task_map=chunk_id_task_map)
 
 @login_required
 def list_users(request, review_milestone_id, simulate=False, chunk_id_task_map={}):
-  # review_milestone = ReviewMilestone.objects.prefetch_related('submit_milestone__assignment__semester__members','submit_milestone__assignment__semester__members__user').select_related('submit_milestone','submit_milestone__assignment','submit_milestone__assignment__semester').get(id=review_milestone_id)
+  # review_milestone = ReviewMilestone.objects.prefetch_related('submit_milestone__assignment__semester__members','submit_milestone__assignment__semester__members__user').get(id=review_milestone_id)
   # review_milestone = ReviewMilestone.objects.prefetch_related('submit_milestone__assignment__semester__members','submit_milestone__assignment__semester__members__user')
   # review_milestone = review_milestone.select_related('submit_milestone','submit_milestone__assignment','submit_milestone__assignment__semester')
   # review_milestone = review_milestone.get(id=review_milestone_id)

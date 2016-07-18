@@ -138,7 +138,7 @@
               {% if user.is_authenticated %}
               <div id="toolbar-logged-in">
                 <a href="{% url 'allusers' %}"> view all users</a> |
-                <a href="{% url 'view_profile' user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
+                <a href="{% url 'view_profile' user.username %}">{{ user.username }} ({{ user.profile.reputation }}) </a> |
                 {% if user.is_staff %}
                 <a href="{% url 'admin:index' %}">Admin</a>|
                 <a href="{% url 'search' %}">Search </a>|
