@@ -66,10 +66,7 @@ def dashboard(request):
 
 @staff_member_required
 def student_dashboard(request, username):
-    try:
-        other_user = User.objects.get(username=username)
-    except:
-        raise Http404
+    other_user = get_object_or_404(User, username=username)
     return dashboard_for(request, other_user)
 
 def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_more_tasks = False):
@@ -403,16 +400,16 @@ def unvote(request):
 @login_required
 def all_activity(request, review_milestone_id, username):
     user = request.user
-    try:
-        participant = User.objects.get(username__exact=username)
-        #get all assignments
-        review_milestone = ReviewMilestone.objects.select_related('submit_milestone', 'assignment__semester').get(id__exact=review_milestone_id)
-        user_membership = Member.objects.get(user=user, semester=review_milestone.assignment.semester)
-        if not user_membership.is_teacher() and not user==participant and not user.is_staff:
-            raise Http404
-    except Member.DoesNotExist:
-        if not user.is_staff:
-            raise Http404
+    participant = get_object_or_404(User, username=username)
+    review_milestone = get_object_or_404(ReviewMilestone, id=review_milestone_id)
+    if Member.objects.filter(user=user, semester=review_milestone.assignment.semester, role=Member.TEACHER).exists():
+        pass
+    elif user == participant:
+        pass
+    elif user.is_staff:
+        pass
+    else:
+        raise PermissionDenied
     
     #get all relevant chunks
     chunks = Chunk.objects \
@@ -422,7 +419,6 @@ def all_activity(request, review_milestone_id, username):
     chunk_set = set()
     review_milestone_data = []
 
-    # lexer = JavaLexer()
     formatter = HtmlFormatter(cssclass='syntax', nowrap=True)
     for chunk in chunks:
         if chunk in chunk_set:
@@ -692,10 +688,7 @@ def edit_membership(request):
 
 @login_required
 def view_profile(request, username):
-    try:
-        participant = User.objects.get(username__exact=username)
-    except:
-        raise Http404
+    participant = get_object_or_404(User, username=username)
     review_milestone_data = []
     #get all review milestones
     review_milestones = ReviewMilestone.objects.all().order_by('-assigned_date')
@@ -862,10 +855,7 @@ def request_extension(request, milestone_id):
     # what semester is this milestone in?
     current_milestone = Milestone.objects.get(id=milestone_id)
     semester = current_milestone.assignment.semester
-    try:
-        membership = Member.objects.get(semester=semester, user=user)
-    except:
-        raise Http404
+    membership = get_object_or_404(Member, semester=semester, user=user)
 
     # calculate how much slack budget user has left for this semester
     slack_budget = membership.slack_budget
@@ -1229,11 +1219,10 @@ def view_all_chunks(request, viewtype, submission_id):
 
 @login_required
 def view_submission_for_milestone(request, viewtype, milestone_id, username):
-  user = request.user
-  try:
-    semester = SubmitMilestone.objects.get(id=milestone_id).assignment.semester
-    author = User.objects.get(username__exact=username)
-    submission = Submission.objects.get(milestone=milestone_id, authors__username=username)
+    user = request.user
+    semester = get_object_or_404(SubmitMilestone, id=milestone_id).assignment.semester
+    author = get_object_or_404(User, username=username)
+    submission = get_object_or_404(Submission, milestone=milestone_id, authors__username=username)
 
     if Member.objects.filter(user=user, semester=semester, role=Member.TEACHER).exists():
         pass
@@ -1247,10 +1236,6 @@ def view_submission_for_milestone(request, viewtype, milestone_id, username):
         raise PermissionDenied
 
     return view_all_chunks(request, viewtype, submission.id)
-  except Submission.DoesNotExist or User.DoesNotExist:
-    raise Http404
-  except Member.DoesNotExist:
-    raise PermissionDenied
 
 @login_required
 def simulate(request, review_milestone_id):
