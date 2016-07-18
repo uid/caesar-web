@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-    <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
+    <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard' %}">Dashboard</a>
     <span class="breadcrumb">Search</span>
 {% endblock %}
 
@@ -66,7 +66,7 @@
             <h1>No Search Specified</h1>
         {% endif %}
     </td><td>
-        <form method="POST" action='{% url "review.views.search" %}'>{% csrf_token %}
+        <form method="POST" action='{% url "search" %}'>{% csrf_token %}
             <input name="value" id="search" ></input>
         </form>
     </td></tr></table>

@@ -27,15 +27,15 @@
     <script type="text/javascript">
         window.caesar = {
             urls: {
-                new_comment: '{% url "review.views.new_comment" %}',
-                reply: '{% url "review.views.reply" %}',
-                delete: '{% url "review.views.delete_comment" %}',
-                vote: '{% url "review.views.vote" %}',
-                unvote: '{% url "review.views.unvote" %}',
-                edit_comment: '{% url "review.views.edit_comment" %}',
-                cancel_assignment: '{% url "review.views.cancel_assignment" %}',
-                more_work: '{% url "review.views.more_work" %}',
-                edit_membership: '{% url "review.views.edit_membership" %}',
+                new_comment: '{% url "new_comment" %}',
+                reply: '{% url "reply" %}',
+                delete: '{% url "delete_comment" %}',
+                vote: '{% url "vote" %}',
+                unvote: '{% url "unvote" %}',
+                edit_comment: '{% url "edit_comment" %}',
+                cancel_assignment: '{% url "cancel_assignment" %}',
+                more_work: '{% url "more_work" %}',
+                edit_membership: '{% url "edit_membership" %}',
             }
         };
 
@@ -137,14 +137,14 @@
           <div id="toolbar-user">
               {% if user.is_authenticated %}
               <div id="toolbar-logged-in">
-                <a href="{% url 'review.views.allusers' %}"> view all users</a> |
-                <a href="{% url 'review.views.view_profile' user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
+                <a href="{% url 'allusers' %}"> view all users</a> |
+                <a href="{% url 'view_profile' user.username %}">{{ user.username }} ({{ user.get_profile.reputation }}) </a> |
                 {% if user.is_staff %}
                 <a href="{% url 'admin:index' %}">Admin</a>|
-                <a href="{% url 'review.views.search' %}">Search </a>|
-                <a href="{% url 'review.views.manage' %}">Manage </a>|
+                <a href="{% url 'search' %}">Search </a>|
+                <a href="{% url 'manage' %}">Manage </a>|
                 {% endif %}
-                <a href="{% url 'django.contrib.auth.views.logout' %}">Logout</a>
+                <a href="{% url 'logout' %}">Logout</a>
               </div>
               {% endif %}
           </div>

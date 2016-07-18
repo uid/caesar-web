@@ -34,7 +34,7 @@ $(document).ready(function() {
   </div>
   <div class="comment-form">
     <form id="edit-comment-form" 
-      action="{% url 'review.views.edit_comment' %}" method="post">
+      action="{% url 'edit_comment' %}" method="post">
       {% csrf_token %}
       <div id='textentry' contenteditable='true'></div>
       {{ form.text }}
@@ -49,7 +49,7 @@ $(document).ready(function() {
 <div class="comment comment-reply new-reply">
   <div class="reply-form">
     <form id="edit-comment-form"
-      action="{% url 'review.views.edit_comment' %}" method="post">
+      action="{% url 'edit_comment' %}" method="post">
       {% csrf_token %}
       <div id='textentry' contenteditable='true'></div>
       {{ form.text }}

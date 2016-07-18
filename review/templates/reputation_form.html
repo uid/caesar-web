@@ -7,8 +7,8 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
-  <a class="breadcrumb" href="{% url 'review.views.manage' %}">manage</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard' %}">Dashboard</a>
+  <a class="breadcrumb" href="{% url 'manage' %}">manage</a>
   <span class="breadcrumb">adjust reputations</span>
 {% endblock %}
 
@@ -30,7 +30,7 @@
     {% endif %}
 {% endif %}
 <form id="new-comment-form" 
-  action="{% url 'review.views.reputation_adjustment' %}" method="post">
+  action="{% url 'reputation_adjustment' %}" method="post">
   {% csrf_token %}
   {{ form.text }}
   <br/>

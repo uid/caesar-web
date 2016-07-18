@@ -26,14 +26,14 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard' %}">Dashboard</a>
   <span class="breadcrumb">manage</span>
 {% endblock %}
 
 {% block content %}
 
-<h4><br/> <a href="{% url 'review.views.reputation_adjustment' %}"> Adjust reputations. </a></h4>
-<h4><br/> <a href="{% url 'review.views.bulk_add' %}"> Bulk add users. </a></h4>
+<h4><br/> <a href="{% url 'reputation_adjustment' %}"> Adjust reputations. </a></h4>
+<h4><br/> <a href="{% url 'bulk_add' %}"> Bulk add users. </a></h4>
 
 <div class="result"></div>
 <button id="close" type="button">Close all assignments.</button><span id="progress"><img src="{% static 'img/progress.gif' %}"/></span>

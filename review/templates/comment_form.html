@@ -27,7 +27,7 @@ $(document).ready(function() {
   </div>
   <div class="comment-form">
     <form id="new-comment-form" 
-      action="{% url 'review.views.new_comment' %}" method="post">
+      action="{% url 'new_comment' %}" method="post">
       {% csrf_token %}
       <div id='textentry' contenteditable='true'></div>
       {{ form.text }}

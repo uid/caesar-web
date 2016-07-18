@@ -45,7 +45,7 @@
 
       $(document).ready(function() {
         $.ajax({
-          url: "{% url 'review.views.load_similar_comments' chunk.id False %}",
+          url: "{% url 'similar_comments' chunk.id False %}",
           success: function(response1) {
             // on load, clear database
             clearDatabase("{{chunk.id}}");
@@ -53,7 +53,7 @@
             commentSearch.init(response1.similar_comment_data, "{{chunk.id}}");
             
             $.ajax({
-              url: "{% url 'review.views.load_similar_comments' chunk.id True %}",
+              url: "{% url 'similar_comments' chunk.id True %}",
               success: function(response2) {
                 commentSearch.addCommentsToDB(response2.similar_comment_data);
               },
@@ -69,7 +69,7 @@
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard' %}">Dashboard</a>
   <span class="breadcrumb" href="{{ chunk.get_absolute_url }}">{{ chunk.name }}</span>
   {% if similar_chunks %}
   <div class="dropdown">
@@ -118,7 +118,7 @@
     {% if task %}
       <!-- mark task you're viewing as complete -->
       {% if remaining_task_count > 0 or last_task %}
-        <form method="get" action="{% url 'review.views.change_task' %}">
+        <form method="get" action="{% url 'change_task' %}">
           <input type="hidden" name="task_id" value="{{ task.id }}"/>
           <input type="hidden" name="status" value='C'/>
           <button id="done-button" type="submit">
@@ -161,7 +161,7 @@
 {% endcomment %}
 <!--
 <div id ="view-all-code">
-    <a href="{% url 'review.views.view_all_chunks' 'code' chunk.file.submission.id %}">
+    <a href="{% url 'all_chunks' 'code' chunk.file.submission.id %}">
       view all code
     </a>
 </div>

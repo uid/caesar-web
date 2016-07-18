@@ -31,9 +31,9 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard' %}">Dashboard</a>
   {% if user != participant %}
-    <a class="breadcrumb" href="{% url 'review.views.allusers' %}">all users</a>
+    <a class="breadcrumb" href="{% url 'allusers' %}">all users</a>
   {% endif %}
   <span class="breadcrumb">{{ participant.username }}</span>
 {% endblock %}
@@ -51,7 +51,7 @@ $(document).ready(function() {
         </span>
       {% endfor %}
       {% if user.is_staff %}
-          <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.student_dashboard' participant.username %}"> [{{participant.username}} Dashboard]</a> 
+          <a class="breadcrumb first-breadcrumb" href="{% url 'student_dashboard' participant.username %}"> [{{participant.username}} Dashboard]</a> 
       {%endif%}
     </div>
   </div>
@@ -71,7 +71,7 @@ $(document).ready(function() {
                       a teacher for that semester
                -->
               {% if user.is_staff or user == participant or review_milestone.assignment.semester in semesters_taught %}
-                <a href="{% url 'review.views.all_activity' review_milestone.id participant.username %}"> view with code</a>
+                <a href="{% url 'all_activity' review_milestone.id participant.username %}"> view with code</a>
               {% endif %}
             </div>
           </h4>
