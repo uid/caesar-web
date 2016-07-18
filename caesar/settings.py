@@ -66,7 +66,9 @@ ROOT_URLCONF = 'caesar.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ project_path('templates') ],
+        'DIRS': [ 
+            #project_path('templates') 
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
