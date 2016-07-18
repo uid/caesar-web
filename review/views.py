@@ -15,7 +15,6 @@ from review.models import Comment, Vote, Task
 from review.forms import CommentForm, ReplyForm, EditCommentForm
 from accounts.forms import UserProfileForm
 from accounts.models import UserProfile, Extension, Member
-from log.models import Log
 
 from pygments import highlight
 from pygments.lexers import get_lexer_for_filename
@@ -174,9 +173,9 @@ def longest_common_substring(s1, s2):
                 m[x][y] = 0
     return s1[x_longest - longest: x_longest]
 
-def markLogStart(user, log):
-    logStart = Log(user=user, log='LOGSTART: '+str(log), timestamp=datetime.datetime.now())
-    logStart.save()
+# def markLogStart(user, log):
+#     logStart = Log(user=user, log='LOGSTART: '+str(log), timestamp=datetime.datetime.now())
+#     logStart.save()
 
 def find_similar_comment(similar_comment_id, form_text):
     similar_comment = Comment.objects.get(id=similar_comment_id)
@@ -198,12 +197,12 @@ def new_comment(request):
             'chunk': chunk_id
         })
         chunk = Chunk.objects.get(pk=chunk_id)
-        markLogStart(request.user, {
-            'type': 'new comment',
-            'start': start,
-            'end': end,
-            'chunk': chunk_id
-        })
+        # markLogStart(request.user, {
+        #     'type': 'new comment',
+        #     'start': start,
+        #     'end': end,
+        #     'chunk': chunk_id
+        # })
 
         return render(request, 'review/comment_form.html', {
             'form': form,
@@ -246,10 +245,10 @@ def reply(request):
         form = ReplyForm(initial={
             'parent': request.GET['parent']
         })
-        markLogStart(request.user,  {
-            'type': 'new reply',
-            'parent': request.GET['parent'],
-        })
+        # markLogStart(request.user,  {
+        #     'type': 'new reply',
+        #     'parent': request.GET['parent'],
+        # })
         return render(request, 'review/reply_form.html', {'form': form})
     else:
         form = ReplyForm(request.POST)
@@ -300,12 +299,12 @@ def edit_comment(request):
              'similar_comment': similar_comment,
         })
         chunk = Chunk.objects.get(pk=comment.chunk.id)
-        markLogStart(request.user,  {
-            'type': 'edit comment',
-            'text': comment.text,
-            'comment_id': comment.id,
-            'similar_comment': similar_comment,
-        })
+        # markLogStart(request.user,  {
+        #     'type': 'edit comment',
+        #     'text': comment.text,
+        #     'comment_id': comment.id,
+        #     'similar_comment': similar_comment,
+        # })
         return render(request, 'review/edit_comment_form.html', {
             'form': form,
             'start': start,
