@@ -61,6 +61,11 @@ MIDDLEWARE_CLASSES = [
     'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware'
 ]
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'mit.auth.SSLRemoteUserBackend',
+]
+
 ROOT_URLCONF = 'caesar.urls'
 
 TEMPLATES = [

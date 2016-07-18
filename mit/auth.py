@@ -1,6 +1,7 @@
 # Code courtesy of Alex Dehnert <adehnert@mit.edu>
 import ldap
 import ldap.filter
+import sys
 
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.backends import RemoteUserBackend
@@ -19,6 +20,7 @@ class SSLRemoteUserBackend(RemoteUserBackend):
         else:
             return username
     def configure_user(self, user, ):
+        print >>sys.stderr, "in configure_user"
         username = user.username
         user.set_unusable_password()
         con = ldap.open('ldap.mit.edu')
