@@ -142,17 +142,14 @@ APPEND_SLASH = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = project_path('apache/collectedstatic')
+
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = STATIC_URL + 'admin/'
 
-STATICFILES_DIRS = (
-    project_path('static'),
-)
-
-STATIC_ROOT = project_path('collectedstatic')
 
 
 # debug_toolbar setup

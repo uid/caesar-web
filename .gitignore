@@ -6,5 +6,6 @@ settings_local.py
 /.vagrant
 /build
 *.sqlite3
+collectedstatic
 apache/ssl
 local-testing

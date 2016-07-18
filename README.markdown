@@ -40,10 +40,16 @@ If it asks you for a password, the password for the vagrant account is just "vag
 
 Copy the template for settings_local.py:
 
-    cd /var/django/caesar
+    cd /var/django/caesar/caesar
     cp settings_local.py.template settings_local.py
 
 The default settings are intended for development: DEBUG is turned on, a local sqlite database file is used for storing data.  For deploying Caesar as a user-facing web app, you should edit settings_local.py and change settings as explained by the comments.
+
+### Collect static files
+
+Collect the static files (CSS, Javascript, images, etc.) from all the apps and libraries used by Caesar into one place where Apache can serve them:
+
+    ./manage.py collectstatic
 
 
 ### Initialize the database
@@ -131,11 +137,17 @@ Now run the setup script:
 
 To point Caesar to the right database, copy the local settings file:
 
-    cd /var/django/caesar
+    cd /var/django/caesar/caesar
     cp settings_local.py.template settings_local.py
 
 Then edit settings_local.py and change the settings appropriately.
 
+
+### Collect static files
+
+Collect the static files (CSS, Javascript, images, etc.) from all the apps and libraries used by Caesar into one place where Apache can serve them:
+ 
+    ./manage.py collectstatic
 
 ### Initialize the database
 
