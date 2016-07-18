@@ -198,6 +198,7 @@ class Batch(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
+      db_table = u'chunks_batch'
       verbose_name_plural = 'batches'
 
     def __str__(self):

@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         # Adding model 'Batch'
-        db.create_table(u'review_batch', (
+        db.create_table(u'chunks_batch', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=50)),
         ))
@@ -176,7 +176,7 @@ class Migration(SchemaMigration):
         # db.delete_unique(u'files', ['path', 'submission_id'])
 
         # # Deleting model 'Batch'
-        # db.delete_table(u'review_batch')
+        # db.delete_table(u'chunks_batch')
 
         # # Deleting model 'SubmitMilestone'
         # db.delete_table(u'chunks_submitmilestone')
