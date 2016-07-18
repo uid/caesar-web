@@ -76,11 +76,11 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block breadcrumbs %}
-  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard.views.dashboard' %}">Dashboard</a>
+  <a class="breadcrumb first-breadcrumb" href="{% url 'review.views.dashboard' %}">Dashboard</a>
 {% endblock %}
 
 {% block secondary-toolbar %}
-{% include "dashboard/dashboard_toolbar.html" %}
+{% include "review/dashboard_toolbar.html" %}
 {% endblock %}
 
 {% block content %}
@@ -189,7 +189,7 @@ $(document).ready(function() {
   <h2 class="task-header">code to review</h2>
   <div id="new-task-list" class="task-list">
     {% for task in active_tasks %}
-      {% include "dashboard/task.html" %}
+      {% include "review/task.html" %}
     {% empty %}
        <div class="task-empty">
             No tasks left. If you haven't already, please fill out 
@@ -207,7 +207,7 @@ $(document).ready(function() {
   <h2 class="task-header">code already reviewed</h2>
   <div id="task-section">
     {% for task in completed_tasks.all %}
-      {% include "dashboard/task.html" %}
+      {% include "review/task.html" %}
     {% empty %}
     <div class="empty">
     No recent tasks found.
@@ -219,7 +219,7 @@ $(document).ready(function() {
       	<div id="historic_content">
       		<div class="task-list">
         	{% for task in old_completed_tasks.all %}
-        	   {% include "dashboard/task.html" %}
+        	   {% include "review/task.html" %}
         		{% empty %}
         			No tasks found.
         	{% endfor %}

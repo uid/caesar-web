@@ -1,6 +1,8 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('review.views',
+    (r'^dashboard/?$', 'dashboard'),
+    (r'^dashboard/(?P<username>\w+)', 'student_dashboard'),
     (r'^more_work', 'more_work'),
     (r'^cancel_assignment', 'cancel_assignment'),
     (r'^change_task/', 'change_task'),
