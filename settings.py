@@ -134,7 +134,6 @@ INSTALLED_APPS = (
     'accounts',
     'chunks',
     'review',
-    'log',
 )
 
 LOGIN_REDIRECT_URL = '/'
