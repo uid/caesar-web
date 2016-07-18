@@ -4,7 +4,7 @@ import django.contrib.auth.views
 import review.views
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='dashboard')),
+    url(r'^$', RedirectView.as_view(pattern_name='dashboard', permanent=False)),
     url(r'^dashboard/(?P<username>\w+)', review.views.student_dashboard, name='student_dashboard'),
     url(r'^dashboard/', review.views.dashboard, name='dashboard'),
     url(r'^more_work/', review.views.more_work, name='more_work'),

@@ -36,7 +36,7 @@ class Subject(models.Model):
     name = models.CharField(blank=False, null=False, max_length=32)
 
     class Meta:
-        db_table = u'chunks_subject'
+        db_table = u'subjects'
 
     def __str__(self):
       return self.name
@@ -54,7 +54,7 @@ class Semester(models.Model):
     is_current_semester = models.BooleanField(default=False, verbose_name='Is in progress')
 
     class Meta:
-        db_table = u'chunks_semester'
+        db_table = u'semesters'
 
     def __str__(self):
       return '%s - %s' % (self.subject, self.semester)
@@ -93,7 +93,7 @@ class Milestone(models.Model):
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
 
     class Meta:
-        db_table = u'chunks_milestone'
+        db_table = u'milestones'
 
     def full_name(self):
         return '%s - %s' % (self.assignment.name, self.name)
@@ -103,7 +103,7 @@ class Milestone(models.Model):
 
 class SubmitMilestone(Milestone):
     class Meta:
-        db_table = u'chunks_submitmilestone'
+        db_table = u'submitmilestones'
     pass
 
 @receiver(post_save, sender=SubmitMilestone)
@@ -143,7 +143,7 @@ class ReviewMilestone(Milestone):
     staff_default = models.IntegerField(default=15)
 
     class Meta:
-        db_table = u'chunks_reviewmilestone'
+        db_table = u'reviewmilestones'
 
 
 @receiver(post_save, sender=ReviewMilestone)
@@ -195,7 +195,7 @@ class Batch(models.Model):
     name = models.CharField(max_length=50)
 
     class Meta:
-      db_table = u'chunks_batch'
+      db_table = u'batches'
       verbose_name_plural = 'batches'
 
     def __str__(self):
@@ -496,7 +496,7 @@ class StaffMarker(models.Model):
     start_line = models.IntegerField(blank=True, null=True)
     end_line = models.IntegerField(blank=True, null=True)
     class Meta:
-        db_table = u'chunks_staffmarker'
+        db_table = u'staffmarkers'
 
 
 class ChunkReview(models.Model):
@@ -509,7 +509,7 @@ class ChunkReview(models.Model):
     # reviewer_ids = models.TextField(blank=True) #space separated list of chunk names [name checked, ]
 
     class Meta:
-        db_table = 'tasks_chunkreview'
+        db_table = 'chunkreviews'
 
     # def reset(self):
     #     self.student_or_alum_reviewers = 0
@@ -556,7 +556,7 @@ class Task(models.Model):
             return self.submission.name
 
     class Meta:
-        db_table = 'tasks_task'
+        db_table = 'tasks'
         unique_together = ('chunk', 'reviewer',)
 
     def __unicode__(self):
@@ -614,6 +614,10 @@ class Comment(models.Model):
     batch = models.ForeignKey(Batch, blank=True, null=True, related_name='comments')
     similar_comment = models.ForeignKey('self', related_name='similar_comments', blank=True, null=True)
 
+    class Meta:
+        db_table = 'comments'
+        ordering = [ 'start', '-end', 'thread_id', 'created' ]
+
     def __unicode__(self):
         return self.text
 
@@ -650,8 +654,6 @@ class Comment(models.Model):
     def is_checkstyle(self):
       return self.author.username is 'checkstyle'
 
-    class Meta:
-        ordering = [ 'start', '-end', 'thread_id', 'created' ]
 
 class Vote(models.Model):
     VALUE_CHOICES = (
@@ -666,11 +668,13 @@ class Vote(models.Model):
 
     REPUTATION_WEIGHT = 1
 
+    class Meta:
+        db_table = 'votes'
+        unique_together = ('comment', 'author',)
+
     def __unicode__(self):
         return u'Vote(value=%s, comment=%s)' % (self.value, self.comment)
 
-    class Meta:
-        unique_together = ('comment', 'author',)
 
 
 @receiver(pre_save, sender=Vote)
@@ -732,7 +736,7 @@ class Notification(models.Model):
     email_sent = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'notifications_notification'
+        db_table = 'notifications'
         ordering = [ '-created' ]
 
 
@@ -796,7 +800,7 @@ class Extension(models.Model):
     slack_used = models.IntegerField(default=0, blank=True, null=True)
 
     class Meta:
-        db_table = 'accounts_extension'
+        db_table = 'extensions'
 
     def assignment(self):
         return self.milestone.assignment
@@ -823,7 +827,7 @@ class Member(models.Model):
     semester = models.ForeignKey(Semester, related_name='members')
 
     class Meta:
-        db_table = 'accounts_member'
+        db_table = 'members'
 
     def __str__(self):
       return '%s (%s), %s' % (self.user.username, self.get_role_display(), self.semester)
@@ -842,7 +846,7 @@ class UserProfile(models.Model):
     reputation = models.IntegerField(default=0, editable=True)
 
     class Meta:
-        db_table = 'accounts_userprofile'
+        db_table = 'userprofiles'
 
     def __unicode__(self):
         return self.user.__unicode__()
