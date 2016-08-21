@@ -74,6 +74,7 @@ LOGIN_REDIRECT_URL = '/'
 
 ROOT_URLCONF = 'caesar.urls'
 
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -85,6 +86,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.static',
+                'review.context_processors.template_constants',
             ],
         },
     },
@@ -177,6 +180,7 @@ DEBUG_TOOLBAR_CONFIG = {
 
 
 
+# Email notifications are turned off right now, so these are moot
 
 # EMAIL_HOST = 'localhost'
 # DEFAULT_FROM_EMAIL = 'caesar@csail.mit.edu'
@@ -184,78 +188,59 @@ DEBUG_TOOLBAR_CONFIG = {
 # EMAIL_SUBJECT_PREFIX = '[Caesar] '
 # SERVER_EMAIL = 'Caesar code reviewing system <caesar@csail.mit.edu>'
 
-# Create settings variables here to be rendered in templates.
+
+# Set to true to enable automatic search for related comments when user is entering a new comment. 
 COMMENT_SEARCH = False
 
-def custom_context_processors(request):
-    return {
-        'COMMENT_SEARCH': COMMENT_SEARCH,
-    }
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.static',
-    'django.core.context_processors.request',
-    'django.contrib.messages.context_processors.messages',
-    'settings.custom_context_processors',
-)
-
-
-
-# PROJECT SPECIFIC SETTINGS
 MINIMUM_SNIPPET_LENGTH = 80
 
-# FIXTURE_DIRS = [project_path('fixtures')]
+# Location of test fixtures
+
+FIXTURE_DIRS = [project_path('fixtures')]
 
 
-
+# Local settings can override any of the above
 
 from settings_local import *
 
-# # run tests in memory
-# if 'test' in sys.argv:
-#     DATABASES['default'] = {'ENGINE': 'django.db.backends.sqlite3'}
 
+# explained at http://www.tiwoc.de/blog/2013/03/django-prevent-email-notification-on-suspiciousoperation/
+# actual code from http://stackoverflow.com/questions/15238506/djangos-suspiciousoperation-invalid-http-host-header
+from django.core.exceptions import SuspiciousOperation
 
-# # explained at http://www.tiwoc.de/blog/2013/03/django-prevent-email-notification-on-suspiciousoperation/
-# # actual code from http://stackoverflow.com/questions/15238506/djangos-suspiciousoperation-invalid-http-host-header
-# from django.core.exceptions import SuspiciousOperation
+def skip_suspicious_operations(record):
+  if record.exc_info:
+    exc_value = record.exc_info[1]
+    if isinstance(exc_value, SuspiciousOperation):
+      return False
+  return True
 
-# def skip_suspicious_operations(record):
-#   if record.exc_info:
-#     exc_value = record.exc_info[1]
-#     if isinstance(exc_value, SuspiciousOperation):
-#       return False
-#   return True
-
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'filters': {
-#         'require_debug_false': {
-#             '()': 'django.utils.log.RequireDebugFalse',
-#         },
-#         # Define filter
-#         'skip_suspicious_operations': {
-#             '()': 'django.utils.log.CallbackFilter',
-#             'callback': skip_suspicious_operations,
-#         },
-#     },
-#     'handlers': {
-#         'mail_admins': {
-#             'level': 'ERROR',
-#             # Add filter to list of filters
-#             'filters': ['require_debug_false', 'skip_suspicious_operations'],
-#             'class': 'django.utils.log.AdminEmailHandler'
-#         }
-#     },
-#     'loggers': {
-#         'django.request': {
-#             'handlers': ['mail_admins'],
-#             'level': 'ERROR',
-#             'propagate': True,
-#         },
-#     }
-# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        # Define filter
+        'skip_suspicious_operations': {
+            '()': 'django.utils.log.CallbackFilter',
+            'callback': skip_suspicious_operations,
+        },
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            # Add filter to list of filters
+            'filters': ['require_debug_false', 'skip_suspicious_operations'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
