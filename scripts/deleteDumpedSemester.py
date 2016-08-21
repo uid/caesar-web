@@ -1,17 +1,13 @@
 #!/usr/bin/env python2.7
-import sys, os
-# Add a custom Python path.
+import sys, os, django
+
+# set up Django
 sys.path.insert(0, "/var/django")
 sys.path.insert(0, "/var/django/caesar")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
+django.setup()
 
-from django.core.management import setup_environ
-from caesar import settings
-setup_environ(settings)
-
-# Set the DJANGO_SETTINGS_MODULE environment variable.
-#os.environ['DJANGO_SETTINGS_MODULE'] = "caesar.settings"
-
-from caesar.reviews.models import *
+from review.models import *
 
 MODEL_TO_CLASS = {
   "review.member": Member,

@@ -1,15 +1,11 @@
 #!/usr/bin/env python2.7
-import sys, os, argparse
-# Add a custom Python path.
+import sys, os, argparse, django
+
+# set up Django
 sys.path.insert(0, "/var/django")
 sys.path.insert(0, "/var/django/caesar")
-
-from django.core.management import setup_environ
-from caesar import settings
-setup_environ(settings)
-
-# Set the DJANGO_SETTINGS_MODULE environment variable.
-#os.environ['DJANGO_SETTINGS_MODULE'] = "caesar.settings"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
+django.setup()
 
 from django.db.models import Q
 from django.contrib.auth.models import User
