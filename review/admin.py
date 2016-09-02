@@ -14,10 +14,12 @@ admin.site.register(User, UserProfileAdmin)
 
 class MemberAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'semester__semester', 'semester__subject__name')
+    raw_id_fields = ('user',)
 admin.site.register(Member, MemberAdmin)
 
 class ExtensionAdmin(admin.ModelAdmin):
     search_fields = ('user__username',)
+    raw_id_fields = ('user',)
 admin.site.register(Extension, ExtensionAdmin)
 
 class AssignmentAdmin(admin.ModelAdmin):
@@ -32,10 +34,12 @@ admin.site.register(Submission, SubmissionAdmin)
 class ChunkAdmin(admin.ModelAdmin):
     list_display = ('name', 'file', 'start', 'end', 'class_type', 'staff_portion', 'student_lines', 'chunk_info')
     search_fields = ('name', 'file__path', 'file__submission__name')
+    raw_id_fields = ('file',)
 admin.site.register(Chunk, ChunkAdmin)
 
 class StaffMarkerAdmin(admin.ModelAdmin):
     list_display = ('chunk', 'start_line', 'end_line')
+    raw_id_fields = ('chunk',)
 admin.site.register(StaffMarker, StaffMarkerAdmin)
 
 class MilestoneAdmin(admin.ModelAdmin):
@@ -68,7 +72,12 @@ class SubmitMilestoneAdmin(MilestoneAdmin):
     exclude = ('type',)
 admin.site.register(SubmitMilestone, SubmitMilestoneAdmin)
 
-admin.site.register(File)
+
+class FileAdmin(admin.ModelAdmin):
+    search_fields = ('path','submission__authors__username',)
+    raw_id_fields = ('submission',)
+admin.site.register(File, FileAdmin)
+
 admin.site.register(Batch)
 admin.site.register(Subject)
 admin.site.register(Semester)
@@ -79,10 +88,12 @@ class TaskAdmin(admin.ModelAdmin):
     fields = ('chunk', 'submission', 'reviewer', 'status', 'milestone', 'created', 'opened', 'started', 'completed',)
     readonly_fields = ('created', 'opened', 'started', 'completed')
     search_fields = ('reviewer__username', 'submission__authors__username', 'milestone__assignment__semester__semester', 'milestone__assignment__semester__subject__name','milestone__assignment__name')
+    raw_id_fields = ('submission', 'chunk', 'chunk_review', 'reviewer',)
 admin.site.register(Task, TaskAdmin)
 
 class VoteInline(admin.TabularInline):
     model = Vote
+    raw_id_fields = ('comment', 'author', )
 class CommentAdmin(admin.ModelAdmin):
     inlines = [ VoteInline ]
     list_display = ('id', 'chunk', 'start', 'end', 'type', 'author', 'text')
@@ -94,4 +105,5 @@ admin.site.register(Comment, CommentAdmin)
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ('recipient', 'created', 'reason', 'comment', 'submission', 'email_sent')
     search_fields = ('comment', 'submission', 'recipient')
+    raw_id_fields = ('submission', 'comment', 'recipient',)
 admin.site.register(Notification, NotificationAdmin)
