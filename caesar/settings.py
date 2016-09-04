@@ -27,7 +27,6 @@ SECRET_KEY = 'iix*r+#bzenhu(*bx$i_&z4(opm9wz*0fpbcvn07@83v9qvw)1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = ()
 MANAGERS = ADMINS
@@ -73,25 +72,6 @@ LOGIN_REDIRECT_URL = '/'
 
 
 ROOT_URLCONF = 'caesar.urls'
-
-
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [ ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'django.core.context_processors.static',
-                'review.context_processors.template_constants',
-            ],
-        },
-    },
-]
 
 WSGI_APPLICATION = 'caesar.wsgi.application'
 
@@ -244,3 +224,24 @@ LOGGING = {
         },
     }
 }
+
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [ ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.core.context_processors.static',
+                'review.context_processors.template_constants',
+            ],
+        },
+    },
+]
