@@ -114,14 +114,21 @@ def set_submit_type(sender, instance, created, **kwargs):
 
 class ReviewMilestone(Milestone):
     reviewers_per_chunk = models.IntegerField(default=2)
+
+    # will someday be used by routing
     # student_reviewers_per_chunk = models.IntegerField(default=2)
     # volunteer_reviewers_per_chunk = models.IntegerField(default=2)
     # teacher_reviewers_per_chunk = models.IntegerField(default=1)
     
     min_student_lines = models.IntegerField(default=30)
     submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestone')
-    chunks_to_assign = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
-    chunks_to_exclude = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
+
+    # comma-separated list of "chunkName number", where number is a priority.
+    # priority 0 means never assigned.    
+    chunk_priorities = models.TextField(blank = True, null=True)
+
+    # used by random_routing.py
+    # chunks_to_exclude = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
 
     # number of chunks to be assigned to students, alums, and staff in the class
     student_count = models.IntegerField(default=5)

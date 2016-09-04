@@ -86,7 +86,7 @@ class ChunkForReview:
         return True
 
 def _convert_review_milestone_to_priority(review_milestone):
-    to_assign = review_milestone.chunks_to_assign
+    to_assign = review_milestone.chunk_priorities
     priority_dict = dict()
     for chunk_info in to_assign.split(",")[0:-1]:
         [chunkname, priority] = chunk_info.split(" ")
