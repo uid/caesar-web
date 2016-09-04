@@ -115,11 +115,8 @@ def set_submit_type(sender, instance, created, **kwargs):
 class ReviewMilestone(Milestone):
     reviewers_per_chunk = models.IntegerField(default=2)
     # student_reviewers_per_chunk = models.IntegerField(default=2)
-    # student_reviewers_per_chunk_default = models.IntegerField(default=2)
     # volunteer_reviewers_per_chunk = models.IntegerField(default=2)
-    # volunteer_reviewers_per_chunk_default = models.IntegerField(default=2)
     # teacher_reviewers_per_chunk = models.IntegerField(default=1)
-    # teacher_reviewers_per_chunk_default = models.IntegerField(default=1)
     
     min_student_lines = models.IntegerField(default=30)
     submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestone')
@@ -128,62 +125,11 @@ class ReviewMilestone(Milestone):
 
     # number of chunks to be assigned to students, alums, and staff in the class
     student_count = models.IntegerField(default=5)
-    student_count_default = models.IntegerField(default=5)
     alum_count = models.IntegerField(default=3)
-    alum_count_default = models.IntegerField(default=3)
     staff_count = models.IntegerField(default=10)
-    staff_count_default = models.IntegerField(default=10)
-
-    # number of students, alums, and staff in the class
-    students = models.IntegerField(default=199)
-    students_default = models.IntegerField(default=199)
-    alums = models.IntegerField(default=1)
-    alums_default = models.IntegerField(default=1)
-    staff = models.IntegerField(default=15)
-    staff_default = models.IntegerField(default=15)
 
     class Meta:
         db_table = u'reviewmilestones'
-
-
-@receiver(post_save, sender=ReviewMilestone)
-def create_current_review_milestone(sender, instance, created, **kwargs):
-    if created:
-        # This code appears to copy parms from previous assignments in that semester.
-        past = ReviewMilestone.objects.filter(assignment__semester = instance.assignment.semester).order_by('-duedate').exclude(id = instance.id)
-        if past.count() > 0:
-            pick = past[0]
-            for milestone in past:
-                #check that the assignment had tasks assigned
-                chunks = Chunk.objects.filter(tasks__milestone=milestone)
-                tasks = False
-                for chunk in chunks:
-                    if chunk.tasks.count() > 0:
-                        pick = milestone
-                        tasks = True
-                        break
-                if tasks:
-                    break
-            #set number of tasks
-            instance.student_count_default = pick.student_count
-            instance.alum_count_default = pick.alum_count
-            instance.staff_count_default = pick.staff_count
-            #set number of students we can expect
-            members = Member.objects.filter(semester=instance.assignment.semester, user__tasks__milestone=pick).distinct()
-            instance.students_default = members.filter(role=Member.STUDENT).count()
-            instance.alums_default = members.filter(role=Member.VOLUNTEER).count()
-            instance.staff_default = members.filter(role=Member.TEACHER).count()
-        else:
-            instance.students_default = Member.objects.filter(role=Member.STUDENT, semester=instance.assignment.semester).count()
-            instance.staff_default = Member.objects.filter(role=Member.TEACHER, semester=instance.assignment.semester).count()
-            instance.alum_default = Member.objects.filter(role=Member.VOLUNTEER, semester=instance.assignment.semester).count()
-        instance.students = instance.students_default
-        instance.alums = instance.alums_default
-        instance.staff = instance.staff_default
-        instance.student_count = instance.student_count_default
-        instance.alum_count = instance.alum_count_default
-        instance.staff_count = instance.staff_count_default
-        instance.save()
 
 @receiver(post_save, sender=ReviewMilestone)
 def set_review_type(sender, instance, created, **kwargs):
@@ -206,7 +152,7 @@ class Submission(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=50)
     authors = models.ManyToManyField(User,
-            blank=True, null=True, related_name='submissions')
+            blank=True, related_name='submissions')
     created = models.DateTimeField(auto_now_add=True)
     revision = models.IntegerField(null=True, blank=True)
     revision_date = models.DateTimeField(null=True, blank=True)
