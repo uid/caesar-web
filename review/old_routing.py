@@ -136,7 +136,7 @@ where submissions.milestone_id=%s and not(user_id=%s)
     django_tasks = Task.objects.filter(
             submission__milestone=submit_milestone) \
             .exclude(submission__authors=django_user) \
-                    .select_related('reviewer__user', 'chunk') \
+                    .select_related('reviewer', 'chunk') \
 
     # load all submissions and chunks into lightweight internal objects
     django_submission_chunks = defaultdict(list)
