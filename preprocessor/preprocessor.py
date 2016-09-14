@@ -1,12 +1,11 @@
 #!/usr/bin/env python2.7
+import sys, os, argparse, django
 
-# Forcing python to search the root Caesar directory.
-import sys
-sys.path.append('/var/django/caesar/')
-
-# Import settings.py (includes DB settings)
-import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+# set up Django
+sys.path.insert(0, "/var/django")
+sys.path.insert(0, "/var/django/caesar")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
+django.setup()
 
 import time
 
@@ -20,7 +19,6 @@ from crawler import crawl_submissions
 from parse import parse_all_files, parse_staff_code
 from checkstyle import generate_checkstyle_comments
 
-import argparse
 parser = argparse.ArgumentParser(description="""
 Load student submissions into Caesar.
 """)
