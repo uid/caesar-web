@@ -28,11 +28,12 @@ class AssignmentAdmin(admin.ModelAdmin):
 admin.site.register(Assignment, AssignmentAdmin)
 
 class SubmissionAdmin(admin.ModelAdmin):
+    list_display = ('id', '__unicode__')
     search_fields = ('authors__username',)
 admin.site.register(Submission, SubmissionAdmin)
 
 class ChunkAdmin(admin.ModelAdmin):
-    list_display = ('name', 'file', 'start', 'end', 'class_type', 'staff_portion', 'student_lines', 'chunk_info')
+    list_display = ('id', 'name', 'file', 'start', 'end', 'class_type', 'staff_portion', 'student_lines', 'chunk_info')
     search_fields = ('name', 'file__path', 'file__submission__name')
     raw_id_fields = ('file',)
 admin.site.register(Chunk, ChunkAdmin)
@@ -55,7 +56,7 @@ class MilestoneAdmin(admin.ModelAdmin):
     extension_data.short_description = 'Extensions (0 Days / 1 Day / 2 Days / ...)'
 
 class ReviewMilestoneAdmin(MilestoneAdmin):
-    list_display = ('__unicode__', 'extension_data', 'routing_link', 'list_users_link',)
+    list_display = ('id', '__unicode__', 'extension_data', 'routing_link', 'list_users_link',)
     def routing_link(self, obj):
         return '<a href="%s%s">%s</a>' % ('/simulate/', obj.id, 'Configure Routing')
     routing_link.allow_tags = True
@@ -68,7 +69,7 @@ class ReviewMilestoneAdmin(MilestoneAdmin):
 admin.site.register(ReviewMilestone, ReviewMilestoneAdmin)
 
 class SubmitMilestoneAdmin(MilestoneAdmin):
-    list_display = ('__unicode__', 'extension_data',)
+    list_display = ('id', '__unicode__', 'extension_data',)
     exclude = ('type',)
 admin.site.register(SubmitMilestone, SubmitMilestoneAdmin)
 
