@@ -1,4 +1,3 @@
-import settings
 from re import match
 from django.core.mail import EmailMultiAlternatives
 from hashlib import md5
