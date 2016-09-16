@@ -181,7 +181,7 @@ FIXTURE_DIRS = [project_path('fixtures')]
 
 # Local settings can override any of the above
 
-from settings_local import *
+from caesar.settings_local import *
 
 
 # explained at http://www.tiwoc.de/blog/2013/03/django-prevent-email-notification-on-suspiciousoperation/
