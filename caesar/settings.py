@@ -182,48 +182,6 @@ FIXTURE_DIRS = [project_path('fixtures')]
 from caesar.settings_local import *
 
 
-# explained at http://www.tiwoc.de/blog/2013/03/django-prevent-email-notification-on-suspiciousoperation/
-# actual code from http://stackoverflow.com/questions/15238506/djangos-suspiciousoperation-invalid-http-host-header
-from django.core.exceptions import SuspiciousOperation
-
-def skip_suspicious_operations(record):
-  if record.exc_info:
-    exc_value = record.exc_info[1]
-    if isinstance(exc_value, SuspiciousOperation):
-      return False
-  return True
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',
-        },
-        # Define filter
-        'skip_suspicious_operations': {
-            '()': 'django.utils.log.CallbackFilter',
-            'callback': skip_suspicious_operations,
-        },
-    },
-    'handlers': {
-        'mail_admins': {
-            'level': 'ERROR',
-            # Add filter to list of filters
-            'filters': ['require_debug_false', 'skip_suspicious_operations'],
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-    }
-}
-
-
 
 TEMPLATES = [
     {
