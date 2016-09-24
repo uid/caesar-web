@@ -176,6 +176,23 @@ MINIMUM_SNIPPET_LENGTH = 80
 
 FIXTURE_DIRS = [project_path('fixtures')]
 
+# Disable emailing "Invalid HTTP_HOST header" error messages that would
+# otherwise clog up inbox, because there are so many probes for these bugs
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'null': {
+            'class': 'logging.NullHandler',
+        },
+    },
+    'loggers': {
+        'django.security.DisallowedHost': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+    }
+}
 
 # Local settings can override any of the above
 
