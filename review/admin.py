@@ -24,7 +24,7 @@ admin.site.register(Extension, ExtensionAdmin)
 
 class AssignmentAdmin(admin.ModelAdmin):
     list_display = ('name', 'semester')
-    search_fields = ('name', 'semester')
+    search_fields = ('name', 'semester__semester', 'semester__subject__name')
 admin.site.register(Assignment, AssignmentAdmin)
 
 class SubmissionAdmin(admin.ModelAdmin):
