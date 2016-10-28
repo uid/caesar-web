@@ -24,7 +24,10 @@ parser.add_argument('--batch',
 parser.add_argument('-n', '--dry-run',
                     action="store_true",
                     help="just do a test run -- don't save anything into the Caesar database")
-
+parser.add_argument('--suppress',
+                    action="append",
+                    default=[],
+                    help="regexes of checkstyle comments to suppress")
 args = parser.parse_args()
 #print args
 
@@ -36,6 +39,6 @@ uncommented_chunks = Chunk.objects.filter(file__submission__batch=batch).exclude
 print "found " + str(len(uncommented_chunks)) + " chunks that checkstyle hasn't commented on"
 
 for chunk in uncommented_chunks:
-    comments = generate_comments(chunk, checkstyle_user, batch)
+    comments = generate_comments(chunk, checkstyle_user, batch, args.suppress)
     if not args.dry_run:
         [comment.save() for comment in comments]

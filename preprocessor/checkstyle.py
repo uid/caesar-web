@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from xml.dom.minidom import parseString
 from subprocess import Popen, PIPE
 from collections import defaultdict
+import re
 
 checkstyle_settings = {
     'settings': '/var/django/caesar/preprocessor/checks.xml',
@@ -28,25 +29,34 @@ def run_checkstyle(path):
   return proc.communicate()[0]
 
 # This probably won't support multi-chunks per file properly
-def generate_comments(chunk, checkstyle_user, batch):
+def generate_comments(chunk, checkstyle_user, batch, suppress_comment_regexes):
   xml = run_checkstyle(chunk.file.path)
   comment_nodes = find_comment_nodes(xml)
   ignored = 0
   comments = []
   for node in comment_nodes:
-    if node.getAttribute('source') in ignored_warnings[chunk.class_type]:
+    message = node.getAttribute('message')
+    line = node.getAttribute('line')
+    checkstyleModule = node.getAttribute('source')
+    if checkstyleModule in ignored_warnings[chunk.class_type] or matchesAny(suppress_comment_regexes, chunk.file.path + ':' + message):
       ignored += 1
     else:
       comments.append(Comment(
         type='S',
-        text=node.getAttribute('message'),
+        text=message,
         chunk=chunk,
         batch=batch,
         author=checkstyle_user,
-        start=node.getAttribute('line'),
-        end=node.getAttribute('line')))
+        start=line,
+        end=line))
   print "checkstyle: on", chunk.name, 'I made', len(comments), 'comments and ignored', ignored, 'minor problems'
   return comments
+
+def matchesAny(regexes, string):
+  for regex in regexes:
+    if re.search(regex, string):
+      return True
+  return False
 
 def find_comment_nodes(xml):
   dom = parseString(xml)
@@ -63,7 +73,7 @@ def find_comment_nodes(xml):
       to_traverse.extend(node.childNodes)
   return comment_nodes
 
-def generate_checkstyle_comments(code_objects, save, batch):
+def generate_checkstyle_comments(code_objects, save, batch, suppress_comment_regexes):
   
   checkstyle_user,created = User.objects.get_or_create(username='checkstyle')
 
@@ -74,6 +84,6 @@ def generate_checkstyle_comments(code_objects, save, batch):
     for chunk in chunks:
       if chunk.student_lines == 0:
         continue  # don't run checkstyle on code that student hasn't touched
-      comments = generate_comments(chunk, checkstyle_user, batch)
+      comments = generate_comments(chunk, checkstyle_user, batch, suppress_comment_regexes)
       if save:
         [comment.save() for comment in comments]

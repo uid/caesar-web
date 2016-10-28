@@ -30,6 +30,10 @@ parser.add_argument('--milestone',
 parser.add_argument('--checkstyle',
                     action="store_true",
                     help="runs Checkstyle on the students' Java code, and preloads its output as comments in Caesar.")
+parser.add_argument('--suppress',
+                    action="append",
+                    default=[],
+                    help="regexes of checkstyle comments to suppress")
 parser.add_argument('-n', '--dry-run',
                     action="store_true",
                     help="just do a test run -- don't save anything into the Caesar database")
@@ -99,4 +103,4 @@ print "Found %s submissions." % (len(code_objects))
 
 if settings['generate_comments']:
   print "Generating checkstyle comments..."
-  generate_checkstyle_comments(code_objects, settings['save_data'], batch)
+  generate_checkstyle_comments(code_objects, settings['save_data'], batch, args.suppress)
