@@ -5,5 +5,4 @@ Pygments
 django-email-templates
 python-ldap
 MySQL-python
-markdown
 django-tools

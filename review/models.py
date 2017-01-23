@@ -45,8 +45,6 @@ class Semester(models.Model):
 
     description = models.CharField(max_length=140, blank=True, \
         help_text='Subject Name. (ex.) Software Construction')
-    about = models.CharField(max_length=140, blank=True, \
-        help_text='Brief decription')
 
     semester = models.CharField(blank=True, null=False, max_length=32)
     is_current_semester = models.BooleanField(default=False, verbose_name='Is in progress')
