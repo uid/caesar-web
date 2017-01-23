@@ -162,10 +162,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('description', models.CharField(blank=True, help_text=b'Subject Name. (ex.) Software Construction', max_length=140)),
-                ('about', review.fields.MarkdownTextField(blank=True, help_text=b'Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')),
+                ('about', models.CharField(max_length=140, blank=True, help_text=b'Brief description')),
                 ('semester', models.CharField(blank=True, max_length=32)),
                 ('is_current_semester', models.BooleanField(default=False, verbose_name=b'Is in progress')),
-                ('about_html', models.TextField(blank=True, editable=False)),
             ],
             options={
                 'db_table': 'semesters',

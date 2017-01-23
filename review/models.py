@@ -13,8 +13,6 @@ from django_tools.middlewares import ThreadLocal
 from email_templates import send_templated_mail
 import app_settings
 
-from review.fields import MarkdownTextField
-
 import datetime
 import sys
 import os
@@ -47,8 +45,8 @@ class Semester(models.Model):
 
     description = models.CharField(max_length=140, blank=True, \
         help_text='Subject Name. (ex.) Software Construction')
-    about = MarkdownTextField(allow_html=False, blank=True, \
-        help_text='Format using <a href="http://stackoverflow.com/editing-help">Markdown</a>.')
+    about = models.CharField(max_length=140, blank=True, \
+        help_text='Brief decription')
 
     semester = models.CharField(blank=True, null=False, max_length=32)
     is_current_semester = models.BooleanField(default=False, verbose_name='Is in progress')
