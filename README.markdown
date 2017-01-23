@@ -57,7 +57,6 @@ Collect the static files (CSS, Javascript, images, etc.) from all the apps and l
 Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in /home/vagrant, so you can always delete that file and start this part over if things go wrong. 
 
     cd /var/django/caesar
-    ./manage.py syncdb         # say "no", don't create superuser yet
     ./manage.py migrate
 
 If you want to preload the database with test data do this:
