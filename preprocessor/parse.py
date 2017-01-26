@@ -1,4 +1,4 @@
-from review.models import Submission, File, Chunk, StaffMarker
+from review.models import Submission, File, Chunk, StaffMarker, Comment
 from django.contrib.auth.models import User
 
 import os
@@ -68,10 +68,20 @@ def parse_student_files(usernames, files, batch, submit_milestone, save, student
 
   submission_name = "-".join(usernames)
   
-  # Shouldn't remake submissions
-  if Submission.objects.filter(milestone=submit_milestone, authors__in=users).count() > 0:
-    print "submission for %s already exists in the database." % submission_name
-    return None
+  # Check for existing submission
+  try:
+    prior_submission = Submission.objects.filter(milestone=submit_milestone, name=submission_name)
+    
+    # if it already has human comments, don't replace the submission them
+    if Comment.objects.filter(chunk__file__submission=prior_submission).exclude(author__username='checkstyle').exists():
+      print "submission for %s already exists and has human comments, so skipping it" % submission_name
+      return None
+
+    print "replacing prior submission for %s" % submission_name
+    if save:
+      prior_submission.delete()
+  except Submission.DoesNotExist:
+    pass # no prior submission, that's fine
 
   # Creating the Submission object
   submission = Submission(milestone=submit_milestone, name=submission_name, batch=batch)
