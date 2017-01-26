@@ -100,7 +100,14 @@ class Milestone(models.Model):
 class SubmitMilestone(Milestone):
     class Meta:
         db_table = u'submitmilestones'
-    pass
+    startingCodePath = models.CharField(max_length=300, blank=True, default="")
+    submittedCodePath = models.CharField(max_length=300, blank=True, default="")
+    includedFilePatterns = models.CharField(max_length=300, blank=True, default="*.java *.c *.h *.cpp *.CC *.py")
+    excludedFilePatterns = models.CharField(max_length=300, blank=True, default="")
+    restrictAccess = models.BooleanField(default=False)
+    runCheckstyle = models.BooleanField(default=False)
+    suppressCheckstyleRegex = models.CharField(max_length=200, blank=True, default="")
+
 
 @receiver(post_save, sender=SubmitMilestone)
 def set_submit_type(sender, instance, created, **kwargs):

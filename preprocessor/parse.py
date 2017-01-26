@@ -2,12 +2,10 @@ from review.models import Submission, File, Chunk, StaffMarker
 from django.contrib.auth.models import User
 
 import os
-from diff_match_patch import diff_match_patch, patch_obj
 from crawler import crawl_submissions
 
 # :( global variables
 failed_users = set()
-diff_object = diff_match_patch()
 
 def parse_staff_code(staff_dir, includes, excludes):
   staff_files = crawl_submissions(staff_dir, includes, excludes)
@@ -55,6 +53,8 @@ def parse_all_files(student_code, student_base_dir, batch, submit_milestone, sav
   return [code_object for code_object in code_objects if code_object != None]
 
 def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code, restricted):
+  global failed_users
+
   # staff_code is a dictionary from filename to staff code
   # Trying to find the user(s) who wrote this submission. Bail if they don't all exist in the DB.
   users = User.objects.filter(username__in=usernames)
@@ -63,7 +63,7 @@ def parse_student_files(usernames, files, batch, submit_milestone, save, student
     missing_users = set(usernames).difference([user.username for user in users])
     for username in missing_users:
       print "user %s doesn't exist in the database." % username
-    failed_users += missing_users
+    failed_users |= missing_users
     return None
 
   submission_name = "-".join(usernames)
