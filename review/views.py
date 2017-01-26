@@ -137,7 +137,7 @@ def dashboard_for(request, dashboard_user, new_task_count = 0, allow_requesting_
         except ObjectDoesNotExist:
             user_extension = None
             extension_days = 0
-        if datetime.datetime.now() <= milestone.duedate + datetime.timedelta(days=extension_days) + datetime.timedelta(hours=2):
+        if datetime.datetime.now() <= milestone.duedate + datetime.timedelta(days=milestone.max_extension if milestone.allow_unextending_to_past else extension_days) + datetime.timedelta(hours=2):
             current_milestone_data.append((milestone, user_extension))
 
     #find total slack days left for each membership
@@ -868,20 +868,36 @@ def request_extension(request, milestone_id):
     except ObjectDoesNotExist:
         user_duedate = current_milestone.duedate
 
+    #
+    if current_milestone.allow_unextending_to_past:
+        cant_change_extensions_after = current_milestone.duedate + datetime.timedelta(days=current_milestone.max_extension)
+    else:
+        cant_change_extensions_after = user_duedate
+
+    grace_period = datetime.timedelta(minutes=30)
+
     # User is going to request an extension
     if request.method == 'GET':
         current_milestone = Milestone.objects.get(id=milestone_id)
         # Make sure user got here legally
-        if datetime.datetime.now() > user_duedate + datetime.timedelta(minutes=30):
+        if datetime.datetime.now() > cant_change_extensions_after + grace_period:
             return redirect('review.views.dashboard')
 
         current_extension = (user_duedate - current_milestone.duedate).days
 
-        late_days = 0
-        if datetime.datetime.now() > current_milestone.duedate + datetime.timedelta(minutes=30):
-            late_days = (datetime.datetime.now() - current_milestone.duedate + datetime.timedelta(minutes=30)).days + 1
+        if current_milestone.allow_unextending_to_past:
+            # if enabled, extension can be decreased at any time 
+            min_extension = 0
+        elif datetime.datetime.now() < current_milestone.duedate + grace_period:
+            # initial deadline of the milestone hasn't happened yet, so extension can still be decreased 
+            min_extension = 0
+        else:
+            # extension can be decreased to any day that hasn't passed yet 
+            min_extension = (datetime.datetime.now() - current_milestone.duedate + grace_period).days + 1
 
-        possible_extensions = range(late_days, min(total_extension_days_left+current_extension+1, current_milestone.max_extension+1))
+        max_extension = min(total_extension_days_left + current_extension, current_milestone.max_extension)
+
+        possible_extensions = range(min_extension, max_extension+1)
 
         written_dates = []
         for day in range(max([current_extension]+possible_extensions)+1):
@@ -896,6 +912,10 @@ def request_extension(request, milestone_id):
             'total_extension_days': total_extension_days_left + current_extension
         })
     else: # user just submitted an extension request
+        # Make sure user got here legally
+        if datetime.datetime.now() > cant_change_extensions_after + grace_period:
+            return redirect('review.views.dashboard')
+
         days = request.POST.get('dayselect', None)
         try:
             current_extension = (user_duedate - current_milestone.duedate).days

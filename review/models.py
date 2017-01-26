@@ -86,6 +86,9 @@ class Milestone(models.Model):
     duedate = models.DateTimeField(null=True, blank=True)
     name = models.CharField(max_length=50)
     max_extension = models.IntegerField(default=2)
+    allow_unextending_to_past = models.BooleanField(default=False, 
+        help_text="If enabled, then user can give back extension days even if it pushes their deadline back into the past. "\
+                  "If disabled, then user's deadline must always be in the future after a change.")
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
 
     class Meta:
