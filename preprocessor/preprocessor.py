@@ -27,34 +27,9 @@ parser.add_argument('--milestone',
                     type=int,
                     required=True,
                     help="id number of SubmitMilestone in Caesar. Go to Admin, Submit milestones, and take the last number from the link of the submit milestone you created for this set of submissions.")
-# parser.add_argument('--checkstyle',
-#                     action="store_true",
-#                     help="runs Checkstyle on the students' Java code, and preloads its output as comments in Caesar.")
-# parser.add_argument('--suppress',
-#                     action="append",
-#                     default=[],
-#                     help="regexes of checkstyle comments to suppress")
 parser.add_argument('-n', '--dry-run',
                     action="store_true",
                     help="just do a test run -- don't save anything into the Caesar database")
-# parser.add_argument('--starting',
-#                     metavar="PATH",
-#                     default=None,
-#                     help="folder containing starting code for the assignment.  Should contain one subfolder, under which is the starting code.")
-# parser.add_argument('--submissions',
-#                     metavar="PATH",
-#                     help="folder containing student code for the assignment. Should contain subfolders named by student usernames: abc/, def/, ghi/, etc.")
-# parser.add_argument('--restrict',
-#                     action="store_true",
-#                     help="Restrict who can view the students' chunks to the student authors and any assigned reviewers")
-# parser.add_argument('--include',
-#                     action="append",
-#                     default=['*.java', '*.c', '*.h', '*.cpp', '*.CC', '*.py'],
-#                     help="filename patterns to upload to Caesar; e.g. *Foo*.java matches Foo.java and src/TheFool/Bar.java")
-# parser.add_argument('--exclude',
-#                     action="append",
-#                     default=[],
-#                     help="filename patterns to exclude from upload")
 args = parser.parse_args()
 #print args
 
