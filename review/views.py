@@ -1101,11 +1101,13 @@ def highlight_comment_chunk_line(request, comment_id):
 def view_all_chunks(request, viewtype, submission_id):
     user = request.user
     submission = Submission.objects.get(id = submission_id)
-    semester = Semester.objects.get(assignments__milestones__submitmilestone__submissions=submission)
+    submit_milestone = SubmitMilestone.objects.get(submissions=submission)
+    semester = Semester.objects.get(assignments__milestones__submitmilestone=submit_milestone)
+    is_author = submission.has_author(user)
 
     if Member.objects.filter(user=user, semester=semester, role=Member.TEACHER).exists():
         pass
-    elif submission.has_author(user):
+    elif is_author:
         pass
     elif Task.objects.filter(submission=submission, reviewer=user).exists():
         pass
@@ -1113,7 +1115,13 @@ def view_all_chunks(request, viewtype, submission_id):
         pass
     else:
         raise PermissionDenied
-        
+    
+    try:
+        review_milestone = ReviewMilestone.objects.get(submit_milestone=submit_milestone)
+        hide_reviews_from_author = (review_milestone.duedate > datetime.datetime.now())
+    except ReviewMilestone.DoesNotExist:
+        hide_reviews_from_author = False
+
     files = File.objects.filter(submission=submission_id).prefetch_related('chunks')
     if not files:
         raise Http404
@@ -1181,7 +1189,12 @@ def view_all_chunks(request, viewtype, submission_id):
                     snippet = chunk.generate_snippet(comment.start, comment.end)
                     return (comment, snippet)
 
-                comments = chunk.comments.prefetch_related('chunk', 'author__profile', 'author__membership__semester')
+                if is_author and hide_reviews_from_author:
+                    # don't let author peek at code reviewing in progress
+                    comments = Comment.objects.none()
+                else:
+                    comments = chunk.comments.prefetch_related('chunk', 'author__profile', 'author__membership__semester')
+
                 comment_data = map(get_comment_data, comments)
 
                 user_comments += comments.filter(type='U').count()
