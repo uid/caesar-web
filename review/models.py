@@ -100,13 +100,20 @@ class Milestone(models.Model):
 class SubmitMilestone(Milestone):
     class Meta:
         db_table = u'submitmilestones'
-    startingCodePath = models.CharField(max_length=300, blank=True, default="")
-    submittedCodePath = models.CharField(max_length=300, blank=True, default="")
-    includedFilePatterns = models.CharField(max_length=300, blank=True, default="*.java *.c *.h *.cpp *.CC *.py")
-    excludedFilePatterns = models.CharField(max_length=300, blank=True, default="")
-    restrictAccess = models.BooleanField(default=False)
-    runCheckstyle = models.BooleanField(default=False)
-    suppressCheckstyleRegex = models.CharField(max_length=200, blank=True, default="")
+    starting_code_path = models.CharField(max_length=300, blank=True, default="", 
+                help_text="Folder containing starting code for the assignment.  Should contain one subfolder, under which is the starting code.")
+    submitted_code_path = models.CharField(max_length=300, blank=True, default="",
+                help_text="Folder containing student code for the assignment. Should contain subfolders named by student usernames: abc/, def/, ghi/, etc.")
+    included_file_patterns = models.CharField(max_length=300, blank=True, default="*.java *.c *.h *.cpp *.CC *.py",
+                help_text="Filename patterns to upload, separated by whitespace; e.g. *Foo*.java matches Foo.java and src/TheFool/Bar.java")
+    excluded_file_patterns = models.CharField(max_length=300, blank=True, default="",
+                help_text="Filename patterns to exclude from upload, separated by whitespace")
+    restrict_access = models.BooleanField(default=False,
+                help_text="If enabled, restrict who can view the students' chunks to the student authors and any assigned reviewers")
+    run_checkstyle = models.BooleanField(default=False,
+                help_text="If enabled, runs Checkstyle on the students' Java code, and preloads its output as comments in Caesar")
+    suppress_checkstyle_regex = models.CharField(max_length=200, blank=True, default="",
+                help_text="Regex of checkstyle comments to suppress; separate multiple patterns by |")
 
 
 @receiver(post_save, sender=SubmitMilestone)

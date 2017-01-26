@@ -67,15 +67,15 @@ stripTrailingSlash = lambda folder: folder[0:-1] if folder is not None and folde
 
 settings = {
     'save_data': not args.dry_run,
-    'student_submission_dir': stripTrailingSlash(submit_milestone.submittedCodePath),
-    'staff_dir': stripTrailingSlash(submit_milestone.startingCodePath),
-    'include': submit_milestone.includedFilePatterns.split(),
-    'exclude': submit_milestone.excludedFilePatterns.split(),
-    'restrict': submit_milestone.restrictAccess,
-    'generate_comments': submit_milestone.runCheckstyle,
-    'suppress_regex': [submit_milestone.suppressCheckstyleRegex],
+    'student_submission_dir': stripTrailingSlash(submit_milestone.submitted_code_path),
+    'staff_dir': stripTrailingSlash(submit_milestone.starting_code_path),
+    'include': submit_milestone.included_file_patterns.split(),
+    'exclude': submit_milestone.excluded_file_patterns.split(),
+    'restrict': submit_milestone.restrict_access,
+    'generate_comments': submit_milestone.run_checkstyle,
+    'suppress_regex': [submit_milestone.suppress_checkstyle_regex],
     }
-print settings
+# print settings
 
 starting_time = time.time()
 
