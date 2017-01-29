@@ -131,11 +131,25 @@ print "selected revisions for", len(revision_map), "users whose personal deadlin
 #pprint(revision_map)
 
 
+# equivalent to ln -sf target source
+def symlink_force(target, source):
+    os.remove(source) if os.path.exists(source) else None
+    os.symlink(target, source)
+
+# take a snapshot from a git repo:string of revision:string and store it at target_path:string 
+def git_snapshot(repo, revision, target_path):
+    if not os.path.isdir(target_path):
+        os.makedirs(target_path)
+        command = 'git --git-dir="{repo}" archive "{revision}" | tar x -C "{target_path}"'.format(repo=repo, revision=revision, target_path=target_path)
+        print command
+        os.system(command)
+
 # revision_map: RevisionMap
 # extracts a snapshot of each user's revision from their git repo (if that snapshot doesn't already exist),
 # and makes a symlink to it in the right place 
 def snapshot_revisions(revision_map):
-    code_path = subject_name + "/private/" + semester_abbr + "/code/" + pset
+    repos_path = subject_name + "/git/" + semester_abbr + "/psets/" + pset
+    code_path = subject_name + "/private/" + semester_abbr + "/code/" + pset    
     snapshots_path = os.path.join(code_path, "snapshots")
     links_path = os.path.join(code_path, milestone_name)
     staff_starting_path = os.path.join(code_path, 'staff')
@@ -143,25 +157,16 @@ def snapshot_revisions(revision_map):
     # make parent folders in case they don't exist yet
     [os.makedirs(path) for path in (snapshots_path, links_path, staff_starting_path) if not os.path.isdir(path)]
 
-    # equivalent to ln -sf target source
-    def symlink_force(target, source):
-        os.remove(source) if os.path.exists(source) else None
-        os.symlink(target, source)
-
-    # make symlink to starting code in case it doesn't exist yet
-    symlink_force('../../../staff/psets/' + pset + '/starting', os.path.join(staff_starting_path, 'starting'))
+    # snapshot the starting code in case it hasn't been done yet
+    git_snapshot(os.path.join(repos_path, 'didit/starting.git'), 'HEAD', os.path.join(staff_starting_path, 'starting'))
 
     for username in revision_map.keys():
         revision = revision_map[username]
         snapshot_name = username + "-" + revision
         print snapshot_name
-        snapshot_path = os.path.join(code_path, "snapshots", snapshot_name)
-        if not os.path.isdir(snapshot_path):
-            os.makedirs(snapshot_path)
-            command = 'git --git-dir="{subject}/git/{semester}/psets/{pset}/{username}.git" archive "{revision}" | tar x -C "{snapshot_folder}"'\
-                        .format(subject=subject_name, semester=semester_abbr, pset=pset, username=username, revision=revision, snapshot_folder=snapshot_path)
-            print command
-            os.system(command)
+        user_repo = os.path.join(repos_path, username + '.git')
+        user_snapshot = os.path.join(code_path, "snapshots", snapshot_name)
+        git_snapshot(user_repo, revision, user_snapshot)
         symlink_force("../snapshots/" + snapshot_name, os.path.join(links_path, username))
 
 snapshot_revisions(revision_map)
