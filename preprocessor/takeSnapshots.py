@@ -9,6 +9,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
 django.setup()
 
 from review.models import *
+from get_milestone import get_milestone
 
 parser = argparse.ArgumentParser(description="""
 Make users into members of a class (as either students or staff).
@@ -17,28 +18,24 @@ Also creates user accounts for any who don't already have a Caesar account.
 parser.add_argument('--subject',
                     nargs=1,
                     type=str,
-                    required=True,
-                    help="name of Subject (in caesar.eecs.mit.edu/admin/subject/; for example '6.005'")
+                    help="name of Subject; for example '6.005'")
 parser.add_argument('--semester',
                     nargs=1,
                     type=str,
-                    required=True,
-                    help="name of Semester (in caesar.eecs.mit.edu/admin/semester/; for example 'Fall 2013')")
+                    help="name of Semester; for example 'Fall 2013')")
 parser.add_argument('--milestone',
                     metavar="ID",
                     type=int,
-                    help="id number of SubmitMilestone in Caesar. If omitted, uses the latest milestone whose deadline has passed.")
-parser.add_argument('-n', '--dry-run',
-                    action="store_true",
-                    help="just do a test run -- don't change filesystem or save anything into the Caesar database")
+                    help="id number of SubmitMilestone; if omitted, uses the latest milestone whose deadline has passed.")
 
 
 args = parser.parse_args()
 #print args
 
-subject_name = args.subject[0]
-semester_name = args.semester[0]
-semester = Semester.objects.get(subject__name=subject_name, semester=semester_name)
+milestone = get_milestone(args)
+semester = milestone.assignment.semester
+semester_name = semester.semester
+subject_name = semester.subject.name
 
 # convert e.g. Spring 2017 to sp17
 m = re.match('(Fa|Sp)\w+ \d\d(\d\d)', semester_name)

@@ -18,15 +18,23 @@ import parse
 from crawler import crawl_submissions
 from parse import parse_all_files, parse_staff_code
 from checkstyle import generate_checkstyle_comments
+from get_milestone import get_milestone
 
 parser = argparse.ArgumentParser(description="""
 Load student submissions into Caesar.
 """)
+parser.add_argument('--subject',
+                    nargs=1,
+                    type=str,
+                    help="name of Subject (in caesar.eecs.mit.edu/admin/subject/; for example '6.005'")
+parser.add_argument('--semester',
+                    nargs=1,
+                    type=str,
+                    help="name of Semester (in caesar.eecs.mit.edu/admin/semester/; for example 'Fall 2013')")
 parser.add_argument('--milestone',
                     metavar="ID",
                     type=int,
-                    required=True,
-                    help="id number of SubmitMilestone in Caesar. Go to Admin, Submit milestones, and take the last number from the link of the submit milestone you created for this set of submissions.")
+                    help="id number of SubmitMilestone in Caesar. If omitted, uses the latest milestone whose deadline has passed.")
 parser.add_argument('-n', '--dry-run',
                     action="store_true",
                     help="just do a test run -- don't save anything into the Caesar database")
@@ -34,21 +42,21 @@ args = parser.parse_args()
 #print args
 
 # Find the submit milestone object
-submit_milestone = SubmitMilestone.objects.get(id=args.milestone)
-print "Found submit milestone %s." % (submit_milestone.full_name())
+milestone = get_milestone(args)
+print "loading code for milestone", milestone.full_name()
 
 stripTrailingSlash = lambda folder: folder[0:-1] if folder is not None and folder[-1]=='/' else folder
 
 
 settings = {
     'save_data': not args.dry_run,
-    'student_submission_dir': stripTrailingSlash(submit_milestone.submitted_code_path),
-    'staff_dir': stripTrailingSlash(submit_milestone.starting_code_path),
-    'include': submit_milestone.included_file_patterns.split(),
-    'exclude': submit_milestone.excluded_file_patterns.split(),
-    'restrict': submit_milestone.restrict_access,
-    'generate_comments': submit_milestone.run_checkstyle,
-    'suppress_regex': [submit_milestone.suppress_checkstyle_regex],
+    'student_submission_dir': stripTrailingSlash(milestone.submitted_code_path),
+    'staff_dir': stripTrailingSlash(milestone.starting_code_path),
+    'include': milestone.included_file_patterns.split(),
+    'exclude': milestone.excluded_file_patterns.split(),
+    'restrict': milestone.restrict_access,
+    'generate_comments': milestone.run_checkstyle,
+    'suppress_regex': [milestone.suppress_checkstyle_regex],
     }
 # print settings
 
@@ -57,7 +65,7 @@ starting_time = time.time()
 staff_code = parse_staff_code(settings['staff_dir'], settings['include'], settings['exclude']) if settings['staff_dir'] is not None else {}
 #print staff_code.keys()
 
-batch = Batch(name=submit_milestone.full_name())
+batch = Batch(name=milestone.full_name())
 if settings['save_data']:
   batch.save()
   print "Batch ID: %s" % (batch.id)
@@ -65,7 +73,7 @@ if settings['save_data']:
 # Crawling the file system.
 student_code = crawl_submissions(settings['student_submission_dir'], settings['include'], settings['exclude'])
 
-code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, submit_milestone, settings['save_data'], staff_code, settings['restrict'])
+code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, milestone, settings['save_data'], staff_code, settings['restrict'])
 
 if parse.failed_users:
   print "To add the missing users to Caesar, use scripts/addMembers.py to add the following list of users:"
