@@ -58,7 +58,7 @@ else:
 
 pset = milestone.assignment.name # e.g. "ps0"
 milestone_name = milestone.name # e.g. "beta"
-print "updating snapshots for submit milestone #", milestone.id, pset, milestone_name
+print "updating snapshots for milestone", milestone.full_name()
 
 
 # in the code below,
