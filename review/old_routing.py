@@ -85,14 +85,6 @@ class ChunkForReview:
             reviewer.other_reviewers.add(user)
         return True
 
-def _convert_review_milestone_to_priority(review_milestone):
-    to_assign = review_milestone.chunk_priorities
-    priority_dict = dict()
-    for chunk_info in to_assign.split(",")[0:-1]:
-        [chunkname, priority] = chunk_info.split(" ")
-        priority_dict[chunkname] = -int(priority)
-    return priority_dict
-
 def load_members(semester):
     # load all existing users
     user_map = defaultdict(lambda : None)
@@ -325,11 +317,8 @@ def _generate_tasks(review_milestone, reviewer, chunk_map,  chunk_id_task_map=de
 
     num_tasks_to_assign = min(num_tasks_to_assign, max_tasks)
 
-    # Might need to refactor
-    chunk_type_priorities = _convert_review_milestone_to_priority(review_milestone)
-
     tasks = []
-    for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, review_milestone.reviewers_per_chunk, review_milestone.min_student_lines, chunk_type_priorities):
+    for chunk_id in find_chunks(reviewer, chunk_map.values(), num_tasks_to_assign, review_milestone.reviewers_per_chunk, review_milestone.min_student_lines, {}):
         submission = chunk_map[chunk_id].submission
         task = Task(reviewer_id=reviewer.id, chunk_id=chunk_id, milestone=review_milestone, submission_id=submission.id)
 

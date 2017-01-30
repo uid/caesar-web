@@ -136,13 +136,6 @@ class ReviewMilestone(Milestone):
     min_student_lines = models.IntegerField(default=30)
     submit_milestone = models.ForeignKey(SubmitMilestone, related_name='review_milestone')
 
-    # comma-separated list of "chunkName number", where number is a priority.
-    # priority 0 means never assigned.    
-    chunk_priorities = models.TextField(blank = True, null=True)
-
-    # used by random_routing.py
-    # chunks_to_exclude = models.TextField(blank = True, null=True) #space separated list of chunk names [name checked, ]
-
     # number of chunks to be assigned to students, alums, and staff in the class
     student_count = models.IntegerField(default=5)
     alum_count = models.IntegerField(default=3)

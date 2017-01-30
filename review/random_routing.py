@@ -16,8 +16,6 @@ def get_reviewable_chunks(review_milestone, reviewer, reviewer_role, simulate=Fa
 	chunks = Chunk.objects.filter(file__submission__milestone=review_milestone.submit_milestone)
 	# remove chunks that have too few student-generated lines
 	chunks = chunks.exclude(student_lines__lt=review_milestone.min_student_lines)
-	# remove chunks that aren't selected for review
-	chunks = chunks.exclude(name__in=list_chunks_to_exclude(review_milestone))
 	# remove chunks already assigned to reviewer
 	chunks = chunks.exclude(chunk_review__tasks__reviewer__id=reviewer_id)
 	# remove chunks that the reviewer authored
@@ -168,13 +166,3 @@ def get_num_tasks_for_user(review_milestone, user, simulate=False):
 		num_tasks_per_role = 0
 	# return min(0,num_tasks_per_role - num_tasks_already_assigned)
 	return num_tasks_per_role
-
-def list_chunks_to_exclude(review_milestone):
-	to_exclude = review_milestone.chunks_to_exclude
-	if to_exclude == None:
-		return []
-	return to_exclude.split()
-
-
-
-	
