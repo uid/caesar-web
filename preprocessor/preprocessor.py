@@ -7,6 +7,8 @@ sys.path.insert(0, "/var/django/caesar")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
 django.setup()
 
+ROOT='/var/django/caesar/preprocessor'
+
 import time
 
 # Django imports
@@ -50,8 +52,8 @@ stripTrailingSlash = lambda folder: folder[0:-1] if folder is not None and folde
 
 settings = {
     'save_data': not args.dry_run,
-    'student_submission_dir': stripTrailingSlash(milestone.submitted_code_path),
-    'staff_dir': stripTrailingSlash(milestone.starting_code_path),
+    'student_submission_dir': stripTrailingSlash(os.path.join(ROOT, milestone.submitted_code_path)),
+    'staff_dir': stripTrailingSlash(os.path.join(ROOT, milestone.starting_code_path)),
     'include': milestone.included_file_patterns.split(),
     'exclude': milestone.excluded_file_patterns.split(),
     'restrict': milestone.restrict_access,
