@@ -20,6 +20,11 @@
     -ms-box-sizing: border-box;
 }
 
+/* views that are embedded in an iframe shouldn't show their own toolbar */
+.embedded #toolbar-main {
+    display:none;
+}
+
 #toolbar-breadcrumbs {
     display: inline-block;
 }
