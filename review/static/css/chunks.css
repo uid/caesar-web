@@ -269,3 +269,23 @@
 .completed {
   background-color: #def;
 }
+
+.side-by-side {
+    position: absolute;
+    display: flex;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: top;
+}
+.side-by-side iframe {
+    flex-basis: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: top;
+}

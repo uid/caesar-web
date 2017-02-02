@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load review_extras %}
+{% load static from staticfiles %}
+
+{% block css %}
+<!-- bootstap messes this page up, so hacking around it. -->
+<link rel="stylesheet" href="{% static 'css/blueprint/screen.css' %}" type="text/css" media="screen, projection" />
+<link rel="stylesheet" href="{% static 'css/blueprint/print.css' %}" type="text/css" media="print" />
+<!--[if lt IE 8]>
+<link rel="stylesheet" href="{% static 'css/blueprint/ie.css' %}" type="text/css" media="screen, projection" />
+<![endif]-->
+<link rel="stylesheet" href="{% static 'css/smoothness/jquery-ui.css' %}" type="text/css" media="screen"/>
+<link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/toolbar.css' %}" type="text/css" />
+
+<link rel="stylesheet" href="{% static 'css/chunks.css' %}" type="text/css" />
+
+{% endblock %}
+
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard' %}">Dashboard</a>
+  <span class="breadcrumb">{{ breadcrumb_name }}</span>
+  <span class="breadcrumb">{{ username }}</span>
+{% endblock %}
+
+{% block content %}
+    <div class="side-by-side">
+        {% for submission in submissions %}
+        <iframe src="/submission/{{ viewtype }}/{{ submission.id }}/embedded"></iframe>
+        {% endfor %}
+    </div>
+{% endblock %}
+

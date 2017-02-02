@@ -111,7 +111,11 @@
 
 
 </head>
-  <body>
+{% if embedded %}
+  <body class="embedded">
+{% else %}
+  <body >
+{% endif %}
 
     <div id="messages">
       {% if messages %}

@@ -1,6 +1,6 @@
 from django.core import serializers
 from django.db.models import Q, Count, Max
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.template import RequestContext
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -1118,7 +1118,7 @@ def highlight_comment_chunk_line(request, comment_id):
     return HttpResponse() 
 
 @login_required
-def view_all_chunks(request, viewtype, submission_id):
+def view_all_chunks(request, viewtype, submission_id, embedded):
     user = request.user
     submission = Submission.objects.get(id = submission_id)
     submit_milestone = SubmitMilestone.objects.get(submissions=submission)
@@ -1248,6 +1248,7 @@ def view_all_chunks(request, viewtype, submission_id):
         'read_only': False,
         'comment_view': comment_view,
         'full_view': True,
+        'embedded': embedded
     })
 
 @login_required
@@ -1269,6 +1270,30 @@ def view_submission_for_milestone(request, viewtype, milestone_id, username):
         raise PermissionDenied
 
     return view_all_chunks(request, viewtype, submission.id)
+
+@login_required
+def view_submissions_for_assignment(request, viewtype, assignment_id, username):
+    user = request.user
+    assignment = get_object_or_404(Assignment, id=assignment_id)
+    semester = assignment.semester
+    author = get_object_or_404(User, username=username)
+    submissions = get_list_or_404(Submission.objects.filter(milestone__assignment=assignment_id, authors__username=username).order_by('milestone__duedate'))
+
+    if Member.objects.filter(user=user, semester=semester, role=Member.TEACHER).exists():
+        pass
+    elif user == author:
+        pass
+    elif user.is_staff:
+        pass
+    else:
+        raise PermissionDenied
+
+    return render(request, 'view_submissions_for_assignment.html', {
+        'breadcrumb_name': assignment.name + " - " + " vs. ".join([submission.milestone.name for submission in submissions]),
+        'submissions': submissions,
+        'viewtype': viewtype,
+        'username': username
+    })
 
 @login_required
 def simulate(request, review_milestone_id):
