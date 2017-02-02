@@ -104,7 +104,7 @@ class SubmitMilestone(Milestone):
     class Meta:
         db_table = u'submitmilestones'
     starting_code_path = models.CharField(max_length=300, blank=True, default="", 
-                help_text="Folder containing starting code for the assignment.  Should contain one subfolder, under which is the starting code.")
+                help_text="Folder containing starting code for the assignment.  Should contain one subfolder, usually called staff/, under which is the starting code.")
     submitted_code_path = models.CharField(max_length=300, blank=True, default="",
                 help_text="Folder containing student code for the assignment. Should contain subfolders named by student usernames: abc/, def/, ghi/, etc.")
     included_file_patterns = models.CharField(max_length=300, blank=True, default="*.java *.c *.h *.cpp *.CC *.py",

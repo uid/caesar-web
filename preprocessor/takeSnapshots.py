@@ -8,6 +8,8 @@ sys.path.insert(0, "/var/django/caesar")
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
 django.setup()
 
+ROOT='/var/django/caesar/preprocessor'
+
 from review.models import *
 from get_milestone import get_milestone
 
@@ -70,7 +72,7 @@ print "updating snapshots for milestone", milestone.full_name()
 # returns list of RevisionMaps of length max_extension+1, 
 #    where sweeps[i] is the i-days-late RevisionMap, or None if no sweep found for that day
 def find_sweeps(deadline, max_extension):
-    sweeps_path = subject_name + "/didit/" + semester_abbr + "/sweeps/psets/" + pset
+    sweeps_path = os.path.join(ROOT, subject_name, 'didit', semester_abbr, 'sweeps/psets', pset)
     sweep_filenames = os.listdir(sweeps_path)   
 
     # filename:string, sweeps folder name, assumed to have the form yymmddThhmmss, e.g. '20170122T221500'; 
@@ -148,17 +150,16 @@ def git_snapshot(repo, revision, target_path):
 # extracts a snapshot of each user's revision from their git repo (if that snapshot doesn't already exist),
 # and makes a symlink to it in the right place 
 def snapshot_revisions(revision_map):
-    repos_path = subject_name + "/git/" + semester_abbr + "/psets/" + pset
-    code_path = subject_name + "/private/" + semester_abbr + "/code/" + pset    
+    repos_path = os.path.join(ROOT, subject_name, 'git', semester_abbr, 'psets', pset)
+    code_path = os.path.join(ROOT, subject_name, 'private', semester_abbr, 'code', pset)
     snapshots_path = os.path.join(code_path, "snapshots")
     links_path = os.path.join(code_path, milestone_name)
-    staff_starting_path = os.path.join(code_path, 'staff')
 
     # make parent folders in case they don't exist yet
-    [os.makedirs(path) for path in (snapshots_path, links_path, staff_starting_path) if not os.path.isdir(path)]
+    [os.makedirs(path) for path in (snapshots_path, links_path) if not os.path.isdir(path)]
 
     # snapshot the starting code in case it hasn't been done yet
-    git_snapshot(os.path.join(repos_path, 'didit/starting.git'), 'HEAD', os.path.join(staff_starting_path, 'starting'))
+    git_snapshot(os.path.join(repos_path, 'didit/starting.git'), 'HEAD', os.path.join(code_path, 'starting/staff'))
 
     for username in revision_map.keys():
         revision = revision_map[username]
@@ -167,6 +168,6 @@ def snapshot_revisions(revision_map):
         user_repo = os.path.join(repos_path, username + '.git')
         user_snapshot = os.path.join(code_path, "snapshots", snapshot_name)
         git_snapshot(user_repo, revision, user_snapshot)
-        symlink_force("../snapshots/" + snapshot_name, os.path.join(links_path, username))
+        symlink_force(os.path.join('../snapshots', snapshot_name), os.path.join(links_path, username))
 
 snapshot_revisions(revision_map)
