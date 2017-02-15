@@ -26,14 +26,12 @@ parser.add_argument('--submission',
 
 
 args = parser.parse_args()
-print args
 
 try:
   submission = Submission.objects.get(pk=args.submission)
 except Submission.DoesNotExist:
   print "can't find submission #", args.submission
   sys.exit(-1)
-print "using submission ", submission
 
 fields = ["author__username", "text", "start", "end", "created"]
 writer = csv.DictWriter(sys.stdout, fields)
