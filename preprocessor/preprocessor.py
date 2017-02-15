@@ -47,13 +47,17 @@ args = parser.parse_args()
 milestone = get_milestone(args)
 print "loading code for milestone", milestone.full_name()
 
-stripTrailingSlash = lambda folder: folder[0:-1] if folder is not None and folder[-1]=='/' else folder
-
+def resolve(folder):
+  if folder == None or folder == "":
+    return None
+  if folder[-1] == '/':
+    folder = folder[0:-1]
+  return os.path.join(ROOT, folder)
 
 settings = {
     'save_data': not args.dry_run,
-    'student_submission_dir': stripTrailingSlash(os.path.join(ROOT, milestone.submitted_code_path)),
-    'staff_dir': stripTrailingSlash(os.path.join(ROOT, milestone.starting_code_path)),
+    'student_submission_dir': resolve(milestone.submitted_code_path),
+    'staff_dir': resolve(milestone.starting_code_path),
     'include': milestone.included_file_patterns.split(),
     'exclude': milestone.excluded_file_patterns.split(),
     'restrict': milestone.restrict_access,
@@ -64,7 +68,10 @@ settings = {
 
 starting_time = time.time()
 
-staff_code = parse_staff_code(settings['staff_dir'], settings['include'], settings['exclude']) if settings['staff_dir'] is not None else {}
+staff_code = {}
+if settings['staff_dir'] is not None:
+  print "Crawling staff code in", settings['staff_dir']
+  staff_code = parse_staff_code(settings['staff_dir'], settings['include'], settings['exclude'])
 #print staff_code.keys()
 
 batch = Batch(name=milestone.full_name())
