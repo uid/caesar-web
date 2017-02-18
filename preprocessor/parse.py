@@ -70,7 +70,7 @@ def parse_student_files(usernames, files, batch, submit_milestone, save, student
   
   # Check for existing submission
   try:
-    prior_submission = Submission.objects.filter(milestone=submit_milestone, name=submission_name)
+    prior_submission = Submission.objects.get(milestone=submit_milestone, name=submission_name)
     
     # if it already has human comments, don't replace the submission them
     if Comment.objects.filter(chunk__file__submission=prior_submission).exclude(author__username='checkstyle').exists():
