@@ -38,11 +38,6 @@ class ChunkAdmin(admin.ModelAdmin):
     raw_id_fields = ('file',)
 admin.site.register(Chunk, ChunkAdmin)
 
-class StaffMarkerAdmin(admin.ModelAdmin):
-    list_display = ('chunk', 'start_line', 'end_line')
-    raw_id_fields = ('chunk',)
-admin.site.register(StaffMarker, StaffMarkerAdmin)
-
 class MilestoneAdmin(admin.ModelAdmin):
     def extension_data(self, obj):
         num_no_extensions = Member.objects.filter(semester=obj.assignment.semester, role=Member.STUDENT)\
@@ -73,19 +68,23 @@ class SubmitMilestoneAdmin(MilestoneAdmin):
     exclude = ('type',)
 admin.site.register(SubmitMilestone, SubmitMilestoneAdmin)
 
-
 class FileAdmin(admin.ModelAdmin):
+    list_display = ('id', 'path')
     search_fields = ('path','submission__authors__username',)
+    ordering = ('-id',)
     raw_id_fields = ('submission',)
 admin.site.register(File, FileAdmin)
 
-admin.site.register(Batch)
+class BatchAdmin(admin.ModelAdmin):
+    ordering = ('-id', )
+admin.site.register(Batch, BatchAdmin)
+
 admin.site.register(Subject)
 admin.site.register(Semester)
-admin.site.register(ChunkReview)
 
 class TaskAdmin(admin.ModelAdmin):
     list_display = ('id', 'status', 'reviewer', 'submission', 'chunk')
+    ordering = ('-id',)
     fields = ('chunk', 'submission', 'reviewer', 'status', 'milestone', 'created', 'opened', 'started', 'completed',)
     readonly_fields = ('created', 'opened', 'started', 'completed')
     search_fields = ('reviewer__username', 'submission__authors__username', 'milestone__assignment__semester__semester', 'milestone__assignment__semester__subject__name','milestone__assignment__name')
@@ -98,13 +97,8 @@ class VoteInline(admin.TabularInline):
 class CommentAdmin(admin.ModelAdmin):
     inlines = [ VoteInline ]
     list_display = ('id', 'chunk', 'start', 'end', 'type', 'author', 'text')
+    ordering = ('-id',)
     search_fields = ('chunk__name', 'text', 'author__username', 
             'author__first_name', 'author__last_name')
     raw_id_fields = ('chunk', 'author', 'batch', 'parent', 'similar_comment')
 admin.site.register(Comment, CommentAdmin)
-
-class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('recipient', 'created', 'reason', 'comment', 'submission', 'email_sent')
-    search_fields = ('comment', 'submission', 'recipient')
-    raw_id_fields = ('submission', 'comment', 'recipient',)
-admin.site.register(Notification, NotificationAdmin)
