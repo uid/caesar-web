@@ -54,6 +54,12 @@ def resolve(folder):
     folder = folder[0:-1]
   return os.path.join(ROOT, folder)
 
+def make_regex_list(regex):
+  if regex == None or regex == "":
+    return []
+  else:
+    return [regex]
+
 settings = {
     'save_data': not args.dry_run,
     'student_submission_dir': resolve(milestone.submitted_code_path),
@@ -62,7 +68,7 @@ settings = {
     'exclude': milestone.excluded_file_patterns.split(),
     'restrict': milestone.restrict_access,
     'generate_comments': milestone.run_checkstyle,
-    'suppress_regex': [milestone.suppress_checkstyle_regex],
+    'suppress_regex': make_regex_list(milestone.suppress_checkstyle_regex),
     }
 # print settings
 
