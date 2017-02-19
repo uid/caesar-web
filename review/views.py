@@ -1118,7 +1118,7 @@ def highlight_comment_chunk_line(request, comment_id):
     return HttpResponse() 
 
 @login_required
-def view_all_chunks(request, viewtype, submission_id, embedded):
+def view_all_chunks(request, viewtype, submission_id, embedded=False):
     user = request.user
     submission = Submission.objects.get(id = submission_id)
     submit_milestone = SubmitMilestone.objects.get(submissions=submission)
@@ -1158,6 +1158,8 @@ def view_all_chunks(request, viewtype, submission_id, embedded):
     common_prefix = ""
     if len(paths) > 1:
         common_prefix = os.path.commonprefix(paths)
+    else:
+        common_prefix = os.path.dirname(paths[0])
 
     #get a list of only the relative paths
     paths = []
