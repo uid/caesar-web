@@ -109,21 +109,20 @@ print "found sweeps for", [i for i in range(0,len(sweeps)) if sweeps[i]], "days 
 
 
 # sweeps: list of max_extension+1 RevisionMaps, where sweeps[n] is the RevisionMap for n-days-late
-# returns a new RevisionMap for every user whose deadline has passed, selecting the n-days-late revision
-#     for that user if the user requested n days of slack
+# returns a new RevisionMap for every registered student whose deadline has passed, selecting the n-days-late revision
+#     for that student if the student requested n days of slack
 def select_revisions(sweeps):
     revisions_by_username = {}
     for username in set([username for sweep in sweeps if sweep for username in sweep.keys()]):
-        sweep_to_use = 0 # assume no extension unless we discover otherwise
+        if not Member.objects.filter(semester=semester, user__username=username, role=Member.STUDENT).exists():
+            print username, "found in sweep but not a student, ignoring"
+            continue
         try:
-            user = Member.objects.get(semester=semester, user__username=username)
-            try:
-                extension = Extension.objects.get(user__username=username, milestone=milestone)
-                sweep_to_use = extension.slack_used
-            except Extension.DoesNotExist:
-                pass # this is normal; users who didn't request slack have no Extension object
-        except Member.DoesNotExist:
-            print username, "found in sweep but not a member of the course in Caesar, assuming zero extension"
+            extension = Extension.objects.get(user__username=username, milestone=milestone)
+            sweep_to_use = extension.slack_used
+        except Extension.DoesNotExist:
+            pass # this is normal; users who didn't request slack have no Extension object
+            sweep_to_use = 0 # assume no extension unless we discover otherwise
         if sweeps[sweep_to_use]:
             revisions_by_username[username] = sweeps[sweep_to_use][username]
     return revisions_by_username
