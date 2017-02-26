@@ -141,7 +141,7 @@ class ReviewMilestone(Milestone):
     alum_count = models.IntegerField(default=3)
     staff_count = models.IntegerField(default=10)
 
-    reveal_date = models.DateTimeField(null=True, blank=True, help_text="When comments are revealed to code author")
+    reveal_date = models.DateTimeField(null=True, blank=True, help_text="When comments are revealed to code author. If blank, comments are always visible to author.")
 
     class Meta:
         db_table = u'reviewmilestones'

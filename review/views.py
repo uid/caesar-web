@@ -1138,7 +1138,7 @@ def view_all_chunks(request, viewtype, submission_id, embedded=False):
     
     try:
         review_milestone = ReviewMilestone.objects.get(submit_milestone=submit_milestone)
-        hide_reviews_from_author = (review_milestone.reveal_date > datetime.datetime.now())
+        hide_reviews_from_author = (review_milestone.reveal_date != None and review_milestone.reveal_date > datetime.datetime.now())
     except ReviewMilestone.DoesNotExist:
         hide_reviews_from_author = False
 
