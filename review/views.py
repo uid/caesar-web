@@ -1142,7 +1142,7 @@ def view_all_chunks(request, viewtype, submission_id, embedded=False):
     except ReviewMilestone.DoesNotExist:
         hide_reviews_from_author = False
 
-    files = File.objects.filter(submission=submission_id).prefetch_related('chunks')
+    files = File.objects.filter(submission=submission_id).order_by('path').prefetch_related('chunks')
     if not files:
         raise Http404
 
