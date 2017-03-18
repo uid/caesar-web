@@ -264,7 +264,7 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
 #            -total_affinity(user, chunk.reviewers),
             len(chunk.submission.reviewers),
 #                    -1*(chunk.return_count + chunk.for_nesting_depth + chunk.if_nesting_depth),
-            -(chunk.student_lines if chunk.student_lines != None else 0),
+            #-(chunk.student_lines if chunk.student_lines != None else 0),
             random.random()
         )
       return chunk_sort_key
@@ -276,6 +276,8 @@ def find_chunks(user, chunks, count, reviewers_per_chunk, min_student_lines, pri
     for _ in itertools.repeat(None, count):
         # TODO consider using a priority queue here
         chunk_to_assign = min(chunks, key=key)
+        if chunk_to_assign.student_lines <= min_student_lines:
+            return
         if chunk_to_assign.assign_reviewer(user):
             yield chunk_to_assign.id
         else:
