@@ -123,7 +123,7 @@ def select_revisions(sweeps):
         except Extension.DoesNotExist:
             pass # this is normal; users who didn't request slack have no Extension object
             sweep_to_use = 0 # assume no extension unless we discover otherwise
-        if sweeps[sweep_to_use]:
+        if sweeps[sweep_to_use] and username in sweeps[sweep_to_use]:
             revisions_by_username[username] = sweeps[sweep_to_use][username]
     return revisions_by_username
 
