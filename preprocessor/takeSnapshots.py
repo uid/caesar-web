@@ -134,7 +134,7 @@ print "selected revisions for", len(revision_map), "users whose personal deadlin
 
 # equivalent to ln -sf target source
 def symlink_force(target, source):
-    os.remove(source) if os.path.exists(source) else None
+    os.remove(source) if os.path.lexists(source) else None
     os.symlink(target, source)
 
 # take a snapshot from a git repo:string of revision:string and store it at target_path:string 
