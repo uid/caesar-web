@@ -40,6 +40,9 @@ parser.add_argument('--milestone',
 parser.add_argument('-n', '--dry-run',
                     action="store_true",
                     help="just do a test run -- don't save anything into the Caesar database")
+parser.add_argument('usernames',
+                    nargs='*',
+                    help="Athena usernames of students to load; if omitted, uses all the students in the latest sweep for the milestone")
 args = parser.parse_args()
 #print args
 
@@ -69,6 +72,7 @@ settings = {
     'restrict': milestone.restrict_access,
     'generate_comments': milestone.run_checkstyle,
     'suppress_regex': make_regex_list(milestone.suppress_checkstyle_regex),
+    'restrict_to_usernames': set(args.usernames)
     }
 # print settings
 
@@ -88,7 +92,7 @@ if settings['save_data']:
 # Crawling the file system.
 student_code = crawl_submissions(settings['student_submission_dir'], settings['include'], settings['exclude'])
 
-code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, milestone, settings['save_data'], staff_code, settings['restrict'])
+code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, milestone, settings['save_data'], staff_code, settings['restrict'], settings['restrict_to_usernames'])
 
 if parse.failed_users:
   print "To add the missing users to Caesar, use scripts/addMembers.py to add the following list of users:"

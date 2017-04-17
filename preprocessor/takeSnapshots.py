@@ -29,6 +29,9 @@ parser.add_argument('--milestone',
                     metavar="ID",
                     type=int,
                     help="id number of SubmitMilestone; if omitted, uses the latest milestone whose deadline has passed.")
+parser.add_argument('usernames',
+                    nargs='*',
+                    help="Athena usernames of students to load; if omitted, uses all the students in the latest sweep for the milestone")
 
 
 args = parser.parse_args()
@@ -38,6 +41,7 @@ milestone = get_milestone(args)
 semester = milestone.assignment.semester
 semester_name = semester.semester
 subject_name = semester.subject.name
+restrict_to_usernames = set(args.usernames)
 
 # convert e.g. Spring 2017 to sp17
 m = re.match('(Fa|Sp)\w+ \d\d(\d\d)', semester_name)
@@ -113,7 +117,11 @@ print "found sweeps for", [i for i in range(0,len(sweeps)) if sweeps[i]], "days 
 #     for that student if the student requested n days of slack
 def select_revisions(sweeps):
     revisions_by_username = {}
-    for username in set([username for sweep in sweeps if sweep for username in sweep.keys()]):
+    usernames_to_select = set([username for sweep in sweeps if sweep for username in sweep.keys()])
+    if len(restrict_to_usernames) > 0:
+        usernames_to_select = usernames_to_select.intersection(restrict_to_usernames)
+
+    for username in usernames_to_select:
         if not Member.objects.filter(semester=semester, user__username=username, role=Member.STUDENT).exists():
             print username, "found in sweep but not a student, ignoring"
             continue

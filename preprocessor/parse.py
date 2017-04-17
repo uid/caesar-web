@@ -39,7 +39,7 @@ def create_file(file_path, submission):
 def split_into_usernames(folderName):
     return folderName.split("-")
 
-def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code, restricted):
+def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code, restricted, restrict_to_usernames=set()):
   code_objects = [
      parse_student_files(split_into_usernames(rootFolderName),
                          files,
@@ -48,12 +48,17 @@ def parse_all_files(student_code, student_base_dir, batch, submit_milestone, sav
                          save,
                          student_base_dir,
                          staff_code,
-                         restricted)
+                         restricted,
+                         restrict_to_usernames)
     for (rootFolderName, files) in student_code.iteritems()]
   return [code_object for code_object in code_objects if code_object != None]
 
-def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code, restricted):
+def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code, restricted, restrict_to_usernames):
   global failed_users
+
+  # if we're loading only particular users, bail if at least one of usernames isn't one of them 
+  if len(restrict_to_usernames) > 0 and len(set(usernames).intersection(restrict_to_usernames)) == 0:
+    return None
 
   # staff_code is a dictionary from filename to staff code
   # Trying to find the user(s) who wrote this submission. Bail if they don't all exist in the DB.
