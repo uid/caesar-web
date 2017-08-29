@@ -39,6 +39,10 @@ class ChunkAdmin(admin.ModelAdmin):
 admin.site.register(Chunk, ChunkAdmin)
 
 class MilestoneAdmin(admin.ModelAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "assignment":
+            kwargs["queryset"] = Assignment.objects.order_by('-semester', 'name')
+        return super(MilestoneAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     def extension_data(self, obj):
         num_no_extensions = Member.objects.filter(semester=obj.assignment.semester, role=Member.STUDENT)\
             .exclude(user__extensions__milestone=obj).count()
@@ -51,6 +55,10 @@ class MilestoneAdmin(admin.ModelAdmin):
     extension_data.short_description = 'Extensions (0 Days / 1 Day / 2 Days / ...)'
 
 class ReviewMilestoneAdmin(MilestoneAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "submit_milestone":
+            kwargs["queryset"] = SubmitMilestone.objects.order_by('-assignment__semester', 'assignment__name', 'name')
+        return super(MilestoneAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     list_display = ('id', '__unicode__', 'extension_data', 'routing_link', 'list_users_link',)
     def routing_link(self, obj):
         return '<a href="%s%s">%s</a>' % ('/simulate/', obj.id, 'Configure Routing')

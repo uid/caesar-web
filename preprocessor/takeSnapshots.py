@@ -118,8 +118,10 @@ print "found sweeps for", [i for i in range(0,len(sweeps)) if sweeps[i]], "days 
 def select_revisions(sweeps):
     revisions_by_username = {}
     usernames_to_select = set([username for sweep in sweeps if sweep for username in sweep.keys()])
+    #pprint(usernames_to_select)
     if len(restrict_to_usernames) > 0:
         usernames_to_select = usernames_to_select.intersection(restrict_to_usernames)
+    #pprint(usernames_to_select)
 
     for username in usernames_to_select:
         if not Member.objects.filter(semester=semester, user__username=username, role=Member.STUDENT).exists():
