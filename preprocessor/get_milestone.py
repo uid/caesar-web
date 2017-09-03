@@ -15,5 +15,5 @@ def get_milestone(args):
             duedate__lte=datetime.datetime.now())\
             .order_by('-duedate')
         if len(milestones) == 0:
-            raise Exception(subject + " " + semester + " has no submit milestones that have passed")
+            raise Exception(str(args.subject) + " " + str(args.semester) + " has no submit milestones that have passed")
         return milestones[0]
