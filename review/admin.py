@@ -14,6 +14,10 @@ class UserProfileAdmin(UserAdmin):
 admin.site.register(User, UserProfileAdmin)
 
 class MemberAdmin(admin.ModelAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "semester":
+            kwargs["queryset"] = Semester.objects.order_by('-is_current_semester','-semester', 'subject__name')
+        return super(MemberAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     search_fields = ('user__username', 'user__first_name', 'user__last_name', 'semester__semester', 'semester__subject__name')
     raw_id_fields = ('user',)
 admin.site.register(Member, MemberAdmin)
@@ -24,6 +28,10 @@ class ExtensionAdmin(admin.ModelAdmin):
 admin.site.register(Extension, ExtensionAdmin)
 
 class AssignmentAdmin(admin.ModelAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "semester":
+            kwargs["queryset"] = Semester.objects.order_by('-is_current_semester','-semester', 'subject__name')
+        return super(AssignmentAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     list_display = ('name', 'semester')
     search_fields = ('name', 'semester__semester', 'semester__subject__name')
 admin.site.register(Assignment, AssignmentAdmin)
@@ -59,7 +67,7 @@ class ReviewMilestoneAdmin(MilestoneAdmin):
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "submit_milestone":
             kwargs["queryset"] = SubmitMilestone.objects.order_by('-assignment__semester', 'assignment__name', 'name')
-        return super(MilestoneAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(ReviewMilestoneAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     list_display = ('id', '__unicode__', 'extension_data', 'routing_link', 'list_users_link',)
     def routing_link(self, obj):
         return '<a href="%s%s">%s</a>' % ('/simulate/', obj.id, 'Configure Routing')
