@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from review.models import *
+import datetime
 
 admin.site.unregister(User)
 UserAdmin.list_display += ('date_joined', 'last_login',)
@@ -84,7 +85,13 @@ class FileAdmin(admin.ModelAdmin):
 admin.site.register(File, FileAdmin)
 
 class BatchAdmin(admin.ModelAdmin):
+    list_display = ('id', 'number_of_submissions', 'loaded_at')
     ordering = ('-id', )
+    def number_of_submissions(self, batch):
+        return Submission.objects.filter(batch=batch).count()
+    def loaded_at(self, batch):
+        submissions = Submission.objects.filter(batch=batch)
+        return submissions[0].created if submissions.exists() else None
 admin.site.register(Batch, BatchAdmin)
 
 admin.site.register(Subject)
