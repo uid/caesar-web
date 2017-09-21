@@ -23,6 +23,10 @@ class MemberAdmin(admin.ModelAdmin):
 admin.site.register(Member, MemberAdmin)
 
 class ExtensionAdmin(admin.ModelAdmin):
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "milestone":
+            kwargs["queryset"] = Milestone.objects.order_by('-assignment__semester', 'assignment__name', 'name')
+        return super(ExtensionAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
     search_fields = ('user__username',)
     raw_id_fields = ('user',)
 admin.site.register(Extension, ExtensionAdmin)
