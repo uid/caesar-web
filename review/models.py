@@ -762,6 +762,7 @@ class Extension(models.Model):
 
     class Meta:
         db_table = 'extensions'
+        unique_together = ('user', 'milestone',)
 
     def assignment(self):
         return self.milestone.assignment
