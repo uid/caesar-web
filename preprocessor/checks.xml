@@ -316,6 +316,7 @@
         <module name="ArrayTypeStyle"/>
         -->
         <module name="TodoComment">
+            <property name="format" value="(TODO)|(FIXME)"/>
             <message key="todo.match"
                      value="Remove all TO-DO comments that are done. #important"/>
         </module>
