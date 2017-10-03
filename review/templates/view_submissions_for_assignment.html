@@ -26,9 +26,17 @@
 
 {% block content %}
     <div class="side-by-side">
-        {% for submission in submissions %}
-        <iframe src="/submission/{{ viewtype }}/{{ submission.id }}/embedded"></iframe>
-        {% endfor %}
     </div>
+
+<script>
+$(function() {
+    var sideBySideDiv = $('.side-by-side');
+    {% for submission in submissions %}
+    sideBySideDiv.append($('<iframe>', { 'src': '/submission/{{ viewtype }}/{{ submission.id }}/embedded'
+                                               + document.location.hash }));
+    console.log('added to', sideBySideDiv);
+    {% endfor %}
+});
+</script>
 {% endblock %}
 
