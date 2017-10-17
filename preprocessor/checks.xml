@@ -90,7 +90,7 @@
         <module name="JavadocMethod">
             <property name="scope" value="package"/>
             <message key="javadoc.missing"
-                     value="Missing a #javadoc comment. #important"/>
+                     value="Non-private method is missing a #javadoc comment. #important"/>
             <message key="javadoc.unusedTag"
                      value="The #javadoc comment has a {0} tag for ''{1}'', but it is not mentioned in the code."/>
             <message key="javadoc.expectedTag"
