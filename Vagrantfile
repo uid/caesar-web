@@ -1,7 +1,6 @@
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "precise64"
-  config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+  config.vm.box = "ubuntu/precise64"
 
   config.vm.provider :virtualbox do |vb|
     vb.memory = 4096
@@ -9,7 +8,7 @@ Vagrant.configure("2") do |config|
                    "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1" ]
   end
 
-  config.vm.network :private_network, ip: "10.18.6.30"
+  config.vm.network :private_network, ip: "10.18.6.31"
 
   config.vm.synced_folder "./", "/var/django/caesar", group: 'www-data'
 

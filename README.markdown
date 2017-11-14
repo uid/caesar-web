@@ -74,7 +74,7 @@ Restart the Apache webserver:
 
     sudo apachectl graceful  # to restart Apache and force it to reload Caesar
 
-Browse to [10.18.6.30](http://10.18.6.30) on your laptop and try to log in, either using the superuser account you created above, or (if you're at MIT) with your MIT certificate.  If login is successful, clicking on the "view all users" link at the top of the page should show you all the users in the test database.
+Browse to [10.18.6.31](http://10.18.6.31) on your laptop and try to log in, either using the superuser account you created above, or (if you're at MIT) with your MIT certificate.  If login is successful, clicking on the "view all users" link at the top of the page should show you all the users in the test database.
 
 
 ### Development tips
@@ -100,9 +100,9 @@ This will cause Django to automatically reload all altered code. Additionally, b
     import pdb; pdb.set_trace()
 you can drop down into a PDB session, which is incredibly useful for debugging crashes & bugs.
 
-By default, your development web server isn't visible outside your laptop.  Nobody else can browse to 10.18.6.30.  But you can make it visible (at your laptop's IP address) using an ssh tunnel:
+By default, your development web server isn't visible outside your laptop.  Nobody else can browse to 10.18.6.31.  But you can make it visible (at your laptop's IP address) using an ssh tunnel:
 
-    sudo ssh -L 0.0.0.0:80:localhost:80 -L 0.0.0.0:443:localhost:443 vagrant@10.18.6.30
+    sudo ssh -L 0.0.0.0:80:localhost:80 -L 0.0.0.0:443:localhost:443 vagrant@10.18.6.31
     (Default) Password: vagrant
 
 
