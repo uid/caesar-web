@@ -15,13 +15,11 @@ apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git libapache2-
 cd /tmp
 pip install -r $CAESAR_DIR/requirements.txt
 
-# Set up SSL, with MIT certificate authority for checking certificates presented by users.
-cp $CAESAR_DIR/apache/mitCAclient.pem /etc/ssl/certs/
-ln -sf /etc/apache2/sites-available/default-ssl /etc/apache2/sites-enabled/000-default-ssl 
+# Set up SSL
 a2enmod ssl
 
 # Install Caesar into Apache
-ln -sf $CAESAR_DIR/apache/caesar /etc/apache2/sites-available
+ln -sf $CAESAR_DIR/apache/caesar.conf /etc/apache2/sites-available
 a2ensite caesar
 
 # Start or restart Apache
