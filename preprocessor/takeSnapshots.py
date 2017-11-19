@@ -89,14 +89,16 @@ if args.project:
         groups = set([os.path.splitext(filename)[0] for filename in os.listdir(repos_path)])
         if len(restrict_to_usernames) > 0:
             groups = groups.intersection(restrict_to_usernames)
-        groups.remove('didit')
-        print groups
+        if 'didit' in groups:
+            groups.remove('didit')
+        #print groups
 
         code_path = os.path.join(ROOT, subject_name, 'private', semester_abbr, 'code', pset)
         milestone_path = os.path.join(code_path, milestone_name)
 
         # make parent folders in case they don't exist yet
-        os.makedirs(milestone_name) if not os.path.isdir(milestone_name) else 1
+        if not os.path.isdir(milestone_name):
+            os.makedirs(milestone_name)
 
         # snapshot the starting code in case it hasn't been done yet
         git_snapshot(os.path.join(repos_path, 'didit/starting.git'), 'HEAD', os.path.join(code_path, 'starting/staff'))
