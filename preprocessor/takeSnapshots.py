@@ -34,7 +34,7 @@ parser.add_argument('--project',
                     help="id number of SubmitMilestone; if omitted, uses the latest milestone whose deadline has passed.")
 parser.add_argument('usernames',
                     nargs='*',
-                    help="Athena usernames of students to load; if omitted, uses all the students in the latest sweep for the milestone")
+                    help="Athena usernames of students to load (with optional ':revision' appended to each with the commit that should be used for that student); if omitted, uses all the students in the latest sweep for the milestone.  username:")
 
 
 args = parser.parse_args()
@@ -44,7 +44,16 @@ milestone = get_milestone(args)
 semester = milestone.assignment.semester
 semester_name = semester.semester
 subject_name = semester.subject.name
-restrict_to_usernames = set(args.usernames)
+
+force_revision_for_username = {}
+restrict_to_usernames = set()
+for username in args.usernames:
+    if ':' in username:
+        (username, revision) = username.split(':')
+        force_revision_for_username[username] = revision
+    restrict_to_usernames.add(username)
+# pprint(force_revision_for_username)
+# pprint(restrict_to_usernames)
 
 # convert e.g. Spring 2017 to sp17
 m = re.match('(Fa|Sp)\w+ \d\d(\d\d)', semester_name)
@@ -171,6 +180,9 @@ else:
         #pprint(usernames_to_select)
 
         for username in usernames_to_select:
+            if username in force_revision_for_username:
+                revisions_by_username[username] = force_revision_for_username[username]
+                continue
             if not Member.objects.filter(semester=semester, user__username=username, role=Member.STUDENT).exists():
                 print username, "found in sweep but not a student, ignoring"
                 continue
@@ -186,8 +198,7 @@ else:
 
     revision_map = select_revisions(sweeps)
     print "selected revisions for", len(revision_map), "users whose personal deadlines have passed"
-    #pprint(revision_map)
-
+    pprint(revision_map)
 
     # equivalent to ln -sf target source
     def symlink_force(target, source):
