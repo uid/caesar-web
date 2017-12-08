@@ -112,7 +112,8 @@ class SubmitMilestone(Milestone):
     excluded_file_patterns = models.CharField(max_length=300, blank=True, default="",
                 help_text="Filename patterns to exclude from upload, separated by whitespace")
     restrict_access = models.BooleanField(default=False,
-                help_text="If enabled, restrict who can view the students' chunks to the student authors and any assigned reviewers")
+                help_text="If enabled, restrict who can view the students' chunks to the student authors and any assigned reviewers. "
+                          "LAs and TAs will not be able to view submissions if this is enabled.")
     run_checkstyle = models.BooleanField(default=False,
                 help_text="If enabled, runs Checkstyle on the students' Java code, and preloads its output as comments in Caesar")
     suppress_checkstyle_regex = models.CharField(max_length=200, blank=True, default="",
