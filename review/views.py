@@ -1257,12 +1257,12 @@ def view_all_chunks(request, viewtype, submission_id, embedded=False):
 def view_submission_for_milestone(request, viewtype, milestone_id, username):
     user = request.user
     semester = get_object_or_404(SubmitMilestone, id=milestone_id).assignment.semester
-    author = get_object_or_404(User, username=username)
     submission = get_object_or_404(Submission, milestone=milestone_id, authors__username=username)
+    is_author = submission.has_author(user)
 
     if Member.objects.filter(user=user, semester=semester, role=Member.TEACHER).exists():
         pass
-    elif user == author:
+    elif is_author:
         pass
     elif Task.objects.filter(submission=submission, reviewer=user).exists():
         pass
@@ -1279,14 +1279,17 @@ def view_submissions_for_assignment(request, viewtype, assignment_id, username):
     assignment = get_object_or_404(Assignment, id=assignment_id)
     semester = assignment.semester
     author = get_object_or_404(User, username=username)
-    submissions = get_list_or_404(Submission.objects.filter(milestone__assignment=assignment_id, authors__username=username).order_by('milestone__duedate'))
+    submissions = Submission.objects.filter(milestone__assignment=assignment_id, authors__username=username).order_by('milestone__duedate')
+    if not submissions.exists():
+        raise Http404
+    submissions_authored_by_this_user = submissions.filter(authors=user)
 
     if Member.objects.filter(user=user, semester=semester, role=Member.TEACHER).exists():
         pass
-    elif user == author:
-        pass
     elif user.is_staff:
         pass
+    elif submissions_authored_by_this_user.exists():
+        submissions = submissions_authored_by_this_user
     else:
         raise PermissionDenied
 
