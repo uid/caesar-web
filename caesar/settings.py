@@ -55,7 +55,8 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'mit.auth.SSLRemoteUserMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware'
+    'django_tools.middlewares.ThreadLocal.ThreadLocalMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 AUTHENTICATION_BACKENDS = [

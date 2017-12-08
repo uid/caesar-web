@@ -1,7 +1,8 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.views.generic import RedirectView, TemplateView
 import django.contrib.auth.views
 import review.views
+from django.conf import settings
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(pattern_name='dashboard', permanent=False)),
@@ -52,3 +53,10 @@ urlpatterns = [
     url(r'^manage/', review.views.manage, name='manage'),
     url(r'^all_extensions/(?P<milestone_id>\d+)', review.views.all_extensions, name='all_extensions'),
 ]
+
+# from https://github.com/bernardopires/django-tenant-schemas/issues/222
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns += [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ]
