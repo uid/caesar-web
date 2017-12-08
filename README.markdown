@@ -2,7 +2,7 @@ Requirements
 ============
 * Ubuntu or Debian
 * Python 2.7 with `pip` available
-* Apache 2 with `mod_wsgi` and `mod_ssl`
+* Apache 2.4 with `mod_wsgi` and `mod_ssl`
 
 All of the configuration files expect the project code to live at 
 `/var/django/caesar`.
@@ -109,7 +109,7 @@ By default, your development web server isn't visible outside your laptop.  Nobo
 Deployment
 ==========
 
-These instructions were written for deployment on Ubuntu 12 with Apache 2.2.
+These instructions were written for deployment on Ubuntu 14 (Trusty) with Apache 2.4.
 
 ### Check out Caesar
 

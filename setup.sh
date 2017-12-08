@@ -9,7 +9,10 @@ CAESAR_DIR=/var/django/caesar
 
 # Install Linux packages we need.
 apt-get update
-apt-get install -y apache2 apache2-dev libldap2-dev libsasl2-dev git libapache2-mod-wsgi oracle-java8-installer python-dev python-numpy python-psycopg2 python-pip libmysqlclient-dev
+apt-get install -y python-dev python-numpy python-psycopg2 python-pip # for Django
+apt-get install -y apache2 apache2-dev libapache2-mod-wsgi # for Apache
+apt-get install -y libmysqlclient-dev libldap2-dev libsasl2-dev # MySQL, LDAP
+apt-get install -y oracle-java8-installer # in order to run checkstyle
 
 # Install Python packages we need.
 cd /tmp
