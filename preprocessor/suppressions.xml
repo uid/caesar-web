@@ -6,5 +6,5 @@
 
 <suppressions>
     <suppress files="Test\.java"
-              checks="MagicNumberCheck" />
+              checks="MagicNumberCheck|JavadocMethodCheck" />
 </suppressions>
