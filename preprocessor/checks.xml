@@ -31,6 +31,14 @@
  -->
 
 <module name="Checker">
+
+    <property name="severity" value="warning"/>
+
+    <!-- suppress certain warnings in certain files (e.g. magic numbers in *Test.java files) -->
+    <module name="SuppressionFilter">
+      <property name="file" value="https://raw.githubusercontent.com/rcmiller/caesar-at-mit/master/preprocessor/suppressions.xml"/>
+    </module>
+
     <!--
      If you set the basedir property below, then all reported file
      names will be relative to the specified directory. See
