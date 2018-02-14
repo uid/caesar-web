@@ -1,5 +1,6 @@
 #!/usr/bin/env python2.7
-import sys, os, django, csv
+import sys, os, django, codecs
+import unicodecsv as csv
 
 # set up Django
 sys.path.insert(0, "/var/django")
@@ -33,8 +34,11 @@ except Submission.DoesNotExist:
   print "can't find submission #", args.submission
   sys.exit(-1)
 
-fields = ["author__username", "text", "start", "end", "created"]
-writer = csv.DictWriter(sys.stdout, fields)
+writer = csv.DictWriter(sys.stdout, ["username", "created", "text"])
 writer.writeheader()
-for comment in Comment.objects.filter(chunk__file__submission=submission).values(*fields):
-  writer.writerow(comment)
+lastTextAndUsername = None
+for comment in Comment.objects.filter(chunk__file__submission=submission).order_by("author__username","created").select_related("author"):
+    textAndUsername = [comment.text, comment.author.username]
+    if textAndUsername != lastTextAndUsername:
+        writer.writerow({"username": comment.author.username, "created": comment.created, "text": comment.text})
+    lastTextAndUsername = textAndUsername

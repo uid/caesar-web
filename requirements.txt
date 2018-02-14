@@ -6,3 +6,5 @@ django-email-templates
 python-ldap
 MySQL-python
 django-tools
+unicodecsv
+
