@@ -73,7 +73,7 @@
     <!-- See http://checkstyle.sf.net/config_whitespace.html -->
     <module name="FileTabCharacter">
             <message key="file.containsTab"
-                     value="File contains #tab characters. This is the first instance, but you need to replace them all. Configure your editor to replace use only space characters for indentation. #important"/>
+                     value="File contains #tab characters. This is the first instance, but you need to replace them all. Configure your editor to use only space characters for indentation. #important"/>
     </module>
 
     <!-- Miscellaneous other checks.                   -->
