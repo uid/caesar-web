@@ -24,7 +24,7 @@ parser.add_argument('--subject',
 parser.add_argument('--semester',
                     nargs=1,
                     type=str,
-                    help="name of Semester; for example 'Fall 2013')")
+                    help="name of Semester; for example 'Fall 2013'); if omitted, uses the semester with the latest milestones")
 parser.add_argument('--milestone',
                     metavar="ID",
                     type=int,
@@ -38,9 +38,11 @@ parser.add_argument('usernames',
 
 
 args = parser.parse_args()
-print args
+#print args
 
 milestone = get_milestone(args)
+print "taking snapshots of code for milestone", str(milestone)
+
 semester = milestone.assignment.semester
 semester_name = semester.semester
 subject_name = semester.subject.name

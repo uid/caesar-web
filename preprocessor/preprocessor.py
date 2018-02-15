@@ -48,7 +48,7 @@ args = parser.parse_args()
 
 # Find the submit milestone object
 milestone = get_milestone(args)
-print "loading code for milestone", milestone.full_name()
+print "loading code for milestone", str(milestone)
 
 def resolve(folder):
   if folder == None or folder == "":
