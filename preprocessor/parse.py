@@ -1,6 +1,6 @@
 from review.models import Submission, File, Chunk, StaffMarker, Comment
 from django.contrib.auth.models import User
-
+import hashlib
 import os
 from crawler import crawl_submissions
 
@@ -53,6 +53,21 @@ def parse_all_files(student_code, student_base_dir, batch, submit_milestone, sav
     for (rootFolderName, files) in student_code.iteritems()]
   return [code_object for code_object in code_objects if code_object != None]
 
+def sha256(files):
+  """
+  files is a list of pathnames, in no particular order.
+  Returns SHA256 hex digest (64 hexidecimal digits) of the file names and contents. 
+  """
+  sorted_files = list(files)
+  sorted_files.sort()
+  hash = hashlib.sha256()
+  for file_path in sorted_files:
+    file_data = open(file_path).read()
+    if len(file_data) > 0:
+      hash.update(file_path)
+      hash.update(file_data)
+  return hash.hexdigest()
+
 def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code, restricted, restrict_to_usernames):
   global failed_users
 
@@ -72,11 +87,17 @@ def parse_student_files(usernames, files, batch, submit_milestone, save, student
     return None
 
   submission_name = "-".join(usernames)
-  
+  submission_hash = sha256(files)
+
   # Check for existing submission
   try:
     prior_submission = Submission.objects.get(milestone=submit_milestone, name=submission_name)
     
+    # if prior submission has same hash, don't replace it
+    if prior_submission.sha256 == submission_hash:
+      print "submission for %s unchanged" % submission_name
+      return None
+
     # if it already has human comments, don't replace the submission them
     if Comment.objects.filter(chunk__file__submission=prior_submission).exclude(author__username='checkstyle').exists():
       print "submission for %s already exists and has human comments, so skipping it" % submission_name
@@ -89,7 +110,7 @@ def parse_student_files(usernames, files, batch, submit_milestone, save, student
     pass # no prior submission, that's fine
 
   # Creating the Submission object
-  submission = Submission(milestone=submit_milestone, name=submission_name, batch=batch)
+  submission = Submission(milestone=submit_milestone, name=submission_name, batch=batch, sha256=submission_hash)
   if save:
     submission.save()
     for user in users:

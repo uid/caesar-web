@@ -174,6 +174,7 @@ class Submission(models.Model):
     revision_date = models.DateTimeField(null=True, blank=True)
     milestone = models.ForeignKey(SubmitMilestone, related_name='submissions')
     batch = models.ForeignKey(Batch, blank=True, null=True, related_name='submissions')
+    sha256 = models.CharField(max_length=64, null=True, blank=True) # SHA256 of all files in the submission 
 
     class Meta:
         db_table = u'submissions'
