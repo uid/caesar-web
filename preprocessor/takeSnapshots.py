@@ -34,7 +34,7 @@ parser.add_argument('--project',
                     help="id number of SubmitMilestone; if omitted, uses the latest milestone whose deadline has passed.")
 parser.add_argument('usernames',
                     nargs='*',
-                    help="Athena usernames of students to load (with optional ':revision' appended to each with the commit that should be used for that student); if omitted, uses all the students in the latest sweep for the milestone.  username:")
+                    help="Athena usernames of students to load (with optional ':revision' appended to each with the commit that should be used for that student); if omitted, uses all the students in the latest sweep for the milestone.")
 
 
 args = parser.parse_args()

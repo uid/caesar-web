@@ -1,5 +1,5 @@
 #!/usr/bin/env python2.7
-import sys, os, argparse, django
+import sys, os, argparse, django, re
 
 # set up Django
 sys.path.insert(0, "/var/django")
@@ -42,7 +42,7 @@ parser.add_argument('-n', '--dry-run',
                     help="just do a test run -- don't save anything into the Caesar database")
 parser.add_argument('usernames',
                     nargs='*',
-                    help="Athena usernames of students to load; if omitted, uses all the students in the latest sweep for the milestone")
+                    help="Athena usernames of students to load; if omitted, uses all the students in the latest sweep for the milestone. Usernames can end with :revision suffix, used by takeSnapshots but ignored here.")
 args = parser.parse_args()
 #print args
 
@@ -72,7 +72,7 @@ settings = {
     'restrict': milestone.restrict_access,
     'generate_comments': milestone.run_checkstyle,
     'suppress_regex': make_regex_list(milestone.suppress_checkstyle_regex),
-    'restrict_to_usernames': set(args.usernames)
+    'restrict_to_usernames': set([re.sub(':.*$', '', u) for u in args.usernames])
     }
 # print settings
 
