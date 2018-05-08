@@ -14,8 +14,7 @@ from review.models import *
 from get_milestone import get_milestone
 
 parser = argparse.ArgumentParser(description="""
-Make users into members of a class (as either students or staff).
-Also creates user accounts for any who don't already have a Caesar account.
+Snapshots student git repositories on Athena.
 """)
 parser.add_argument('--subject',
                     nargs=1,
