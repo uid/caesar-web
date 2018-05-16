@@ -37,6 +37,9 @@ parser.add_argument('--milestone',
                     metavar="ID",
                     type=int,
                     help="id number of SubmitMilestone in Caesar. If omitted, uses the latest milestone whose deadline has passed.")
+parser.add_argument('--project',
+                    action='store_true',
+                    help="this milestone is a group project, not an individual problem set")
 parser.add_argument('-n', '--dry-run',
                     action="store_true",
                     help="just do a test run -- don't save anything into the Caesar database")
