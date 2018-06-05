@@ -691,31 +691,34 @@ def view_profile(request, username):
     participant = get_object_or_404(User, username=username)
     review_milestone_data = []
     #get all review milestones
-    review_milestones = ReviewMilestone.objects.all().order_by('-assigned_date')
+    review_milestones = ReviewMilestone.objects.filter(assignment__semester__members__user=participant).order_by('-assigned_date')
     for review_milestone in review_milestones:
-        #get all comments that the user wrote
+        #get all comments that the user wrote on code for this milestone, as long as they weren't the code author
         comments = Comment.objects.filter(author=participant) \
-                          .filter(chunk__file__submission__milestone=review_milestone.submit_milestone).select_related('chunk')
+                          .filter(chunk__file__submission__milestone=review_milestone.submit_milestone) \
+                          .exclude(chunk__file__submission__authors=participant) \
+                          .select_related('chunk')
         review_data = []
         for comment in comments:
             if comment.is_reply():
                 #false means not a vote activity
-                review_data.append(("reply-comment", comment, comment.generate_snippet(), False, None))
+                review_data.append(("reply-comment", comment, comment.text, False, None))
             else:
-                review_data.append(("new-comment", comment, comment.generate_snippet(), False, None))
+                review_data.append(("new-comment", comment, comment.text, False, None))
 
         votes = Vote.objects.filter(author=participant) \
                     .filter(comment__chunk__file__submission__milestone = review_milestone.submit_milestone) \
+                    .exclude(comment__chunk__file__submission__authors=participant) \
                     .select_related('comment__chunk')
         for vote in votes:
             if vote.value == 1:
                 #true means vote activity
-                review_data.append(("vote-up", vote.comment, vote.comment.generate_snippet(), True, vote))
+                review_data.append(("vote-up", vote.comment, vote.comment.text, True, vote))
             elif vote.value == -1:
-                review_data.append(("vote-down", vote.comment, vote.comment.generate_snippet(), True, vote))
+                review_data.append(("vote-down", vote.comment, vote.comment.text, True, vote))
         review_data = sorted(review_data, key=lambda element: element[1].modified, reverse = True)
         review_milestone_data.append((review_milestone, review_data))
-        user_memberships = request.user.membership.filter(role=Member.TEACHER)
+    user_memberships = request.user.membership.filter(role=Member.TEACHER)
     return render(request, 'view_profile.html', {
         'review_milestone_data': review_milestone_data,
         'participant': participant,

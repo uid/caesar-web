@@ -61,7 +61,6 @@ $(document).ready(function() {
     <div class="span12" id='code'>
       <h3>My Review Activity</h3>
       {% for review_milestone, review_data in review_milestone_data %}
-        {% if review_data %}
           <h3 class="assignment-display">
             <a name="assignment-display"></a> {% if not review_milestone.assignment.is_current_semester %}{{ review_milestone.assignment.semester }} - {% endif %}{{ review_milestone.full_name }}
             <div class="view-all-activity">
@@ -105,10 +104,9 @@ $(document).ready(function() {
             {% empty %}
             {% endfor %}
           </table>
-          {% endif %}
-          {% empty %}
-            <p>The user has no activity yet.</p>
-          {% endfor %}
+      {% empty %}
+        <p>The user has no activity yet.</p>
+      {% endfor %}
     </div>
   </div>
 

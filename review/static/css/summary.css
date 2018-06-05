@@ -161,3 +161,6 @@ table.assignment-stream {
 [class*="social foundicon-"]:before {
   font-family: "SocialFoundicons" !important;
 }
+.assignment-stream td {
+    vertical-align: top;
+}
