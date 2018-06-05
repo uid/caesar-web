@@ -95,10 +95,10 @@
     <ul>
       <li>Make a comment by clicking or selecting the relevant code lines. <span class="colorred"> The white lines show student-authored code; gray lines were provided by staff.</span></li>
       <li>Upvote or downvote an existing comment.</li>
-      <li>Reply to an existing comment to agree, disagree, or discuss.</li>
+      <li>Reply to an existing comment to elaborate, disagree, or discuss.</li>
     </ul>
     <p>Please do at least one thing on this code, then click the
-      {% if not last_task %} Next button to go to the next methods to review.
+      {% if not last_task %} Next button to go to the next code to review.
       {% else %} Done button.
       {% endif %}
     </p>
@@ -120,7 +120,6 @@
       {% if remaining_task_count > 0 or last_task %}
         <form method="get" action="{% url 'change_task' %}">
           <input type="hidden" name="task_id" value="{{ task.id }}"/>
-          <input type="hidden" name="status" value='C'/>
           <button id="done-button" type="submit">
           {% if remaining_task_count > 0 %}
             Next
