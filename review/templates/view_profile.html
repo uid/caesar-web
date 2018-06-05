@@ -95,7 +95,7 @@ $(document).ready(function() {
                     <span class="negative-votes">-{{comment.downvote_count}}</span>
                 {% endif %}
             </td>      
-            <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {{ snippet }} </td>
+            <td class="{% if is_vote %}grey-text{% else %}black-text{% endif %} "> {%if comment.deleted %}[deleted] {%endif%} {{ snippet }} </td>
 
               <td class="grey-text"> {{ comment.chunk.name }} </td>
               <td class="grey-text"> {{ comment.modified }} </td>
