@@ -2,10 +2,10 @@ settings_local.py
 *~
 *.pyc
 .DS_Store
-/media/cache
-/media/photos
 /data
 /.vagrant
 /build
 *.sqlite3
-
+collectedstatic
+apache/ssl
+local-testing

@@ -1,12 +1,10 @@
-Django==1.5
-South>=0.8.3
-django-debug-toolbar==0.11.0  # later versions cause errors
-sorl-thumbnail==11.09 # 11.12.1b has a bug https://github.com/mariocesar/sorl-thumbnail/issues/269
+Django==1.9
+django-debug-toolbar
 django-extensions
 Pygments
 django-email-templates
-pillow
 python-ldap
 MySQL-python
-markdown
 django-tools
+unicodecsv
+

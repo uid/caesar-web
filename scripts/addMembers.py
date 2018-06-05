@@ -1,20 +1,15 @@
 #!/usr/bin/env python2.7
-import sys, os, argparse
-# Add a custom Python path.
+import sys, os, argparse, django
+
+# set up Django
 sys.path.insert(0, "/var/django")
 sys.path.insert(0, "/var/django/caesar")
-
-from django.core.management import setup_environ
-from caesar import settings
-setup_environ(settings)
-
-# Set the DJANGO_SETTINGS_MODULE environment variable.
-#os.environ['DJANGO_SETTINGS_MODULE'] = "caesar.settings"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
+django.setup()
 
 from django.db.models import Q
 from django.contrib.auth.models import User
-from accounts.models import UserProfile, Member
-from chunks.models import Chunk, Assignment, Submission, Subject, Semester
+from review.models import UserProfile, Member, Chunk, Assignment, Submission, Subject, Semester
 
 import ldap
 import ldap.filter
@@ -60,10 +55,15 @@ def fetch_user_data_from_LDAP(user, ):
     fields = ['cn', 'sn', 'givenName', 'mail', ]
     userfilter = ldap.filter.filter_format('uid=%s', [username])
     result = con.search_s('dc=mit,dc=edu', ldap.SCOPE_SUBTREE, userfilter, fields)
+    print result
     if len(result) == 1:
-        user.first_name = result[0][1]['givenName'][0]
-        user.last_name = result[0][1]['sn'][0]
-        user.email = result[0][1]['mail'][0]
+        data = result[0][1]
+        if 'givenName' in data:
+            user.first_name = data['givenName'][0] 
+        if 'sn' in data:
+            user.last_name = data['sn'][0]
+        if 'mail' in data:
+            user.email = data['mail'][0]
         user.save()
         user.profile.company = 'MIT'
         user.profile.save()
@@ -94,12 +94,12 @@ parser.add_argument('--subject',
                     nargs=1,
                     type=str,
                     required=True,
-                    help="name of Subject (in caesar.eecs.mit.edu/admin/chunks/subject/; for example '6.005'")
+                    help="name of Subject (in caesar.eecs.mit.edu/admin/subject/; for example '6.005'")
 parser.add_argument('--semester',
                     nargs=1,
                     type=str,
                     required=True,
-                    help="name of Semester (in caesar.eecs.mit.edu/admin/chunks/semester/; for example 'Fall 2013')")
+                    help="name of Semester (in caesar.eecs.mit.edu/admin/semester/; for example 'Fall 2013')")
 parser.add_argument('--role',
                     nargs=1,
                     type=str,

@@ -142,13 +142,6 @@ table.assignment-stream {
     list-style: none;
     margin: 10px 0;
 }
-#profile-photo {
-    margin-top: 20px;
-}
-#profile-photo.edit-profile {
-    height: 73px;
-    margin-top: 0;
-}
 .row .span9 {
     margin-left: 0;
     padding-left: 19px;
@@ -167,4 +160,7 @@ table.assignment-stream {
 }
 [class*="social foundicon-"]:before {
   font-family: "SocialFoundicons" !important;
+}
+.assignment-stream td {
+    vertical-align: top;
 }

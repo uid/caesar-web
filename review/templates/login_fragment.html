@@ -1,0 +1,16 @@
+<script type="text/javascript">
+
+
+</script>
+
+<div id="login-form">
+  <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    {{ form.username.label_tag }}: {{ form.username }}
+    {{ form.password.label_tag }}: {{ form.password }}
+    <input type="hidden" name="next" value="{{ next }}" />
+    <button class="login-button" type="submit">Login</button>
+    <button class="cancel-button" type="button">Cancel</button>
+  </form>
+</div>
+

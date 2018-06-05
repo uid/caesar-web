@@ -2,7 +2,7 @@ Requirements
 ============
 * Ubuntu or Debian
 * Python 2.7 with `pip` available
-* Apache 2 with `mod_wsgi` and `mod_ssl`
+* Apache 2.4 with `mod_wsgi` and `mod_ssl`
 
 All of the configuration files expect the project code to live at 
 `/var/django/caesar`.
@@ -40,10 +40,16 @@ If it asks you for a password, the password for the vagrant account is just "vag
 
 Copy the template for settings_local.py:
 
-    cd /var/django/caesar
+    cd /var/django/caesar/caesar
     cp settings_local.py.template settings_local.py
 
 The default settings are intended for development: DEBUG is turned on, a local sqlite database file is used for storing data.  For deploying Caesar as a user-facing web app, you should edit settings_local.py and change settings as explained by the comments.
+
+### Collect static files
+
+Collect the static files (CSS, Javascript, images, etc.) from all the apps and libraries used by Caesar into one place where Apache can serve them:
+
+    ./manage.py collectstatic
 
 
 ### Initialize the database
@@ -51,7 +57,6 @@ The default settings are intended for development: DEBUG is turned on, a local s
 Now, initialize the database.  With the default settings_local.py file, the database is stored in a .sqlite3 file in /home/vagrant, so you can always delete that file and start this part over if things go wrong. 
 
     cd /var/django/caesar
-    ./manage.py syncdb         # say "no", don't create superuser yet
     ./manage.py migrate
 
 If you want to preload the database with test data do this:
@@ -69,7 +74,7 @@ Restart the Apache webserver:
 
     sudo apachectl graceful  # to restart Apache and force it to reload Caesar
 
-Browse to [10.18.6.30](http://10.18.6.30) on your laptop and try to log in, either using the superuser account you created above, or (if you're at MIT) with your MIT certificate.  If login is successful, clicking on the "view all users" link at the top of the page should show you all the users in the test database.
+Browse to [10.18.6.31](http://10.18.6.31) on your laptop and try to log in, either using the superuser account you created above, or (if you're at MIT) with your MIT certificate.  If login is successful, clicking on the "view all users" link at the top of the page should show you all the users in the test database.
 
 
 ### Development tips
@@ -95,16 +100,16 @@ This will cause Django to automatically reload all altered code. Additionally, b
     import pdb; pdb.set_trace()
 you can drop down into a PDB session, which is incredibly useful for debugging crashes & bugs.
 
-By default, your development web server isn't visible outside your laptop.  Nobody else can browse to 10.18.6.30.  But you can make it visible (at your laptop's IP address) using an ssh tunnel:
+By default, your development web server isn't visible outside your laptop.  Nobody else can browse to 10.18.6.31.  But you can make it visible (at your laptop's IP address) using an ssh tunnel:
 
-    sudo ssh -L 0.0.0.0:80:localhost:80 -L 0.0.0.0:443:localhost:443 vagrant@10.18.6.30
+    sudo ssh -L 0.0.0.0:80:localhost:80 -L 0.0.0.0:443:localhost:443 vagrant@10.18.6.31
     (Default) Password: vagrant
 
 
 Deployment
 ==========
 
-These instructions were written for deployment on Ubuntu 12 with Apache 2.2.
+These instructions were written for deployment on Ubuntu 14 (Trusty) with Apache 2.4.
 
 ### Check out Caesar
 
@@ -131,11 +136,17 @@ Now run the setup script:
 
 To point Caesar to the right database, copy the local settings file:
 
-    cd /var/django/caesar
+    cd /var/django/caesar/caesar
     cp settings_local.py.template settings_local.py
 
 Then edit settings_local.py and change the settings appropriately.
 
+
+### Collect static files
+
+Collect the static files (CSS, Javascript, images, etc.) from all the apps and libraries used by Caesar into one place where Apache can serve them:
+ 
+    ./manage.py collectstatic
 
 ### Initialize the database
 

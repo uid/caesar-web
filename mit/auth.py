@@ -1,6 +1,7 @@
 # Code courtesy of Alex Dehnert <adehnert@mit.edu>
 import ldap
 import ldap.filter
+import sys
 
 from django.contrib.auth.middleware import RemoteUserMiddleware
 from django.contrib.auth.backends import RemoteUserBackend

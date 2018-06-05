@@ -1,0 +1,42 @@
+{% load review_extras %}
+{% load static from staticfiles %}
+<script type="text/javascript">
+
+$(document).ready(function() {
+  {% if COMMENT_SEARCH %}
+    var comment_type = "comment";
+    try {
+      setupSimilarComments(comment_type);      
+    }
+    catch(e) {}
+  {% endif %}
+});
+
+</script>
+
+<div class="comment new-comment" title="Add a comment">
+  <div class="comment-header">
+    <span class="comment-line-numbers">
+    {{ start }}
+    {% if end != start %} - {{ end }}
+    {% endif %}
+    </span>
+    <span class="comment-snippet">
+    {{ snippet }}
+    </span>
+  </div>
+  <div class="comment-form">
+    <form id="new-comment-form" 
+      action="{% url 'new_comment' %}" method="post">
+      {% csrf_token %}
+      <div id='textentry' contenteditable='true'></div>
+      {{ form.text }}
+      {{ form.start }}
+      {{ form.end }}
+      {{ form.chunk }}
+      {{ form.similar_comment }}
+      <button type="submit">Save</button>
+      <button id="cancel-button" type="button">Cancel</button>
+    </form>
+  </div>
+</div>

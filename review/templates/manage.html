@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static from staticfiles %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/summary.css' %}" type="text/css" />
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script>
+$(document).ready(function() {
+    $('#progress').hide();
+    $('#close').click(function(e) {
+        $('#progress').show();
+        $.post(caesar.urls.cancel_assignment, {
+            assignment: "all",
+        }, function(data) {
+            $('#progress').hide();
+            $('.result').append('<div class="success">Total closed: '+data.total+'</div>');
+        },"json");
+    });
+});
+</script>
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard' %}">Dashboard</a>
+  <span class="breadcrumb">manage</span>
+{% endblock %}
+
+{% block content %}
+
+<h4><br/> <a href="{% url 'reputation_adjustment' %}"> Adjust reputations. </a></h4>
+<h4><br/> <a href="{% url 'bulk_add' %}"> Bulk add users. </a></h4>
+
+<div class="result"></div>
+<button id="close" type="button">Close all assignments.</button><span id="progress"><img src="{% static 'img/progress.gif' %}"/></span>
+
+{% endblock %}

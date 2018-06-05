@@ -1,0 +1,184 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>{% block title %}Caesar{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% block css %}
+    <link rel="stylesheet" href="{% static 'css/blueprint/screen.css' %}" type="text/css" media="screen, projection" />
+    <link rel="stylesheet" href="{% static 'css/blueprint/print.css' %}" type="text/css" media="print" />
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="{% static 'css/blueprint/ie.css" type="text/css" media="screen, projection" />
+    <![endif]-->
+    <link rel="stylesheet" href="{% static 'css/smoothness/jquery-ui.css' %}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/toolbar.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" type="text/css">
+    {% endblock %}
+
+    {% block js %}
+    <script type="text/javascript">
+        // Allow us to only style elements if Javascript is enabled
+        document.documentElement.className = "js";
+    </script>
+
+    <script type="text/javascript">
+        window.caesar = {
+            urls: {
+                new_comment: '{% url "new_comment" %}',
+                reply: '{% url "reply" %}',
+                delete: '{% url "delete_comment" %}',
+                vote: '{% url "vote" %}',
+                unvote: '{% url "unvote" %}',
+                edit_comment: '{% url "edit_comment" %}',
+                cancel_assignment: '{% url "cancel_assignment" %}',
+                more_work: '{% url "more_work" %}',
+                edit_membership: '{% url "edit_membership" %}',
+            }
+        };
+
+    </script>
+
+    <script type="text/javascript" src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery-ui-1.10.4.custom.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.cookie.js' %}"></script>
+
+    <script type="text/javascript">
+        // CSRF protection for AJAX post requests made with jQuery
+        $(document).ajaxSend(function(event, xhr, settings) {
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie != '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = jQuery.trim(cookies[i]);
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            function sameOrigin(url) {
+                // url could be relative or scheme relative or absolute
+                var host = document.location.host; // host + port
+                var protocol = document.location.protocol;
+                var sr_origin = '//' + host;
+                var origin = protocol + sr_origin;
+                // Allow absolute or scheme relative URLs to same origin
+                return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+                    (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+                    // or any other URL that isn't scheme relative or absolute i.e relative.
+                    !(/^(\/\/|http:|https:).*/.test(url));
+            }
+            function safeMethod(method) {
+                return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+            }
+
+            if (!safeMethod(settings.type) && sameOrigin(settings.url)) {
+                xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+            }
+        });
+
+    </script>
+
+    {% if "caesar" in request.get_host %}
+    <!-- GhostRec usability tracking -->
+    <!-- 
+    <script type="text/javascript">
+    (function() {
+        var host = ("https:" == document.location.protocol ? "https://secure." : "http://www.") + 'eemt.se';
+        document.write(unescape("%3Cscript src='" + host + "/gt/js/1207.js' type='text/javascript'%3E%3C/script%3E"));
+    })();
+    </script>
+    -->
+
+    <!-- Userfly usability tracking -->
+    <!--
+    <script type="text/javascript">
+    var userflyHost = (("https:" == document.location.protocol) ? "https://secure.userfly.com" : "http://asset.userfly.com");
+    document.write(unescape("%3Cscript src='" + userflyHost + "/users/70508/userfly.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    -->
+    {% endif %}
+     <script type="text/javascript" src = "{% static 'js/hashtag.js' %}" ></script>
+    {% endblock %}
+
+
+</head>
+{% if embedded %}
+  <body class="embedded">
+{% else %}
+  <body >
+{% endif %}
+
+    <div id="messages">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{message.tags}}">
+            <a class="close" data-dismiss="alert">×</a>
+            {{message}}
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    <div class="container ">
+
+      {% block header %}
+      <div id="toolbar" class="span-24">
+        <div id="toolbar-main" class="span-24">
+          <div id="toolbar-breadcrumbs">
+              {% block breadcrumbs %}
+
+              {% endblock %}
+          </div>
+          <div id="toolbar-user">
+              {% if user.is_authenticated %}
+              <div id="toolbar-logged-in">
+                <a href="{% url 'allusers' %}"> view all users</a> |
+                <a href="{% url 'view_profile' user.username %}">{{ user.username }} ({{ user.profile.reputation }}) </a> |
+                {% if user.is_staff %}
+                <a href="{% url 'admin:index' %}">Admin</a>|
+                <a href="{% url 'search' %}">Search </a>|
+                <a href="{% url 'manage' %}">Manage </a>|
+                {% endif %}
+                <a href="{% url 'logout' %}">Logout</a>
+              </div>
+              {% endif %}
+          </div>
+          <div id="toolbar-actions">
+              {% block actions %}
+
+              {% endblock %}
+          </div>
+        </div>
+        <div id="secondary-toolbar" class="span-24">
+            {% block secondary-toolbar %}
+            {% endblock %}
+        </div>
+      </div>
+      <div class="clear-both"></div>
+      {% endblock %}
+
+      {% block content %}
+      {% endblock %}
+
+      {% block footer %}
+      <footer id="footer" class="footer span-24 prepend-top">
+          Questions or comments about this system? Please contact <a href="mailto:caesar@csail.mit.edu">caesar@csail.mit.edu</a>.
+      </footer>
+      {% endblock %}
+    </div>
+
+    <script type="text/javascript" charset="utf-8">
+      formatHashtags();
+    </script>
+
+  </body>
+</html>

@@ -1,1 +1,0 @@
-This folder contains the photos that Caesar users upload for their profiles. 

@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+{% load review_extras %}
+{% load static from staticfiles %}
+
+{% block css %}
+<!-- bootstap messes this page up, so hacking around it. -->
+<link rel="stylesheet" href="{% static 'css/blueprint/screen.css' %}" type="text/css" media="screen, projection" />
+<link rel="stylesheet" href="{% static 'css/blueprint/print.css' %}" type="text/css" media="print" />
+<!--[if lt IE 8]>
+<link rel="stylesheet" href="{% static 'css/blueprint/ie.css' %}" type="text/css" media="screen, projection" />
+<![endif]-->
+<link rel="stylesheet" href="{% static 'css/smoothness/jquery-ui.css' %}" type="text/css" media="screen"/>
+<link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/toolbar.css' %}" type="text/css" />
+
+<link rel="stylesheet" href="{% static 'css/chunks.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/comments.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/syntax.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'css/fullchunks.css' %}" type="text/css" />
+
+{% if COMMENT_SEARCH %}
+  <link rel="stylesheet" href="{% static 'css/comments.css' %}" type="text/css" />
+  <script type="text/javascript" src="{% static 'js/fullproof-all.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/stopwords.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/comments_search.js' %}"></script>
+{% endif %}
+
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+
+<script type="text/javascript" charset="utf-8">
+    caesar.state = {
+        taskStatus: '{{ task.status }}',
+        chunkId: {{ chunk.id }},
+        fullView: {% if full_view %}true{% else %}false{% endif %}
+    };
+
+    {% if COMMENT_SEARCH %}
+      // on unload this page, clear database
+      $(window).on("unload", function() {
+        clearDatabase("{{chunk.id}}");
+      });
+
+      $(document).ready(function() {
+        $.ajax({
+          url: "{% url 'similar_comments' chunk.id False %}",
+          success: function(response1) {
+            // on load, clear database
+            clearDatabase("{{chunk.id}}");
+            // Add comments to database
+            commentSearch.init(response1.similar_comment_data, "{{chunk.id}}");
+            
+            $.ajax({
+              url: "{% url 'similar_comments' chunk.id True %}",
+              success: function(response2) {
+                commentSearch.addCommentsToDB(response2.similar_comment_data);
+              },
+            });
+          },
+        });
+      });
+    {% endif %}
+</script>
+
+<script type="text/javascript" src="{% static 'js/chunk.js' %}"></script>
+
+{% endblock %}
+
+{% block breadcrumbs %}
+  <a class="breadcrumb first-breadcrumb" href="{% url 'dashboard' %}">Dashboard</a>
+  <span class="breadcrumb" href="{{ chunk.get_absolute_url }}">{{ chunk.name }}</span>
+  {% if similar_chunks %}
+  <div class="dropdown">
+    <a id="similar-link" class="breadcrumb dropdown-link">Similar code..</a>
+    <ul class="dropdown-menu">
+      {% for c in similar_chunks %}
+      <li><a href="{{ c.get_absolute_url }}">{{ c.name }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block actions %}
+{% endblock %}
+
+{% block secondary-toolbar %}
+<div id="secondary-toolbar-inner">
+  {% if task %}
+  <div id="instructions-text">
+    <p>Please review this code as if you are writing to the student who wrote 
+    it.  You can:</p>
+    <ul>
+      <li>Make a comment by clicking or selecting the relevant code lines. <span class="colorred"> The white lines show student-authored code; gray lines were provided by staff.</span></li>
+      <li>Upvote or downvote an existing comment.</li>
+      <li>Reply to an existing comment to agree, disagree, or discuss.</li>
+    </ul>
+    <p>Please do at least one thing on this code, then click the
+      {% if not last_task %} Next button to go to the next methods to review.
+      {% else %} Done button.
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+  <div id="chunk-navigation">
+    <div id="task-count">
+      {% if task %}
+        {{ remaining_task_count|default:"No" }} 
+        {% if not task.status == 'C' or task.status == 'U' %} additional {% endif %}
+        code section{{ remaining_task_count|pluralize }}
+        remaining for review
+      {% else %}
+        You have not been assigned to review this code.
+      {% endif %}
+    </div>
+    {% if task %}
+      <!-- mark task you're viewing as complete -->
+      {% if remaining_task_count > 0 or last_task %}
+        <form method="get" action="{% url 'change_task' %}">
+          <input type="hidden" name="task_id" value="{{ task.id }}"/>
+          <input type="hidden" name="status" value='C'/>
+          <button id="done-button" type="submit">
+          {% if remaining_task_count > 0 %}
+            Next
+          {% elif last_task %}
+            Done!
+          {% endif %}
+          </button>
+        </form>
+      {% else %}
+        <!--
+          <a href='https://spreadsheets.google.com/spreadsheet/viewform?formkey=dGNyMlRVTGNTbXFZazA5bDRPd25sZFE6MQ' target="_blank"><button>Fill out the Feedback survey</button></a>
+        -->
+      {% endif %}
+    {% endif %}
+  </div>
+  <button id="toggle-comments-button" type="button">
+    Collapse all comments
+  </button>
+  <button id="toggle-auto-comments-button" type="button">
+    Collapse all checkstyle comments
+  </button>
+  {% if task %}
+  <button id="toggle-instructions-button" type="button">
+    Hide instructions
+  </button>
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+
+{% comment %}
+<div id="chunk-info" class="span-24">
+    <h3>
+    {{ chunk.file.submission.assignment.name }} :: 
+    {{ chunk.file.submission.name }} :: 
+    {{ chunk.file.path }}
+    </h3>
+</div>
+{% endcomment %}
+<!--
+<div id ="view-all-code">
+    <a href="{% url 'all_chunks' 'code' chunk.file.submission.id %}">
+      view all code
+    </a>
+</div>
+<br/>
+-->
+<div id="comment-display" class="span-6">
+  <div style="mid-width:30em" id="comment-display-inner" class="file-{{file.id}} files">
+     {% for comment, vote, snippet in comment_data %}
+       {% include "comment.html" %} 
+     {% endfor %}
+  </div>
+</div>
+
+<div id="chunk-display" class="span-18 last">
+  <div class="syntax">
+  {% for n, line, staff_code in highlighted_lines %}
+  {% if not staff_code %}
+  <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-student">
+    <span id="line-{{chunk.id}}-{{ n }}-{{file.id}}" class="line">
+      <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+    </span>
+  </span>
+  {% else %}
+  <span id="chunk-{{chunk.id}}-line-{{ n }}" class="chunk-line chunk-line-staff">
+    <span id="line-{{chunk.id}}-{{ n }}-{{file.id}}" class="line">
+      <span class="line-number">{{ n }}</span><pre class="line-code">{{ line|safe }}</pre>
+    </span>
+  </span>
+  {% endif %}
+  {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+

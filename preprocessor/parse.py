@@ -1,16 +1,14 @@
-from chunks.models import Submission, File, Chunk, StaffMarker
+from review.models import Submission, File, Chunk, StaffMarker, Comment
 from django.contrib.auth.models import User
-
+import hashlib
 import os
-from diff_match_patch import diff_match_patch, patch_obj
 from crawler import crawl_submissions
 
 # :( global variables
 failed_users = set()
-diff_object = diff_match_patch()
 
-def parse_staff_code(staff_dir):
-  staff_files = crawl_submissions(staff_dir)
+def parse_staff_code(staff_dir, includes, excludes):
+  staff_files = crawl_submissions(staff_dir, includes, excludes)
   num_subdirs = len(staff_dir.split('/'))
   staff_code = {}
   for files in staff_files.values():
@@ -41,7 +39,7 @@ def create_file(file_path, submission):
 def split_into_usernames(folderName):
     return folderName.split("-")
 
-def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code, restricted):
+def parse_all_files(student_code, student_base_dir, batch, submit_milestone, save, staff_code, restricted, restrict_to_usernames=set()):
   code_objects = [
      parse_student_files(split_into_usernames(rootFolderName),
                          files,
@@ -50,11 +48,33 @@ def parse_all_files(student_code, student_base_dir, batch, submit_milestone, sav
                          save,
                          student_base_dir,
                          staff_code,
-                         restricted)
+                         restricted,
+                         restrict_to_usernames)
     for (rootFolderName, files) in student_code.iteritems()]
   return [code_object for code_object in code_objects if code_object != None]
 
-def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code, restricted):
+def sha256(files):
+  """
+  files is a list of pathnames, in no particular order.
+  Returns SHA256 hex digest (64 hexidecimal digits) of the file names and contents. 
+  """
+  sorted_files = list(files)
+  sorted_files.sort()
+  hash = hashlib.sha256()
+  for file_path in sorted_files:
+    file_data = open(file_path).read()
+    if len(file_data) > 0:
+      hash.update(file_path)
+      hash.update(file_data)
+  return hash.hexdigest()
+
+def parse_student_files(usernames, files, batch, submit_milestone, save, student_base_dir, staff_code, restricted, restrict_to_usernames):
+  global failed_users
+
+  # if we're loading only particular users, bail if at least one of usernames isn't one of them 
+  if len(restrict_to_usernames) > 0 and len(set(usernames).intersection(restrict_to_usernames)) == 0:
+    return None
+
   # staff_code is a dictionary from filename to staff code
   # Trying to find the user(s) who wrote this submission. Bail if they don't all exist in the DB.
   users = User.objects.filter(username__in=usernames)
@@ -63,18 +83,34 @@ def parse_student_files(usernames, files, batch, submit_milestone, save, student
     missing_users = set(usernames).difference([user.username for user in users])
     for username in missing_users:
       print "user %s doesn't exist in the database." % username
-    failed_users += missing_users
+    failed_users |= missing_users
     return None
 
   submission_name = "-".join(usernames)
-  
-  # Shouldn't remake submissions
-  if Submission.objects.filter(milestone=submit_milestone, authors__in=users).count() > 0:
-    print "submission for %s already exists in the database." % submission_name
-    return None
+  submission_hash = sha256(files)
+
+  # Check for existing submission
+  try:
+    prior_submission = Submission.objects.get(milestone=submit_milestone, name=submission_name)
+    
+    # if prior submission has same hash, don't replace it
+    if prior_submission.sha256 == submission_hash:
+      print "submission for %s unchanged" % submission_name
+      return None
+
+    # if it already has human comments, don't replace the submission them
+    if Comment.objects.filter(chunk__file__submission=prior_submission).exclude(author__username='checkstyle').exists():
+      print "submission for %s already exists and has human comments, so skipping it" % submission_name
+      return None
+
+    print "replacing prior submission for %s" % submission_name
+    if save:
+      prior_submission.delete()
+  except Submission.DoesNotExist:
+    pass # no prior submission, that's fine
 
   # Creating the Submission object
-  submission = Submission(milestone=submit_milestone, name=submission_name, batch=batch)
+  submission = Submission(milestone=submit_milestone, name=submission_name, batch=batch, sha256=submission_hash)
   if save:
     submission.save()
     for user in users:

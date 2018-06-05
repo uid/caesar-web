@@ -1,21 +1,15 @@
 #!/usr/bin/env python2.7
-import sys, os
-# Add a custom Python path.
+import sys, os, django
+
+# set up Django
 sys.path.insert(0, "/var/django")
 sys.path.insert(0, "/var/django/caesar")
-
-from django.core.management import setup_environ
-from caesar import settings
-setup_environ(settings)
-
-# Set the DJANGO_SETTINGS_MODULE environment variable.
-#os.environ['DJANGO_SETTINGS_MODULE'] = "caesar.settings"
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
+django.setup()
 
 from django.db.models import Q
 from django.contrib.auth.models import User
-from caesar.chunks.models import Submission,File,Chunk,ReviewMilestone
-from caesar.tasks.models import Task
-from caesar.accounts.models import Member
+from review.models import Submission, File, Chunk, ReviewMilestone, Task, Member
 
 import datetime
 
@@ -48,8 +42,8 @@ print args
 
 try:
   submission = Submission.objects.get(pk=args.submission)
-except Submssion.DoesNotExist:
-  print "can't find submission #" + args.submission
+except Submission.DoesNotExist:
+  print "can't find submission #", args.submission
   sys.exit(-1)
 print "using submission ", submission
 

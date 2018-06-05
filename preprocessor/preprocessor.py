@@ -1,17 +1,18 @@
 #!/usr/bin/env python2.7
+import sys, os, argparse, django, re
 
-# Forcing python to search the root Caesar directory.
-import sys
-sys.path.append('/var/django/caesar/')
+# set up Django
+sys.path.insert(0, "/var/django")
+sys.path.insert(0, "/var/django/caesar")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "caesar.settings")
+django.setup()
 
-# Import settings.py (includes DB settings)
-import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+ROOT='/var/django/caesar/preprocessor'
 
 import time
 
 # Django imports
-from chunks.models import Assignment, Submission, File, Chunk, Batch, SubmitMilestone
+from review.models import Assignment, Submission, File, Chunk, Batch, SubmitMilestone
 from django.db import transaction
 
 # Preprocessor imports
@@ -19,72 +20,82 @@ import parse
 from crawler import crawl_submissions
 from parse import parse_all_files, parse_staff_code
 from checkstyle import generate_checkstyle_comments
+from get_milestone import get_milestone
 
-import argparse
 parser = argparse.ArgumentParser(description="""
 Load student submissions into Caesar.
 """)
+parser.add_argument('--subject',
+                    nargs=1,
+                    type=str,
+                    help="name of Subject (in caesar.eecs.mit.edu/admin/subject/; for example '6.005'")
+parser.add_argument('--semester',
+                    nargs=1,
+                    type=str,
+                    help="name of Semester (in caesar.eecs.mit.edu/admin/semester/; for example 'Fall 2013')")
 parser.add_argument('--milestone',
                     metavar="ID",
                     type=int,
-                    required=True,
-                    help="id number of SubmitMilestone in Caesar. Go to Admin, Submit milestones, and take the last number from the link of the submit milestone you created for this set of submissions.")
-parser.add_argument('--checkstyle',
-                    action="store_true",
-                    help="runs Checkstyle on the students' Java code, and preloads its output as comments in Caesar.")
+                    help="id number of SubmitMilestone in Caesar. If omitted, uses the latest milestone whose deadline has passed.")
+parser.add_argument('--project',
+                    action='store_true',
+                    help="this milestone is a group project, not an individual problem set")
 parser.add_argument('-n', '--dry-run',
                     action="store_true",
                     help="just do a test run -- don't save anything into the Caesar database")
-parser.add_argument('--starting',
-                    metavar="PATH",
-                    required=False,
-                    default=None,
-                    help="folder containing starting code for the assignment.  Should contain one subfolder, under which is the starting code.")
-parser.add_argument('--submissions',
-                    metavar="PATH",
-                    required=True,
-                    help="folder containing student code for the assignment. Should contain subfolders named by student usernames: abc/, def/, ghi/, etc.")
-parser.add_argument('--restrict',
-                    action="store_true",
-                    help="Restrict who can view the students' chunks to the student authors and any assigned reviewers")
-
+parser.add_argument('usernames',
+                    nargs='*',
+                    help="Athena usernames of students to load; if omitted, uses all the students in the latest sweep for the milestone. Usernames can end with :revision suffix, used by takeSnapshots but ignored here.")
 args = parser.parse_args()
 #print args
 
-stripTrailingSlash = lambda folder: folder[0:-1] if folder is not None and folder[-1]=='/' else folder
+# Find the submit milestone object
+milestone = get_milestone(args)
+print "loading code for milestone", str(milestone)
+
+def resolve(folder):
+  if folder == None or folder == "":
+    return None
+  if folder[-1] == '/':
+    folder = folder[0:-1]
+  return os.path.join(ROOT, folder)
+
+def make_regex_list(regex):
+  if regex == None or regex == "":
+    return []
+  else:
+    return [regex]
 
 settings = {
-    'submit_milestone_id': args.milestone,
-    'generate_comments': args.checkstyle,
     'save_data': not args.dry_run,
-    'staff_dir': stripTrailingSlash(args.starting),
-    'student_submission_dir': stripTrailingSlash(args.submissions)
+    'student_submission_dir': resolve(milestone.submitted_code_path),
+    'staff_dir': resolve(milestone.starting_code_path),
+    'include': milestone.included_file_patterns.split(),
+    'exclude': milestone.excluded_file_patterns.split(),
+    'restrict': milestone.restrict_access,
+    'generate_comments': milestone.run_checkstyle,
+    'suppress_regex': make_regex_list(milestone.suppress_checkstyle_regex),
+    'restrict_to_usernames': set([re.sub(':.*$', '', u) for u in args.usernames])
     }
-#print settings
+# print settings
 
 starting_time = time.time()
 
-# TODO(mglidden)
-# Placing the entire preprocessor in a transaction might slow down the database during
-# load time, but it will automatically roll back the changes if there's an exception.
-# with transaction.commit_on_success():
-
-# Finding the submit milestone object
-submit_milestone = SubmitMilestone.objects.get(id=settings['submit_milestone_id'])
-print "Found existing submit milestone. Adding code to %s." % (submit_milestone.full_name())
-
-staff_code = parse_staff_code(settings['staff_dir']) if settings['staff_dir'] is not None else {}
+staff_code = {}
+if settings['staff_dir'] is not None:
+  print "Crawling staff code in", settings['staff_dir']
+  staff_code = parse_staff_code(settings['staff_dir'], settings['include'], settings['exclude'])
 #print staff_code.keys()
 
-batch = Batch(name=submit_milestone.full_name())
+batch = Batch(name=milestone.full_name())
 if settings['save_data']:
   batch.save()
   print "Batch ID: %s" % (batch.id)
 
 # Crawling the file system.
-student_code = crawl_submissions(settings['student_submission_dir'])
+student_code = crawl_submissions(settings['student_submission_dir'], settings['include'], settings['exclude'])
 
-code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, submit_milestone, settings['save_data'], staff_code, args.restrict)
+code_objects = parse_all_files(student_code, settings['student_submission_dir'], batch, milestone, settings['save_data'], staff_code, settings['restrict'], settings['restrict_to_usernames'])
 
 if parse.failed_users:
   print "To add the missing users to Caesar, use scripts/addMembers.py to add the following list of users:"
@@ -95,4 +106,4 @@ print "Found %s submissions." % (len(code_objects))
 
 if settings['generate_comments']:
   print "Generating checkstyle comments..."
-  generate_checkstyle_comments(code_objects, settings['save_data'], batch)
+  generate_checkstyle_comments(code_objects, settings['save_data'], batch, settings['suppress_regex'])
