@@ -231,7 +231,7 @@ def new_comment(request):
                 task = Task.objects.get(
                     chunk=chunk, reviewer=user)
                 if task.status == 'N' or task.status == 'O':
-                    task.mark_as('S')
+                    task.mark_as('C')
             except Task.DoesNotExist:
                 pass
             return render(request, 'comment.html', {
@@ -276,7 +276,7 @@ def reply(request):
                 task = Task.objects.get(chunk=comment.chunk,
                         reviewer=request.user)
                 if task.status == 'N' or task.status == 'O':
-                    task.mark_as('S')
+                    task.mark_as('C')
             except Task.DoesNotExist:
                 pass
             return render(request, 'comment.html', {
@@ -373,7 +373,7 @@ def vote(request):
         task = Task.objects.get(chunk=comment.chunk,
                 reviewer=request.user)
         if task.status == 'N' or task.status == 'O':
-            task.mark_as('S')
+            task.mark_as('C')
     except Task.DoesNotExist:
         pass
     response_json = json.dumps({
@@ -498,9 +498,7 @@ def search(request):
 @login_required
 def change_task(request):
     task_id = request.GET['task_id']
-    status = request.GET['status']
     task = get_object_or_404(Task, pk=task_id)
-    task.mark_as(status)
     try:
         next_task = request.user.tasks.exclude(status='C').exclude(status='U') \
                                               .order_by('created')[0:1].get()
@@ -560,11 +558,6 @@ def cancel_assignment(request):
     if request.method == 'POST':
         assignments = request.POST.get('assignment', None)
         if assignments == "all":
-            started_tasks = Task.objects.filter(status='S')
-            started = 0
-            for task in started_tasks:
-                task.mark_as('C')
-                started += 1
             unfinished_tasks = Task.objects.exclude(status='C').exclude(status='U')
             total = 0
             for task in unfinished_tasks:

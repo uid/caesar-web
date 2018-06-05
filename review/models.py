@@ -494,7 +494,6 @@ class Task(models.Model):
     STATUS_CHOICES=(
         ('N', 'New'),
         ('O', 'Opened'),
-        ('S', 'Started'),
         ('C', 'Completed'),
         ('U', 'Unfinished'),
     )
@@ -508,7 +507,6 @@ class Task(models.Model):
     # TODO switch to a more robust model history tracking (e.g. versioning)
     created = models.DateTimeField(auto_now_add=True)
     opened = models.DateTimeField(blank=True, null=True)
-    started = models.DateTimeField(blank=True, null=True)
     completed = models.DateTimeField(blank=True, null=True)
 
     # how should tasks be sorted in the dashboard?
@@ -532,12 +530,9 @@ class Task(models.Model):
         self.status = status
         if status == 'N':
             self.opened = None
-            self.started = None
             self.completed = None
         elif status == 'O':
             self.opened = datetime.datetime.now()
-        elif status == 'S':
-            self.started = datetime.datetime.now()
         elif status == 'C':
             self.completed = datetime.datetime.now()
 
